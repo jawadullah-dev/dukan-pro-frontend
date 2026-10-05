@@ -754,7 +754,7 @@ function KanbanColumn(props: KanbanColumnProps) {
           'flex size-full flex-col gap-2 rounded-lg border bg-zinc-100 p-2.5 aria-disabled:pointer-events-none aria-disabled:opacity-50 dark:bg-zinc-900',
           {
             'touch-none select-none': asHandle,
-            'cursor-default': context.flatCursor,
+            'cursor-pointer': context.flatCursor,
             'data-dragging:cursor-grabbing': !context.flatCursor,
             'cursor-grab': !isDragging && asHandle && !context.flatCursor,
             'opacity-50': isDragging,
@@ -816,7 +816,7 @@ function KanbanColumnHandle(props: KanbanColumnHandleProps) {
       {
         className: cn(
           'select-none disabled:pointer-events-none disabled:opacity-50',
-          context.flatCursor ? 'cursor-default' : 'cursor-grab data-dragging:cursor-grabbing',
+          context.flatCursor ? 'cursor-pointer' : 'cursor-grab data-dragging:cursor-grabbing',
           className
         ),
         disabled: isDisabled
@@ -921,7 +921,7 @@ function KanbanItem(props: KanbanItemProps) {
           'focus-visible:ring-ring focus-visible:ring-1 focus-visible:ring-offset-1 focus-visible:outline-hidden',
           {
             'touch-none select-none': asHandle,
-            'cursor-default': context.flatCursor,
+            'cursor-pointer': context.flatCursor,
             'data-dragging:cursor-grabbing': !context.flatCursor,
             'cursor-grab': !isDragging && asHandle && !context.flatCursor,
             'opacity-50': isDragging,
@@ -970,7 +970,7 @@ function KanbanItemHandle(props: KanbanItemHandleProps) {
       {
         className: cn(
           'select-none disabled:pointer-events-none disabled:opacity-50',
-          context.flatCursor ? 'cursor-default' : 'cursor-grab data-dragging:cursor-grabbing',
+          context.flatCursor ? 'cursor-pointer' : 'cursor-grab data-dragging:cursor-grabbing',
           className
         ),
         disabled: isDisabled

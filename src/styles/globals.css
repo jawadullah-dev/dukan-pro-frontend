@@ -19,31 +19,77 @@
     @apply bg-background text-foreground;
   }
 
-  /* Global scrollbar styling to match ScrollArea */
+  /* Hide scrollbars globally; scrolling still works */
   * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
+}
 
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
+/*
+  Pointer cursor for interactive controls.
+  Kept outside @layer so it beats Tailwind utilities like cursor-default.
+*/
+button:not(:disabled):not([aria-disabled='true']),
+[role='button']:not([aria-disabled='true']):not([data-disabled]),
+[role='menuitem']:not([aria-disabled='true']),
+[role='menuitemcheckbox']:not([aria-disabled='true']),
+[role='menuitemradio']:not([aria-disabled='true']),
+[role='option']:not([aria-disabled='true']),
+[role='tab']:not([aria-disabled='true']),
+[role='checkbox']:not([aria-disabled='true']),
+[role='radio']:not([aria-disabled='true']),
+[role='switch']:not([aria-disabled='true']),
+[role='combobox']:not([aria-disabled='true']),
+[role='listbox']:not([aria-disabled='true']),
+a[href],
+summary,
+label[for],
+select:not(:disabled),
+input[type='checkbox']:not(:disabled),
+input[type='radio']:not(:disabled),
+input[type='file']:not(:disabled),
+input[type='submit']:not(:disabled),
+input[type='button']:not(:disabled),
+input[type='reset']:not(:disabled),
+[data-slot='button']:not(:disabled),
+[data-slot$='-trigger']:not(:disabled):not([data-disabled]),
+[data-slot$='-item']:not([data-disabled]):not([aria-disabled='true']),
+[data-slot='checkbox']:not(:disabled),
+[data-slot='switch']:not([data-disabled]),
+[data-slot='tabs-trigger']:not(:disabled),
+[data-slot='select-trigger']:not(:disabled),
+[data-slot='select-item']:not([data-disabled]),
+[data-slot='dropdown-menu-item']:not([data-disabled]),
+[data-slot='dropdown-menu-checkbox-item']:not([data-disabled]),
+[data-slot='dropdown-menu-radio-item']:not([data-disabled]),
+[data-slot='dropdown-menu-sub-trigger'],
+[data-slot='context-menu-item']:not([data-disabled]),
+[data-slot='menubar-item']:not([data-disabled]),
+[data-slot='command-item']:not([data-disabled]),
+[data-slot='combobox-item']:not([data-disabled]),
+[data-slot='combobox-trigger'],
+[data-slot='sidebar-menu-button'],
+[data-slot='sidebar-menu-sub-button'],
+[data-slot='sidebar-trigger'],
+[data-slot='collapsible-trigger'],
+[data-sidebar='menu-button'],
+[data-sidebar='menu-sub-button'] {
+  cursor: pointer;
+}
 
-  ::-webkit-scrollbar-thumb {
-    background-color: var(--border);
-    border-radius: 9999px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--muted-foreground);
-  }
+button:disabled,
+button[aria-disabled='true'],
+[aria-disabled='true'],
+[data-disabled],
+:disabled {
+  cursor: not-allowed;
 }
 
 /* View Transition Wave Effect */
@@ -178,6 +224,16 @@
     to {
       --scroll-fade-e: 0px;
     }
+  }
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
   }
 }
 

@@ -1,56 +1,29 @@
 'use client';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { UserAvatarProfile } from '@/components/user-avatar-profile';
-import { SignOutButton, useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+
+import { useQuery } from '@tanstack/react-query';
+import { sessionQueryOptions } from '@/features/dukaan/api/queries';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
 export function UserNav() {
-  const { user } = useUser();
-  const router = useRouter();
-  if (user) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={<Button variant='ghost' className='relative h-8 w-8 rounded-full' />}
-        >
-          <UserAvatarProfile user={user} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className='w-56' align='end' sideOffset={10}>
-          <DropdownMenuGroup>
-            <DropdownMenuLabel className='font-normal'>
-              <div className='flex flex-col space-y-1'>
-                <p className='text-sm leading-none font-medium'>{user.fullName}</p>
-                <p className='text-muted-foreground text-xs leading-none'>
-                  {user.emailAddresses[0].emailAddress}
-                </p>
-              </div>
-            </DropdownMenuLabel>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>New Team</DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem>
-              <SignOutButton redirectUrl='/auth/sign-in' />
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
+  const { data } = useQuery(sessionQueryOptions());
+  if (!data) return null;
+
+  const initials = data.user_name
+    .split(' ')
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  return (
+    <div className='flex items-center gap-2 px-1'>
+      <Avatar className='h-8 w-8'>
+        <AvatarFallback>{initials}</AvatarFallback>
+      </Avatar>
+      <div className='hidden flex-col text-left text-xs sm:flex'>
+        <span className='font-medium'>{data.user_name}</span>
+        <span className='text-muted-foreground'>{data.shop_name}</span>
+      </div>
+    </div>
+  );
 }

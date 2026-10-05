@@ -32,8 +32,9 @@ export function SelectField({
       </FieldLabel>
       <Select
         name={field.name}
-        value={field.state.value}
+        value={field.state.value ?? ''}
         onValueChange={(value) => field.handleChange(value ?? '')}
+        items={options.map((opt) => ({ value: opt.value, label: opt.label }))}
       >
         <SelectTrigger
           id={field.name}

@@ -21,6 +21,10 @@
   },
   "rules": {
     "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-underscore-dangle": [
+      "warn",
+      { "allow": ["__dukaanStore", "__dukaanSeedVersion"] }
+    ],
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
     "no-unused-expressions": "warn",
     "@typescript-eslint/no-explicit-any": "warn",

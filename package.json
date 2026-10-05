@@ -1,17 +1,15 @@
 {
-  "name": "next-shadcn-dashboard-starter",
+  "name": "dukaan-pro",
   "version": "1.0.0",
   "private": true,
-  "author": {
-    "name": "Kiran",
-    "url": "https://github.com/Kiranism"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "cleanup": "node scripts/cleanup.js",
     "typecheck": "tsc --noEmit",
+    "type-check": "tsc --noEmit",
+    "test": "tsc --noEmit",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix && bun format",
     "lint:strict": "oxlint --deny-warnings",
@@ -22,7 +20,6 @@
   "dependencies": {
     "@ai-sdk/react": "^4.0.47",
     "@base-ui/react": "^1.6.0",
-    "@clerk/nextjs": "^7.8.1",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",

@@ -16,9 +16,7 @@ const META_THEME_COLORS = {
 };
 
 export const metadata: Metadata = {
-  ...(process.env.NEXT_PUBLIC_APP_URL
-    ? { metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL) }
-    : {}),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
   title: {
     default: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
     template: '%s | Shadcn Dashboard'
@@ -71,11 +69,35 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}')
                 }
               } catch (_) {}
+
+              // Strip attributes injected by browser extensions before React hydrates
+              // (e.g. fdprocessedid from password managers / form fillers).
+              (function () {
+                var ATTRS = ['fdprocessedid', 'data-new-gr-c-s-check-loaded', 'data-gr-ext-installed'];
+                function strip() {
+                  for (var i = 0; i < ATTRS.length; i++) {
+                    var nodes = document.querySelectorAll('[' + ATTRS[i] + ']');
+                    for (var j = 0; j < nodes.length; j++) nodes[j].removeAttribute(ATTRS[i]);
+                  }
+                }
+                strip();
+                var observer = new MutationObserver(strip);
+                observer.observe(document.documentElement, {
+                  attributes: true,
+                  subtree: true,
+                  attributeFilter: ATTRS
+                });
+                window.addEventListener('DOMContentLoaded', function () {
+                  strip();
+                  setTimeout(function () { observer.disconnect(); }, 2000);
+                });
+              })();
             `
           }}
         />
       </head>
       <body
+        suppressHydrationWarning
         className={cn(
           'bg-background overflow-x-hidden overscroll-none font-sans antialiased',
           fontVariables

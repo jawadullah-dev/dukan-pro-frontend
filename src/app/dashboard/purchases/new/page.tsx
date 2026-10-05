@@ -1,0 +1,28 @@
+import PageContainer from '@/components/layout/page-container';
+import { PurchasesListClient } from '@/features/dukaan/components/purchases';
+import {
+  productsQueryOptions,
+  purchasesQueryOptions,
+  suppliersQueryOptions
+} from '@/features/dukaan/api/queries';
+import { getQueryClient } from '@/lib/query-client';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { Suspense } from 'react';
+
+export const metadata = { title: 'Dashboard: New purchase' };
+
+export default function Page() {
+  const qc = getQueryClient();
+  void qc.prefetchQuery(purchasesQueryOptions({ limit: 100 }));
+  void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
+  void qc.prefetchQuery(productsQueryOptions({ limit: 100 }));
+  return (
+    <PageContainer pageTitle='Purchases' pageDescription='Stock-in purchases'>
+      <HydrationBoundary state={dehydrate(qc)}>
+        <Suspense>
+          <PurchasesListClient defaultOpenAdd />
+        </Suspense>
+      </HydrationBoundary>
+    </PageContainer>
+  );
+}

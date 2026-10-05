@@ -1,8 +1,15 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Modal } from '@/components/ui/modal';
-import { LoadingButton } from '@/components/ui/loading-button';
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -23,26 +30,32 @@ export function AlertModal({
   description = 'This action cannot be undone.',
   confirmLabel = 'Continue'
 }: AlertModalProps) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return null;
-  }
-
   return (
-    <Modal title={title} description={description} isOpen={isOpen} onClose={onClose}>
-      <div className='flex w-full items-center justify-end space-x-2 pt-6'>
-        <Button variant='outline' onClick={onClose}>
-          Cancel
-        </Button>
-        <LoadingButton loading={loading} type='button' variant='destructive' onClick={onConfirm}>
-          {confirmLabel}
-        </LoadingButton>
-      </div>
-    </Modal>
+    <AlertDialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open && !loading) onClose();
+      }}
+    >
+      <AlertDialogContent size='default'>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            variant='destructive'
+            disabled={loading}
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
+          >
+            {loading ? 'Please wait…' : confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

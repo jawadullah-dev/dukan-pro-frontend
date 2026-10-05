@@ -5,7 +5,6 @@ import { Breadcrumbs } from '../breadcrumbs';
 import SearchInput from '../search-input';
 import { ThemeSelector } from '../themes/theme-selector';
 import { ThemeModeToggle } from '../themes/theme-mode-toggle';
-import CtaGithub from './cta-github';
 import { NotificationCenter } from '@/features/notifications/components/notification-center';
 
 export default function Header() {
@@ -18,7 +17,6 @@ export default function Header() {
       </div>
 
       <div className='flex items-center gap-2 px-4'>
-        <CtaGithub />
         <div className='hidden md:flex'>
           <SearchInput />
         </div>

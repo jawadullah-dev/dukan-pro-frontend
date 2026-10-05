@@ -4,7 +4,6 @@ import {
   Fira_Code,
   Geist,
   Geist_Mono,
-  Google_Sans_Flex,
   Instrument_Sans,
   Inter,
   JetBrains_Mono,
@@ -27,11 +26,6 @@ const fontSans = Geist({
 const fontMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-mono'
-});
-
-const fontGoogleSansFlex = Google_Sans_Flex({
-  subsets: ['latin'],
-  variable: '--font-google-sans-flex'
 });
 
 const fontSourceCodePro = Source_Code_Pro({
@@ -105,7 +99,6 @@ const fontPlayfairDisplay = Playfair_Display({
 export const fontVariables = cn(
   fontSans.variable,
   fontMono.variable,
-  fontGoogleSansFlex.variable,
   fontSourceCodePro.variable,
   fontInstrument.variable,
   fontNotoMono.variable,

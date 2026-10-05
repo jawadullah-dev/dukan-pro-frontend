@@ -31,8 +31,8 @@
   --sidebar-accent-foreground: oklch(1 0 180);
   --sidebar-border: oklch(0.9401 0 0);
   --sidebar-ring: oklch(0.683 0 180);
-  --font-sans: var(--font-google-sans-flex), ui-sans-serif, sans-serif;
-  --font-serif: var(--font-google-sans-flex), ui-sans-serif, serif;
+  --font-sans: var(--font-instrument), ui-sans-serif, sans-serif;
+  --font-serif: var(--font-instrument), ui-sans-serif, serif;
   --font-mono: var(--font-source-code-pro), ui-monospace, monospace;
   --radius: 0.75rem;
   --shadow-x: 0;

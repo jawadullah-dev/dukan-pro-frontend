@@ -12,6 +12,14 @@ export function getCommonPinningStyles<TData>({
   const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left');
   const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right');
 
+  // Unpinned columns grow to fill the table — no forced pixel widths.
+  if (!isPinned) {
+    return {
+      position: 'relative',
+      minWidth: column.columnDef.minSize
+    };
+  }
+
   return {
     boxShadow: isLastLeftPinnedColumn
       ? '-5px 0 5px -5px var(--border) inset'
@@ -20,10 +28,12 @@ export function getCommonPinningStyles<TData>({
         : undefined,
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
     right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
-    position: isPinned ? 'sticky' : 'relative',
-    background: isPinned ? 'var(--background)' : undefined,
+    position: 'sticky',
+    background: 'var(--background)',
     width: column.getSize(),
-    zIndex: isPinned ? 1 : 0
+    minWidth: column.getSize(),
+    maxWidth: column.getSize(),
+    zIndex: 1
   };
 }
 

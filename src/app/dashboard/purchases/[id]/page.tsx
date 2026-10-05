@@ -1,0 +1,23 @@
+import PageContainer from '@/components/layout/page-container';
+import { PurchaseDetailClient } from '@/features/dukaan/components/purchases';
+import { purchaseQueryOptions } from '@/features/dukaan/api/queries';
+import { getQueryClient } from '@/lib/query-client';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { Suspense } from 'react';
+
+export const metadata = { title: 'Dashboard: Purchase' };
+
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const qc = getQueryClient();
+  void qc.prefetchQuery(purchaseQueryOptions(id));
+  return (
+    <PageContainer pageTitle='Purchase detail' pageDescription='View and cancel with reason'>
+      <HydrationBoundary state={dehydrate(qc)}>
+        <Suspense>
+          <PurchaseDetailClient id={id} />
+        </Suspense>
+      </HydrationBoundary>
+    </PageContainer>
+  );
+}

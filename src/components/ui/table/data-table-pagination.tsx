@@ -19,7 +19,7 @@ interface DataTablePaginationProps<TData> extends React.ComponentProps<'div'> {
 
 export function DataTablePagination<TData>({
   table,
-  pageSizeOptions = [10, 20, 30, 40, 50],
+  pageSizeOptions = [20, 30, 50, 100],
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
@@ -34,20 +34,24 @@ export function DataTablePagination<TData>({
       <div className='text-muted-foreground text-sm whitespace-nowrap'>
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
           <>
-            {table.getFilteredSelectedRowModel().rows.length} of{' '}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            {table.getFilteredSelectedRowModel().rows.length} of {table.getRowCount()} row(s)
+            selected.
           </>
         ) : (
-          <>{table.getFilteredRowModel().rows.length} row(s) total.</>
+          <>{table.getRowCount()} row(s) total.</>
         )}
       </div>
       <div className='flex items-center gap-2 sm:gap-6 lg:gap-8'>
         <div className='hidden items-center space-x-2 sm:flex'>
           <p className='text-sm font-medium whitespace-nowrap'>Rows per page</p>
           <Select
+            items={pageSizeOptions.map((pageSize) => ({
+              value: `${pageSize}`,
+              label: `${pageSize}`
+            }))}
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value));
+              if (value != null) table.setPageSize(Number(value));
             }}
           >
             <SelectTrigger className='h-8 w-[4.5rem] [&[data-size]]:h-8'>

@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { getCommonPinningStyles } from '@/lib/data-table';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface DataTableProps<TData> extends React.ComponentProps<'div'> {
@@ -25,23 +24,37 @@ export function DataTable<TData>({ table, actionBar, children }: DataTableProps<
       <div className='relative flex flex-1'>
         <div className='absolute inset-0 flex overflow-hidden rounded-lg border'>
           <ScrollArea className='h-full w-full'>
-            <Table>
-              <TableHeader className='bg-muted sticky top-0 z-10'>
+            <Table className='min-w-full table-fixed'>
+              <TableHeader className='sticky top-0 z-10 bg-background'>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead
-                        key={header.id}
-                        colSpan={header.colSpan}
-                        style={{
-                          ...getCommonPinningStyles({ column: header.column })
-                        }}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    ))}
+                  <TableRow key={headerGroup.id} className='border-0 hover:bg-transparent'>
+                    {headerGroup.headers.map((header) => {
+                      const isActions = header.column.id === 'actions';
+                      return (
+                        <TableHead
+                          key={header.id}
+                          colSpan={header.colSpan}
+                          className={
+                            isActions
+                              ? 'w-12 border-0 bg-background text-right'
+                              : 'border-0 bg-background'
+                          }
+                          style={
+                            isActions
+                              ? {
+                                  width: header.column.getSize() || 48,
+                                  minWidth: header.column.getSize() || 48,
+                                  maxWidth: header.column.getSize() || 48
+                                }
+                              : undefined
+                          }
+                        >
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      );
+                    })}
                   </TableRow>
                 ))}
               </TableHeader>
@@ -49,16 +62,26 @@ export function DataTable<TData>({ table, actionBar, children }: DataTableProps<
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell
-                          key={cell.id}
-                          style={{
-                            ...getCommonPinningStyles({ column: cell.column })
-                          }}
-                        >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
+                      {row.getVisibleCells().map((cell) => {
+                        const isActions = cell.column.id === 'actions';
+                        return (
+                          <TableCell
+                            key={cell.id}
+                            className={isActions ? 'w-12 text-right' : undefined}
+                            style={
+                              isActions
+                                ? {
+                                    width: cell.column.getSize() || 48,
+                                    minWidth: cell.column.getSize() || 48,
+                                    maxWidth: cell.column.getSize() || 48
+                                  }
+                                : undefined
+                            }
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   ))
                 ) : (

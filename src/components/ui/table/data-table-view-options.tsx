@@ -56,7 +56,9 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                   key={column.id}
                   onSelect={() => column.toggleVisibility(!column.getIsVisible())}
                 >
-                  <span className='truncate'>{column.columnDef.meta?.label ?? column.id}</span>
+                  <span className='truncate'>
+                    {column.columnDef.meta?.label ?? column.id.replaceAll('_', ' ')}
+                  </span>
                   <Icons.check
                     className={cn(
                       'ml-auto size-4 shrink-0',

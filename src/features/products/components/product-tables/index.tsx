@@ -14,7 +14,7 @@ const columnIds = columns.map((c) => c.id).filter(Boolean) as string[];
 export function ProductTable() {
   const [params] = useQueryStates({
     page: parseAsInteger.withDefault(1),
-    perPage: parseAsInteger.withDefault(10),
+    perPage: parseAsInteger.withDefault(20),
     name: parseAsString,
     category: parseAsString,
     sort: getSortingStateParser(columnIds).withDefault([])

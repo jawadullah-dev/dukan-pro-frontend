@@ -1,7 +1,6 @@
 import type { NextConfig } from 'next';
-import { withSentryConfig } from '@sentry/nextjs/config';
+import { createRequire } from 'node:module';
 
-// Define the base Next.js configuration
 const baseConfig: NextConfig = {
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
   images: {
@@ -19,30 +18,25 @@ const baseConfig: NextConfig = {
   }
 };
 
-let configWithPlugins = baseConfig;
-
-// Only wrap with Sentry when a DSN is configured and Sentry is not disabled
 const sentryEnabled =
   Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN) &&
   process.env.NEXT_PUBLIC_SENTRY_DISABLED !== 'true';
 
-if (sentryEnabled) {
-  configWithPlugins = withSentryConfig(configWithPlugins, {
+function withOptionalSentry(config: NextConfig): NextConfig {
+  if (!sentryEnabled) return config;
+
+  // Load from the package root (not `@sentry/nextjs/config`) so builds work
+  // across Sentry versions on Vercel / Bun.
+  const require = createRequire(import.meta.url);
+  const { withSentryConfig } = require('@sentry/nextjs') as typeof import('@sentry/nextjs');
+
+  return withSentryConfig(config, {
     org: process.env.NEXT_PUBLIC_SENTRY_ORG,
     project: process.env.NEXT_PUBLIC_SENTRY_PROJECT,
-    // Only print logs for uploading source maps in CI
     silent: !process.env.CI,
-
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
     widenClientFileUpload: true,
-
-    // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
     tunnelRoute: '/monitoring',
-
-    // Disable Sentry telemetry
     telemetry: false,
-
-    // Sentry v10: moved under webpack namespace
     webpack: {
       reactComponentAnnotation: {
         enabled: true
@@ -51,13 +45,11 @@ if (sentryEnabled) {
         removeDebugLogging: true
       }
     },
-
-    // Disable source map upload when org/project are not configured
     sourcemaps: {
       disable: !process.env.NEXT_PUBLIC_SENTRY_ORG || !process.env.NEXT_PUBLIC_SENTRY_PROJECT
     }
   });
 }
 
-const nextConfig = configWithPlugins;
+const nextConfig = withOptionalSentry(baseConfig);
 export default nextConfig;

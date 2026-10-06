@@ -12,10 +12,17 @@ For other platforms, see the [Next.js deployment docs](https://nextjs.org/docs/a
 
 ## Environment Variables for Production
 
-Ensure these are set in your deployment platform:
+Ensure these are set in your deployment platform (Vercel → Project → Settings → Environment Variables):
 
-- All `NEXT_PUBLIC_*` variables for client-side access
-- `SENTRY_*` variables if using error tracking
+| Variable | Required | Example |
+| --- | --- | --- |
+| `AUTH_SECRET` | **Yes** | Output of `openssl rand -base64 32` |
+| `AUTH_URL` | Recommended | `https://dukan-pro-frontend.vercel.app` |
+| `NEXT_PUBLIC_*` / `SENTRY_*` | Optional | Only if using Sentry |
+
+Without `AUTH_SECRET`, sign-in redirects to `/api/auth/error` with “There is a problem with the server configuration.”
+
+After adding vars, **Redeploy** (Deployments → … → Redeploy). Local `.env.local` is not uploaded to Vercel.
 
 Sentry source maps are uploaded automatically in CI.
 

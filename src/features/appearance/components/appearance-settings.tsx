@@ -9,8 +9,10 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
+import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { cn } from '@/lib/utils';
 import { useAppearanceStore, type AppearanceAccent } from '@/lib/appearance/store';
+import { t } from '@/i18n';
 
 const ACCENT_OPTIONS: AppearanceAccent[] = ['blue', 'green', 'purple', 'orange', 'red', 'teal'];
 
@@ -89,6 +91,22 @@ export function AppearanceSettings() {
             Reset all
           </Button>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className='flex items-center gap-2 text-base'>
+              <Icons.download className='h-4 w-4' />
+              {t('pwa.installApp')}
+            </CardTitle>
+            <CardDescription>{t('pwa.installDesktopHint')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <InstallPrompt
+              variant='menu'
+              className='border-border hover:bg-muted rounded-md border px-3 py-2'
+            />
+          </CardContent>
+        </Card>
 
         <Card>
           <CardHeader>

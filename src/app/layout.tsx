@@ -1,8 +1,15 @@
 import Providers from '@/components/layout/providers';
+import { PwaShell } from '@/components/pwa/pwa-shell';
 import { Toaster } from '@/components/ui/sonner';
 import { fontVariables } from '@/components/themes/font.config';
 import { DEFAULT_THEME, THEMES } from '@/components/themes/theme.config';
 import ThemeProvider from '@/components/themes/theme-provider';
+import {
+  APP_DESCRIPTION,
+  APP_NAME,
+  PWA_THEME_COLOR_DARK,
+  PWA_THEME_COLOR_LIGHT
+} from '@/config/site';
 import { cn } from '@/lib/utils';
 import type { Metadata, Viewport } from 'next';
 import { cookies } from 'next/headers';
@@ -10,45 +17,51 @@ import NextTopLoader from 'nextjs-toploader';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import '../styles/globals.css';
 
-const META_THEME_COLORS = {
-  light: '#ffffff',
-  dark: '#09090b'
-};
-
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
+  applicationName: APP_NAME,
   title: {
-    default: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
-    template: '%s | Shadcn Dashboard'
+    default: APP_NAME,
+    template: `%s | ${APP_NAME}`
   },
-  description:
-    'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
+  description: APP_DESCRIPTION,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: APP_NAME
+  },
+  formatDetection: {
+    telephone: false
+  },
+  icons: {
+    icon: [
+      { url: '/icons/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }
+    ],
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }]
+  },
   openGraph: {
-    title: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
-    description:
-      'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
-    siteName: 'Shadcn Dashboard',
-    type: 'website',
-    images: [
-      {
-        url: '/shadcn-dashboard.png',
-        width: 3200,
-        height: 1600,
-        alt: 'Shadcn Dashboard overview page'
-      }
-    ]
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    siteName: APP_NAME,
+    type: 'website'
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Shadcn Dashboard - Next.js Admin Dashboard Template',
-    description:
-      'Free, open source admin dashboard starter built with Next.js 16, shadcn/ui, Tailwind CSS, and TypeScript.',
-    images: ['/shadcn-dashboard.png']
+    card: 'summary',
+    title: APP_NAME,
+    description: APP_DESCRIPTION
   }
 };
 
 export const viewport: Viewport = {
-  themeColor: META_THEME_COLORS.light
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: PWA_THEME_COLOR_LIGHT },
+    { media: '(prefers-color-scheme: dark)', color: PWA_THEME_COLOR_DARK }
+  ],
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover'
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -64,14 +77,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           dangerouslySetInnerHTML={{
             __html: `
               try {
-                // Set meta theme color
                 if (localStorage.theme === 'dark' || ((!('theme' in localStorage) || localStorage.theme === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${META_THEME_COLORS.dark}')
+                  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${PWA_THEME_COLOR_DARK}')
                 }
               } catch (_) {}
 
-              // Strip attributes injected by browser extensions before/during React hydrate
-              // (e.g. fdprocessedid from password managers / form fillers).
               (function () {
                 var ATTRS = ['fdprocessedid', 'data-new-gr-c-s-check-loaded', 'data-gr-ext-installed'];
                 function strip() {
@@ -100,7 +110,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   attributeFilter: ATTRS,
                   childList: true
                 });
-                // Keep stripping through hydration; stop after page is settled.
                 window.addEventListener('load', function () {
                   strip();
                   setTimeout(function () {
@@ -117,6 +126,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         suppressHydrationWarning
         className={cn(
           'bg-background overflow-x-hidden overscroll-none font-sans antialiased',
+          'standalone:overscroll-none',
           fontVariables
         )}
       >
@@ -130,8 +140,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             enableColorScheme
           >
             <Providers activeThemeValue={themeToApply}>
-              <Toaster />
-              {children}
+              <PwaShell>
+                <Toaster />
+                {children}
+              </PwaShell>
             </Providers>
           </ThemeProvider>
         </NuqsAdapter>

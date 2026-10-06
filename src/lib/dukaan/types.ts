@@ -308,6 +308,8 @@ export interface ListFilters {
   method?: string;
   low_stock?: string;
   is_active?: string;
+  /** Customer list: `owing` | `settled` (comma-separated facets) */
+  udhar_state?: string;
 }
 
 export interface Paginated<T> {

@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState } from 'react';
 import { toast } from 'sonner';
+import { FloatingActionButton } from '@/components/common/floating-action-button';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +15,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { FieldGroup } from '@/components/ui/field';
+import { t } from '@/i18n';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import {
@@ -312,22 +314,34 @@ function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
   );
 }
 
-export function ExpensesHeaderAction() {
+export function ExpensesHeaderAction({
+  className,
+  onAdd
+}: {
+  className?: string;
+  onAdd: () => void;
+}) {
+  return (
+    <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
+      <Icons.add className='me-2 h-4 w-4' />
+      {t('common.addExpense')}
+    </Button>
+  );
+}
+
+export function ExpensesClient() {
   const [open, setOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
+
+  const handleOpen = () => {
+    setFormKey((k) => k + 1);
+    setOpen(true);
+  };
+
   return (
     <>
-      <Button
-        type='button'
-        size='sm'
-        onClick={() => {
-          setFormKey((k) => k + 1);
-          setOpen(true);
-        }}
-      >
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add expense
-      </Button>
+      <ExpensesTable toolbarAction={<ExpensesHeaderAction className='h-8' onAdd={handleOpen} />} />
+      <FloatingActionButton label={t('common.addExpense')} onClick={handleOpen} />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='sm:max-w-lg'>
           <DialogHeader>
@@ -345,25 +359,34 @@ export function ExpensesHeaderAction() {
   );
 }
 
-export function ExpensesClient() {
-  return <ExpensesTable toolbarAction={<ExpensesHeaderAction />} />;
-}
-
-export function ExpenseCategoriesHeaderAction() {
+export function ExpenseCategoriesHeaderAction({ onAdd }: { onAdd?: () => void }) {
   const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    if (onAdd) onAdd();
+    else setOpen(true);
+  };
   return (
     <>
-      <Button type='button' size='sm' onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add category
+      <Button type='button' size='sm' onClick={handleOpen}>
+        <Icons.add className='me-2 h-4 w-4' />
+        {t('common.addCategory')}
       </Button>
-      <ExpenseCategoryDialog open={open} onOpenChange={setOpen} />
+      {onAdd ? null : <ExpenseCategoryDialog open={open} onOpenChange={setOpen} />}
     </>
   );
 }
 
 export function ExpenseCategoriesClient() {
-  return <ExpenseCategoriesTable toolbarAction={<ExpenseCategoriesHeaderAction />} />;
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <ExpenseCategoriesTable
+        toolbarAction={<ExpenseCategoriesHeaderAction onAdd={() => setOpen(true)} />}
+      />
+      <FloatingActionButton label={t('common.addCategory')} onClick={() => setOpen(true)} />
+      <ExpenseCategoryDialog open={open} onOpenChange={setOpen} />
+    </>
+  );
 }
 
 export function CashLedgerClient() {
@@ -519,22 +542,36 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
   );
 }
 
-export function SupplierPaymentsHeaderAction() {
+export function SupplierPaymentsHeaderAction({
+  className,
+  onAdd
+}: {
+  className?: string;
+  onAdd: () => void;
+}) {
+  return (
+    <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
+      <Icons.add className='me-2 h-4 w-4' />
+      {t('common.addPayment')}
+    </Button>
+  );
+}
+
+export function SupplierPaymentsClient() {
   const [open, setOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
+
+  const handleOpen = () => {
+    setFormKey((k) => k + 1);
+    setOpen(true);
+  };
+
   return (
     <>
-      <Button
-        type='button'
-        size='sm'
-        onClick={() => {
-          setFormKey((k) => k + 1);
-          setOpen(true);
-        }}
-      >
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add payment
-      </Button>
+      <SupplierPaymentsTable
+        toolbarAction={<SupplierPaymentsHeaderAction className='h-8' onAdd={handleOpen} />}
+      />
+      <FloatingActionButton label={t('common.addPayment')} onClick={handleOpen} />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='sm:max-w-lg'>
           <DialogHeader>
@@ -552,8 +589,4 @@ export function SupplierPaymentsHeaderAction() {
       </Dialog>
     </>
   );
-}
-
-export function SupplierPaymentsClient() {
-  return <SupplierPaymentsTable toolbarAction={<SupplierPaymentsHeaderAction />} />;
 }

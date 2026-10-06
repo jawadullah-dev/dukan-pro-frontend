@@ -1,19 +1,31 @@
 import * as React from 'react';
 
-const MOBILE_BREAKPOINT = 768;
+/** Matches plan: off-canvas shell below 1024px (sidebar + bottom nav phones). */
+export const MOBILE_BREAKPOINT = 1024;
+
+function subscribeMaxWidth(maxPx: number, onStoreChange: () => void) {
+  const mql = window.matchMedia(`(max-width: ${maxPx}px)`);
+  mql.addEventListener('change', onStoreChange);
+  return () => mql.removeEventListener('change', onStoreChange);
+}
+
+function getMaxWidthSnapshot(maxPx: number) {
+  return window.matchMedia(`(max-width: ${maxPx}px)`).matches;
+}
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined);
+  return React.useSyncExternalStore(
+    (onStoreChange) => subscribeMaxWidth(MOBILE_BREAKPOINT - 1, onStoreChange),
+    () => getMaxWidthSnapshot(MOBILE_BREAKPOINT - 1),
+    () => false
+  );
+}
 
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    };
-    mql.addEventListener('change', onChange);
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
-    return () => mql.removeEventListener('change', onChange);
-  }, []);
-
-  return !!isMobile;
+/** True below 640px — phone bottom nav / hide breadcrumbs. */
+export function useIsPhone() {
+  return React.useSyncExternalStore(
+    (onStoreChange) => subscribeMaxWidth(639, onStoreChange),
+    () => getMaxWidthSnapshot(639),
+    () => false
+  );
 }

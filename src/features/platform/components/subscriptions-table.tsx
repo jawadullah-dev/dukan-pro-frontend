@@ -3,11 +3,14 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { parseAsArrayOf, parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs';
-import { DataTable } from '@/components/ui/table/data-table';
+import {
+  ResponsiveDataTable,
+  type DetailConfig,
+  type MobileItemConfig
+} from '@/components/data-table';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
-import { DataTableToolbar } from '@/components/ui/table/data-table-toolbar';
 import { useDataTable } from '@/hooks/use-data-table';
-import { formatPkr } from '@/lib/dukaan/numbers';
+import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import { Icons } from '@/components/icons';
 import { RowActionsMenu } from '@/features/dukaan/components/row-actions-menu';
 import type { PlatformSubscription } from '../api/types';
@@ -24,7 +27,10 @@ const columns: ColumnDef<PlatformSubscription>[] = [
       label: 'Shop',
       placeholder: 'Search subscriptions…',
       variant: 'text',
-      icon: Icons.search
+      icon: Icons.search,
+      type: 'text',
+      primary: true,
+      priority: 1
     },
     enableColumnFilter: true
   },
@@ -36,7 +42,9 @@ const columns: ColumnDef<PlatformSubscription>[] = [
     meta: {
       label: 'All',
       variant: 'multiSelect',
-      options: [...PLATFORM_PLAN_OPTIONS]
+      options: [...PLATFORM_PLAN_OPTIONS],
+      type: 'text',
+      priority: 2
     },
     enableColumnFilter: true
   },
@@ -48,7 +56,9 @@ const columns: ColumnDef<PlatformSubscription>[] = [
     meta: {
       label: 'Status',
       variant: 'multiSelect',
-      options: [...PLATFORM_STATUS_OPTIONS]
+      options: [...PLATFORM_STATUS_OPTIONS],
+      type: 'status',
+      priority: 1
     },
     enableColumnFilter: true
   },
@@ -57,7 +67,7 @@ const columns: ColumnDef<PlatformSubscription>[] = [
     accessorKey: 'next_due_at',
     header: ({ column }) => <DataTableColumnHeader column={column} title='Next due' />,
     cell: ({ row }) => row.original.next_due_at ?? '—',
-    meta: { label: 'Next due' }
+    meta: { label: 'Next due', type: 'date', priority: 2 }
   },
   {
     id: 'amount_paisa',
@@ -65,10 +75,16 @@ const columns: ColumnDef<PlatformSubscription>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
     cell: ({ row }) =>
       row.original.amount_paisa > 0 ? formatPkr(row.original.amount_paisa) : 'Rs 0',
-    meta: { label: 'Amount' }
+    meta: {
+      label: 'Amount',
+      type: 'money',
+      highlight: true,
+      priority: 1
+    }
   },
   {
     id: 'actions',
+    meta: { mobile: 'hidden' },
     cell: () => (
       <RowActionsMenu
         actions={[
@@ -80,6 +96,37 @@ const columns: ColumnDef<PlatformSubscription>[] = [
     enableSorting: false
   }
 ];
+
+const subscriptionMobileItem: MobileItemConfig<PlatformSubscription> = {
+  title: (row) => row.shop_name,
+  subtitle: (row) => formatLabel(row.plan),
+  badge: (row) => ({ label: row.status, status: row.status }),
+  value: (row) => (row.amount_paisa > 0 ? formatPkr(row.amount_paisa) : 'Rs 0'),
+  meta: [(row) => row.next_due_at ?? '—'],
+  ariaLabel: (row) => `${row.shop_name}, ${formatLabel(row.plan)}, ${formatPkr(row.amount_paisa)}`
+};
+
+const subscriptionDetail: DetailConfig<PlatformSubscription> = {
+  mode: 'sheet',
+  title: (row) => row.shop_name,
+  badge: (row) => ({ label: row.status, status: row.status }),
+  value: (row) => (row.amount_paisa > 0 ? formatPkr(row.amount_paisa) : 'Rs 0'),
+  sections: (row) => [
+    {
+      title: 'Subscription',
+      fields: [
+        { label: 'Shop', value: row.shop_name },
+        { label: 'Plan', value: formatLabel(row.plan) },
+        { label: 'Status', value: <ShopStatusBadge status={row.status} /> },
+        { label: 'Next due', value: row.next_due_at ?? '—' },
+        {
+          label: 'Amount',
+          value: row.amount_paisa > 0 ? formatPkr(row.amount_paisa) : 'Rs 0'
+        }
+      ]
+    }
+  ]
+};
 
 export function PlatformSubscriptionsTable() {
   const [page] = useQueryState('page', parseAsInteger.withDefault(1));
@@ -122,8 +169,10 @@ export function PlatformSubscriptionsTable() {
   });
 
   return (
-    <DataTable table={table}>
-      <DataTableToolbar table={table} />
-    </DataTable>
+    <ResponsiveDataTable
+      table={table}
+      mobileItem={subscriptionMobileItem}
+      detail={subscriptionDetail}
+    />
   );
 }

@@ -14,7 +14,8 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail
+  SidebarRail,
+  useSidebar
 } from '@/components/ui/sidebar';
 import { getNavGroupsForRole } from '@/config/nav-config';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -51,6 +52,7 @@ function filterNavGroups(groups: NavGroup[], query: string): NavGroup[] {
 export default function AppSidebar({ role }: { role: SessionRole }) {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
+  const { isMobile, setOpenMobile } = useSidebar();
   const initialGroups = React.useMemo(() => getNavGroupsForRole(role), [role]);
   const filteredGroups = useFilteredNavGroups(initialGroups, role);
   const [search, setSearch] = React.useState('');
@@ -59,6 +61,10 @@ export default function AppSidebar({ role }: { role: SessionRole }) {
     [filteredGroups, search]
   );
   const isSearching = search.trim().length > 0;
+
+  const closeMobileNav = React.useCallback(() => {
+    if (isMobile) setOpenMobile(false);
+  }, [isMobile, setOpenMobile]);
 
   React.useEffect(() => {
     // Side effects based on sidebar state changes
@@ -131,7 +137,13 @@ export default function AppSidebar({ role }: { role: SessionRole }) {
                         {item.items?.map((subItem) => (
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton
-                              render={<Link href={subItem.url} aria-label={subItem.title} />}
+                              render={
+                                <Link
+                                  href={subItem.url}
+                                  aria-label={subItem.title}
+                                  onClick={closeMobileNav}
+                                />
+                              }
                               isActive={pathname === subItem.url}
                             >
                               <span>{subItem.title}</span>
@@ -144,7 +156,9 @@ export default function AppSidebar({ role }: { role: SessionRole }) {
                 ) : (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
-                      render={<Link href={item.url} aria-label={item.title} />}
+                      render={
+                        <Link href={item.url} aria-label={item.title} onClick={closeMobileNav} />
+                      }
                       tooltip={item.title}
                       isActive={isActive}
                     >

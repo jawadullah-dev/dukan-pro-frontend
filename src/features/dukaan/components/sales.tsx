@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { toast } from 'sonner';
+import { FloatingActionButton } from '@/components/common/floating-action-button';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,6 +26,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { t } from '@/i18n';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import {
@@ -43,43 +45,63 @@ import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { FormEntitySelect } from './form-entity-select';
 import { SalesTable } from './tables/commerce-tables';
 
-export function SalesHeaderAction({ defaultOpen = false }: { defaultOpen?: boolean }) {
+function SaleCreateDialog({
+  open,
+  onOpenChange,
+  clearDefaultQuery
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  clearDefaultQuery?: boolean;
+}) {
   const router = useRouter();
-  const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <>
-      <Button type='button' size='sm' onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add sale
-      </Button>
-      <Dialog
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next && defaultOpen) router.replace('/dashboard/sales');
-        }}
-      >
-        <DialogContent className='flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl'>
-          <DialogHeader className='shrink-0 px-4 pt-4 pr-12'>
-            <DialogTitle>New sale</DialogTitle>
-            <DialogDescription>
-              Phones require a customer; walk-in accessories OK; Udhar needs customer
-            </DialogDescription>
-          </DialogHeader>
-          <div className='no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4'>
-            <Suspense fallback={<p className='text-muted-foreground text-sm'>Loading…</p>}>
-              <SaleCreateForm onDone={() => setOpen(false)} />
-            </Suspense>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        onOpenChange(next);
+        if (!next && clearDefaultQuery) router.replace('/dashboard/sales');
+      }}
+    >
+      <DialogContent className='flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl'>
+        <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
+          <DialogTitle>New sale</DialogTitle>
+          <DialogDescription>
+            Phones require a customer; walk-in accessories OK; Udhar needs customer
+          </DialogDescription>
+        </DialogHeader>
+        <div className='no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4'>
+          <Suspense fallback={<p className='text-muted-foreground text-sm'>Loading…</p>}>
+            <SaleCreateForm onDone={() => onOpenChange(false)} />
+          </Suspense>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function SalesHeaderAction({ className, onAdd }: { className?: string; onAdd: () => void }) {
+  return (
+    <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
+      <Icons.add className='me-2 h-4 w-4' />
+      {t('common.newSale')}
+    </Button>
   );
 }
 
 export function SalesListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) {
-  return <SalesTable toolbarAction={<SalesHeaderAction defaultOpen={defaultOpenAdd} />} />;
+  const [open, setOpen] = useState(defaultOpenAdd);
+
+  return (
+    <>
+      <SalesTable
+        toolbarAction={<SalesHeaderAction className='h-8' onAdd={() => setOpen(true)} />}
+      />
+      <FloatingActionButton label={t('common.newSale')} onClick={() => setOpen(true)} />
+      <SaleCreateDialog open={open} onOpenChange={setOpen} clearDefaultQuery={defaultOpenAdd} />
+    </>
+  );
 }
 
 function imeiLabel(imei1: string, imei2?: string): string {

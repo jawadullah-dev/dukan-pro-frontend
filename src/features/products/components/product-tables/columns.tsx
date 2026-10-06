@@ -10,6 +10,7 @@ import { CATEGORY_OPTIONS } from './options';
 
 export const columns: ColumnDef<Product>[] = [
   {
+    id: 'photo_url',
     accessorKey: 'photo_url',
     header: 'IMAGE',
     cell: ({ row }) => {
@@ -24,7 +25,8 @@ export const columns: ColumnDef<Product>[] = [
           />
         </div>
       );
-    }
+    },
+    meta: { label: 'Image', type: 'image', priority: 2 }
   },
   {
     id: 'name',
@@ -37,7 +39,10 @@ export const columns: ColumnDef<Product>[] = [
       label: 'Name',
       placeholder: 'Search products...',
       variant: 'text',
-      icon: Icons.text
+      icon: Icons.text,
+      type: 'text',
+      primary: true,
+      priority: 1
     },
     enableColumnFilter: true
   },
@@ -63,20 +68,40 @@ export const columns: ColumnDef<Product>[] = [
     meta: {
       label: 'categories',
       variant: 'multiSelect',
-      options: CATEGORY_OPTIONS
+      options: CATEGORY_OPTIONS,
+      type: 'text',
+      priority: 2
     }
   },
   {
+    id: 'price',
     accessorKey: 'price',
-    header: 'PRICE'
+    header: ({ column }: { column: Column<Product, unknown> }) => (
+      <DataTableColumnHeader column={column} title='Price' />
+    ),
+    meta: {
+      label: 'Price',
+      type: 'money',
+      highlight: true,
+      priority: 1
+    }
   },
   {
+    id: 'description',
     accessorKey: 'description',
-    header: 'DESCRIPTION'
+    header: ({ column }: { column: Column<Product, unknown> }) => (
+      <DataTableColumnHeader column={column} title='Description' />
+    ),
+    meta: {
+      label: 'Description',
+      type: 'longtext',
+      priority: 4,
+      mobile: 'hidden'
+    }
   },
-
   {
     id: 'actions',
+    meta: { mobile: 'hidden' },
     cell: ({ row }) => <CellAction data={row.original} />
   }
 ];

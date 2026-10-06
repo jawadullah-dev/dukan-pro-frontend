@@ -16,8 +16,14 @@ export const proxy = auth((req) => {
   const isLoginPage = pathname.startsWith('/login');
   const isDashboard = pathname.startsWith('/dashboard');
   const isAuthApi = pathname.startsWith('/api/auth');
+  const isPwaAsset =
+    pathname.startsWith('/serwist') ||
+    pathname.startsWith('/~offline') ||
+    pathname === '/manifest.webmanifest' ||
+    pathname.startsWith('/icons/') ||
+    pathname.startsWith('/screenshots/');
 
-  if (isAuthApi) {
+  if (isAuthApi || isPwaAsset) {
     return NextResponse.next();
   }
 

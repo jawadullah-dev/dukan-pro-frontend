@@ -4,6 +4,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { FloatingActionButton } from '@/components/common/floating-action-button';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +24,8 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { StatusBadge } from '@/components/data-table';
+import { t } from '@/i18n';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import {
@@ -42,41 +44,65 @@ import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { FormEntitySelect } from './form-entity-select';
 import { PurchasesTable } from './tables/commerce-tables';
 
-export function PurchasesHeaderAction({ defaultOpen = false }: { defaultOpen?: boolean }) {
+function PurchaseCreateDialog({
+  open,
+  onOpenChange,
+  clearDefaultQuery
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  clearDefaultQuery?: boolean;
+}) {
   const router = useRouter();
-  const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <>
-      <Button type='button' size='sm' onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        New purchase
-      </Button>
-      <Dialog
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next && defaultOpen) router.replace('/dashboard/purchases');
-        }}
-      >
-        <DialogContent className='flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl'>
-          <DialogHeader className='shrink-0 px-4 pt-4 pr-12'>
-            <DialogTitle>New purchase</DialogTitle>
-            <DialogDescription>
-              Stock in with IMEI1/IMEI2; opening stock skips cash
-            </DialogDescription>
-          </DialogHeader>
-          <div className='no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4'>
-            <PurchaseCreateForm onDone={() => setOpen(false)} />
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        onOpenChange(next);
+        if (!next && clearDefaultQuery) router.replace('/dashboard/purchases');
+      }}
+    >
+      <DialogContent className='flex max-h-[90dvh] w-full flex-col gap-0 overflow-hidden p-0 data-[size]:max-w-none sm:max-w-3xl max-sm:inset-x-0 max-sm:bottom-0 max-sm:top-auto max-sm:max-h-[90dvh] max-sm:translate-y-0 max-sm:rounded-t-[var(--radius)] max-sm:rounded-b-none'>
+        <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
+          <DialogTitle>New purchase</DialogTitle>
+          <DialogDescription>Stock in with IMEI1/IMEI2; opening stock skips cash</DialogDescription>
+        </DialogHeader>
+        <div className='no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]'>
+          <PurchaseCreateForm onDone={() => onOpenChange(false)} />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function PurchasesHeaderAction({
+  className,
+  onAdd
+}: {
+  className?: string;
+  onAdd: () => void;
+}) {
+  return (
+    <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
+      <Icons.add className='me-2 h-4 w-4' />
+      {t('common.newPurchase')}
+    </Button>
   );
 }
 
 export function PurchasesListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) {
-  return <PurchasesTable toolbarAction={<PurchasesHeaderAction defaultOpen={defaultOpenAdd} />} />;
+  const [open, setOpen] = useState(defaultOpenAdd);
+
+  return (
+    <>
+      <PurchasesTable
+        toolbarAction={<PurchasesHeaderAction className='h-8' onAdd={() => setOpen(true)} />}
+      />
+      <FloatingActionButton label={t('common.newPurchase')} onClick={() => setOpen(true)} />
+      <PurchaseCreateDialog open={open} onOpenChange={setOpen} clearDefaultQuery={defaultOpenAdd} />
+    </>
+  );
 }
 
 function parseImeiList(text: string): string[] {
@@ -442,10 +468,10 @@ export function PurchaseDetailClient({ id }: { id: string }) {
           {data.supplier?.name} · {data.purchase_date} · Outstanding {formatPkr(data.outstanding)}
         </p>
         <div className='flex flex-wrap gap-2'>
-          <Badge variant={data.status === 'ACTIVE' ? 'default' : 'secondary'}>
-            {formatLabel(data.status)}
-          </Badge>
-          {data.is_opening_stock ? <Badge variant='outline'>Opening stock</Badge> : null}
+          <StatusBadge status={data.status} />
+          {data.is_opening_stock ? (
+            <StatusBadge status='OPENING' label='Opening stock' tone='neutral' />
+          ) : null}
         </div>
         {data.supplier_invoice_ref ? (
           <p className='text-muted-foreground text-sm'>Invoice ref: {data.supplier_invoice_ref}</p>

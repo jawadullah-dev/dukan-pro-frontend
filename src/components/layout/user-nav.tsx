@@ -17,6 +17,8 @@ import {
 import { SidebarMenuButton } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Icons } from '@/components/icons';
+import { InstallPrompt } from '@/components/pwa/install-prompt';
+import { clearPwaCaches } from '@/lib/pwa';
 
 function ProfileAvatar({ className }: { className?: string }) {
   return (
@@ -26,6 +28,11 @@ function ProfileAvatar({ className }: { className?: string }) {
       </AvatarFallback>
     </Avatar>
   );
+}
+
+async function handleSignOut() {
+  await clearPwaCaches();
+  await signOut({ callbackUrl: '/login' });
 }
 
 function AccountMenuItems({ userName, shopName }: { userName: string; shopName: string }) {
@@ -40,12 +47,11 @@ function AccountMenuItems({ userName, shopName }: { userName: string; shopName: 
         </DropdownMenuLabel>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
-      <DropdownMenuItem
-        variant='destructive'
-        onClick={() => {
-          void signOut({ callbackUrl: '/login' });
-        }}
-      >
+      <div className='px-1 py-0.5'>
+        <InstallPrompt variant='menu' />
+      </div>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem variant='destructive' onClick={() => void handleSignOut()}>
         <Icons.logout className='mr-2 h-4 w-4' />
         Sign out
       </DropdownMenuItem>

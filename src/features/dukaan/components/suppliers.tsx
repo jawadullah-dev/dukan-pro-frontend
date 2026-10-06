@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { FloatingActionButton } from '@/components/common/floating-action-button';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +15,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { FieldGroup } from '@/components/ui/field';
+import { t } from '@/i18n';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { toPaisa } from '@/lib/dukaan/numbers';
@@ -132,19 +134,30 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
   );
 }
 
-export function SuppliersHeaderAction() {
+export function SuppliersHeaderAction({ onAdd }: { onAdd?: () => void }) {
   const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    if (onAdd) onAdd();
+    else setOpen(true);
+  };
   return (
     <>
-      <Button type='button' size='sm' onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add supplier
+      <Button type='button' size='sm' onClick={handleOpen}>
+        <Icons.add className='me-2 h-4 w-4' />
+        {t('common.addSupplier')}
       </Button>
-      <SupplierDialog open={open} onOpenChange={setOpen} />
+      {onAdd ? null : <SupplierDialog open={open} onOpenChange={setOpen} />}
     </>
   );
 }
 
 export function SuppliersListClient() {
-  return <SuppliersTable toolbarAction={<SuppliersHeaderAction />} />;
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <SuppliersTable toolbarAction={<SuppliersHeaderAction onAdd={() => setOpen(true)} />} />
+      <FloatingActionButton label={t('common.addSupplier')} onClick={() => setOpen(true)} />
+      <SupplierDialog open={open} onOpenChange={setOpen} />
+    </>
+  );
 }

@@ -11,12 +11,42 @@
 
 @import './theme.css';
 
+/* Semantic status tones (tables/badges) — independent of brand primary. */
+:root {
+  --status-success: oklch(0.52 0.14 145);
+  --status-success-bg: oklch(0.52 0.14 145 / 0.14);
+  --status-warning: oklch(0.62 0.14 75);
+  --status-warning-bg: oklch(0.72 0.14 75 / 0.2);
+}
+
+.dark {
+  --status-success: oklch(0.72 0.14 145);
+  --status-success-bg: oklch(0.72 0.14 145 / 0.16);
+  --status-warning: oklch(0.78 0.12 85);
+  --status-warning-bg: oklch(0.78 0.12 85 / 0.16);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Standalone PWA: reduce accidental pull-to-refresh / rubber-band on POS & tables */
+  html {
+    overscroll-behavior: none;
+  }
+  body {
+    overscroll-behavior-y: none;
+  }
+  @media (display-mode: standalone) {
+    html,
+    body {
+      overscroll-behavior: none;
+      overscroll-behavior-y: none;
+    }
   }
 
   /* Hide scrollbars globally; scrolling still works */

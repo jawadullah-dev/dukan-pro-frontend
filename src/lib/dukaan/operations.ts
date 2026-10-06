@@ -471,10 +471,16 @@ export async function listCustomers(filters: ListFilters = {}) {
       (c) => c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q)
     );
   }
-  const withUdhar = items.map((c) => ({
+  let withUdhar = items.map((c) => ({
     ...c,
     udhar: getCustomerUdhar(sid, c.id)
   }));
+  if (filters.udhar_state) {
+    withUdhar = withUdhar.filter((c) => {
+      const state = c.udhar > 0 ? 'owing' : 'settled';
+      return matchesFacet(filters.udhar_state, state);
+    });
+  }
   return paginate(withUdhar, filters);
 }
 
@@ -556,13 +562,20 @@ function imeiAlreadyExists(
 export async function listPurchases(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
-  let items = getStore().purchases.filter((p) => p.shop_id === sid);
+  const store = getStore();
+  let items = store.purchases
+    .filter((p) => p.shop_id === sid)
+    .map((p) => ({
+      ...p,
+      supplier_name: store.suppliers.find((s) => s.id === p.supplier_id)?.name ?? '—'
+    }));
   if (filters.search) {
     const q = filters.search.toLowerCase();
     items = items.filter(
       (p) =>
         p.purchase_no.toLowerCase().includes(q) ||
-        (p.supplier_invoice_ref ?? '').toLowerCase().includes(q)
+        (p.supplier_invoice_ref ?? '').toLowerCase().includes(q) ||
+        p.supplier_name.toLowerCase().includes(q)
     );
   }
   if (filters.status) {
@@ -995,10 +1008,16 @@ export type SaleLineInput = {
 export async function listSales(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
-  let items = getStore().sales.filter((s) => s.shop_id === sid);
+  const store = getStore();
+  let items = store.sales.filter((s) => s.shop_id === sid);
   if (filters.search) {
     const q = filters.search.toLowerCase();
-    items = items.filter((s) => s.sale_no.toLowerCase().includes(q));
+    items = items.filter((s) => {
+      const customerName = s.customer_id
+        ? (store.customers.find((c) => c.id === s.customer_id)?.name ?? '')
+        : '';
+      return s.sale_no.toLowerCase().includes(q) || customerName.toLowerCase().includes(q);
+    });
   }
   if (filters.status) {
     items = items.filter((s) => matchesFacet(filters.status, s.status));
@@ -1006,6 +1025,9 @@ export async function listSales(filters: ListFilters = {}) {
   items = items.toSorted((a, b) => b.created_at.localeCompare(a.created_at));
   const enriched = items.map((s) => ({
     ...s,
+    customer_name: s.customer_id
+      ? (store.customers.find((c) => c.id === s.customer_id)?.name ?? 'Walk-in')
+      : 'Walk-in',
     outstanding: getSaleOutstanding(s.id),
     paid: s.total_amount - getSaleOutstanding(s.id)
   }));

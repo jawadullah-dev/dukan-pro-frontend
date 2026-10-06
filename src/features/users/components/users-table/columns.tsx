@@ -26,13 +26,20 @@ export const columns: ColumnDef<User>[] = [
       label: 'Name',
       placeholder: 'Search users...',
       variant: 'text' as const,
-      icon: Icons.text
+      icon: Icons.text,
+      type: 'text',
+      primary: true,
+      priority: 1
     },
     enableColumnFilter: true
   },
   {
+    id: 'phone',
     accessorKey: 'phone',
-    header: 'PHONE'
+    header: ({ column }: { column: Column<User, unknown> }) => (
+      <DataTableColumnHeader column={column} title='Phone' />
+    ),
+    meta: { label: 'Phone', type: 'phone', priority: 2 }
   },
   {
     id: 'role',
@@ -52,21 +59,28 @@ export const columns: ColumnDef<User>[] = [
     meta: {
       label: 'roles',
       variant: 'multiSelect' as const,
-      options: ROLE_OPTIONS
+      options: ROLE_OPTIONS,
+      type: 'text',
+      priority: 2
     }
   },
   {
+    id: 'status',
     accessorKey: 'status',
-    header: 'STATUS',
+    header: ({ column }: { column: Column<User, unknown> }) => (
+      <DataTableColumnHeader column={column} title='Status' />
+    ),
     cell: ({ cell }) => {
       const status = cell.getValue<User['status']>();
       const variant =
         status === 'Active' ? 'default' : status === 'Inactive' ? 'secondary' : 'outline';
       return <Badge variant={variant}>{status}</Badge>;
-    }
+    },
+    meta: { label: 'Status', type: 'status', priority: 1 }
   },
   {
     id: 'actions',
+    meta: { mobile: 'hidden' },
     cell: ({ row }) => <CellAction data={row.original} />
   }
 ];

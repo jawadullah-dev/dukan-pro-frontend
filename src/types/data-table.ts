@@ -12,6 +12,26 @@ declare module '@tanstack/react-table' {
     range?: [number, number];
     unit?: string;
     icon?: React.FC<React.SVGProps<SVGSVGElement>>;
+    /** 1 = always in compact; 4 = widest screens only. Actions ignore this. */
+    priority?: 1 | 2 | 3 | 4;
+    /** Semantic type for auto mobile layout + detail formatting. */
+    type?:
+      | 'text'
+      | 'id'
+      | 'phone'
+      | 'money'
+      | 'number'
+      | 'date'
+      | 'status'
+      | 'boolean'
+      | 'image'
+      | 'longtext';
+    /** Main identifying column (title slot). */
+    primary?: boolean;
+    /** Most important number (value slot). */
+    highlight?: boolean;
+    /** Explicit phone list slot; overrides auto-layout for this column. */
+    mobile?: 'title' | 'subtitle' | 'badge' | 'value' | 'meta' | 'hidden';
   }
 }
 

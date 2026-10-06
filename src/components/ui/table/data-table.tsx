@@ -1,106 +1,56 @@
-import { type Table as TanstackTable, flexRender } from '@tanstack/react-table';
-import type * as React from 'react';
+'use client';
 
-import { DataTablePagination } from '@/components/ui/table/data-table-pagination';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { isValidElement, type ReactElement, type ReactNode } from 'react';
+import type { Table as TanstackTable } from '@tanstack/react-table';
+import { ResponsiveDataTable } from '@/components/data-table/responsive-data-table';
+import type {
+  DetailConfig,
+  MobileItemConfig,
+  QuickFilterChip
+} from '@/components/data-table/types';
+import type { LedgerListConfig } from '@/components/data-table/responsive-data-table';
 
-interface DataTableProps<TData> extends React.ComponentProps<'div'> {
+interface DataTableProps<TData> {
   table: TanstackTable<TData>;
-  actionBar?: React.ReactNode;
+  actionBar?: ReactNode;
+  children?: ReactNode;
+  className?: string;
+  /** Optional overrides — otherwise auto-layout from column meta. */
+  mobileItem?: MobileItemConfig<TData>;
+  detail?: DetailConfig<TData> | Partial<DetailConfig<TData>>;
+  quickFilters?: QuickFilterChip[];
+  ledger?: LedgerListConfig<TData>;
 }
 
-export function DataTable<TData>({ table, actionBar, children }: DataTableProps<TData>) {
+/**
+ * Compatibility entry: every list page uses ResponsiveDataTable under the hood.
+ * Pass `toolbarAction` via `<DataTableToolbar>{action}</DataTableToolbar>` children,
+ * or use ResponsiveDataTable directly.
+ */
+export function DataTable<TData>({
+  table,
+  children,
+  className,
+  mobileItem,
+  detail,
+  quickFilters,
+  ledger
+}: DataTableProps<TData>) {
+  let toolbarAction: ReactNode;
+  if (isValidElement(children)) {
+    const el = children as ReactElement<{ children?: ReactNode }>;
+    toolbarAction = el.props.children;
+  }
+
   return (
-    <div className='flex flex-1 flex-col space-y-4'>
-      {children}
-      <div className='relative flex flex-1'>
-        <div className='absolute inset-0 flex overflow-hidden rounded-lg border'>
-          <ScrollArea className='h-full w-full'>
-            <Table className='min-w-full table-fixed'>
-              <TableHeader className='sticky top-0 z-10 bg-background'>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className='border-0 hover:bg-transparent'>
-                    {headerGroup.headers.map((header) => {
-                      const isActions = header.column.id === 'actions';
-                      return (
-                        <TableHead
-                          key={header.id}
-                          colSpan={header.colSpan}
-                          className={
-                            isActions
-                              ? 'w-12 border-0 bg-background text-right'
-                              : 'border-0 bg-background'
-                          }
-                          style={
-                            isActions
-                              ? {
-                                  width: header.column.getSize() || 48,
-                                  minWidth: header.column.getSize() || 48,
-                                  maxWidth: header.column.getSize() || 48
-                                }
-                              : undefined
-                          }
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                      {row.getVisibleCells().map((cell) => {
-                        const isActions = cell.column.id === 'actions';
-                        return (
-                          <TableCell
-                            key={cell.id}
-                            className={isActions ? 'w-12 text-right' : undefined}
-                            style={
-                              isActions
-                                ? {
-                                    width: cell.column.getSize() || 48,
-                                    minWidth: cell.column.getSize() || 48,
-                                    maxWidth: cell.column.getSize() || 48
-                                  }
-                                : undefined
-                            }
-                          >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={table.getAllColumns().length} className='h-24 text-center'>
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-            <ScrollBar orientation='horizontal' />
-          </ScrollArea>
-        </div>
-      </div>
-      <div className='flex flex-col gap-2.5'>
-        <DataTablePagination table={table} />
-        {actionBar && table.getFilteredSelectedRowModel().rows.length > 0 && actionBar}
-      </div>
-    </div>
+    <ResponsiveDataTable
+      table={table}
+      toolbarAction={toolbarAction}
+      mobileItem={mobileItem}
+      detail={detail}
+      quickFilters={quickFilters}
+      ledger={ledger}
+      className={className}
+    />
   );
 }

@@ -1,6 +1,7 @@
 import KBar from '@/components/kbar';
 import AppSidebar from '@/components/layout/app-sidebar';
 import Header from '@/components/layout/header';
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { InfoSidebar } from '@/components/layout/info-sidebar';
 import { InfobarProvider } from '@/components/ui/infobar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
@@ -39,12 +40,17 @@ export default async function DashboardLayout({ children }: { children: React.Re
           Skip to content
         </a>
         <AppSidebar role={role} />
-        <SidebarInset id='main-content' tabIndex={-1} className='scroll-mt-16'>
+        <SidebarInset
+          id='main-content'
+          tabIndex={-1}
+          className='min-h-dvh min-w-0 overflow-x-hidden scroll-mt-16'
+        >
           <Header />
           <InfobarProvider defaultOpen={false}>
             {children}
             <InfoSidebar side='right' />
           </InfobarProvider>
+          <MobileBottomNav role={role} />
         </SidebarInset>
       </SidebarProvider>
     </KBar>

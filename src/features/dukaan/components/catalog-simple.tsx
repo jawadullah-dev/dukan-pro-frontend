@@ -1,41 +1,65 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { FloatingActionButton } from '@/components/common/floating-action-button';
 import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
+import { t } from '@/i18n';
 import { BrandDialog, CategoryDialog } from './catalog-dialogs';
 import { BrandsTable, CategoriesTable } from './tables/catalog-tables';
 
-export function CategoriesHeaderAction() {
+export function CategoriesHeaderAction({ onAdd }: { onAdd?: () => void }) {
   const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    if (onAdd) onAdd();
+    else setOpen(true);
+  };
   return (
     <>
-      <Button type='button' size='sm' onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add category
+      <Button type='button' size='sm' onClick={handleOpen}>
+        <Icons.add className='me-2 h-4 w-4' />
+        {t('common.addCategory')}
       </Button>
-      <CategoryDialog open={open} onOpenChange={setOpen} />
+      {onAdd ? null : <CategoryDialog open={open} onOpenChange={setOpen} />}
     </>
   );
 }
 
 export function CategoriesPageClient() {
-  return <CategoriesTable toolbarAction={<CategoriesHeaderAction />} />;
-}
-
-export function BrandsHeaderAction() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <Button type='button' size='sm' onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add brand
+      <CategoriesTable toolbarAction={<CategoriesHeaderAction onAdd={() => setOpen(true)} />} />
+      <FloatingActionButton label={t('common.addCategory')} onClick={() => setOpen(true)} />
+      <CategoryDialog open={open} onOpenChange={setOpen} />
+    </>
+  );
+}
+
+export function BrandsHeaderAction({ onAdd }: { onAdd?: () => void }) {
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    if (onAdd) onAdd();
+    else setOpen(true);
+  };
+  return (
+    <>
+      <Button type='button' size='sm' onClick={handleOpen}>
+        <Icons.add className='me-2 h-4 w-4' />
+        {t('common.addBrand')}
       </Button>
-      <BrandDialog open={open} onOpenChange={setOpen} />
+      {onAdd ? null : <BrandDialog open={open} onOpenChange={setOpen} />}
     </>
   );
 }
 
 export function BrandsPageClient() {
-  return <BrandsTable toolbarAction={<BrandsHeaderAction />} />;
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <BrandsTable toolbarAction={<BrandsHeaderAction onAdd={() => setOpen(true)} />} />
+      <FloatingActionButton label={t('common.addBrand')} onClick={() => setOpen(true)} />
+      <BrandDialog open={open} onOpenChange={setOpen} />
+    </>
+  );
 }

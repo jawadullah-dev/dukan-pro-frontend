@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { FloatingActionButton } from '@/components/common/floating-action-button';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +23,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { t } from '@/i18n';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { createClientRequestId, formatPkr, toPaisa } from '@/lib/dukaan/numbers';
@@ -138,21 +140,32 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
   );
 }
 
-export function CustomersHeaderAction() {
+export function CustomersHeaderAction({ onAdd }: { onAdd?: () => void }) {
   const [open, setOpen] = useState(false);
+  const handleOpen = () => {
+    if (onAdd) onAdd();
+    else setOpen(true);
+  };
   return (
     <>
-      <Button type='button' size='sm' onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add customer
+      <Button type='button' size='sm' onClick={handleOpen}>
+        <Icons.add className='me-2 h-4 w-4' />
+        {t('common.addCustomer')}
       </Button>
-      <CustomerDialog open={open} onOpenChange={setOpen} />
+      {onAdd ? null : <CustomerDialog open={open} onOpenChange={setOpen} />}
     </>
   );
 }
 
 export function CustomersListClient() {
-  return <CustomersTable toolbarAction={<CustomersHeaderAction />} />;
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <CustomersTable toolbarAction={<CustomersHeaderAction onAdd={() => setOpen(true)} />} />
+      <FloatingActionButton label={t('common.addCustomer')} onClick={() => setOpen(true)} />
+      <CustomerDialog open={open} onOpenChange={setOpen} />
+    </>
+  );
 }
 
 export function CustomerLedgerClient({ id }: { id: string }) {

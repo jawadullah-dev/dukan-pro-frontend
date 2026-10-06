@@ -27,7 +27,14 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant='ghost'
+            className='size-11 min-h-11 min-w-11 p-0 sm:size-8 sm:min-h-8 sm:min-w-8'
+          />
+        }
+      >
         <span className='sr-only'>Open menu</span>
         <Icons.ellipsis className='h-4 w-4' />
       </DropdownMenuTrigger>

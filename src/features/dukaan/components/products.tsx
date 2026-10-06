@@ -2,31 +2,45 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { FloatingActionButton } from '@/components/common/floating-action-button';
 import { Icons } from '@/components/icons';
+import { Button } from '@/components/ui/button';
+import { t } from '@/i18n';
 import { ProductDialog } from './catalog-dialogs';
 import { ProductsTable } from './tables/catalog-tables';
 
-export function ProductsHeaderAction({ defaultOpen = false }: { defaultOpen?: boolean }) {
-  const router = useRouter();
-  const [open, setOpen] = useState(defaultOpen);
+export function ProductsHeaderAction({
+  className,
+  onAdd
+}: {
+  className?: string;
+  onAdd: () => void;
+}) {
   return (
-    <>
-      <Button type='button' size='sm' onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add product
-      </Button>
-      <ProductDialog
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next && defaultOpen) router.replace('/dashboard/products');
-        }}
-      />
-    </>
+    <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
+      <Icons.add className='me-2 h-4 w-4' />
+      {t('common.addProduct')}
+    </Button>
   );
 }
 
 export function ProductsListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) {
-  return <ProductsTable toolbarAction={<ProductsHeaderAction defaultOpen={defaultOpenAdd} />} />;
+  const router = useRouter();
+  const [open, setOpen] = useState(defaultOpenAdd);
+
+  return (
+    <>
+      <ProductsTable
+        toolbarAction={<ProductsHeaderAction className='h-8' onAdd={() => setOpen(true)} />}
+      />
+      <FloatingActionButton label={t('common.addProduct')} onClick={() => setOpen(true)} />
+      <ProductDialog
+        open={open}
+        onOpenChange={(next) => {
+          setOpen(next);
+          if (!next && defaultOpenAdd) router.replace('/dashboard/products');
+        }}
+      />
+    </>
+  );
 }

@@ -19,10 +19,21 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/?source=pwa',
     scope: '/',
     display: 'standalone',
+    display_override: ['standalone', 'minimal-ui'],
     orientation: 'any',
     theme_color: PWA_THEME_COLOR_LIGHT,
     background_color: PWA_BACKGROUND_COLOR,
     categories: ['business', 'productivity'],
+    // Self-reference so desktop Chrome can report install via getInstalledRelatedApps.
+    // prefer_related_applications must stay false — true would block PWA install.
+    prefer_related_applications: false,
+    related_applications: [
+      {
+        platform: 'webapp',
+        url: '/manifest.webmanifest',
+        id: APP_ID
+      }
+    ],
     icons: [
       {
         src: '/icons/icon-192.png',

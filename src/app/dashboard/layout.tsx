@@ -48,7 +48,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Header />
           <InfobarProvider
             defaultOpen={false}
-            className='flex min-h-0 flex-1 flex-col overflow-hidden'
+            // Keep row direction (default): page content + info sidebar side-by-side.
+            // flex-col crushed the page and clipped the title under the header.
+            className='min-h-0 flex-1 overflow-hidden'
           >
             {children}
             <InfoSidebar side='right' />

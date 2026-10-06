@@ -66,7 +66,8 @@ export default function PageContainer({
   return (
     <div
       className={cn(
-        'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-4 pt-2 md:px-6 md:pt-4',
+        // min-w-0: shrink correctly beside the info sidebar (row flex parent).
+        'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-4 pt-4 md:px-6 md:pt-6',
         // Bottom clearance for fixed mobile nav / FAB — kept on the shell so
         // the inner list scroller can use the remaining height cleanly.
         'pb-[max(1rem,calc(5.5rem+env(safe-area-inset-bottom)))] sm:pb-4'

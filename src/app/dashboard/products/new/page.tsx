@@ -18,7 +18,7 @@ export default function Page() {
   void qc.prefetchQuery(brandsQueryOptions({ limit: 100 }));
   return (
     <PageContainer
-      pageTitle='Products'
+      pageTitle='pages.products.title'
       pageDescription='Serialized phones and quantity accessories'
     >
       <HydrationBoundary state={dehydrate(qc)}>

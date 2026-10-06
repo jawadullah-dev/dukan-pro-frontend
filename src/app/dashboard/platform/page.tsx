@@ -26,7 +26,7 @@ export default function PlatformPage() {
 
   return (
     <PageContainer
-      pageTitle='Platform'
+      pageTitle='pages.platform.title'
       pageDescription='Manage dukan shops and subscriptions across the platform.'
     >
       <HydrationBoundary state={dehydrate(queryClient)}>

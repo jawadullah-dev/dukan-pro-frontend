@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { DataTableFiltersSheet } from './data-table-filters-sheet';
 import type { ContainerMode } from './use-container-mode';
 
@@ -29,6 +29,7 @@ export function DataTableToolbar<TData>({
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
+  const t = useT();
   const [filtersOpen, setFiltersOpen] = React.useState(false);
   const isFiltered = table.getState().columnFilters.length > 0;
   const filterCount =
@@ -125,6 +126,7 @@ export function DataTableToolbar<TData>({
 }
 
 function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unknown> }) {
+  const t = useT();
   const columnMeta = column.columnDef.meta;
   if (!columnMeta?.variant) return null;
 

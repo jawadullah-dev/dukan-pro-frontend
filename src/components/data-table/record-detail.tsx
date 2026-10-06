@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from './status-badge';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { cn } from '@/lib/utils';
 import type { DetailConfig } from './types';
 
@@ -31,6 +31,7 @@ export function RecordDetail<TData>({
   data,
   detail
 }: RecordDetailProps<TData>) {
+  const t = useT();
   if (!data) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>

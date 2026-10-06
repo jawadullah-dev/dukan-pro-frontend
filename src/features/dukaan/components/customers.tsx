@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { createClientRequestId, formatPkr, toPaisa } from '@/lib/dukaan/numbers';
@@ -142,6 +142,7 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
 }
 
 export function CustomersHeaderAction({ onAdd }: { onAdd?: () => void }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     if (onAdd) onAdd();
@@ -159,6 +160,7 @@ export function CustomersHeaderAction({ onAdd }: { onAdd?: () => void }) {
 }
 
 export function CustomersListClient() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   return (
     <TablePageBody>

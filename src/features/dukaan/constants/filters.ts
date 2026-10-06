@@ -1,33 +1,120 @@
 import { formatLabel } from '@/lib/dukaan/numbers';
+import { t } from '@/i18n';
 
 function optionsFrom(values: readonly string[]) {
   return values.map((value) => ({ label: formatLabel(value), value }));
 }
 
+export function getRecordStatusOptions() {
+  return [
+    { label: t('status.active'), value: 'ACTIVE' },
+    { label: t('status.cancelled'), value: 'CANCELLED' }
+  ];
+}
+
+export function getTrackingTypeOptions() {
+  return [
+    { label: t('status.serialized'), value: 'SERIALIZED' },
+    { label: t('status.quantity'), value: 'QUANTITY' }
+  ];
+}
+
+export function getActiveStatusOptions() {
+  return [
+    { label: t('status.active'), value: 'true' },
+    { label: t('status.inactive'), value: 'false' }
+  ];
+}
+
+export function getLowStockOptions() {
+  return [
+    { label: t('status.lowStock'), value: 'true' },
+    { label: t('status.stockOk'), value: 'false' }
+  ];
+}
+
+export function getCashDirectionOptions() {
+  return [
+    { label: t('status.cashIn'), value: 'IN' },
+    { label: t('status.cashOut'), value: 'OUT' }
+  ];
+}
+
+/** Live-translated options — read `.label` at render time. */
 export const RECORD_STATUS_OPTIONS = [
-  { label: 'Active', value: 'ACTIVE' },
-  { label: 'Cancelled', value: 'CANCELLED' }
-] as const;
+  {
+    get label() {
+      return t('status.active');
+    },
+    value: 'ACTIVE'
+  },
+  {
+    get label() {
+      return t('status.cancelled');
+    },
+    value: 'CANCELLED'
+  }
+];
 
 export const TRACKING_TYPE_OPTIONS = [
-  { label: 'Serialized', value: 'SERIALIZED' },
-  { label: 'Quantity', value: 'QUANTITY' }
-] as const;
+  {
+    get label() {
+      return t('status.serialized');
+    },
+    value: 'SERIALIZED'
+  },
+  {
+    get label() {
+      return t('status.quantity');
+    },
+    value: 'QUANTITY'
+  }
+];
 
 export const ACTIVE_STATUS_OPTIONS = [
-  { label: 'Active', value: 'true' },
-  { label: 'Inactive', value: 'false' }
-] as const;
+  {
+    get label() {
+      return t('status.active');
+    },
+    value: 'true'
+  },
+  {
+    get label() {
+      return t('status.inactive');
+    },
+    value: 'false'
+  }
+];
 
 export const LOW_STOCK_OPTIONS = [
-  { label: 'Low stock', value: 'true' },
-  { label: 'OK', value: 'false' }
-] as const;
+  {
+    get label() {
+      return t('status.lowStock');
+    },
+    value: 'true'
+  },
+  {
+    get label() {
+      return t('status.stockOk');
+    },
+    value: 'false'
+  }
+];
 
 export const CASH_DIRECTION_OPTIONS = [
-  { label: 'In', value: 'IN' },
-  { label: 'Out', value: 'OUT' }
-] as const;
+  {
+    get label() {
+      return t('status.cashIn');
+    },
+    value: 'IN'
+  },
+  {
+    get label() {
+      return t('status.cashOut');
+    },
+    value: 'OUT'
+  }
+];
 
 export const CASH_TYPE_OPTIONS = optionsFrom([
   'OPENING_CASH',

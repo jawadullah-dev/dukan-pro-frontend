@@ -13,15 +13,8 @@ import { NotificationCenter } from '@/features/notifications/components/notifica
 import { UserNav } from '@/components/layout/user-nav';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { t } from '@/i18n';
-
-function pageTitleFromPath(pathname: string): string {
-  const segment = pathname.split('/').filter(Boolean).pop() ?? 'Dashboard';
-  return segment
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
+import { useT } from '@/i18n/use-t';
+import { pageTitleKeyFromPath } from '@/lib/i18n/path-titles';
 
 /** Detail routes need an in-app back control (standalone PWA has no browser chrome). */
 function isDetailPath(pathname: string): boolean {
@@ -31,10 +24,12 @@ function isDetailPath(pathname: string): boolean {
 }
 
 export default function Header() {
+  const t = useT();
   const { query } = useKBar();
   const pathname = usePathname();
   const router = useRouter();
-  const title = pageTitleFromPath(pathname);
+  const titleKey = pageTitleKeyFromPath(pathname);
+  const title = titleKey ? t(titleKey) : 'Dukaan';
   const showBack = isDetailPath(pathname);
 
   return (

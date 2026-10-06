@@ -1,7 +1,10 @@
+'use client';
+
 import React from 'react';
 import { Heading } from '../ui/heading';
 import type { InfobarContent } from '@/components/ui/infobar';
 import { cn } from '@/lib/utils';
+import { useT, translateMaybe } from '@/i18n/use-t';
 
 function PageSkeleton() {
   return (
@@ -41,19 +44,22 @@ export default function PageContainer({
   isLoading?: boolean;
   access?: boolean;
   accessFallback?: React.ReactNode;
+  /** Plain text or i18n message key (e.g. pages.sales.title). */
   pageTitle?: string;
   pageDescription?: string;
   infoContent?: InfobarContent;
   pageHeaderAction?: React.ReactNode;
   fill?: boolean;
 }) {
+  const t = useT();
+  const title = pageTitle ? translateMaybe(pageTitle, t) : '';
+  const description = pageDescription ? translateMaybe(pageDescription, t) : '';
+
   if (!access) {
     return (
       <div role='status' className='flex flex-1 items-center justify-center p-4 md:px-6'>
         {accessFallback ?? (
-          <div className='text-muted-foreground text-center text-lg'>
-            You do not have access to this page.
-          </div>
+          <div className='text-muted-foreground text-center text-lg'>{t('common.noAccess')}</div>
         )}
       </div>
     );
@@ -69,14 +75,10 @@ export default function PageContainer({
         <div className='mb-3 flex shrink-0 flex-col gap-2 px-4 pt-4 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4 md:px-6 md:pt-6'>
           {/* Phones already show the title in the top bar — avoid duplicate H1. */}
           <div className='hidden sm:block'>
-            <Heading
-              title={pageTitle ?? ''}
-              description={pageDescription ?? ''}
-              infoContent={infoContent}
-            />
+            <Heading title={title} description={description} infoContent={infoContent} />
           </div>
-          {pageDescription ? (
-            <p className='text-muted-foreground text-xs sm:hidden'>{pageDescription}</p>
+          {description ? (
+            <p className='text-muted-foreground text-xs sm:hidden'>{description}</p>
           ) : null}
           {pageHeaderAction ? (
             <div className='hidden w-full shrink-0 sm:block sm:w-auto'>{pageHeaderAction}</div>
@@ -87,17 +89,11 @@ export default function PageContainer({
       <div
         className={cn(
           'flex min-h-0 min-w-0 flex-1 flex-col',
-          // Padding lives on the scroll/fill pane so card rings & borders are not
-          // clipped by overflow (ring draws outside the box).
           hasHeader ? 'px-4 md:px-6' : 'px-4 pt-4 md:px-6 md:pt-6',
           'pb-[max(1rem,calc(5.5rem+env(safe-area-inset-bottom)))] sm:pb-4',
           fill ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'
         )}
       >
-        {/*
-          p-px: keeps 1px ring/border of full-width cards inside the scrollport.
-          Without this, overflow-y-auto clips left/right/bottom card edges.
-        */}
         <div
           className={cn(
             'min-w-0 p-px',

@@ -12,7 +12,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const qc = getQueryClient();
   void qc.prefetchQuery(customerQueryOptions(id));
   return (
-    <PageContainer pageTitle='Customer ledger' pageDescription='Udhar history and payments'>
+    <PageContainer
+      pageTitle='pages.customerLedger.title'
+      pageDescription='pages.customerLedger.description'
+    >
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <CustomerLedgerClient id={id} />

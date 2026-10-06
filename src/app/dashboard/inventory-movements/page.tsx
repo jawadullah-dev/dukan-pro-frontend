@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <PageContainer
       fill
-      pageTitle='Inventory movements'
+      pageTitle='pages.movements.title'
       pageDescription='Append-only stock movement history'
     >
       <HydrationBoundary state={dehydrate(qc)}>

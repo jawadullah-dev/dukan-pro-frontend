@@ -1,4 +1,5 @@
 import type { AppearanceState } from './store';
+import { setLocale, type AppLocale } from '@/i18n';
 
 const RADIUS_REM: Record<AppearanceState['radius'], string> = {
   sharp: '0.25rem',
@@ -29,4 +30,5 @@ export function applyAppearancePrefs(
   delete root.dataset.appearanceFont;
   root.lang = prefs.language === 'en' ? 'en' : prefs.language === 'ur' ? 'ur' : 'ps';
   root.dir = prefs.language === 'en' ? 'ltr' : 'rtl';
+  setLocale(prefs.language as AppLocale);
 }

@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <PageContainer
       fill
-      pageTitle='Payments'
+      pageTitle='pages.payments.title'
       pageDescription='Customer payments — cancel with reason (owner only)'
     >
       <HydrationBoundary state={dehydrate(qc)}>

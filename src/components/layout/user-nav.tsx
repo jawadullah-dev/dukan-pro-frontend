@@ -21,6 +21,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Icons } from '@/components/icons';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { clearPwaCaches } from '@/lib/pwa';
+import { useT } from '@/i18n/use-t';
 
 function ProfileAvatar({ className }: { className?: string }) {
   return (
@@ -33,6 +34,7 @@ function ProfileAvatar({ className }: { className?: string }) {
 }
 
 function AccountMenuItems({ userName, shopName }: { userName: string; shopName: string }) {
+  const t = useT();
   const [signingOut, setSigningOut] = React.useState(false);
 
   const onSignOut = () => {
@@ -69,7 +71,7 @@ function AccountMenuItems({ userName, shopName }: { userName: string; shopName: 
         ) : (
           <Icons.logout className='mr-2 h-4 w-4' />
         )}
-        {signingOut ? 'Signing out…' : 'Sign out'}
+        {signingOut ? t('nav.signingOut') : t('nav.signOut')}
       </DropdownMenuItem>
     </>
   );
@@ -77,6 +79,7 @@ function AccountMenuItems({ userName, shopName }: { userName: string; shopName: 
 
 /** Compact profile avatar for the top header (next to notifications). */
 export function UserNav() {
+  const t = useT();
   const { data, isPending } = useQuery(sessionQueryOptions());
 
   if (isPending) {
@@ -93,7 +96,7 @@ export function UserNav() {
             variant='ghost'
             size='icon'
             className='relative h-8 w-8 rounded-full'
-            aria-label='Account menu'
+            aria-label={t('nav.accountMenu')}
           />
         }
       >
@@ -108,6 +111,7 @@ export function UserNav() {
 
 /** Sidebar footer account row — same session + logout for both roles. */
 export function SidebarUserMenu() {
+  const t = useT();
   const { data, isPending } = useQuery(sessionQueryOptions());
 
   if (isPending) {
@@ -131,7 +135,7 @@ export function SidebarUserMenu() {
           <SidebarMenuButton
             size='lg'
             className='data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground'
-            aria-label='Account menu'
+            aria-label={t('nav.accountMenu')}
           />
         }
       >

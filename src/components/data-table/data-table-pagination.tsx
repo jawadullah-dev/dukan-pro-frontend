@@ -12,7 +12,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 
 interface DataTablePaginationProps<TData> extends React.ComponentProps<'div'> {
   table: Table<TData>;
@@ -28,6 +28,7 @@ export function DataTablePagination<TData>({
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
+  const t = useT();
   const { pageIndex, pageSize } = table.getState().pagination;
   const total = table.getRowCount();
   const from = total === 0 ? 0 : pageIndex * pageSize + 1;

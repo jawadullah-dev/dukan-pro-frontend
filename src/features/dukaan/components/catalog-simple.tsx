@@ -5,11 +5,12 @@ import { FloatingActionButton } from '@/components/common/floating-action-button
 import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { BrandDialog, CategoryDialog } from './catalog-dialogs';
 import { BrandsTable, CategoriesTable } from './tables/catalog-tables';
 
 export function CategoriesHeaderAction({ onAdd }: { onAdd?: () => void }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     if (onAdd) onAdd();
@@ -27,6 +28,7 @@ export function CategoriesHeaderAction({ onAdd }: { onAdd?: () => void }) {
 }
 
 export function CategoriesPageClient() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   return (
     <TablePageBody>
@@ -38,6 +40,7 @@ export function CategoriesPageClient() {
 }
 
 export function BrandsHeaderAction({ onAdd }: { onAdd?: () => void }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     if (onAdd) onAdd();
@@ -55,6 +58,7 @@ export function BrandsHeaderAction({ onAdd }: { onAdd?: () => void }) {
 }
 
 export function BrandsPageClient() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   return (
     <TablePageBody>

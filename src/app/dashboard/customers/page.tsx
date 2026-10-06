@@ -11,7 +11,11 @@ export default function Page() {
   const qc = getQueryClient();
   void qc.prefetchQuery(customersQueryOptions({ limit: 100 }));
   return (
-    <PageContainer fill pageTitle='Customers' pageDescription='Customer list and Udhar'>
+    <PageContainer
+      fill
+      pageTitle='pages.customers.title'
+      pageDescription='pages.customers.description'
+    >
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <CustomersListClient />

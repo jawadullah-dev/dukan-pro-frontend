@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <PageContainer
       fill
-      pageTitle='Expense categories'
+      pageTitle='pages.expenseCategories.title'
       pageDescription='Categories used when recording expenses'
     >
       <HydrationBoundary state={dehydrate(qc)}>

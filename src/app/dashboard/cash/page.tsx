@@ -11,7 +11,7 @@ export default function Page() {
   const qc = getQueryClient();
   void qc.prefetchQuery(cashQueryOptions({ limit: 100 }));
   return (
-    <PageContainer fill pageTitle='Cash ledger' pageDescription='Append-only cash movements'>
+    <PageContainer fill pageTitle='pages.cash.title' pageDescription='pages.cash.description'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <CashLedgerClient />

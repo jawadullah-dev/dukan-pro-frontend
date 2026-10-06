@@ -5,7 +5,7 @@ import type { Row, Table } from '@tanstack/react-table';
 import { MobileListItem } from './mobile-list-item';
 import { RecordDetail } from './record-detail';
 import { Skeleton } from '@/components/ui/skeleton';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import type { DetailConfig, MobileItemConfig } from './types';
 
 interface MobileListProps<TData> {
@@ -27,6 +27,7 @@ export function MobileList<TData>({
   isLoading,
   onNavigate
 }: MobileListProps<TData>) {
+  const t = useT();
   const [active, setActive] = React.useState<Row<TData> | null>(null);
   const rows = table.getRowModel().rows;
 

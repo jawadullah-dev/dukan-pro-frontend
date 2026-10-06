@@ -2,6 +2,7 @@
 
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
+import { useT } from '@/i18n/use-t';
 import { ACTION_LABELS } from '../constants/ui';
 
 interface DialogCancelButtonProps {
@@ -11,10 +12,11 @@ interface DialogCancelButtonProps {
 
 /** Outline dismiss control — Cancel text + close icon. */
 export function DialogCancelButton({ onClick, disabled }: DialogCancelButtonProps) {
+  const t = useT();
   return (
     <Button type='button' variant='outline' disabled={disabled} onClick={onClick}>
       <Icons.close className='mr-2 h-4 w-4' />
-      {ACTION_LABELS.cancel}
+      {t('common.cancel')}
     </Button>
   );
 }
@@ -46,11 +48,12 @@ export function DialogPrimaryButton({
   onClick,
   variant = 'default'
 }: DialogPrimaryButtonProps) {
+  const t = useT();
   const Icon = PRIMARY_ICON[mode];
   return (
     <Button type={type} variant={variant} disabled={disabled} isLoading={loading} onClick={onClick}>
       <Icon className='mr-2 h-4 w-4' />
-      {ACTION_LABELS[mode]}
+      {t(`common.${mode}` as const)}
     </Button>
   );
 }
@@ -69,8 +72,9 @@ export function DialogConfirmButton({
   loading = false,
   type = 'submit',
   onClick,
-  label = ACTION_LABELS.confirm
+  label
 }: DialogConfirmButtonProps) {
+  const t = useT();
   return (
     <Button
       type={type}
@@ -80,7 +84,7 @@ export function DialogConfirmButton({
       onClick={onClick}
     >
       <Icons.trash className='mr-2 h-4 w-4' />
-      {label}
+      {label ?? t('common.confirm')}
     </Button>
   );
 }

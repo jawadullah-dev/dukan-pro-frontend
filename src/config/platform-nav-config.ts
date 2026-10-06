@@ -1,12 +1,12 @@
 import { NavGroup } from '@/types';
 
-/** Platform super-admin navigation — flat links like shop admin (no dropdowns). */
+/** Platform super-admin navigation — titles/labels are i18n keys. */
 export const platformNavGroups: NavGroup[] = [
   {
-    label: 'Overview',
+    label: 'nav.group.overview',
     items: [
       {
-        title: 'Dashboard',
+        title: 'nav.dashboard',
         url: '/dashboard/platform',
         icon: 'dashboard',
         shortcut: ['d', 'd'],
@@ -16,17 +16,17 @@ export const platformNavGroups: NavGroup[] = [
     ]
   },
   {
-    label: 'Management',
+    label: 'nav.group.management',
     items: [
       {
-        title: 'Shops',
+        title: 'nav.shops',
         url: '/dashboard/platform/shops',
         icon: 'building',
         isActive: false,
         items: []
       },
       {
-        title: 'Subscriptions',
+        title: 'nav.subscriptions',
         url: '/dashboard/platform/subscriptions',
         icon: 'creditCard',
         isActive: false,
@@ -35,10 +35,10 @@ export const platformNavGroups: NavGroup[] = [
     ]
   },
   {
-    label: 'Settings',
+    label: 'nav.group.settings',
     items: [
       {
-        title: 'Appearance',
+        title: 'nav.appearance',
         url: '/dashboard/settings/appearance',
         icon: 'palette',
         isActive: false,

@@ -16,7 +16,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { FieldGroup } from '@/components/ui/field';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { toPaisa } from '@/lib/dukaan/numbers';
@@ -136,6 +136,7 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
 }
 
 export function SuppliersHeaderAction({ onAdd }: { onAdd?: () => void }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     if (onAdd) onAdd();
@@ -153,6 +154,7 @@ export function SuppliersHeaderAction({ onAdd }: { onAdd?: () => void }) {
 }
 
 export function SuppliersListClient() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   return (
     <TablePageBody>

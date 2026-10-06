@@ -14,7 +14,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { DataTableFacetedFilter } from '@/components/ui/table/data-table-faceted-filter';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { cn } from '@/lib/utils';
 
 interface DataTableFiltersSheetProps<TData> {
@@ -32,6 +32,7 @@ export function DataTableFiltersSheet<TData>({
   onOpenChange,
   pageSizeOptions = [20, 30, 50, 100]
 }: DataTableFiltersSheetProps<TData>) {
+  const t = useT();
   const filterColumns = React.useMemo(
     () =>
       table

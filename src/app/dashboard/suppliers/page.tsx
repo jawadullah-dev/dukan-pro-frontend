@@ -13,7 +13,7 @@ export default function Page() {
   return (
     <PageContainer
       fill
-      pageTitle='Suppliers'
+      pageTitle='pages.suppliers.title'
       pageDescription='Buy-from contacts including Walk-in seller'
     >
       <HydrationBoundary state={dehydrate(qc)}>

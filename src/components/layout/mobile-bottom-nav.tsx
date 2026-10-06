@@ -10,7 +10,7 @@ import { useFilteredNavGroups } from '@/hooks/use-nav';
 import { useIsPhone } from '@/hooks/use-mobile';
 import type { SessionRole } from '@/lib/dukaan/session';
 import type { NavItem } from '@/types';
-import { t } from '@/i18n';
+import { useT, translateMaybe } from '@/i18n/use-t';
 import { cn } from '@/lib/utils';
 
 const SHOP_PRIMARY = [
@@ -44,6 +44,7 @@ function isActivePath(pathname: string, url: string): boolean {
 
 /** Phone-only bottom bar: 4 primary destinations + More sheet. */
 export function MobileBottomNav({ role }: { role: SessionRole }) {
+  const t = useT();
   const isPhone = useIsPhone();
   const pathname = usePathname();
   const [moreOpen, setMoreOpen] = React.useState(false);
@@ -83,7 +84,7 @@ export function MobileBottomNav({ role }: { role: SessionRole }) {
                   )}
                 >
                   <Icon className='size-5' />
-                  <span className='max-w-full truncate'>{item.title}</span>
+                  <span className='max-w-full truncate'>{translateMaybe(item.title, t)}</span>
                 </Link>
               </li>
             );
@@ -129,7 +130,7 @@ export function MobileBottomNav({ role }: { role: SessionRole }) {
                     )}
                   >
                     <Icon className='size-5 shrink-0' />
-                    {item.title}
+                    {translateMaybe(item.title, t)}
                   </Link>
                 </li>
               );

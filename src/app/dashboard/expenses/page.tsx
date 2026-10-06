@@ -12,7 +12,11 @@ export default function Page() {
   void qc.prefetchQuery(expensesQueryOptions({ limit: 100 }));
   void qc.prefetchQuery(expenseCategoriesQueryOptions({ limit: 100 }));
   return (
-    <PageContainer fill pageTitle='Expenses' pageDescription='Operating expenses'>
+    <PageContainer
+      fill
+      pageTitle='pages.expenses.title'
+      pageDescription='pages.expenses.description'
+    >
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <ExpensesClient />

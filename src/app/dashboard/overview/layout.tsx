@@ -44,7 +44,7 @@ export default async function OverViewLayout({
   void queryClient.prefetchQuery(sessionQueryOptions());
 
   return (
-    <PageContainer pageTitle='Dashboard' pageDescription='Shop snapshot for today'>
+    <PageContainer pageTitle='pages.dashboard.title' pageDescription='pages.dashboard.description'>
       <HydrationBoundary state={dehydrate(queryClient)}>
         <Suspense fallback={<DashboardSkeleton />}>
           <DukaanDashboard />

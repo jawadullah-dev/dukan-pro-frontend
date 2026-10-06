@@ -13,7 +13,7 @@ export default function Page() {
   void qc.prefetchQuery(unitsQueryOptions());
   return (
     <PageContainer
-      pageTitle='Stock adjustments'
+      pageTitle='pages.adjustments.title'
       pageDescription='Adjustment, damaged, or lost with reason'
     >
       <HydrationBoundary state={dehydrate(qc)}>

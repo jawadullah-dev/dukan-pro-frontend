@@ -1,10 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 
 /** Slim banner when the device goes offline. */
 export function OfflineBanner() {
+  const t = useT();
   const [offline, setOffline] = React.useState(false);
 
   React.useEffect(() => {

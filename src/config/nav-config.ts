@@ -2,13 +2,13 @@ import { NavGroup } from '@/types';
 import type { SessionRole } from '@/lib/dukaan/session';
 import { platformNavGroups } from '@/config/platform-nav-config';
 
-/** Dukan shop owner / admin navigation. */
+/** Dukan shop owner / admin navigation — titles/labels are i18n keys. */
 export const shopNavGroups: NavGroup[] = [
   {
-    label: 'Overview',
+    label: 'nav.group.overview',
     items: [
       {
-        title: 'Dashboard',
+        title: 'nav.dashboard',
         url: '/dashboard/overview',
         icon: 'dashboard',
         isActive: false,
@@ -18,10 +18,10 @@ export const shopNavGroups: NavGroup[] = [
     ]
   },
   {
-    label: 'Catalog',
+    label: 'nav.group.catalog',
     items: [
       {
-        title: 'Products',
+        title: 'nav.products',
         url: '/dashboard/products',
         icon: 'product',
         shortcut: ['p', 'p'],
@@ -29,14 +29,14 @@ export const shopNavGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Categories',
+        title: 'nav.categories',
         url: '/dashboard/categories',
         icon: 'folder',
         isActive: false,
         items: []
       },
       {
-        title: 'Brands',
+        title: 'nav.brands',
         url: '/dashboard/brands',
         icon: 'tag',
         isActive: false,
@@ -45,31 +45,31 @@ export const shopNavGroups: NavGroup[] = [
     ]
   },
   {
-    label: 'Stock',
+    label: 'nav.group.stock',
     items: [
       {
-        title: 'Purchases',
+        title: 'nav.purchases',
         url: '/dashboard/purchases',
         icon: 'truck',
         isActive: false,
         items: []
       },
       {
-        title: 'Inventory',
+        title: 'nav.inventory',
         url: '/dashboard/inventory',
         icon: 'box',
         isActive: false,
         items: []
       },
       {
-        title: 'Adjustments',
+        title: 'nav.adjustments',
         url: '/dashboard/stock-adjustments',
         icon: 'adjustments',
         isActive: false,
         items: []
       },
       {
-        title: 'Movements',
+        title: 'nav.movements',
         url: '/dashboard/inventory-movements',
         icon: 'history',
         isActive: false,
@@ -78,10 +78,10 @@ export const shopNavGroups: NavGroup[] = [
     ]
   },
   {
-    label: 'Sales',
+    label: 'nav.group.sales',
     items: [
       {
-        title: 'Sales',
+        title: 'nav.sales',
         url: '/dashboard/sales',
         icon: 'receipt',
         shortcut: ['s', 's'],
@@ -89,14 +89,14 @@ export const shopNavGroups: NavGroup[] = [
         items: []
       },
       {
-        title: 'Customers',
+        title: 'nav.customers',
         url: '/dashboard/customers',
         icon: 'teams',
         isActive: false,
         items: []
       },
       {
-        title: 'Payments',
+        title: 'nav.payments',
         url: '/dashboard/payments',
         icon: 'cash',
         isActive: false,
@@ -105,31 +105,31 @@ export const shopNavGroups: NavGroup[] = [
     ]
   },
   {
-    label: 'Money',
+    label: 'nav.group.money',
     items: [
       {
-        title: 'Supplier Payments',
+        title: 'nav.supplierPayments',
         url: '/dashboard/supplier-payments',
         icon: 'creditCard',
         isActive: false,
         items: []
       },
       {
-        title: 'Expenses',
+        title: 'nav.expenses',
         url: '/dashboard/expenses',
         icon: 'wallet',
         isActive: false,
         items: []
       },
       {
-        title: 'Expense Categories',
+        title: 'nav.expenseCategories',
         url: '/dashboard/expense-categories',
         icon: 'folder',
         isActive: false,
         items: []
       },
       {
-        title: 'Cash Ledger',
+        title: 'nav.cashLedger',
         url: '/dashboard/cash',
         icon: 'cash',
         isActive: false,
@@ -138,10 +138,10 @@ export const shopNavGroups: NavGroup[] = [
     ]
   },
   {
-    label: 'People',
+    label: 'nav.group.people',
     items: [
       {
-        title: 'Suppliers',
+        title: 'nav.suppliers',
         url: '/dashboard/suppliers',
         icon: 'building',
         isActive: false,
@@ -150,10 +150,10 @@ export const shopNavGroups: NavGroup[] = [
     ]
   },
   {
-    label: 'Settings',
+    label: 'nav.group.settings',
     items: [
       {
-        title: 'Appearance',
+        title: 'nav.appearance',
         url: '/dashboard/settings/appearance',
         icon: 'palette',
         isActive: false,

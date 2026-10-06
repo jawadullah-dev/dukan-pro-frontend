@@ -16,7 +16,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { FieldGroup } from '@/components/ui/field';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import {
@@ -336,6 +336,7 @@ export function ExpensesHeaderAction({
   className?: string;
   onAdd: () => void;
 }) {
+  const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
       <Icons.add className='me-2 h-4 w-4' />
@@ -345,6 +346,7 @@ export function ExpensesHeaderAction({
 }
 
 export function ExpensesClient() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
 
@@ -375,6 +377,7 @@ export function ExpensesClient() {
 }
 
 export function ExpenseCategoriesHeaderAction({ onAdd }: { onAdd?: () => void }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
     if (onAdd) onAdd();
@@ -392,6 +395,7 @@ export function ExpenseCategoriesHeaderAction({ onAdd }: { onAdd?: () => void })
 }
 
 export function ExpenseCategoriesClient() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   return (
     <TablePageBody>
@@ -574,6 +578,7 @@ export function SupplierPaymentsHeaderAction({
   className?: string;
   onAdd: () => void;
 }) {
+  const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
       <Icons.add className='me-2 h-4 w-4' />
@@ -583,6 +588,7 @@ export function SupplierPaymentsHeaderAction({
 }
 
 export function SupplierPaymentsClient() {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
 

@@ -26,7 +26,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { StatusBadge } from '@/components/data-table';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import {
@@ -84,6 +84,7 @@ export function PurchasesHeaderAction({
   className?: string;
   onAdd: () => void;
 }) {
+  const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
       <Icons.add className='me-2 h-4 w-4' />
@@ -93,6 +94,7 @@ export function PurchasesHeaderAction({
 }
 
 export function PurchasesListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) {
+  const t = useT();
   const [open, setOpen] = useState(defaultOpenAdd);
 
   return (

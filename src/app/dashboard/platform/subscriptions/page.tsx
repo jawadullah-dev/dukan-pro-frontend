@@ -20,7 +20,7 @@ export default function PlatformSubscriptionsPage() {
   return (
     <PageContainer
       fill
-      pageTitle='Subscriptions'
+      pageTitle='pages.subscriptions.title'
       pageDescription='Assign and manage shop subscription plans.'
       pageHeaderAction={
         <Button>

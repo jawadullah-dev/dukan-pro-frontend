@@ -12,7 +12,7 @@ import { Icons } from '@/components/icons';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { cn } from '@/lib/utils';
 import { useAppearanceStore, type AppearanceAccent } from '@/lib/appearance/store';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 
 const ACCENT_OPTIONS: AppearanceAccent[] = ['blue', 'green', 'purple', 'orange', 'red', 'teal'];
 
@@ -72,6 +72,7 @@ function LivePreview() {
 }
 
 export function AppearanceSettings() {
+  const t = useT();
   const { theme, setTheme } = useTheme();
   const { activeTheme, setActiveTheme } = useThemeConfig();
   const prefs = useAppearanceStore();
@@ -81,14 +82,12 @@ export function AppearanceSettings() {
       <div className='min-w-0 space-y-6'>
         <div className='flex items-start justify-between gap-4'>
           <div>
-            <h2 className='text-2xl font-semibold tracking-tight'>Appearance</h2>
-            <p className='text-muted-foreground text-sm'>
-              Theme, colors and layout — changes apply instantly.
-            </p>
+            <h2 className='text-2xl font-semibold tracking-tight'>{t('appearance.title')}</h2>
+            <p className='text-muted-foreground text-sm'>{t('appearance.subtitle')}</p>
           </div>
           <Button variant='outline' size='sm' onClick={() => prefs.resetAll()}>
             <Icons.history className='mr-2 h-4 w-4' />
-            Reset all
+            {t('appearance.reset')}
           </Button>
         </div>
 
@@ -112,18 +111,18 @@ export function AppearanceSettings() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2 text-base'>
               <Icons.palette className='h-4 w-4' />
-              Theme
+              {t('appearance.theme')}
             </CardTitle>
-            <CardDescription>Light/dark mode and visual theme presets.</CardDescription>
+            <CardDescription>{t('appearance.themeHint')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='space-y-2'>
-              <Label>Mode</Label>
+              <Label>{t('appearance.mode')}</Label>
               <div className='flex flex-wrap gap-2'>
                 {[
-                  { value: 'system', label: 'System', icon: Icons.laptop },
-                  { value: 'light', label: 'Light', icon: Icons.sun },
-                  { value: 'dark', label: 'Dark', icon: Icons.moon }
+                  { value: 'system', label: t('appearance.modeSystem'), icon: Icons.laptop },
+                  { value: 'light', label: t('appearance.modeLight'), icon: Icons.sun },
+                  { value: 'dark', label: t('appearance.modeDark'), icon: Icons.moon }
                 ].map((mode) => (
                   <Button
                     key={mode.value}
@@ -141,20 +140,20 @@ export function AppearanceSettings() {
             <div className='space-y-2'>
               <Label>Visual theme</Label>
               <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
-                {THEMES.map((t) => (
+                {THEMES.map((th) => (
                   <button
-                    key={t.value}
+                    key={th.value}
                     type='button'
-                    onClick={() => setActiveTheme(t.value)}
+                    onClick={() => setActiveTheme(th.value)}
                     className={cn(
                       'rounded-lg border px-3 py-2 text-left text-sm transition-colors',
-                      activeTheme === t.value
+                      activeTheme === th.value
                         ? 'border-primary bg-primary/5 ring-1 ring-primary'
                         : 'hover:bg-muted/50'
                     )}
                   >
-                    <span className='font-medium'>{t.name}</span>
-                    {activeTheme === t.value ? (
+                    <span className='font-medium'>{th.name}</span>
+                    {activeTheme === th.value ? (
                       <Icons.check className='text-primary mt-1 h-4 w-4' />
                     ) : null}
                   </button>
@@ -168,7 +167,7 @@ export function AppearanceSettings() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2 text-base'>
               <Icons.sparkles className='h-4 w-4' />
-              Colors
+              {t('appearance.accent')}
             </CardTitle>
             <CardDescription>Accent color for buttons and highlights.</CardDescription>
           </CardHeader>
@@ -207,7 +206,7 @@ export function AppearanceSettings() {
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='space-y-2'>
-              <Label>Density</Label>
+              <Label>{t('appearance.density')}</Label>
               <div className='flex flex-wrap gap-2'>
                 {(['comfortable', 'compact'] as const).map((density) => (
                   <Button
@@ -217,13 +216,15 @@ export function AppearanceSettings() {
                     variant={prefs.density === density ? 'default' : 'outline'}
                     onClick={() => prefs.setDensity(density)}
                   >
-                    {density === 'comfortable' ? 'Comfortable' : 'Compact'}
+                    {density === 'comfortable'
+                      ? t('appearance.comfortable')
+                      : t('appearance.compact')}
                   </Button>
                 ))}
               </div>
             </div>
             <div className='space-y-2'>
-              <Label>Corner radius</Label>
+              <Label>{t('appearance.radius')}</Label>
               <div className='flex flex-wrap gap-2'>
                 {(['sharp', 'medium', 'round'] as const).map((radius) => (
                   <Button
@@ -233,7 +234,11 @@ export function AppearanceSettings() {
                     variant={prefs.radius === radius ? 'default' : 'outline'}
                     onClick={() => prefs.setRadius(radius)}
                   >
-                    {radius.charAt(0).toUpperCase() + radius.slice(1)}
+                    {radius === 'sharp'
+                      ? t('appearance.sharp')
+                      : radius === 'medium'
+                        ? t('appearance.medium')
+                        : t('appearance.round')}
                   </Button>
                 ))}
               </div>
@@ -245,9 +250,9 @@ export function AppearanceSettings() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2 text-base'>
               <Icons.brightness className='h-4 w-4' />
-              Language & region
+              {t('appearance.language')}
             </CardTitle>
-            <CardDescription>Interface language and number style.</CardDescription>
+            <CardDescription>{t('appearance.languageHint')}</CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
             <div className='grid gap-2 sm:grid-cols-3'>
@@ -275,7 +280,7 @@ export function AppearanceSettings() {
               ))}
             </div>
             <div className='space-y-2'>
-              <Label>Digit style</Label>
+              <Label>{t('appearance.digits')}</Label>
               <RadioGroup
                 value={prefs.digits}
                 onValueChange={(v) => prefs.setDigits(v as typeof prefs.digits)}
@@ -283,11 +288,11 @@ export function AppearanceSettings() {
               >
                 <div className='flex items-center gap-2'>
                   <RadioGroupItem value='western' id='digits-western' />
-                  <Label htmlFor='digits-western'>0 1 2 3</Label>
+                  <Label htmlFor='digits-western'>{t('appearance.digitsWestern')}</Label>
                 </div>
                 <div className='flex items-center gap-2'>
                   <RadioGroupItem value='eastern' id='digits-eastern' />
-                  <Label htmlFor='digits-eastern'>٠ ١ ٢ ٣</Label>
+                  <Label htmlFor='digits-eastern'>{t('appearance.digitsEastern')}</Label>
                 </div>
               </RadioGroup>
             </div>

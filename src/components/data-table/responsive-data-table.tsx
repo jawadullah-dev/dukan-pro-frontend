@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { useContainerMode } from './use-container-mode';
 import { isColumnVisibleInMode } from './column-visibility';
 import { DataTableToolbar } from './data-table-toolbar';
@@ -57,6 +57,7 @@ export function ResponsiveDataTable<TData>({
   ledger,
   className
 }: ResponsiveDataTableProps<TData>) {
+  const t = useT();
   const router = useRouter();
   const { ref, mode, wideCompact, measured } = useContainerMode();
   const [sideRow, setSideRow] = React.useState<Row<TData> | null>(null);
@@ -188,6 +189,7 @@ function CompactOrFullTable<TData>({
   wideCompact: boolean;
   onRowClick?: (row: Row<TData>) => void;
 }) {
+  const t = useT();
   const stickyFirst = mode === 'compact';
 
   return (

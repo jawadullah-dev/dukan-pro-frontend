@@ -12,7 +12,10 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const qc = getQueryClient();
   void qc.prefetchQuery(purchaseQueryOptions(id));
   return (
-    <PageContainer pageTitle='Purchase detail' pageDescription='View and cancel with reason'>
+    <PageContainer
+      pageTitle='pages.purchaseDetail.title'
+      pageDescription='pages.purchaseDetail.description'
+    >
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <PurchaseDetailClient id={id} />

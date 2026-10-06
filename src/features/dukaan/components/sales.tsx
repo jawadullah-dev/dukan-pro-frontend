@@ -27,7 +27,7 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import {
@@ -83,6 +83,7 @@ function SaleCreateDialog({
 }
 
 export function SalesHeaderAction({ className, onAdd }: { className?: string; onAdd: () => void }) {
+  const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
       <Icons.add className='me-2 h-4 w-4' />
@@ -92,6 +93,7 @@ export function SalesHeaderAction({ className, onAdd }: { className?: string; on
 }
 
 export function SalesListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) {
+  const t = useT();
   const [open, setOpen] = useState(defaultOpenAdd);
 
   return (

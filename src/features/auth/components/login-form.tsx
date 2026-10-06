@@ -12,22 +12,24 @@ import { Icons } from '@/components/icons';
 import { homePathForRole, canAccessPath } from '@/lib/auth/routes';
 import { DEMO_OWNER_PHONE, DEMO_SUPER_ADMIN_PHONE } from '@/lib/auth/accounts';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
-
-const loginSchema = z.object({
-  phone: z
-    .string()
-    .min(1, 'Phone number is required')
-    .refine(isValidPkMobile, 'Enter a valid mobile (03XXXXXXXXX)'),
-  password: z.string().min(1, 'Password is required')
-});
-
-type LoginValues = z.infer<typeof loginSchema>;
+import { useT } from '@/i18n/use-t';
 
 export function LoginForm() {
+  const t = useT();
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
   const [error, setError] = useState<string | null>(null);
+
+  const loginSchema = z.object({
+    phone: z
+      .string()
+      .min(1, t('auth.phoneRequired'))
+      .refine(isValidPkMobile, t('auth.phoneInvalid')),
+    password: z.string().min(1, t('auth.passwordRequired'))
+  });
+
+  type LoginValues = z.infer<typeof loginSchema>;
 
   const form = useAppForm({
     defaultValues: {
@@ -46,7 +48,7 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        setError('Invalid phone number or password');
+        setError(t('auth.invalidCredentials'));
         return;
       }
 
@@ -66,8 +68,8 @@ export function LoginForm() {
   return (
     <Card className='w-full max-w-md border-border/60 shadow-sm'>
       <CardHeader className='space-y-1'>
-        <CardTitle className='text-2xl font-semibold tracking-tight'>Sign in</CardTitle>
-        <CardDescription>Log in with your mobile number. No self-registration.</CardDescription>
+        <CardTitle className='text-2xl font-semibold tracking-tight'>{t('auth.signIn')}</CardTitle>
+        <CardDescription>{t('auth.signInHint')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -89,7 +91,7 @@ export function LoginForm() {
               name='phone'
               children={(field) => (
                 <field.TextField
-                  label='Phone'
+                  label={t('auth.phone')}
                   type='tel'
                   inputMode='numeric'
                   autoComplete='tel'
@@ -103,7 +105,7 @@ export function LoginForm() {
               name='password'
               children={(field) => (
                 <field.TextField
-                  label='Password'
+                  label={t('auth.password')}
                   type='password'
                   autoComplete='current-password'
                   placeholder='••••••••'
@@ -117,7 +119,7 @@ export function LoginForm() {
           <form.AppForm>
             <form.SubmitButton className='w-full'>
               <Icons.login className='size-4' />
-              Sign in
+              {t('auth.signIn')}
             </form.SubmitButton>
           </form.AppForm>
 

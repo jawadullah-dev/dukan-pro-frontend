@@ -9,7 +9,8 @@ import {
   buildCustomerLedger
 } from './ledger';
 import { formatPurchaseNo, formatSaleNo, newId, nowIso, todayIsoDate } from './numbers';
-import { assertShopActive, getSession } from './session';
+import { assertShopActive, canCancelRecords, getSession, setRuntimeSession } from './session';
+import { toDukaanSession } from '@/lib/auth/session-map';
 import { getStore, runTransaction } from './store';
 import type {
   Brand,
@@ -1508,7 +1509,7 @@ export async function cancelSale(
   await delay();
   const sid = shopId();
   const session = getSession();
-  if (session.role !== 'OWNER') throw new Error('Only owner can cancel');
+  if (!canCancelRecords(session.role)) throw new Error('Only owner can cancel');
   if (!reason.trim()) throw new Error('Reason is required');
 
   const cashOut = (await previewCancelSale(id)).cash_out;
@@ -1614,7 +1615,7 @@ export async function cancelPurchase(
 ): Promise<{ ok: boolean; cash_warning?: SoftCashWarning }> {
   await delay();
   const sid = shopId();
-  if (getSession().role !== 'OWNER') throw new Error('Only owner can cancel');
+  if (!canCancelRecords()) throw new Error('Only owner can cancel');
   if (!reason.trim()) throw new Error('Reason is required');
 
   const storePeek = getStore();
@@ -1726,7 +1727,7 @@ export async function cancelPayment(
 ): Promise<{ ok: boolean; cash_warning?: SoftCashWarning }> {
   await delay();
   const sid = shopId();
-  if (getSession().role !== 'OWNER') throw new Error('Only owner can cancel');
+  if (!canCancelRecords()) throw new Error('Only owner can cancel');
   if (!reason.trim()) throw new Error('Reason is required');
 
   if (kind === 'customer') {
@@ -1887,5 +1888,20 @@ export async function listPayments(filters: ListFilters = {}) {
 
 export async function getSessionInfo() {
   await delay();
-  return getSession();
+
+  if (typeof window === 'undefined') {
+    const { auth } = await import('@/auth');
+    const session = await auth();
+    if (!session?.user) throw new Error('Unauthorized');
+    const mapped = toDukaanSession(session);
+    setRuntimeSession(mapped);
+    return mapped;
+  }
+
+  const { getSession: getAuthSession } = await import('next-auth/react');
+  const session = await getAuthSession();
+  if (!session?.user) throw new Error('Unauthorized');
+  const mapped = toDukaanSession(session);
+  setRuntimeSession(mapped);
+  return mapped;
 }

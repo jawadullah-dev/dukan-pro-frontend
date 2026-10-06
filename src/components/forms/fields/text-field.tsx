@@ -3,24 +3,70 @@
 import * as React from 'react';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput
+} from '@/components/ui/input-group';
 import { Spinner } from '@/components/ui/spinner';
+import { Icons } from '@/components/icons';
+import { cn } from '@/lib/utils';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+
+type IconComponent = React.ComponentType<{ className?: string }>;
+
+type TextFieldProps = BaseFieldProps &
+  Omit<React.ComponentProps<typeof Input>, 'value' | 'onChange' | 'onBlur'> & {
+    /** Leading icon inside the input (e.g. phone, search). */
+    startIcon?: IconComponent;
+  };
 
 /**
  * Text-style input (text, email, password, tel, url, time, number).
  * For `type='number'` the value converts at the edge: clearing writes
  * `undefined` so a required `z.number({ error: '…' })` reports a human
  * message instead of a type error.
+ *
+ * `type='password'` gets a show/hide eye toggle. Pass `startIcon` for a
+ * leading glyph (phone, lock, search, etc.).
  */
 export function TextField({
   label,
   description,
   required,
+  startIcon: StartIcon,
+  className,
+  type,
   ...inputProps
-}: BaseFieldProps & Omit<React.ComponentProps<typeof Input>, 'value' | 'onChange' | 'onBlur'>) {
+}: TextFieldProps) {
   const field = useFieldContext<string | number | undefined>();
   const isInvalid = useFieldInvalid();
   const isValidating = field.state.meta.isValidating;
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const isPassword = type === 'password';
+  const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
+  const useGroup = Boolean(StartIcon) || isPassword;
+
+  const sharedInputProps = {
+    ...inputProps,
+    id: field.name,
+    name: field.name,
+    value: field.state.value ?? '',
+    onBlur: field.handleBlur,
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+      field.handleChange(
+        type === 'number'
+          ? e.target.value === ''
+            ? undefined
+            : Number(e.target.value)
+          : e.target.value
+      ),
+    'aria-invalid': isInvalid,
+    'aria-describedby': isInvalid ? `${field.name}-error` : undefined,
+    type: inputType
+  };
 
   return (
     <Field data-invalid={isInvalid}>
@@ -28,27 +74,45 @@ export function TextField({
         {label}
         {required && ' *'}
       </FieldLabel>
-      <div className='relative'>
-        <Input
-          id={field.name}
-          name={field.name}
-          value={field.state.value ?? ''}
-          onBlur={field.handleBlur}
-          onChange={(e) =>
-            field.handleChange(
-              inputProps.type === 'number'
-                ? e.target.value === ''
-                  ? undefined
-                  : Number(e.target.value)
-                : e.target.value
-            )
-          }
-          aria-invalid={isInvalid}
-          aria-describedby={isInvalid ? `${field.name}-error` : undefined}
-          {...inputProps}
-        />
-        {isValidating && <Spinner className='absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2' />}
-      </div>
+      {useGroup ? (
+        <InputGroup
+          className={cn(
+            'h-9! has-[[data-slot=input-group-control]:focus-visible]:ring-0',
+            className
+          )}
+          data-disabled={inputProps.disabled ? true : undefined}
+        >
+          {StartIcon ? (
+            <InputGroupAddon align='inline-start'>
+              <StartIcon className='size-4' />
+            </InputGroupAddon>
+          ) : null}
+          <InputGroupInput {...sharedInputProps} />
+          {isPassword ? (
+            <InputGroupAddon align='inline-end'>
+              <InputGroupButton
+                size='icon-xs'
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPassword((v) => !v)}
+              >
+                {showPassword ? <Icons.eyeOff /> : <Icons.eye />}
+              </InputGroupButton>
+            </InputGroupAddon>
+          ) : null}
+          {isValidating ? (
+            <InputGroupAddon align='inline-end'>
+              <Spinner className='size-4' />
+            </InputGroupAddon>
+          ) : null}
+        </InputGroup>
+      ) : (
+        <div className='relative'>
+          <Input className={className} {...sharedInputProps} />
+          {isValidating && (
+            <Spinner className='absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2' />
+          )}
+        </div>
+      )}
       {description && <FieldDescription>{description}</FieldDescription>}
       {isInvalid && <FieldError id={`${field.name}-error`} errors={field.state.meta.errors} />}
     </Field>

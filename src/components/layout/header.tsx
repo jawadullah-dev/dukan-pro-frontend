@@ -6,6 +6,7 @@ import SearchInput from '../search-input';
 import { ThemeSelector } from '../themes/theme-selector';
 import { ThemeModeToggle } from '../themes/theme-mode-toggle';
 import { NotificationCenter } from '@/features/notifications/components/notification-center';
+import { UserNav } from '@/components/layout/user-nav';
 
 export default function Header() {
   return (
@@ -25,6 +26,7 @@ export default function Header() {
           <ThemeSelector />
         </div>
         <NotificationCenter />
+        <UserNav />
       </div>
     </header>
   );

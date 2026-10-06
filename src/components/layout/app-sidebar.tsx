@@ -1,15 +1,6 @@
 'use client';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -25,12 +16,13 @@ import {
   SidebarMenuSubItem,
   SidebarRail
 } from '@/components/ui/sidebar';
-import { navGroups } from '@/config/nav-config';
+import { getNavGroupsForRole } from '@/config/nav-config';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useFilteredNavGroups } from '@/hooks/use-nav';
+import type { SessionRole } from '@/lib/dukaan/session';
 import type { NavGroup, NavItem } from '@/types';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '@/components/icons';
 
@@ -56,11 +48,11 @@ function filterNavGroups(groups: NavGroup[], query: string): NavGroup[] {
     .filter((group) => group.items.length > 0);
 }
 
-export default function AppSidebar() {
+export default function AppSidebar({ role }: { role: SessionRole }) {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
-  const router = useRouter();
-  const filteredGroups = useFilteredNavGroups(navGroups);
+  const initialGroups = React.useMemo(() => getNavGroupsForRole(role), [role]);
+  const filteredGroups = useFilteredNavGroups(initialGroups, role);
   const [search, setSearch] = React.useState('');
   const visibleGroups = React.useMemo(
     () => filterNavGroups(filteredGroups, search),
@@ -108,10 +100,16 @@ export default function AppSidebar() {
             <SidebarMenu>
               {group.items.map((item) => {
                 const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+                const isActive =
+                  pathname === item.url ||
+                  (item.url !== '/dashboard/platform' &&
+                    item.url !== '/dashboard/overview' &&
+                    pathname.startsWith(item.url));
+
                 return item?.items && item?.items?.length > 0 ? (
                   <Collapsible
                     key={item.title}
-                    defaultOpen={item.isActive || isSearching}
+                    defaultOpen={item.isActive || isSearching || isActive}
                     open={isSearching ? true : undefined}
                     render={<SidebarMenuItem />}
                   >
@@ -119,7 +117,7 @@ export default function AppSidebar() {
                       render={
                         <SidebarMenuButton
                           tooltip={item.title}
-                          isActive={pathname === item.url}
+                          isActive={isActive}
                           className='group/collapsible'
                         />
                       }
@@ -148,7 +146,7 @@ export default function AppSidebar() {
                     <SidebarMenuButton
                       render={<Link href={item.url} aria-label={item.title} />}
                       tooltip={item.title}
-                      isActive={pathname === item.url}
+                      isActive={isActive}
                     >
                       <Icon />
                       <span>{item.title}</span>
@@ -160,45 +158,8 @@ export default function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <SidebarMenuButton
-                    size='lg'
-                    className='data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground'
-                  />
-                }
-              >
-                <span className='truncate'>Account</span>
-                <Icons.chevronsDown className='ml-auto size-4' />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className='w-(--anchor-width) min-w-56 rounded-lg'
-                side='bottom'
-                align='end'
-                sideOffset={4}
-              >
-                <DropdownMenuGroup>
-                  <DropdownMenuLabel className='p-0 font-normal'>
-                    <div className='text-muted-foreground px-1 py-1.5 text-sm'>
-                      Sign in to manage your account
-                    </div>
-                  </DropdownMenuLabel>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={() => router.push('/dashboard/notifications')}>
-                    <Icons.notification className='mr-2 h-4 w-4' />
-                    Notifications
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarFooter className='group-data-[collapsible=icon]:hidden'>
+        <p className='text-muted-foreground px-2 py-1 text-xs'>Dukaan Pro</p>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -1,5 +1,8 @@
+import { auth } from '@/auth';
+import { homePathForRole } from '@/lib/auth/routes';
 import { redirect } from 'next/navigation';
 
 export default async function Dashboard() {
-  redirect('/dashboard/overview');
+  const session = await auth();
+  redirect(homePathForRole(session?.user?.role));
 }

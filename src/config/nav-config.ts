@@ -1,6 +1,9 @@
 import { NavGroup } from '@/types';
+import type { SessionRole } from '@/lib/dukaan/session';
+import { platformNavGroups } from '@/config/platform-nav-config';
 
-export const navGroups: NavGroup[] = [
+/** Dukan shop owner / admin navigation. */
+export const shopNavGroups: NavGroup[] = [
   {
     label: 'Overview',
     items: [
@@ -145,5 +148,25 @@ export const navGroups: NavGroup[] = [
         items: []
       }
     ]
+  },
+  {
+    label: 'Settings',
+    items: [
+      {
+        title: 'Appearance',
+        url: '/dashboard/settings/appearance',
+        icon: 'palette',
+        isActive: false,
+        items: []
+      }
+    ]
   }
 ];
+
+export function getNavGroupsForRole(role: SessionRole | undefined): NavGroup[] {
+  if (role === 'SUPER_ADMIN') return platformNavGroups;
+  return shopNavGroups;
+}
+
+/** @deprecated Use getNavGroupsForRole — kept for legacy imports. */
+export const navGroups = shopNavGroups;

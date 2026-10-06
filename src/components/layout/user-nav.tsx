@@ -1,29 +1,133 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { signOut } from 'next-auth/react';
 import { sessionQueryOptions } from '@/features/dukaan/api/queries';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { SidebarMenuButton } from '@/components/ui/sidebar';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Icons } from '@/components/icons';
 
+function ProfileAvatar({ className }: { className?: string }) {
+  return (
+    <Avatar className={className}>
+      <AvatarFallback className='bg-muted'>
+        <Icons.user className='text-muted-foreground size-4' />
+      </AvatarFallback>
+    </Avatar>
+  );
+}
+
+function AccountMenuItems({ userName, shopName }: { userName: string; shopName: string }) {
+  return (
+    <>
+      <DropdownMenuGroup>
+        <DropdownMenuLabel className='font-normal'>
+          <div className='flex flex-col gap-1 px-0.5 py-0.5'>
+            <p className='text-sm leading-none font-medium'>{userName}</p>
+            <p className='text-muted-foreground truncate text-xs leading-none'>{shopName}</p>
+          </div>
+        </DropdownMenuLabel>
+      </DropdownMenuGroup>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem
+        variant='destructive'
+        onClick={() => {
+          void signOut({ callbackUrl: '/login' });
+        }}
+      >
+        <Icons.logout className='mr-2 h-4 w-4' />
+        Sign out
+      </DropdownMenuItem>
+    </>
+  );
+}
+
+/** Compact profile avatar for the top header (next to notifications). */
 export function UserNav() {
-  const { data } = useQuery(sessionQueryOptions());
+  const { data, isPending } = useQuery(sessionQueryOptions());
+
+  if (isPending) {
+    return <Skeleton className='h-8 w-8 rounded-full' />;
+  }
+
   if (!data) return null;
 
-  const initials = data.user_name
-    .split(' ')
-    .map((p) => p[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant='ghost'
+            size='icon'
+            className='relative h-8 w-8 rounded-full'
+            aria-label='Account menu'
+          />
+        }
+      >
+        <ProfileAvatar className='h-8 w-8' />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className='w-56' align='end' sideOffset={8}>
+        <AccountMenuItems userName={data.user_name} shopName={data.shop_name} />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+/** Sidebar footer account row — same session + logout for both roles. */
+export function SidebarUserMenu() {
+  const { data, isPending } = useQuery(sessionQueryOptions());
+
+  if (isPending) {
+    return (
+      <div className='flex items-center gap-2 p-2'>
+        <Skeleton className='h-8 w-8 rounded-full' />
+        <div className='grid flex-1 gap-1'>
+          <Skeleton className='h-3 w-24' />
+          <Skeleton className='h-3 w-16' />
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
 
   return (
-    <div className='flex items-center gap-2 px-1'>
-      <Avatar className='h-8 w-8'>
-        <AvatarFallback>{initials}</AvatarFallback>
-      </Avatar>
-      <div className='hidden flex-col text-left text-xs sm:flex'>
-        <span className='font-medium'>{data.user_name}</span>
-        <span className='text-muted-foreground'>{data.shop_name}</span>
-      </div>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <SidebarMenuButton
+            size='lg'
+            className='data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground'
+            aria-label='Account menu'
+          />
+        }
+      >
+        <ProfileAvatar className='h-8 w-8 shrink-0' />
+        <div className='grid min-w-0 flex-1 text-left text-sm leading-tight'>
+          <span className='truncate font-medium'>{data.user_name}</span>
+          <span className='text-muted-foreground truncate text-xs'>{data.shop_name}</span>
+        </div>
+        <Icons.chevronsUpDown className='ml-auto size-4 shrink-0' />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className='w-(--anchor-width) min-w-56 rounded-lg'
+        side='top'
+        align='end'
+        sideOffset={4}
+      >
+        <AccountMenuItems userName={data.user_name} shopName={data.shop_name} />
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

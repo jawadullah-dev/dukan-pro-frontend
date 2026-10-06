@@ -123,6 +123,7 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
                     required
                     type='email'
                     placeholder='john@example.com'
+                    startIcon={Icons.mail}
                   />
                 )}
               />
@@ -130,7 +131,14 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
               <form.AppField
                 name='phone'
                 children={(field) => (
-                  <field.TextField label='Phone' required type='tel' placeholder='(555) 123-4567' />
+                  <field.TextField
+                    label='Phone'
+                    required
+                    type='tel'
+                    inputMode='numeric'
+                    placeholder='03XXXXXXXXX'
+                    startIcon={Icons.phone}
+                  />
                 )}
               />
 

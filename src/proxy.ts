@@ -1,9 +1,58 @@
+import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { authConfig } from '@/auth.config';
+import { homePathForRole, redirectForRole } from '@/lib/auth/routes';
 
-export function proxy(_req: NextRequest) {
+/**
+ * Edge middleware — uses authConfig (includes jwt/session callbacks)
+ * so `req.auth.user.role` is available for platform route guards.
+ */
+const { auth } = NextAuth(authConfig);
+
+export const proxy = auth((req) => {
+  const { pathname } = req.nextUrl;
+  const isLoggedIn = !!req.auth;
+  const role = req.auth?.user?.role;
+  const isLoginPage = pathname.startsWith('/login');
+  const isDashboard = pathname.startsWith('/dashboard');
+  const isAuthApi = pathname.startsWith('/api/auth');
+
+  if (isAuthApi) {
+    return NextResponse.next();
+  }
+
+  if (isDashboard && !isLoggedIn) {
+    const loginUrl = new URL('/login', req.nextUrl);
+    loginUrl.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (isLoggedIn && role) {
+    const roleRedirect = redirectForRole(pathname, role);
+    if (roleRedirect) {
+      return NextResponse.redirect(new URL(roleRedirect, req.nextUrl));
+    }
+  }
+
+  if (isLoginPage && isLoggedIn) {
+    return NextResponse.redirect(new URL(homePathForRole(role), req.nextUrl));
+  }
+
+  if (pathname === '/' && isLoggedIn) {
+    return NextResponse.redirect(new URL(homePathForRole(role), req.nextUrl));
+  }
+
+  if (pathname === '/' && !isLoggedIn) {
+    return NextResponse.redirect(new URL('/login', req.nextUrl));
+  }
+
+  // Logged-in user hit /dashboard with no role yet — send to a safe default
+  if (pathname === '/dashboard' && isLoggedIn) {
+    return NextResponse.redirect(new URL(homePathForRole(role), req.nextUrl));
+  }
+
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: [

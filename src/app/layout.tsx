@@ -70,7 +70,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 }
               } catch (_) {}
 
-              // Strip attributes injected by browser extensions before React hydrates
+              // Strip attributes injected by browser extensions before/during React hydrate
               // (e.g. fdprocessedid from password managers / form fillers).
               (function () {
                 var ATTRS = ['fdprocessedid', 'data-new-gr-c-s-check-loaded', 'data-gr-ext-installed'];
@@ -81,15 +81,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   }
                 }
                 strip();
-                var observer = new MutationObserver(strip);
+                var observer = new MutationObserver(function (mutations) {
+                  for (var m = 0; m < mutations.length; m++) {
+                    var t = mutations[m].target;
+                    if (t && t.nodeType === 1) {
+                      for (var i = 0; i < ATTRS.length; i++) {
+                        if (t.hasAttribute && t.hasAttribute(ATTRS[i])) {
+                          t.removeAttribute(ATTRS[i]);
+                        }
+                      }
+                    }
+                  }
+                  strip();
+                });
                 observer.observe(document.documentElement, {
                   attributes: true,
                   subtree: true,
-                  attributeFilter: ATTRS
+                  attributeFilter: ATTRS,
+                  childList: true
                 });
-                window.addEventListener('DOMContentLoaded', function () {
+                // Keep stripping through hydration; stop after page is settled.
+                window.addEventListener('load', function () {
                   strip();
-                  setTimeout(function () { observer.disconnect(); }, 2000);
+                  setTimeout(function () {
+                    strip();
+                    observer.disconnect();
+                  }, 5000);
                 });
               })();
             `

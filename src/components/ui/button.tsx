@@ -49,6 +49,8 @@ function Button({
   return (
     <ButtonPrimitive
       data-slot='button'
+      // Form fillers inject attrs (e.g. fdprocessedid) before hydrate.
+      suppressHydrationWarning
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

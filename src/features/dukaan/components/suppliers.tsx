@@ -96,7 +96,16 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
             />
             <form.AppField
               name='phone'
-              children={(field) => <field.TextField label='Phone' required />}
+              children={(field) => (
+                <field.TextField
+                  label='Phone'
+                  type='tel'
+                  inputMode='numeric'
+                  placeholder='03XXXXXXXXX'
+                  startIcon={Icons.phone}
+                  required
+                />
+              )}
             />
             <form.AppField
               name='address'

@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import type { FC } from 'react';
 import { Icons } from '@/components/icons';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 export interface UploadedFile {
@@ -131,7 +132,7 @@ export const FilePreview: FC<FilePreviewProps> = ({
           >
             {file.isUploading && (
               <div className='absolute inset-0 flex items-center justify-center rounded-xl bg-black/30'>
-                <Icons.spinner size={20} className='animate-spin text-white' />
+                <Spinner className='size-5 text-white' aria-hidden />
               </div>
             )}
 

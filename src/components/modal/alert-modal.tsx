@@ -46,13 +46,13 @@ export function AlertModal({
           <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             variant='destructive'
-            disabled={loading}
+            isLoading={loading}
             onClick={(e) => {
               e.preventDefault();
               onConfirm();
             }}
           >
-            {loading ? 'Please wait…' : confirmLabel}
+            {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

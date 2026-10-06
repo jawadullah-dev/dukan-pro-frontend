@@ -150,7 +150,12 @@ export default function ProductForm({
           </FieldGroup>
 
           <div className='flex justify-end gap-2'>
-            <Button type='button' variant='outline' onClick={() => router.back()}>
+            <Button
+              type='button'
+              variant='outline'
+              disabled={isPending}
+              onClick={() => router.back()}
+            >
               Cancel
             </Button>
             <LoadingButton loading={isPending} type='submit'>

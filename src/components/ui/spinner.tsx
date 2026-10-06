@@ -1,9 +1,10 @@
+import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { IconLoader } from '@tabler/icons-react';
 
-function Spinner({ className, ...props }: React.ComponentProps<'svg'>) {
+/** Canonical loading indicator — use this for every spinner in the app. */
+function Spinner({ className, ...props }: React.ComponentProps<typeof Icons.spinner>) {
   return (
-    <IconLoader
+    <Icons.spinner
       data-slot='spinner'
       role='status'
       aria-label='Loading'

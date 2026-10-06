@@ -170,7 +170,12 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
         </div>
 
         <SheetFooter>
-          <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
+          <Button
+            type='button'
+            variant='outline'
+            disabled={isPending}
+            onClick={() => onOpenChange(false)}
+          >
             Cancel
           </Button>
           <LoadingButton loading={isPending} type='submit' form='user-form-sheet'>

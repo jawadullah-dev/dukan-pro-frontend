@@ -10,9 +10,9 @@ import {
   IconCircleCheck,
   IconInfoCircle,
   IconAlertTriangle,
-  IconAlertOctagon,
-  IconLoader
+  IconAlertOctagon
 } from '@tabler/icons-react';
+import { Spinner } from '@/components/ui/spinner';
 
 const toast = ToastPrimitive.createToastManager();
 
@@ -154,7 +154,7 @@ function ToastIcon({ type }: { type: string | undefined }) {
   }
 
   if (type === 'loading') {
-    icon = <IconLoader className='animate-spin' aria-hidden='true' />;
+    icon = <Spinner aria-hidden className='size-4' />;
   }
 
   if (!icon) {

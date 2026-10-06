@@ -1,6 +1,7 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -40,21 +41,51 @@ const buttonVariants = cva(
   }
 );
 
+type ButtonProps = ButtonPrimitive.Props &
+  VariantProps<typeof buttonVariants> & {
+    /**
+     * Shows the shared Spinner over the label (no layout shift).
+     * Prefer this over ad-hoc Icons.spinner in buttons.
+     */
+    isLoading?: boolean;
+  };
+
 function Button({
   className,
   variant = 'default',
   size = 'default',
+  isLoading = false,
+  disabled,
+  children,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonProps) {
   return (
     <ButtonPrimitive
       data-slot='button'
       // Form fillers inject attrs (e.g. fdprocessedid) before hydrate.
       suppressHydrationWarning
-      className={cn(buttonVariants({ variant, size, className }))}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading || undefined}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        isLoading && 'relative disabled:opacity-100'
+      )}
       {...props}
-    />
+    >
+      {isLoading ? (
+        <>
+          {/* Keep label in layout (invisible) so width/height never jump */}
+          <span className='invisible inline-flex items-center gap-[inherit]' aria-hidden>
+            {children}
+          </span>
+          <Spinner aria-hidden className='absolute inset-0 m-auto' />
+        </>
+      ) : (
+        children
+      )}
+    </ButtonPrimitive>
   );
 }
 
 export { Button, buttonVariants };
+export type { ButtonProps };

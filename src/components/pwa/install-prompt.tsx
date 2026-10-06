@@ -160,13 +160,9 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
               size='sm'
               className='flex-1'
               onClick={onInstallClick}
-              disabled={prompting}
+              isLoading={prompting}
             >
-              {prompting
-                ? t('pwa.installing')
-                : ios || !hasDeferred
-                  ? t('pwa.howToInstall')
-                  : t('pwa.installApp')}
+              {ios || !hasDeferred ? t('pwa.howToInstall') : t('pwa.installApp')}
             </Button>
             <Button type='button' size='sm' variant='ghost' onClick={dismissBanner}>
               {t('pwa.dismiss')}
@@ -200,14 +196,14 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
             <Button
               type='button'
               className='mt-2 w-full'
-              disabled={prompting}
+              isLoading={prompting}
               onClick={() => {
                 void promptNativeInstall().then((outcome) => {
                   if (outcome === 'accepted') setHelpOpen(false);
                 });
               }}
             >
-              {prompting ? t('pwa.installing') : t('pwa.installApp')}
+              {t('pwa.installApp')}
             </Button>
           ) : null}
           <div

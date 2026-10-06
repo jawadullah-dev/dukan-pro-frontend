@@ -187,7 +187,7 @@ export function StockAdjustForm() {
           children={(field) => <field.TextareaField label='Reason' required />}
         />
       </FieldGroup>
-      <Button type='submit' disabled={save.isPending}>
+      <Button type='submit' isLoading={save.isPending}>
         Save adjustment
       </Button>
     </form>
@@ -295,19 +295,25 @@ function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
           <div className='mt-2 flex gap-3'>
             <Button
               type='button'
+              isLoading={create.isPending}
               onClick={() => create.mutate({ value: form.state.values, confirm_overdraft: true })}
             >
               Confirm
             </Button>
-            <Button type='button' variant='outline' onClick={() => setWarning(null)}>
+            <Button
+              type='button'
+              variant='outline'
+              disabled={create.isPending}
+              onClick={() => setWarning(null)}
+            >
               Back
             </Button>
           </div>
         </div>
       ) : (
         <DialogFooter>
-          <DialogCancelButton onClick={onDone} />
-          <DialogPrimaryButton mode='save' disabled={create.isPending} />
+          <DialogCancelButton onClick={onDone} disabled={create.isPending} />
+          <DialogPrimaryButton mode='save' loading={create.isPending} />
         </DialogFooter>
       )}
     </form>
@@ -523,19 +529,25 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
           <div className='mt-2 flex gap-3'>
             <Button
               type='button'
+              isLoading={save.isPending}
               onClick={() => save.mutate({ value: form.state.values, confirm_overdraft: true })}
             >
               Confirm
             </Button>
-            <Button type='button' variant='outline' onClick={() => setWarning(null)}>
+            <Button
+              type='button'
+              variant='outline'
+              disabled={save.isPending}
+              onClick={() => setWarning(null)}
+            >
               Back
             </Button>
           </div>
         </div>
       ) : (
         <DialogFooter>
-          <DialogCancelButton onClick={onDone} />
-          <DialogPrimaryButton mode='save' disabled={save.isPending} />
+          <DialogCancelButton onClick={onDone} disabled={save.isPending} />
+          <DialogPrimaryButton mode='save' loading={save.isPending} />
         </DialogFooter>
       )}
     </form>

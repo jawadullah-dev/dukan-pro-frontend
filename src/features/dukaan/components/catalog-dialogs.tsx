@@ -98,8 +98,8 @@ function CategoryDialogBody({
           />
         </FieldGroup>
         <DialogFooter>
-          <DialogCancelButton onClick={() => onOpenChange(false)} />
-          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} disabled={save.isPending} />
+          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={save.isPending} />
+          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} loading={save.isPending} />
         </DialogFooter>
       </form>
     </DialogContent>
@@ -175,8 +175,8 @@ function BrandDialogBody({
           />
         </FieldGroup>
         <DialogFooter>
-          <DialogCancelButton onClick={() => onOpenChange(false)} />
-          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} disabled={save.isPending} />
+          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={save.isPending} />
+          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} loading={save.isPending} />
         </DialogFooter>
       </form>
     </DialogContent>
@@ -427,8 +427,8 @@ function ProductDialogBody({
           </FieldGroup>
         </div>
         <DialogFooter className='mx-0 mb-0 shrink-0'>
-          <DialogCancelButton onClick={() => onOpenChange(false)} />
-          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} disabled={save.isPending} />
+          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={save.isPending} />
+          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} loading={save.isPending} />
         </DialogFooter>
       </form>
     </DialogContent>

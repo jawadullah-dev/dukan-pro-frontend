@@ -24,6 +24,8 @@ type DialogPrimaryMode = 'add' | 'edit' | 'save';
 interface DialogPrimaryButtonProps {
   mode: DialogPrimaryMode;
   disabled?: boolean;
+  /** Shows the shared button spinner while a mutation runs. */
+  loading?: boolean;
   type?: 'submit' | 'button';
   onClick?: () => void;
   variant?: 'default' | 'destructive';
@@ -39,13 +41,14 @@ const PRIMARY_ICON = {
 export function DialogPrimaryButton({
   mode,
   disabled,
+  loading = false,
   type = 'submit',
   onClick,
   variant = 'default'
 }: DialogPrimaryButtonProps) {
   const Icon = PRIMARY_ICON[mode];
   return (
-    <Button type={type} variant={variant} disabled={disabled} onClick={onClick}>
+    <Button type={type} variant={variant} disabled={disabled} isLoading={loading} onClick={onClick}>
       <Icon className='mr-2 h-4 w-4' />
       {ACTION_LABELS[mode]}
     </Button>
@@ -54,6 +57,7 @@ export function DialogPrimaryButton({
 
 interface DialogConfirmButtonProps {
   disabled?: boolean;
+  loading?: boolean;
   type?: 'submit' | 'button';
   onClick?: () => void;
   label?: string;
@@ -62,12 +66,19 @@ interface DialogConfirmButtonProps {
 /** Destructive confirm (cancel payment / expense / etc.). */
 export function DialogConfirmButton({
   disabled,
+  loading = false,
   type = 'submit',
   onClick,
   label = ACTION_LABELS.confirm
 }: DialogConfirmButtonProps) {
   return (
-    <Button type={type} variant='destructive' disabled={disabled} onClick={onClick}>
+    <Button
+      type={type}
+      variant='destructive'
+      disabled={disabled}
+      isLoading={loading}
+      onClick={onClick}
+    >
       <Icons.trash className='mr-2 h-4 w-4' />
       {label}
     </Button>

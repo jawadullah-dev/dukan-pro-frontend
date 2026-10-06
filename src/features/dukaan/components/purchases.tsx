@@ -420,19 +420,19 @@ export function PurchaseCreateForm({ onDone }: { onDone?: () => void }) {
           Cash is {formatPkr(warning.current_cash)}. Paying {formatPkr(warning.amount)} would leave{' '}
           {formatPkr(warning.projected_cash)}. Confirm soft overdraft?
           <div className='mt-2 flex justify-end gap-3'>
-            <DialogCancelButton onClick={() => setWarning(null)} />
+            <DialogCancelButton onClick={() => setWarning(null)} disabled={save.isPending} />
             <DialogPrimaryButton
               mode='save'
               type='button'
-              disabled={save.isPending}
+              loading={save.isPending}
               onClick={() => save.mutate({ value: form.state.values, confirm_overdraft: true })}
             />
           </div>
         </div>
       ) : (
         <DialogFooter className='mx-0 mb-0 px-0'>
-          {onDone ? <DialogCancelButton onClick={onDone} /> : null}
-          <DialogPrimaryButton mode='save' disabled={save.isPending} />
+          {onDone ? <DialogCancelButton onClick={onDone} disabled={save.isPending} /> : null}
+          <DialogPrimaryButton mode='save' loading={save.isPending} />
         </DialogFooter>
       )}
     </form>
@@ -512,7 +512,7 @@ export function PurchaseDetailClient({ id }: { id: string }) {
               children={(field) => <field.TextareaField label='Cancel with reason' required />}
             />
           </FieldGroup>
-          <Button type='submit' variant='destructive' disabled={cancel.isPending}>
+          <Button type='submit' variant='destructive' isLoading={cancel.isPending}>
             Cancel purchase
           </Button>
         </form>

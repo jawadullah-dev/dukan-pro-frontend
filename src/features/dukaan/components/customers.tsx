@@ -132,8 +132,8 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
           </FieldGroup>
         </div>
         <DialogFooter className='mx-0 mb-0 shrink-0'>
-          <DialogCancelButton onClick={() => onOpenChange(false)} />
-          <DialogPrimaryButton mode='add' disabled={create.isPending} />
+          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={create.isPending} />
+          <DialogPrimaryButton mode='add' loading={create.isPending} />
         </DialogFooter>
       </form>
     </DialogContent>
@@ -233,7 +233,7 @@ export function CustomerLedgerClient({ id }: { id: string }) {
             )}
           />
         </div>
-        <Button type='submit' disabled={pay.isPending}>
+        <Button type='submit' isLoading={pay.isPending}>
           Save payment
         </Button>
       </form>

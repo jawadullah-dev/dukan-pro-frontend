@@ -123,12 +123,14 @@ export default function SheetProductForm() {
         </div>
 
         <SheetFooter>
-          <Button type='button' variant='outline' onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button type='submit' form='sheet-product-form'>
-            Create Product
-          </Button>
+          <form.AppForm>
+            <Button type='button' variant='outline' onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <form.SubmitButton type='submit' form='sheet-product-form'>
+              Create Product
+            </form.SubmitButton>
+          </form.AppForm>
         </SheetFooter>
       </SheetContent>
     </Sheet>

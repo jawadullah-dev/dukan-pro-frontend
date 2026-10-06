@@ -120,8 +120,8 @@ function ExpenseCancelBody({
           />
         </FieldGroup>
         <DialogFooter>
-          <DialogCancelButton onClick={onClose} />
-          <DialogConfirmButton disabled={cancel.isPending} />
+          <DialogCancelButton onClick={onClose} disabled={cancel.isPending} />
+          <DialogConfirmButton loading={cancel.isPending} />
         </DialogFooter>
       </form>
     </DialogContent>

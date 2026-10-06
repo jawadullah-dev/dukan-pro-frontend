@@ -99,8 +99,8 @@ function ExpenseCategoryDialogBody({
           />
         </FieldGroup>
         <DialogFooter>
-          <DialogCancelButton onClick={() => onOpenChange(false)} />
-          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} disabled={save.isPending} />
+          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={save.isPending} />
+          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} loading={save.isPending} />
         </DialogFooter>
       </form>
     </DialogContent>

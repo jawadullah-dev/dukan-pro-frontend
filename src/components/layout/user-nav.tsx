@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { signOut } from 'next-auth/react';
 import { sessionQueryOptions } from '@/features/dukaan/api/queries';
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenuButton } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Spinner } from '@/components/ui/spinner';
 import { Icons } from '@/components/icons';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { clearPwaCaches } from '@/lib/pwa';
@@ -30,12 +32,22 @@ function ProfileAvatar({ className }: { className?: string }) {
   );
 }
 
-async function handleSignOut() {
-  await clearPwaCaches();
-  await signOut({ callbackUrl: '/login' });
-}
-
 function AccountMenuItems({ userName, shopName }: { userName: string; shopName: string }) {
+  const [signingOut, setSigningOut] = React.useState(false);
+
+  const onSignOut = () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    void (async () => {
+      try {
+        await clearPwaCaches();
+        await signOut({ callbackUrl: '/login' });
+      } catch {
+        setSigningOut(false);
+      }
+    })();
+  };
+
   return (
     <>
       <DropdownMenuGroup>
@@ -51,9 +63,13 @@ function AccountMenuItems({ userName, shopName }: { userName: string; shopName: 
         <InstallPrompt variant='menu' />
       </div>
       <DropdownMenuSeparator />
-      <DropdownMenuItem variant='destructive' onClick={() => void handleSignOut()}>
-        <Icons.logout className='mr-2 h-4 w-4' />
-        Sign out
+      <DropdownMenuItem variant='destructive' disabled={signingOut} onClick={onSignOut}>
+        {signingOut ? (
+          <Spinner className='mr-2 size-4' aria-hidden />
+        ) : (
+          <Icons.logout className='mr-2 h-4 w-4' />
+        )}
+        {signingOut ? 'Signing out…' : 'Sign out'}
       </DropdownMenuItem>
     </>
   );

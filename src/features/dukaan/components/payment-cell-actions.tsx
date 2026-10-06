@@ -131,6 +131,7 @@ function PaymentCancelBody({
             <div className='mt-2 flex gap-3'>
               <Button
                 type='button'
+                isLoading={cancel.isPending}
                 onClick={() =>
                   cancel.mutate({
                     reason: form.state.values.reason.trim(),
@@ -140,15 +141,20 @@ function PaymentCancelBody({
               >
                 Confirm cancel
               </Button>
-              <Button type='button' variant='outline' onClick={() => setWarning(null)}>
+              <Button
+                type='button'
+                variant='outline'
+                disabled={cancel.isPending}
+                onClick={() => setWarning(null)}
+              >
                 Back
               </Button>
             </div>
           </div>
         ) : (
           <DialogFooter>
-            <DialogCancelButton onClick={onClose} />
-            <DialogConfirmButton disabled={cancel.isPending} />
+            <DialogCancelButton onClick={onClose} disabled={cancel.isPending} />
+            <DialogConfirmButton loading={cancel.isPending} />
           </DialogFooter>
         )}
       </form>

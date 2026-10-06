@@ -1,48 +1,34 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
-import { cn } from '@/lib/utils';
+import { Button, type ButtonProps } from '@/components/ui/button';
 
-export interface LoadingButtonProps extends Omit<React.ComponentProps<typeof Button>, 'className'> {
-  /** When true, overlays a spinner and disables the button. */
+export interface LoadingButtonProps extends ButtonProps {
+  /** Alias for Button `isLoading` — kept for existing call sites. */
   loading?: boolean;
   /** Polite screen-reader announcement while loading. */
   loadingLabel?: string;
-  className?: string;
 }
 
 /**
- * A `Button` with a built-in loading state. The spinner is overlaid on top of
- * the label, which stays in layout (`opacity-0`) while loading — so toggling
- * `loading` never changes the button's size and there's no layout shift.
- * Inherits every Button `variant` / `size` and the theme tokens.
+ * Thin wrapper around Button `isLoading`. Prefer `<Button isLoading={…}>`
+ * for new code; this stays for forms / older call sites.
  */
 export function LoadingButton({
   loading = false,
+  isLoading,
   loadingLabel = 'Loading…',
-  disabled,
-  className,
   children,
   ...props
 }: LoadingButtonProps) {
-  const gap = props.size === 'sm' || props.size === 'xs' ? 'gap-1' : 'gap-1.5';
+  const busy = isLoading || loading;
   return (
     <>
-      <Button
-        {...props}
-        disabled={disabled || loading}
-        aria-busy={loading || undefined}
-        className={cn('relative', loading && 'disabled:opacity-100', className)}
-      >
-        {loading && <Spinner aria-hidden className='absolute inset-0 m-auto' />}
-        <span className={cn('inline-flex items-center', gap, loading && 'opacity-0')}>
-          {children}
-        </span>
+      <Button {...props} isLoading={busy}>
+        {children}
       </Button>
       <span role='status' aria-live='polite' className='sr-only'>
-        {loading ? loadingLabel : ''}
+        {busy ? loadingLabel : ''}
       </span>
     </>
   );

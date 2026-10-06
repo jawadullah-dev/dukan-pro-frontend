@@ -2,6 +2,7 @@
 
 import type { FC } from 'react';
 import { Icons } from '@/components/icons';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
 
 export type NotificationStatus = 'unread' | 'read' | 'archived';
@@ -157,7 +158,7 @@ export const NotificationCard: FC<NotificationCardProps> = ({
                     )}
                   >
                     {showLoading ? (
-                      <Icons.spinner size={12} className='animate-spin' />
+                      <Spinner className='size-3' aria-hidden />
                     ) : (
                       <>
                         <span>{action.label}</span>

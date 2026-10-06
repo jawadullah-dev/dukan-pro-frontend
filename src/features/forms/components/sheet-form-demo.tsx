@@ -162,12 +162,14 @@ function SheetFormSection() {
             </form>
 
             <SheetFooter className='pt-4'>
-              <Button type='button' variant='outline' onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button type='submit' form='sheet-form-id'>
-                Create Product
-              </Button>
+              <form.AppForm>
+                <Button type='button' variant='outline' onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <form.SubmitButton type='submit' form='sheet-form-id'>
+                  Create Product
+                </form.SubmitButton>
+              </form.AppForm>
             </SheetFooter>
           </SheetContent>
         </Sheet>
@@ -258,12 +260,14 @@ function DialogFormSection() {
             </form>
 
             <DialogFooter>
-              <Button type='button' variant='outline' onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button type='submit' form='dialog-form-id'>
-                Submit Feedback
-              </Button>
+              <form.AppForm>
+                <Button type='button' variant='outline' onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <form.SubmitButton type='submit' form='dialog-form-id'>
+                  Submit Feedback
+                </form.SubmitButton>
+              </form.AppForm>
             </DialogFooter>
           </DialogContent>
         </Dialog>

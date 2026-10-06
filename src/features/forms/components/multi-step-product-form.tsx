@@ -247,7 +247,9 @@ export default function MultiStepProductForm() {
               </Button>
             )}
             {step.isCompleted ? (
-              <Button type='submit'>Submit</Button>
+              <form.AppForm>
+                <form.SubmitButton type='submit'>Submit</form.SubmitButton>
+              </form.AppForm>
             ) : (
               <Button size='sm' variant='ghost' type='button' onClick={() => void handleNext()}>
                 Next <Icons.chevronRight />

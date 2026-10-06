@@ -396,8 +396,8 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
       </div>
 
       <DialogFooter className='mx-0 mb-0 px-0'>
-        {onDone ? <DialogCancelButton onClick={onDone} /> : null}
-        <DialogPrimaryButton mode='save' disabled={save.isPending} />
+        {onDone ? <DialogCancelButton onClick={onDone} disabled={save.isPending} /> : null}
+        <DialogPrimaryButton mode='save' loading={save.isPending} />
       </DialogFooter>
     </form>
   );
@@ -515,7 +515,7 @@ export function SaleDetailClient({ id }: { id: string }) {
               <div className='mt-2 flex gap-3'>
                 <Button
                   type='button'
-                  disabled={cancel.isPending}
+                  isLoading={cancel.isPending}
                   onClick={() =>
                     cancel.mutate({
                       reason: form.state.values.reason.trim(),
@@ -525,13 +525,18 @@ export function SaleDetailClient({ id }: { id: string }) {
                 >
                   Confirm cancel
                 </Button>
-                <Button type='button' variant='outline' onClick={() => setWarning(null)}>
+                <Button
+                  type='button'
+                  variant='outline'
+                  disabled={cancel.isPending}
+                  onClick={() => setWarning(null)}
+                >
                   Back
                 </Button>
               </div>
             </div>
           ) : (
-            <Button type='submit' variant='destructive' disabled={cancel.isPending}>
+            <Button type='submit' variant='destructive' isLoading={cancel.isPending}>
               Cancel sale
             </Button>
           )}

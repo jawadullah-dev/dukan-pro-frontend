@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import { NextResponse } from 'next/server';
 import { authConfig } from '@/auth.config';
-import { homePathForRole, redirectForRole } from '@/lib/auth/routes';
+import { homePathForRole, redirectForRole, shortcutPathForRole } from '@/lib/auth/routes';
 
 /**
  * Edge middleware — uses authConfig (includes jwt/session callbacks)
@@ -45,7 +45,9 @@ export const proxy = auth((req) => {
   }
 
   if (pathname === '/' && isLoggedIn) {
-    return NextResponse.redirect(new URL(homePathForRole(role), req.nextUrl));
+    const to = req.nextUrl.searchParams.get('to');
+    const shortcut = shortcutPathForRole(to, role);
+    return NextResponse.redirect(new URL(shortcut ?? homePathForRole(role), req.nextUrl));
   }
 
   if (pathname === '/' && !isLoggedIn) {

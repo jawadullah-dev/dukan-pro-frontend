@@ -12,17 +12,20 @@ import {
 import { Icons } from '@/components/icons';
 import { t } from '@/i18n';
 import { isIosInstallCandidate, isStandaloneDisplay } from '@/lib/pwa';
+import {
+  bumpInstallVisitsOnce,
+  ensureInstallListeners,
+  getDeferredPrompt,
+  isInstallMarkedInstalled,
+  isInstallPrompting,
+  promptNativeInstall,
+  subscribeInstallState
+} from '@/lib/pwa-install';
 import { cn } from '@/lib/utils';
 
 const DISMISS_KEY = 'pwa-install-dismissed-at';
-const VISIT_KEY = 'pwa-install-visits';
 const DISMISS_DAYS = 14;
 const MIN_VISITS = 2;
-
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-};
 
 function readDismissed(): boolean {
   try {
@@ -36,66 +39,53 @@ function readDismissed(): boolean {
   }
 }
 
-function bumpVisits(): number {
-  try {
-    const n = Number(localStorage.getItem(VISIT_KEY) ?? '0') + 1;
-    localStorage.setItem(VISIT_KEY, String(n));
-    return n;
-  } catch {
-    return MIN_VISITS;
-  }
-}
-
 interface InstallPromptProps {
   /** Render as menu item only (no banner). */
   variant?: 'banner' | 'menu' | 'both';
   className?: string;
 }
 
+/**
+ * Install entry points (banner + menu). Open/close/cancel as many times as you
+ * want — never crashes; falls back to how-to dialog when the native prompt
+ * was already used or dismissed.
+ */
 export function InstallPrompt({ variant = 'both', className }: InstallPromptProps) {
-  const [deferred, setDeferred] = React.useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = React.useState(false);
+  const [hasDeferred, setHasDeferred] = React.useState(false);
+  const [prompting, setPrompting] = React.useState(false);
   const [showBanner, setShowBanner] = React.useState(false);
-  const [iosOpen, setIosOpen] = React.useState(false);
+  const [helpOpen, setHelpOpen] = React.useState(false);
   const [eligible, setEligible] = React.useState(false);
+  const ios = isIosInstallCandidate();
 
   React.useEffect(() => {
-    if (isStandaloneDisplay()) {
+    if (isStandaloneDisplay() || isInstallMarkedInstalled()) {
       setInstalled(true);
       return;
     }
 
-    const visits = bumpVisits();
-    const dismissed = readDismissed();
-    setEligible(visits >= MIN_VISITS && !dismissed);
+    ensureInstallListeners();
+    const visits = bumpInstallVisitsOnce();
+    setEligible(visits >= MIN_VISITS && !readDismissed());
+    setHasDeferred(Boolean(getDeferredPrompt()));
+    setPrompting(isInstallPrompting());
 
-    const onBip = (e: Event) => {
-      e.preventDefault();
-      setDeferred(e as BeforeInstallPromptEvent);
-    };
-    const onInstalled = () => {
-      setInstalled(true);
-      setShowBanner(false);
-      setDeferred(null);
-    };
-
-    window.addEventListener('beforeinstallprompt', onBip);
-    window.addEventListener('appinstalled', onInstalled);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onBip);
-      window.removeEventListener('appinstalled', onInstalled);
-    };
+    return subscribeInstallState(() => {
+      setInstalled(isInstallMarkedInstalled() || isStandaloneDisplay());
+      setHasDeferred(Boolean(getDeferredPrompt()));
+      setPrompting(isInstallPrompting());
+    });
   }, []);
 
   React.useEffect(() => {
     if (!eligible || installed) return;
     if (variant === 'menu') return;
-    // Never on first visit; wait a beat after login/shell mount
     const timer = window.setTimeout(() => setShowBanner(true), 2500);
     return () => window.clearTimeout(timer);
   }, [eligible, installed, variant]);
 
-  const dismiss = () => {
+  const dismissBanner = () => {
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
     } catch {
@@ -105,20 +95,31 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
     setEligible(false);
   };
 
-  const installChromium = async () => {
-    if (!deferred) return;
-    await deferred.prompt();
-    await deferred.userChoice;
-    setDeferred(null);
-    setShowBanner(false);
+  const openHelp = () => {
+    setHelpOpen(true);
   };
 
-  const openHelp = () => {
-    if (isIosInstallCandidate()) {
-      setIosOpen(true);
+  const onInstallClick = () => {
+    // iOS never gets beforeinstallprompt — always show Share steps.
+    if (ios) {
+      openHelp();
       return;
     }
-    void installChromium();
+
+    // Native prompt available — show it. Closing without install is fine;
+    // the next tap opens the how-to dialog (BIP is one-shot per session).
+    if (hasDeferred && !prompting) {
+      void promptNativeInstall().then((outcome) => {
+        if (outcome === 'accepted') {
+          setShowBanner(false);
+          setHelpOpen(false);
+        }
+      });
+      return;
+    }
+
+    // Already used native prompt this session, or browser has no BIP — show steps.
+    openHelp();
   };
 
   if (installed) return null;
@@ -135,10 +136,11 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
             'hover:bg-accent flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm',
             className
           )}
-          onClick={openHelp}
+          onClick={onInstallClick}
+          disabled={prompting}
         >
           <Icons.download className='size-4' />
-          {t('pwa.installApp')}
+          {prompting ? t('pwa.installing') : t('pwa.installApp')}
         </button>
       ) : null}
 
@@ -149,34 +151,70 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
           className='border-border bg-card fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 rounded-xl border p-3 shadow-lg sm:inset-x-auto sm:end-4 sm:bottom-4 sm:max-w-sm'
         >
           <p className='text-sm font-medium'>{t('pwa.installApp')}</p>
-          <p className='text-muted-foreground mt-1 text-xs'>{t('pwa.installDesktopHint')}</p>
+          <p className='text-muted-foreground mt-1 text-xs'>
+            {ios ? t('pwa.iosBody') : t('pwa.installDesktopHint')}
+          </p>
           <div className='mt-3 flex gap-2'>
-            <Button type='button' size='sm' className='flex-1' onClick={openHelp}>
-              {isIosInstallCandidate() ? t('pwa.howToInstall') : t('pwa.installApp')}
+            <Button
+              type='button'
+              size='sm'
+              className='flex-1'
+              onClick={onInstallClick}
+              disabled={prompting}
+            >
+              {prompting
+                ? t('pwa.installing')
+                : ios || !hasDeferred
+                  ? t('pwa.howToInstall')
+                  : t('pwa.installApp')}
             </Button>
-            <Button type='button' size='sm' variant='ghost' onClick={dismiss}>
+            <Button type='button' size='sm' variant='ghost' onClick={dismissBanner}>
               {t('pwa.dismiss')}
             </Button>
           </div>
         </div>
       ) : null}
 
-      <Dialog open={iosOpen} onOpenChange={setIosOpen}>
+      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className='max-w-sm'>
           <DialogHeader>
-            <DialogTitle>{t('pwa.iosTitle')}</DialogTitle>
-            <DialogDescription>{t('pwa.iosBody')}</DialogDescription>
+            <DialogTitle>{ios ? t('pwa.iosTitle') : t('pwa.androidTitle')}</DialogTitle>
+            <DialogDescription>{ios ? t('pwa.iosBody') : t('pwa.androidBody')}</DialogDescription>
           </DialogHeader>
           <ol className='text-muted-foreground list-decimal space-y-2 ps-4 text-sm'>
-            <li>{t('pwa.iosStep1')}</li>
-            <li>{t('pwa.iosStep2')}</li>
-            <li>{t('pwa.iosStep3')}</li>
+            {ios ? (
+              <>
+                <li>{t('pwa.iosStep1')}</li>
+                <li>{t('pwa.iosStep2')}</li>
+                <li>{t('pwa.iosStep3')}</li>
+              </>
+            ) : (
+              <>
+                <li>{t('pwa.androidStep1')}</li>
+                <li>{t('pwa.androidStep2')}</li>
+                <li>{t('pwa.androidStep3')}</li>
+              </>
+            )}
           </ol>
+          {!ios && hasDeferred ? (
+            <Button
+              type='button'
+              className='mt-2 w-full'
+              disabled={prompting}
+              onClick={() => {
+                void promptNativeInstall().then((outcome) => {
+                  if (outcome === 'accepted') setHelpOpen(false);
+                });
+              }}
+            >
+              {prompting ? t('pwa.installing') : t('pwa.installApp')}
+            </Button>
+          ) : null}
           <div
-            className='bg-muted text-muted-foreground mt-2 flex h-28 items-center justify-center rounded-lg text-xs'
+            className='bg-muted text-muted-foreground mt-2 flex h-20 items-center justify-center rounded-lg px-3 text-center text-xs'
             aria-hidden
           >
-            Share → Add to Home Screen
+            {ios ? 'Share → Add to Home Screen' : 'Browser menu ⋮ → Install app'}
           </div>
         </DialogContent>
       </Dialog>

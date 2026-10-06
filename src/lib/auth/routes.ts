@@ -10,6 +10,24 @@ export function homePathForRole(role: AuthAccountRole | string | undefined): str
   return role === 'SUPER_ADMIN' ? PLATFORM_HOME : SHOP_HOME;
 }
 
+/** PWA shortcut targets (`/?to=sales`). Platform admins always go home. */
+export function shortcutPathForRole(
+  to: string | null | undefined,
+  role: AuthAccountRole | string | undefined
+): string | null {
+  if (!to || role === 'SUPER_ADMIN') return null;
+  switch (to) {
+    case 'sales':
+      return '/dashboard/sales/new';
+    case 'customers':
+      return '/dashboard/customers';
+    case 'inventory':
+      return '/dashboard/inventory';
+    default:
+      return null;
+  }
+}
+
 export function isPlatformRoute(pathname: string): boolean {
   return pathname === PLATFORM_PREFIX || pathname.startsWith(`${PLATFORM_PREFIX}/`);
 }

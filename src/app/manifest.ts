@@ -59,26 +59,28 @@ export default function manifest(): MetadataRoute.Manifest {
         label: `${APP_NAME} mobile`
       }
     ],
+    // Shortcuts go through `/` so cold PWA launches hit the public entry first
+    // (auth redirect), instead of a hard NetworkOnly miss on /dashboard/*.
     shortcuts: [
       {
         name: 'New sale',
         short_name: 'Sale',
         description: 'Start a new sale',
-        url: '/dashboard/sales/new?source=pwa',
+        url: '/?source=pwa&to=sales',
         icons: [{ src: '/icons/shortcut-sale.png', sizes: '96x96', type: 'image/png' }]
       },
       {
         name: 'Add customer',
         short_name: 'Customer',
         description: 'Add a customer',
-        url: '/dashboard/customers?source=pwa',
+        url: '/?source=pwa&to=customers',
         icons: [{ src: '/icons/shortcut-customer.png', sizes: '96x96', type: 'image/png' }]
       },
       {
         name: 'Inventory',
         short_name: 'Stock',
         description: 'Open inventory',
-        url: '/dashboard/inventory?source=pwa',
+        url: '/?source=pwa&to=inventory',
         icons: [{ src: '/icons/shortcut-inventory.png', sizes: '96x96', type: 'image/png' }]
       }
     ]

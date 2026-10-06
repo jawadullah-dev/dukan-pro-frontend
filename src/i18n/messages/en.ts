@@ -47,6 +47,7 @@ export const en = {
   'table.balance': 'Balance',
   'nav.back': 'Back',
   'pwa.installApp': 'Install app',
+  'pwa.installing': 'Opening install…',
   'pwa.howToInstall': 'How to install',
   'pwa.dismiss': 'Not now',
   'pwa.installDesktopHint':
@@ -56,6 +57,12 @@ export const en = {
   'pwa.iosStep1': 'Tap the Share button.',
   'pwa.iosStep2': 'Scroll and tap Add to Home Screen.',
   'pwa.iosStep3': 'Tap Add. Open the app from your home screen.',
+  'pwa.androidTitle': 'Install on this phone',
+  'pwa.androidBody':
+    'You can install Dukaan Pro from Chrome. Close the install sheet anytime — tap Install again when you are ready.',
+  'pwa.androidStep1': 'Tap Install app below, or open the Chrome menu (⋮).',
+  'pwa.androidStep2': 'Choose Install app / Add to Home screen.',
+  'pwa.androidStep3': 'Open Dukaan from your home screen — works like a normal app.',
   'pwa.updateAvailable': 'A new version is available. Reload',
   'pwa.reload': 'Reload',
   'pwa.offlineBanner': 'You are offline. Connect to save or sell.',

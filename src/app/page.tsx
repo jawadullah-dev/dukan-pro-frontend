@@ -1,8 +1,13 @@
 import { auth } from '@/auth';
-import { homePathForRole } from '@/lib/auth/routes';
+import { homePathForRole, shortcutPathForRole } from '@/lib/auth/routes';
 import { redirect } from 'next/navigation';
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ to?: string }> }) {
   const session = await auth();
-  redirect(session?.user ? homePathForRole(session.user.role) : '/login');
+  if (!session?.user) {
+    redirect('/login');
+  }
+  const { to } = await searchParams;
+  const shortcut = shortcutPathForRole(to, session.user.role);
+  redirect(shortcut ?? homePathForRole(session.user.role));
 }

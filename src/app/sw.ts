@@ -1,9 +1,8 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist';
+import type { PrecacheEntry, SerwistGlobalConfig, SerwistPlugin } from 'serwist';
 import {
-  CacheFirst,
   ExpirationPlugin,
   NetworkFirst,
   NetworkOnly,
@@ -11,6 +10,7 @@ import {
   Serwist,
   StaleWhileRevalidate
 } from 'serwist';
+import { NetworkOnlyWithRetry } from '@/app/sw-network-retry';
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -20,7 +20,8 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
-const CACHE_VERSION = 'v1';
+/** Bump when runtime cache rules change so phones drop stale buckets. */
+const CACHE_VERSION = 'v2';
 
 /** Paths that must never be stored in a Cache API bucket. */
 function isBusinessPath(pathname: string): boolean {
@@ -30,6 +31,21 @@ function isBusinessPath(pathname: string): boolean {
     pathname.startsWith('/monitoring')
   );
 }
+
+/** Never cache redirect responses (e.g. `/` → `/dashboard` or `/login`). */
+const skipRedirectCachePlugin: SerwistPlugin = {
+  cacheWillUpdate: async ({ response }) => {
+    if (!response) return null;
+    if (response.redirected || response.type === 'opaqueredirect') return null;
+    if (response.status !== 200) return null;
+    return response;
+  }
+};
+
+const businessNetwork = new NetworkOnlyWithRetry({
+  maxAttempts: 3,
+  retryDelayMs: 280
+});
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
@@ -43,24 +59,16 @@ const serwist = new Serwist({
       matcher: ({ request }) => request.method !== 'GET' && request.method !== 'HEAD',
       handler: new NetworkOnly()
     },
-    // All API + auth — never cache (shared shop devices)
+    // Auth + API — retry, never cache
     {
-      matcher: ({ url }) => isBusinessPath(url.pathname) && url.pathname.startsWith('/api/'),
-      handler: new NetworkOnly({ networkTimeoutSeconds: 10 })
+      matcher: ({ url, sameOrigin }) =>
+        sameOrigin && (url.pathname.startsWith('/api/') || url.pathname.startsWith('/monitoring')),
+      handler: businessNetwork
     },
+    // Dashboard (navigations, RSC, prefetch) — retry, never cache
     {
-      matcher: /\/api\/auth\/.*/,
-      handler: new NetworkOnly({ networkTimeoutSeconds: 10 })
-    },
-    // Dashboard navigations / RSC — network only (contains business data)
-    {
-      matcher: ({ request, url, sameOrigin }) =>
-        sameOrigin &&
-        isBusinessPath(url.pathname) &&
-        (request.mode === 'navigate' ||
-          request.destination === 'document' ||
-          request.headers.get('RSC') === '1'),
-      handler: new NetworkOnly()
+      matcher: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/dashboard'),
+      handler: businessNetwork
     },
     // Static fonts / media / next assets
     {
@@ -77,9 +85,10 @@ const serwist = new Serwist({
         plugins: [new ExpirationPlugin({ maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 })]
       })
     },
+    // Hashed Next chunks — SWR so a new deploy is not stuck on stale CacheFirst JS
     {
       matcher: /\/_next\/static.+\.js$/i,
-      handler: new CacheFirst({
+      handler: new StaleWhileRevalidate({
         cacheName: `next-static-js-${CACHE_VERSION}`,
         plugins: [new ExpirationPlugin({ maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 })]
       })
@@ -107,7 +116,7 @@ const serwist = new Serwist({
     },
     {
       matcher: /\.(?:mp3|wav|ogg)$/i,
-      handler: new CacheFirst({
+      handler: new NetworkFirst({
         cacheName: `static-audio-${CACHE_VERSION}`,
         plugins: [
           new ExpirationPlugin({ maxEntries: 16, maxAgeSeconds: 60 * 60 * 24 }),
@@ -115,25 +124,41 @@ const serwist = new Serwist({
         ]
       })
     },
-    // Public pages only (login, offline) — network-first
+    // `/` always redirects — never cache documents for it
+    {
+      matcher: ({ request, url, sameOrigin }) =>
+        sameOrigin &&
+        url.pathname === '/' &&
+        (request.mode === 'navigate' || request.destination === 'document'),
+      handler: businessNetwork
+    },
+    // Other public pages (login, offline) — network-first, no redirects in cache
     {
       matcher: ({ request, url, sameOrigin }) =>
         sameOrigin &&
         !isBusinessPath(url.pathname) &&
+        url.pathname !== '/' &&
         (request.mode === 'navigate' || request.destination === 'document'),
       handler: new NetworkFirst({
         cacheName: `pages-public-${CACHE_VERSION}`,
-        networkTimeoutSeconds: 5,
-        plugins: [new ExpirationPlugin({ maxEntries: 16, maxAgeSeconds: 60 * 60 * 24 })]
+        networkTimeoutSeconds: 8,
+        plugins: [
+          skipRedirectCachePlugin,
+          new ExpirationPlugin({ maxEntries: 16, maxAgeSeconds: 60 * 60 * 24 })
+        ]
       })
     },
     // Same-origin fallback for other non-API GETs
     {
-      matcher: ({ url, sameOrigin }) => sameOrigin && !isBusinessPath(url.pathname),
+      matcher: ({ url, sameOrigin }) =>
+        sameOrigin && !isBusinessPath(url.pathname) && url.pathname !== '/',
       handler: new NetworkFirst({
         cacheName: `misc-public-${CACHE_VERSION}`,
         networkTimeoutSeconds: 8,
-        plugins: [new ExpirationPlugin({ maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 })]
+        plugins: [
+          skipRedirectCachePlugin,
+          new ExpirationPlugin({ maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 })
+        ]
       })
     },
     // Cross-origin: network only
@@ -147,7 +172,12 @@ const serwist = new Serwist({
       {
         url: '/~offline',
         matcher({ request }) {
-          return request.destination === 'document';
+          // Android Chrome often leaves destination empty on navigations.
+          return (
+            request.mode === 'navigate' ||
+            request.destination === 'document' ||
+            request.destination === ''
+          );
         }
       }
     ]
@@ -167,6 +197,7 @@ self.addEventListener('message', (event) => {
           keys
             .filter(
               (key) =>
+                key.includes('v1') ||
                 key.includes(CACHE_VERSION) ||
                 key.startsWith('pages-') ||
                 key.startsWith('static-') ||

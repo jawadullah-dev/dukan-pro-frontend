@@ -4,6 +4,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 import { Suspense, useState } from 'react';
 import { toast } from 'sonner';
 import { FloatingActionButton } from '@/components/common/floating-action-button';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -47,11 +48,19 @@ import {
 import { ExpenseCategoryDialog } from './expense-category-dialogs';
 
 export function InventoryListClient() {
-  return <InventoryTable />;
+  return (
+    <TablePageBody>
+      <InventoryTable />
+    </TablePageBody>
+  );
 }
 
 export function InventoryMovementsClient() {
-  return <MovementsTable />;
+  return (
+    <TablePageBody>
+      <MovementsTable />
+    </TablePageBody>
+  );
 }
 
 type StockAdjustValues = {
@@ -345,7 +354,7 @@ export function ExpensesClient() {
   };
 
   return (
-    <>
+    <TablePageBody>
       <ExpensesTable toolbarAction={<ExpensesHeaderAction className='h-8' onAdd={handleOpen} />} />
       <FloatingActionButton label={t('common.addExpense')} onClick={handleOpen} />
       <Dialog open={open} onOpenChange={setOpen}>
@@ -361,7 +370,7 @@ export function ExpensesClient() {
           ) : null}
         </DialogContent>
       </Dialog>
-    </>
+    </TablePageBody>
   );
 }
 
@@ -385,18 +394,22 @@ export function ExpenseCategoriesHeaderAction({ onAdd }: { onAdd?: () => void })
 export function ExpenseCategoriesClient() {
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <TablePageBody>
       <ExpenseCategoriesTable
         toolbarAction={<ExpenseCategoriesHeaderAction onAdd={() => setOpen(true)} />}
       />
       <FloatingActionButton label={t('common.addCategory')} onClick={() => setOpen(true)} />
       <ExpenseCategoryDialog open={open} onOpenChange={setOpen} />
-    </>
+    </TablePageBody>
   );
 }
 
 export function CashLedgerClient() {
-  return <CashTable />;
+  return (
+    <TablePageBody>
+      <CashTable />
+    </TablePageBody>
+  );
 }
 
 function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
@@ -579,7 +592,7 @@ export function SupplierPaymentsClient() {
   };
 
   return (
-    <>
+    <TablePageBody>
       <SupplierPaymentsTable
         toolbarAction={<SupplierPaymentsHeaderAction className='h-8' onAdd={handleOpen} />}
       />
@@ -599,6 +612,6 @@ export function SupplierPaymentsClient() {
           ) : null}
         </DialogContent>
       </Dialog>
-    </>
+    </TablePageBody>
   );
 }

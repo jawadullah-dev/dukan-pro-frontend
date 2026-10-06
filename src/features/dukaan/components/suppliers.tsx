@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { FloatingActionButton } from '@/components/common/floating-action-button';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -154,10 +155,10 @@ export function SuppliersHeaderAction({ onAdd }: { onAdd?: () => void }) {
 export function SuppliersListClient() {
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <TablePageBody>
       <SuppliersTable toolbarAction={<SuppliersHeaderAction onAdd={() => setOpen(true)} />} />
       <FloatingActionButton label={t('common.addSupplier')} onClick={() => setOpen(true)} />
       <SupplierDialog open={open} onOpenChange={setOpen} />
-    </>
+    </TablePageBody>
   );
 }

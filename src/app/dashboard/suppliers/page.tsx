@@ -1,4 +1,4 @@
-﻿import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/layout/page-container';
 import { SuppliersListClient } from '@/features/dukaan/components/suppliers';
 import { suppliersQueryOptions } from '@/features/dukaan/api/queries';
 import { getQueryClient } from '@/lib/query-client';
@@ -12,6 +12,7 @@ export default function Page() {
   void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
   return (
     <PageContainer
+      fill
       pageTitle='Suppliers'
       pageDescription='Buy-from contacts including Walk-in seller'
     >

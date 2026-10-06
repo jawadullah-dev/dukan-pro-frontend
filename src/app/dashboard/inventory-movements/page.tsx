@@ -12,6 +12,7 @@ export default function Page() {
   void qc.prefetchQuery(inventoryMovementsQueryOptions({ limit: 100 }));
   return (
     <PageContainer
+      fill
       pageTitle='Inventory movements'
       pageDescription='Append-only stock movement history'
     >

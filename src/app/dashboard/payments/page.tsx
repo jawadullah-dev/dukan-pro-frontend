@@ -12,6 +12,7 @@ export default function Page() {
   void qc.prefetchQuery(paymentsQueryOptions({ limit: 100 }));
   return (
     <PageContainer
+      fill
       pageTitle='Payments'
       pageDescription='Customer payments — cancel with reason (owner only)'
     >

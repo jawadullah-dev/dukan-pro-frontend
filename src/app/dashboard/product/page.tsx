@@ -22,6 +22,7 @@ export default async function Page(props: pageProps) {
 
   return (
     <PageContainer
+      fill
       pageTitle='Products'
       pageDescription='Manage products (React Query + nuqs table pattern.)'
       infoContent={productInfoContent}

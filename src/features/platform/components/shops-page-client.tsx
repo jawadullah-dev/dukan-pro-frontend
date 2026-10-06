@@ -1,6 +1,7 @@
 'use client';
 
 import { FloatingActionButton } from '@/components/common/floating-action-button';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { PlatformShopsTable } from './shops-table';
@@ -17,10 +18,10 @@ export function CreateShopHeaderAction() {
 
 export function PlatformShopsListClient() {
   return (
-    <>
+    <TablePageBody>
       <PlatformShopsTable />
       {/* Create-shop dialog not wired yet — FAB mirrors header affordance on phones. */}
       <FloatingActionButton label='Create New Shop' onClick={() => {}} />
-    </>
+    </TablePageBody>
   );
 }

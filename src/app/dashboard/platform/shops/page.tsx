@@ -19,6 +19,7 @@ export default function PlatformShopsPage() {
 
   return (
     <PageContainer
+      fill
       pageTitle='Shop Management'
       pageDescription='Manage all tenant mobile shops and subscriptions'
       pageHeaderAction={<CreateShopHeaderAction />}

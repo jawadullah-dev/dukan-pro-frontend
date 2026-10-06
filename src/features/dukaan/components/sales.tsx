@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { toast } from 'sonner';
 import { FloatingActionButton } from '@/components/common/floating-action-button';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -94,13 +95,13 @@ export function SalesListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: b
   const [open, setOpen] = useState(defaultOpenAdd);
 
   return (
-    <>
+    <TablePageBody>
       <SalesTable
         toolbarAction={<SalesHeaderAction className='h-8' onAdd={() => setOpen(true)} />}
       />
       <FloatingActionButton label={t('common.newSale')} onClick={() => setOpen(true)} />
       <SaleCreateDialog open={open} onOpenChange={setOpen} clearDefaultQuery={defaultOpenAdd} />
-    </>
+    </TablePageBody>
   );
 }
 

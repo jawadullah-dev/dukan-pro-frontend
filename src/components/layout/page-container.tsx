@@ -1,6 +1,7 @@
 import React from 'react';
 import { Heading } from '../ui/heading';
 import type { InfobarContent } from '@/components/ui/infobar';
+import { cn } from '@/lib/utils';
 
 function PageSkeleton() {
   return (
@@ -29,7 +30,12 @@ export default function PageContainer({
   pageTitle,
   pageDescription,
   infoContent,
-  pageHeaderAction
+  pageHeaderAction,
+  /**
+   * When true, children fill remaining height (no page scroll).
+   * Use for mobile table/list screens so only the table body scrolls.
+   */
+  fill = false
 }: {
   children: React.ReactNode;
   isLoading?: boolean;
@@ -39,6 +45,7 @@ export default function PageContainer({
   pageDescription?: string;
   infoContent?: InfobarContent;
   pageHeaderAction?: React.ReactNode;
+  fill?: boolean;
 }) {
   if (!access) {
     return (
@@ -57,9 +64,16 @@ export default function PageContainer({
   const hasHeader = pageTitle || pageHeaderAction;
 
   return (
-    <div className='flex min-w-0 flex-1 flex-col px-4 pt-2 pb-[max(1rem,calc(5.5rem+env(safe-area-inset-bottom)))] sm:pb-4 md:px-6 md:pt-4'>
+    <div
+      className={cn(
+        'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-4 pt-2 md:px-6 md:pt-4',
+        // Bottom clearance for fixed mobile nav / FAB — kept on the shell so
+        // the inner list scroller can use the remaining height cleanly.
+        'pb-[max(1rem,calc(5.5rem+env(safe-area-inset-bottom)))] sm:pb-4'
+      )}
+    >
       {hasHeader && (
-        <div className='mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4'>
+        <div className='mb-3 flex shrink-0 flex-col gap-2 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4'>
           {/* Phones already show the title in the top bar — avoid duplicate H1. */}
           <div className='hidden sm:block'>
             <Heading
@@ -76,7 +90,14 @@ export default function PageContainer({
           ) : null}
         </div>
       )}
-      {content}
+      <div
+        className={cn(
+          'flex min-h-0 min-w-0 flex-1 flex-col',
+          fill ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'
+        )}
+      >
+        {content}
+      </div>
     </div>
   );
 }

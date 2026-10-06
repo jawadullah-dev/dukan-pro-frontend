@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FloatingActionButton } from '@/components/common/floating-action-button';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { t } from '@/i18n';
@@ -28,11 +29,11 @@ export function CategoriesHeaderAction({ onAdd }: { onAdd?: () => void }) {
 export function CategoriesPageClient() {
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <TablePageBody>
       <CategoriesTable toolbarAction={<CategoriesHeaderAction onAdd={() => setOpen(true)} />} />
       <FloatingActionButton label={t('common.addCategory')} onClick={() => setOpen(true)} />
       <CategoryDialog open={open} onOpenChange={setOpen} />
-    </>
+    </TablePageBody>
   );
 }
 
@@ -56,10 +57,10 @@ export function BrandsHeaderAction({ onAdd }: { onAdd?: () => void }) {
 export function BrandsPageClient() {
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <TablePageBody>
       <BrandsTable toolbarAction={<BrandsHeaderAction onAdd={() => setOpen(true)} />} />
       <FloatingActionButton label={t('common.addBrand')} onClick={() => setOpen(true)} />
       <BrandDialog open={open} onOpenChange={setOpen} />
-    </>
+    </TablePageBody>
   );
 }

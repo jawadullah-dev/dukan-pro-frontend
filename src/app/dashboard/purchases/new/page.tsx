@@ -17,7 +17,7 @@ export default function Page() {
   void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
   void qc.prefetchQuery(productsQueryOptions({ limit: 100 }));
   return (
-    <PageContainer pageTitle='Purchases' pageDescription='Stock-in purchases'>
+    <PageContainer fill pageTitle='Purchases' pageDescription='Stock-in purchases'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <PurchasesListClient defaultOpenAdd />

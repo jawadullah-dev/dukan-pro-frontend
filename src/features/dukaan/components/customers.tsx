@@ -4,6 +4,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { FloatingActionButton } from '@/components/common/floating-action-button';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -160,11 +161,11 @@ export function CustomersHeaderAction({ onAdd }: { onAdd?: () => void }) {
 export function CustomersListClient() {
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <TablePageBody>
       <CustomersTable toolbarAction={<CustomersHeaderAction onAdd={() => setOpen(true)} />} />
       <FloatingActionButton label={t('common.addCustomer')} onClick={() => setOpen(true)} />
       <CustomerDialog open={open} onOpenChange={setOpen} />
-    </>
+    </TablePageBody>
   );
 }
 

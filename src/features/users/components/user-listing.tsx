@@ -1,4 +1,5 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { getQueryClient } from '@/lib/query-client';
 import { searchParamsCache } from '@/lib/searchparams';
 import { usersQueryOptions } from '../api/queries';
@@ -24,8 +25,10 @@ export default function UserListingPage() {
   void queryClient.prefetchQuery(usersQueryOptions(filters));
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <UsersTable />
-    </HydrationBoundary>
+    <TablePageBody>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <UsersTable />
+      </HydrationBoundary>
+    </TablePageBody>
   );
 }

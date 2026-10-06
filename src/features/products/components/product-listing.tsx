@@ -1,4 +1,5 @@
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { getQueryClient } from '@/lib/query-client';
 import { searchParamsCache } from '@/lib/searchparams';
 import { productsQueryOptions } from '../api/queries';
@@ -24,8 +25,10 @@ export default function ProductListingPage() {
   void queryClient.prefetchQuery(productsQueryOptions(filters));
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ProductTable />
-    </HydrationBoundary>
+    <TablePageBody>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <ProductTable />
+      </HydrationBoundary>
+    </TablePageBody>
   );
 }

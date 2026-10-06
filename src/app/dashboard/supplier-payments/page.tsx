@@ -1,4 +1,4 @@
-﻿import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/layout/page-container';
 import { SupplierPaymentsClient } from '@/features/dukaan/components/money-stock';
 import {
   purchasesQueryOptions,
@@ -17,7 +17,7 @@ export default function Page() {
   void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
   void qc.prefetchQuery(purchasesQueryOptions({ limit: 100 }));
   return (
-    <PageContainer pageTitle='Supplier payments' pageDescription='Pay supplier dues later'>
+    <PageContainer fill pageTitle='Supplier payments' pageDescription='Pay supplier dues later'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <SupplierPaymentsClient />

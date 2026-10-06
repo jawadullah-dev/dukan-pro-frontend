@@ -11,7 +11,7 @@ export default function Page() {
   const qc = getQueryClient();
   void qc.prefetchQuery(brandsQueryOptions({ page: 1, limit: 20 }));
   return (
-    <PageContainer pageTitle='Brands' pageDescription='Product brands for this shop'>
+    <PageContainer fill pageTitle='Brands' pageDescription='Product brands for this shop'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <BrandsPageClient />

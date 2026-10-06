@@ -43,10 +43,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <SidebarInset
           id='main-content'
           tabIndex={-1}
-          className='min-h-dvh min-w-0 overflow-x-hidden scroll-mt-16'
+          className='flex h-dvh max-h-dvh min-h-0 min-w-0 flex-col overflow-hidden scroll-mt-16'
         >
           <Header />
-          <InfobarProvider defaultOpen={false}>
+          <InfobarProvider
+            defaultOpen={false}
+            className='flex min-h-0 flex-1 flex-col overflow-hidden'
+          >
             {children}
             <InfoSidebar side='right' />
           </InfobarProvider>

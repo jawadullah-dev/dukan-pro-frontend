@@ -12,6 +12,7 @@ export default function Page() {
   void qc.prefetchQuery(productsQueryOptions({ page: 1, limit: 20 }));
   return (
     <PageContainer
+      fill
       pageTitle='Products'
       pageDescription='Serialized phones and quantity accessories'
     >

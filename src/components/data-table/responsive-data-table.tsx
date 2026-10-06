@@ -83,7 +83,15 @@ export function ResponsiveDataTable<TData>({
   }, [detailProp, table.options.columns, table.options.data]);
 
   return (
-    <div ref={ref} className={cn('flex w-full min-w-0 flex-1 flex-col gap-3', className)}>
+    <div
+      ref={ref}
+      data-slot='responsive-data-table'
+      className={cn(
+        // Fill TablePageBody / PageContainer(fill); rows scroll in the inner pane.
+        'flex min-h-0 w-full min-w-0 flex-1 flex-col gap-3 overflow-hidden',
+        className
+      )}
+    >
       {!measured ? (
         <div className='flex flex-col gap-2' aria-busy='true'>
           <Skeleton className='h-11 w-full' />
@@ -97,40 +105,44 @@ export function ResponsiveDataTable<TData>({
           </DataTableToolbar>
 
           {isList && quickFilters?.length ? (
-            <QuickFilterChips table={table} chips={quickFilters} />
+            <div className='shrink-0'>
+              <QuickFilterChips table={table} chips={quickFilters} />
+            </div>
           ) : null}
 
-          {isList ? (
-            ledger ? (
-              <GroupedLedgerList
-                table={table}
-                getDateKey={ledger.getDateKey}
-                mobileItem={mobileItem}
-                detail={detail}
-                onNavigate={(href) => router.push(href)}
-              />
+          <div className='min-h-0 flex-1 overflow-y-auto overscroll-y-contain'>
+            {isList ? (
+              <>
+                {ledger ? (
+                  <GroupedLedgerList
+                    table={table}
+                    getDateKey={ledger.getDateKey}
+                    mobileItem={mobileItem}
+                    detail={detail}
+                    onNavigate={(href) => router.push(href)}
+                  />
+                ) : (
+                  <MobileList
+                    table={table}
+                    mobileItem={mobileItem}
+                    detail={detail}
+                    onNavigate={(href) => router.push(href)}
+                  />
+                )}
+                <LoadMore table={table} />
+              </>
             ) : (
-              <MobileList
-                table={table}
-                mobileItem={mobileItem}
-                detail={detail}
-                onNavigate={(href) => router.push(href)}
-              />
-            )
-          ) : (
-            <CompactOrFullTable
-              table={table}
-              mode={mode === 'full' ? 'full' : 'compact'}
-              wideCompact={wideCompact}
-              onRowClick={(row) => setSideRow(row)}
-            />
-          )}
-
-          {isList ? (
-            <LoadMore table={table} />
-          ) : (
-            <DataTablePagination table={table} variant='full' />
-          )}
+              <>
+                <CompactOrFullTable
+                  table={table}
+                  mode={mode === 'full' ? 'full' : 'compact'}
+                  wideCompact={wideCompact}
+                  onRowClick={(row) => setSideRow(row)}
+                />
+                <DataTablePagination table={table} variant='full' />
+              </>
+            )}
+          </div>
 
           <RecordDetail
             open={sideRow != null}

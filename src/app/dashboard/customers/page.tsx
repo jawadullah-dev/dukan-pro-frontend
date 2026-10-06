@@ -1,4 +1,4 @@
-﻿import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/layout/page-container';
 import { CustomersListClient } from '@/features/dukaan/components/customers';
 import { customersQueryOptions } from '@/features/dukaan/api/queries';
 import { getQueryClient } from '@/lib/query-client';
@@ -11,7 +11,7 @@ export default function Page() {
   const qc = getQueryClient();
   void qc.prefetchQuery(customersQueryOptions({ limit: 100 }));
   return (
-    <PageContainer pageTitle='Customers' pageDescription='Customer list and Udhar'>
+    <PageContainer fill pageTitle='Customers' pageDescription='Customer list and Udhar'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <CustomersListClient />

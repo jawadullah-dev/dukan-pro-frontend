@@ -1,4 +1,4 @@
-﻿import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/layout/page-container';
 import { SalesListClient } from '@/features/dukaan/components/sales';
 import { salesQueryOptions } from '@/features/dukaan/api/queries';
 import { getQueryClient } from '@/lib/query-client';
@@ -11,7 +11,7 @@ export default function Page() {
   const qc = getQueryClient();
   void qc.prefetchQuery(salesQueryOptions({ limit: 100 }));
   return (
-    <PageContainer pageTitle='Sales' pageDescription='Cash, part payment, and Udhar sales'>
+    <PageContainer fill pageTitle='Sales' pageDescription='Cash, part payment, and Udhar sales'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <SalesListClient />

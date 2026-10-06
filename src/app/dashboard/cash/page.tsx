@@ -1,4 +1,4 @@
-﻿import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/layout/page-container';
 import { CashLedgerClient } from '@/features/dukaan/components/money-stock';
 import { cashQueryOptions } from '@/features/dukaan/api/queries';
 import { getQueryClient } from '@/lib/query-client';
@@ -11,7 +11,7 @@ export default function Page() {
   const qc = getQueryClient();
   void qc.prefetchQuery(cashQueryOptions({ limit: 100 }));
   return (
-    <PageContainer pageTitle='Cash ledger' pageDescription='Append-only cash movements'>
+    <PageContainer fill pageTitle='Cash ledger' pageDescription='Append-only cash movements'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <CashLedgerClient />

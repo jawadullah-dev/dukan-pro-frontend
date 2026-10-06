@@ -19,7 +19,7 @@ export default function Page() {
   void qc.prefetchQuery(customersQueryOptions({ limit: 100 }));
   void qc.prefetchQuery(unitsQueryOptions());
   return (
-    <PageContainer pageTitle='Sales' pageDescription='Cash, part payment, and Udhar sales'>
+    <PageContainer fill pageTitle='Sales' pageDescription='Cash, part payment, and Udhar sales'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <SalesListClient defaultOpenAdd />

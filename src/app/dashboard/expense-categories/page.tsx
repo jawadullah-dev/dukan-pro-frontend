@@ -12,6 +12,7 @@ export default function Page() {
   void qc.prefetchQuery(expenseCategoriesQueryOptions({ page: 1, limit: 20 }));
   return (
     <PageContainer
+      fill
       pageTitle='Expense categories'
       pageDescription='Categories used when recording expenses'
     >

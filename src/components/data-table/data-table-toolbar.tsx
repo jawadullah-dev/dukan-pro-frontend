@@ -51,7 +51,8 @@ export function DataTableToolbar<TData>({
       <div
         role='toolbar'
         className={cn(
-          'bg-background/95 sticky top-14 z-10 -mx-1 flex flex-col gap-2 border-b border-border/60 px-1 py-2 backdrop-blur-md',
+          // top-0: app header sits outside the page scrollport (dashboard shell).
+          'bg-background/95 sticky top-0 z-10 -mx-1 flex shrink-0 flex-col gap-2 border-b border-border/60 px-1 py-2 backdrop-blur-md',
           className
         )}
         {...props}

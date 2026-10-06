@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { TablePageBody } from '@/components/layout/table-page-body';
 import { PlatformSubscriptionsTable } from '@/features/platform/components/subscriptions-table';
 import { platformSubscriptionsQueryOptions } from '@/features/platform/api/queries';
 import { getQueryClient } from '@/lib/query-client';
@@ -18,6 +19,7 @@ export default function PlatformSubscriptionsPage() {
 
   return (
     <PageContainer
+      fill
       pageTitle='Subscriptions'
       pageDescription='Assign and manage shop subscription plans.'
       pageHeaderAction={
@@ -27,11 +29,13 @@ export default function PlatformSubscriptionsPage() {
         </Button>
       }
     >
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <Suspense fallback={<Skeleton className='h-96 w-full rounded-xl' />}>
-          <PlatformSubscriptionsTable />
-        </Suspense>
-      </HydrationBoundary>
+      <TablePageBody>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <Suspense fallback={<Skeleton className='h-96 w-full rounded-xl' />}>
+            <PlatformSubscriptionsTable />
+          </Suspense>
+        </HydrationBoundary>
+      </TablePageBody>
     </PageContainer>
   );
 }

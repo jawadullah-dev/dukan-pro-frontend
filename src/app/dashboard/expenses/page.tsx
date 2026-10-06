@@ -1,4 +1,4 @@
-﻿import PageContainer from '@/components/layout/page-container';
+import PageContainer from '@/components/layout/page-container';
 import { ExpensesClient } from '@/features/dukaan/components/money-stock';
 import { expenseCategoriesQueryOptions, expensesQueryOptions } from '@/features/dukaan/api/queries';
 import { getQueryClient } from '@/lib/query-client';
@@ -12,7 +12,7 @@ export default function Page() {
   void qc.prefetchQuery(expensesQueryOptions({ limit: 100 }));
   void qc.prefetchQuery(expenseCategoriesQueryOptions({ limit: 100 }));
   return (
-    <PageContainer pageTitle='Expenses' pageDescription='Operating expenses'>
+    <PageContainer fill pageTitle='Expenses' pageDescription='Operating expenses'>
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
           <ExpensesClient />

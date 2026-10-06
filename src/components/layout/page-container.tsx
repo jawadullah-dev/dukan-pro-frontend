@@ -8,7 +8,7 @@ function PageSkeleton() {
     <div
       role='status'
       aria-label='Loading page'
-      className='flex flex-1 animate-pulse flex-col gap-4 p-4 md:px-6'
+      className='flex flex-1 animate-pulse flex-col gap-4'
     >
       <div className='flex items-center justify-between'>
         <div>
@@ -64,17 +64,9 @@ export default function PageContainer({
   const hasHeader = pageTitle || pageHeaderAction;
 
   return (
-    <div
-      className={cn(
-        // min-w-0: shrink correctly beside the info sidebar (row flex parent).
-        'flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden px-4 pt-4 md:px-6 md:pt-6',
-        // Bottom clearance for fixed mobile nav / FAB — kept on the shell so
-        // the inner list scroller can use the remaining height cleanly.
-        'pb-[max(1rem,calc(5.5rem+env(safe-area-inset-bottom)))] sm:pb-4'
-      )}
-    >
-      {hasHeader && (
-        <div className='mb-3 flex shrink-0 flex-col gap-2 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4'>
+    <div className='flex min-h-0 min-w-0 flex-1 flex-col'>
+      {hasHeader ? (
+        <div className='mb-3 flex shrink-0 flex-col gap-2 px-4 pt-4 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4 md:px-6 md:pt-6'>
           {/* Phones already show the title in the top bar — avoid duplicate H1. */}
           <div className='hidden sm:block'>
             <Heading
@@ -90,14 +82,30 @@ export default function PageContainer({
             <div className='hidden w-full shrink-0 sm:block sm:w-auto'>{pageHeaderAction}</div>
           ) : null}
         </div>
-      )}
+      ) : null}
+
       <div
         className={cn(
           'flex min-h-0 min-w-0 flex-1 flex-col',
+          // Padding lives on the scroll/fill pane so card rings & borders are not
+          // clipped by overflow (ring draws outside the box).
+          hasHeader ? 'px-4 md:px-6' : 'px-4 pt-4 md:px-6 md:pt-6',
+          'pb-[max(1rem,calc(5.5rem+env(safe-area-inset-bottom)))] sm:pb-4',
           fill ? 'overflow-hidden' : 'overflow-y-auto overscroll-y-contain'
         )}
       >
-        {content}
+        {/*
+          p-px: keeps 1px ring/border of full-width cards inside the scrollport.
+          Without this, overflow-y-auto clips left/right/bottom card edges.
+        */}
+        <div
+          className={cn(
+            'min-w-0 p-px',
+            fill ? 'flex min-h-0 flex-1 flex-col overflow-hidden' : 'w-full'
+          )}
+        >
+          {content}
+        </div>
       </div>
     </div>
   );

@@ -43,14 +43,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <SidebarInset
           id='main-content'
           tabIndex={-1}
-          className='flex h-dvh max-h-dvh min-h-0 min-w-0 flex-col overflow-hidden scroll-mt-16'
+          className='flex h-dvh max-h-dvh min-h-0 min-w-0 flex-col overflow-x-clip overflow-y-hidden scroll-mt-16'
         >
           <Header />
           <InfobarProvider
             defaultOpen={false}
-            // Keep row direction (default): page content + info sidebar side-by-side.
-            // flex-col crushed the page and clipped the title under the header.
-            className='min-h-0 flex-1 overflow-hidden'
+            // Row layout: page + info sidebar. min-h-0 lets the page scroll pane size correctly.
+            // Avoid overflow-hidden here — it clips card rings/borders at the edges.
+            className='min-h-0 flex-1'
           >
             {children}
             <InfoSidebar side='right' />

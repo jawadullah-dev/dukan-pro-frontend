@@ -111,37 +111,40 @@ export function ResponsiveDataTable<TData>({
           ) : null}
 
           <div className='min-h-0 flex-1 overflow-y-auto overscroll-y-contain'>
-            {isList ? (
-              <>
-                {ledger ? (
-                  <GroupedLedgerList
+            {/* p-px keeps list/table borders & rings inside the scrollport */}
+            <div className='p-px'>
+              {isList ? (
+                <>
+                  {ledger ? (
+                    <GroupedLedgerList
+                      table={table}
+                      getDateKey={ledger.getDateKey}
+                      mobileItem={mobileItem}
+                      detail={detail}
+                      onNavigate={(href) => router.push(href)}
+                    />
+                  ) : (
+                    <MobileList
+                      table={table}
+                      mobileItem={mobileItem}
+                      detail={detail}
+                      onNavigate={(href) => router.push(href)}
+                    />
+                  )}
+                  <LoadMore table={table} />
+                </>
+              ) : (
+                <>
+                  <CompactOrFullTable
                     table={table}
-                    getDateKey={ledger.getDateKey}
-                    mobileItem={mobileItem}
-                    detail={detail}
-                    onNavigate={(href) => router.push(href)}
+                    mode={mode === 'full' ? 'full' : 'compact'}
+                    wideCompact={wideCompact}
+                    onRowClick={(row) => setSideRow(row)}
                   />
-                ) : (
-                  <MobileList
-                    table={table}
-                    mobileItem={mobileItem}
-                    detail={detail}
-                    onNavigate={(href) => router.push(href)}
-                  />
-                )}
-                <LoadMore table={table} />
-              </>
-            ) : (
-              <>
-                <CompactOrFullTable
-                  table={table}
-                  mode={mode === 'full' ? 'full' : 'compact'}
-                  wideCompact={wideCompact}
-                  onRowClick={(row) => setSideRow(row)}
-                />
-                <DataTablePagination table={table} variant='full' />
-              </>
-            )}
+                  <DataTablePagination table={table} variant='full' />
+                </>
+              )}
+            </div>
           </div>
 
           <RecordDetail

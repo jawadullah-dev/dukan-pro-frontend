@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import type { ListFilters, Paginated } from '@/lib/dukaan';
+import { useT } from '@/i18n/use-t';
 
 const PAGE_SIZE = 20;
 const EMPTY_EXTRA_ITEMS: NamedEntity[] = [];
@@ -47,19 +48,24 @@ export function InfiniteEntitySelect<T extends NamedEntity>({
   onValueChange,
   queryKey,
   fetchPage,
-  placeholder = 'Select...',
-  searchPlaceholder = 'Search...',
-  emptyMessage = 'No results found.',
+  placeholder,
+  searchPlaceholder,
+  emptyMessage,
   selectedLabel,
   activeOnly = true,
   disabled,
   className,
   extraItems = EMPTY_EXTRA_ITEMS
 }: InfiniteEntitySelectProps<T>) {
+  const t = useT();
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [debouncedSearch, setDebouncedSearch] = React.useState('');
   const [labelCache, setLabelCache] = React.useState<Record<string, string>>({});
+
+  const effPlaceholder = placeholder ?? t('common.select');
+  const effSearchPlaceholder = searchPlaceholder ?? t('nav.searchPlaceholder');
+  const effEmptyMessage = emptyMessage ?? t('table.noResults');
 
   React.useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedSearch(search.trim()), 300);
@@ -101,8 +107,8 @@ export function InfiniteEntitySelect<T extends NamedEntity>({
     ? (selectedLabel ??
       labelCache[value] ??
       items.find((item) => item.id === value)?.name ??
-      'Selected')
-    : placeholder;
+      t('common.selected'))
+    : effPlaceholder;
 
   const onListScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const el = event.currentTarget;
@@ -138,13 +144,17 @@ export function InfiniteEntitySelect<T extends NamedEntity>({
         }
       >
         <span className='truncate'>{displayLabel}</span>
-        <Icons.chevronsUpDown className='ml-2 size-4 shrink-0 opacity-50' />
+        <Icons.chevronsUpDown className='ms-2 size-4 shrink-0 opacity-50' />
       </PopoverTrigger>
       <PopoverContent className='w-(--anchor-width) p-0' align='start'>
         <Command shouldFilter={false}>
-          <CommandInput placeholder={searchPlaceholder} value={search} onValueChange={setSearch} />
+          <CommandInput
+            placeholder={effSearchPlaceholder}
+            value={search}
+            onValueChange={setSearch}
+          />
           <CommandList id={LIST_ID} className='pt-1' onScroll={onListScroll}>
-            <CommandEmpty>{query.isLoading ? 'Loading...' : emptyMessage}</CommandEmpty>
+            <CommandEmpty>{query.isLoading ? t('common.loading') : effEmptyMessage}</CommandEmpty>
             <CommandGroup>
               {items.map((item) => (
                 <CommandItem
@@ -164,14 +174,16 @@ export function InfiniteEntitySelect<T extends NamedEntity>({
                   }}
                 >
                   <Icons.check
-                    className={cn('mr-2 size-4', value === item.id ? 'opacity-100' : 'opacity-0')}
+                    className={cn('me-2 size-4', value === item.id ? 'opacity-100' : 'opacity-0')}
                   />
                   <span className='truncate'>{item.name}</span>
                 </CommandItem>
               ))}
             </CommandGroup>
             {query.isFetchingNextPage ? (
-              <div className='text-muted-foreground py-2 text-center text-xs'>Loading more...</div>
+              <div className='text-muted-foreground py-2 text-center text-xs'>
+                {t('table.loadMore')}
+              </div>
             ) : null}
           </CommandList>
         </Command>

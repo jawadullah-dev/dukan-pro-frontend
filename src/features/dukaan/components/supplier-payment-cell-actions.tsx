@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useT } from '@/i18n/use-t';
 import { Icons } from '@/components/icons';
 import {
   Dialog,
@@ -17,7 +18,7 @@ import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { dukaanKeys } from '../api/queries';
-import { reasonSchema } from '../schemas/forms';
+import { createReasonSchema } from '../schemas/forms';
 import { DialogCancelButton, DialogConfirmButton } from './dialog-actions';
 import { RowActionsMenu } from './row-actions-menu';
 
@@ -31,6 +32,7 @@ interface SupplierPaymentActionRow {
 
 export function SupplierPaymentCellAction({ data }: { data: SupplierPaymentActionRow }) {
   const qc = useQueryClient();
+  const t = useT();
   const [open, setOpen] = useState(false);
 
   if (data.status !== 'ACTIVE') return null;
@@ -40,7 +42,7 @@ export function SupplierPaymentCellAction({ data }: { data: SupplierPaymentActio
       <RowActionsMenu
         actions={[
           {
-            label: 'Cancel',
+            label: t('dukaan.actions.cancel'),
             icon: Icons.trash,
             variant: 'destructive',
             onClick: () => setOpen(true)
@@ -73,10 +75,11 @@ function SupplierPaymentCancelBody({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const t = useT();
   const cancel = useMutation({
     mutationFn: (reason: string) => dukaan.cancelPayment(data.id, reason, 'supplier'),
     onSuccess: () => {
-      toast.success('Supplier payment cancelled');
+      toast.success(t('dukaan.actions.supplierPaymentCancelled'));
       onSuccess();
     },
     onError: (e: Error) => toast.error(e.message)
@@ -84,7 +87,7 @@ function SupplierPaymentCancelBody({
 
   const form = useAppForm({
     defaultValues: { reason: '' },
-    validators: { onSubmit: reasonSchema },
+    validators: { onSubmit: createReasonSchema(t) },
     onSubmit: ({ value }) => {
       cancel.mutate(value.reason.trim());
     }
@@ -93,7 +96,7 @@ function SupplierPaymentCancelBody({
   return (
     <DialogContent className='sm:max-w-lg'>
       <DialogHeader>
-        <DialogTitle>Cancel supplier payment</DialogTitle>
+        <DialogTitle>{t('dukaan.actions.cancelSupplierPaymentTitle')}</DialogTitle>
         <DialogDescription>
           {data.supplier_name ?? 'Supplier'} · {formatPkr(data.amount)} ·{' '}
           {data.created_at.slice(0, 10)}
@@ -111,9 +114,9 @@ function SupplierPaymentCancelBody({
             name='reason'
             children={(field) => (
               <field.TextareaField
-                label='Reason'
+                label={t('stock.reason')}
                 required
-                placeholder='Why are you cancelling this payment?'
+                placeholder={t('dukaan.actions.cancelSupplierPaymentPlaceholder')}
                 autoFocus
               />
             )}

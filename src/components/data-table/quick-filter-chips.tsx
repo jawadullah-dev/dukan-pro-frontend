@@ -1,6 +1,7 @@
 'use client';
 
 import type { Table } from '@tanstack/react-table';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { QuickFilterChip } from './types';
 
@@ -15,12 +16,13 @@ export function QuickFilterChips<TData>({ table, chips, className }: QuickFilter
   if (chips.length === 0) return null;
 
   const activeId = resolveActiveChip(table, chips);
+  const t = useTranslations();
 
   return (
     <div
       className={cn('no-scrollbar -mx-1 flex gap-2 overflow-x-auto px-1 pb-1', className)}
       role='group'
-      aria-label='Quick filters'
+      aria-label={t('table.filters')}
     >
       {chips.map((chip) => {
         const selected = chip.id === activeId;

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from './status-badge';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { DetailConfig } from './types';
 
@@ -31,7 +31,7 @@ export function RecordDetail<TData>({
   data,
   detail
 }: RecordDetailProps<TData>) {
-  const t = useT();
+  const t = useTranslations();
   if (!data) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -90,8 +90,12 @@ export function RecordDetail<TData>({
               <dl className='space-y-3'>
                 {section.fields.map((field, fi) => (
                   <div key={fi} className='grid gap-0.5'>
-                    <dt className='text-muted-foreground text-xs'>{field.label}</dt>
-                    <dd className='text-sm break-words'>{field.value ?? '—'}</dd>
+                    <dt className='text-muted-foreground text-xs'>
+                      {typeof field.label === 'function' ? field.label(data) : field.label}
+                    </dt>
+                    <dd className='text-sm break-words'>
+                      {typeof field.value === 'function' ? field.value(data) : (field.value ?? '—')}
+                    </dd>
                   </div>
                 ))}
               </dl>

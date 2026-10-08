@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useT } from '@/i18n/use-t';
 
 interface CellActionProps {
   data: Product;
@@ -24,15 +25,16 @@ interface CellActionProps {
 export function CellAction({ data }: CellActionProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const t = useT();
 
   const deleteMutation = useMutation({
     ...deleteProductMutation,
     onSuccess: () => {
-      toast.success('Product deleted successfully');
+      toast.success(t('dukaan.product.deleted'));
       setOpen(false);
     },
     onError: () => {
-      toast.error('Failed to delete product');
+      toast.error(t('common.productDeleteFailed'));
     }
   });
 
@@ -46,19 +48,19 @@ export function CellAction({ data }: CellActionProps) {
       />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-          <span className='sr-only'>Open menu</span>
+          <span className='sr-only'>{t('common.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuGroup>
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
           </DropdownMenuGroup>
           <DropdownMenuGroup>
             <DropdownMenuItem onClick={() => router.push(`/dashboard/product/${data.id}`)}>
-              <Icons.edit className='mr-2 h-4 w-4' /> Update
+              <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setOpen(true)}>
-              <Icons.trash className='mr-2 h-4 w-4' /> Delete
+              <Icons.trash className='me-2 h-4 w-4' /> {t('common.delete')}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

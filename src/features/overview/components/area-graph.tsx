@@ -12,6 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import React from 'react';
+import { useT } from '@/i18n/use-t';
 
 const chartData = [
   { month: 'January', desktop: 342, mobile: 245 },
@@ -28,29 +29,30 @@ const chartData = [
   { month: 'December', desktop: 271, mobile: 198 }
 ];
 
-const chartConfig = {
-  desktop: {
-    label: 'Desktop',
-    color: 'var(--chart-1)'
-  },
-  mobile: {
-    label: 'Mobile',
-    color: 'var(--chart-2)'
-  }
-} satisfies ChartConfig;
-
 export function AreaGraph() {
+  const t = useT();
+  const chartConfig = {
+    desktop: {
+      label: t('chartLabels.devices.desktop'),
+      color: 'var(--chart-1)'
+    },
+    mobile: {
+      label: t('chartLabels.devices.mobile'),
+      color: 'var(--chart-2)'
+    }
+  } satisfies ChartConfig;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>
-          Dotted Area Chart
+          {t('overview.areaChartTitle')}
           <Badge variant='outline'>
             <Icons.trendingUp />
             -5.2%
           </Badge>
         </CardTitle>
-        <CardDescription>Showing total visitors for the last 6 months</CardDescription>
+        <CardDescription>{t('overview.areaChartDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

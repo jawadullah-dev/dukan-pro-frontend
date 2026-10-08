@@ -12,12 +12,13 @@ import { Icons } from '@/components/icons';
 import { homePathForRole, canAccessPath } from '@/lib/auth/routes';
 import { DEMO_OWNER_PHONE, DEMO_SUPER_ADMIN_PHONE } from '@/lib/auth/accounts';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
-import { useT } from '@/i18n/use-t';
+import { useTranslations, useLocale } from 'next-intl';
 
 export function LoginForm() {
-  const t = useT();
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const locale = useLocale();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +55,7 @@ export function LoginForm() {
 
       const session = await getSession();
       const role = session?.user?.role;
-      const home = homePathForRole(role);
+      const home = homePathForRole(role, locale);
       const target =
         callbackUrl && callbackUrl.startsWith('/') && canAccessPath(callbackUrl, role)
           ? callbackUrl
@@ -124,10 +125,10 @@ export function LoginForm() {
           </form.AppForm>
 
           <p className='text-muted-foreground text-center text-xs leading-relaxed'>
-            Demo: <span className='text-foreground'>{DEMO_SUPER_ADMIN_PHONE}</span> or{' '}
-            <span className='text-foreground'>{DEMO_OWNER_PHONE}</span>
+            {t('auth.demoLabel')}: <span className='text-foreground'>{DEMO_SUPER_ADMIN_PHONE}</span>{' '}
+            {t('auth.orConjunction')} <span className='text-foreground'>{DEMO_OWNER_PHONE}</span>
             <br />
-            Password: <span className='text-foreground'>admin@123</span>
+            {t('auth.passwordLabel')}: <span className='text-foreground'>admin@123</span>
           </p>
         </form>
       </CardContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import * as Sentry from '@sentry/nextjs';
+import { useLocale, useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
 // global-error replaces the root layout when it errors, so globals.css is not
@@ -12,12 +13,18 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const dir = locale === 'ur' || locale === 'ps' ? 'rtl' : 'ltr';
+
   useEffect(() => {
     Sentry.captureException(error);
-  }, [error]);
+    document.documentElement.lang = locale;
+    document.documentElement.dir = dir;
+  }, [dir, error, locale]);
 
   return (
-    <html lang='en'>
+    <html lang={locale} dir={dir}>
       <body
         style={{
           margin: 0,
@@ -29,9 +36,9 @@ export default function GlobalError({
         }}
       >
         <div style={{ textAlign: 'center', padding: '1rem' }}>
-          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Something went wrong</h1>
+          <h1 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{t('errors.genericTitle')}</h1>
           <p style={{ color: '#6b7280', marginBottom: '1.25rem' }}>
-            An unexpected error occurred. Please try again.
+            {t('errors.genericDescription')}
           </p>
           <button
             onClick={() => reset()}
@@ -44,7 +51,7 @@ export default function GlobalError({
               cursor: 'pointer'
             }}
           >
-            Try again
+            {t('errors.reload')}
           </button>
         </div>
       </body>

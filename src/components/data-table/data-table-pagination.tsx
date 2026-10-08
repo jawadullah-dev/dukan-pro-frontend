@@ -12,7 +12,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 
 interface DataTablePaginationProps<TData> extends React.ComponentProps<'div'> {
   table: Table<TData>;
@@ -28,7 +28,7 @@ export function DataTablePagination<TData>({
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
-  const t = useT();
+  const t = useTranslations();
   const { pageIndex, pageSize } = table.getState().pagination;
   const total = table.getRowCount();
   const from = total === 0 ? 0 : pageIndex * pageSize + 1;
@@ -84,7 +84,7 @@ export function DataTablePagination<TData>({
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <Icons.chevronsLeft />
+              <Icons.chevronsLeft className='rtl:rotate-180' />
             </Button>
           ) : null}
           <Button
@@ -95,7 +95,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            {compact ? t('table.prev') : <Icons.chevronLeft />}
+            {compact ? t('table.prev') : <Icons.chevronLeft className='rtl:rotate-180' />}
           </Button>
           <Button
             aria-label={t('table.nextPage')}
@@ -105,7 +105,7 @@ export function DataTablePagination<TData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            {compact ? t('table.next') : <Icons.chevronRight />}
+            {compact ? t('table.next') : <Icons.chevronRight className='rtl:rotate-180' />}
           </Button>
           {!compact ? (
             <Button
@@ -116,7 +116,7 @@ export function DataTablePagination<TData>({
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <Icons.chevronsRight />
+              <Icons.chevronsRight className='rtl:rotate-180' />
             </Button>
           ) : null}
         </div>

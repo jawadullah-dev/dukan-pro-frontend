@@ -15,7 +15,7 @@ export function DialogCancelButton({ onClick, disabled }: DialogCancelButtonProp
   const t = useT();
   return (
     <Button type='button' variant='outline' disabled={disabled} onClick={onClick}>
-      <Icons.close className='mr-2 h-4 w-4' />
+      <Icons.close className='me-2 h-4 w-4' />
       {t('common.cancel')}
     </Button>
   );
@@ -52,7 +52,7 @@ export function DialogPrimaryButton({
   const Icon = PRIMARY_ICON[mode];
   return (
     <Button type={type} variant={variant} disabled={disabled} isLoading={loading} onClick={onClick}>
-      <Icon className='mr-2 h-4 w-4' />
+      <Icon className='me-2 h-4 w-4' />
       {t(`common.${mode}` as const)}
     </Button>
   );
@@ -83,7 +83,7 @@ export function DialogConfirmButton({
       isLoading={loading}
       onClick={onClick}
     >
-      <Icons.trash className='mr-2 h-4 w-4' />
+      <Icons.trash className='me-2 h-4 w-4' />
       {label ?? t('common.confirm')}
     </Button>
   );

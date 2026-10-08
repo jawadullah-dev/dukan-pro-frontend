@@ -2,6 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useT } from '@/i18n/use-t';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,7 @@ import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import type { ExpenseCategory } from '@/lib/dukaan/types';
 import { dukaanKeys } from '../api/queries';
-import { nameOnlySchema } from '../schemas/forms';
+import { createNameOnlySchema } from '../schemas/forms';
 import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 
 interface ExpenseCategoryDialogProps {
@@ -51,6 +52,7 @@ function ExpenseCategoryDialogBody({
 }) {
   const qc = useQueryClient();
   const isEdit = Boolean(category);
+  const t = useT();
 
   const save = useMutation({
     mutationFn: async (name: string) => {
@@ -58,7 +60,9 @@ function ExpenseCategoryDialogBody({
       return dukaan.createExpenseCategory(name);
     },
     onSuccess: () => {
-      toast.success(isEdit ? 'Expense category updated' : 'Expense category created');
+      toast.success(
+        isEdit ? t('dukaan.category.expenseUpdated') : t('dukaan.category.expenseCreated')
+      );
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       onOpenChange(false);
     },
@@ -67,7 +71,7 @@ function ExpenseCategoryDialogBody({
 
   const form = useAppForm({
     defaultValues: { name: category?.name ?? '' },
-    validators: { onSubmit: nameOnlySchema },
+    validators: { onSubmit: createNameOnlySchema(t) },
     onSubmit: ({ value }) => {
       save.mutate(value.name.trim());
     }
@@ -76,11 +80,13 @@ function ExpenseCategoryDialogBody({
   return (
     <DialogContent className='sm:max-w-lg'>
       <DialogHeader>
-        <DialogTitle>{isEdit ? 'Edit expense category' : 'Add expense category'}</DialogTitle>
+        <DialogTitle>
+          {isEdit ? t('dukaan.category.expenseEditTitle') : t('dukaan.category.expenseAddTitle')}
+        </DialogTitle>
         <DialogDescription>
           {isEdit
-            ? 'Update the expense category name.'
-            : 'Create a category used when recording expenses.'}
+            ? t('dukaan.category.expenseEditDescription')
+            : t('dukaan.category.expenseAddDescription')}
         </DialogDescription>
       </DialogHeader>
       <form
@@ -94,7 +100,12 @@ function ExpenseCategoryDialogBody({
           <form.AppField
             name='name'
             children={(field) => (
-              <field.TextField label='Name' required placeholder='e.g. Rent' autoFocus />
+              <field.TextField
+                label={t('dukaan.party.name')}
+                required
+                placeholder={t('dukaan.category.expenseNamePlaceholder')}
+                autoFocus
+              />
             )}
           />
         </FieldGroup>

@@ -26,8 +26,8 @@ export function getCommonPinningStyles<TData>({
       : isFirstRightPinnedColumn
         ? '5px 0 5px -5px var(--border) inset'
         : undefined,
-    left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
-    right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
+    insetInlineStart: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
+    insetInlineEnd: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
     position: 'sticky',
     background: 'var(--background)',
     width: column.getSize(),
@@ -37,7 +37,7 @@ export function getCommonPinningStyles<TData>({
   };
 }
 
-export function getFilterOperators(filterVariant: FilterVariant) {
+export function getFilterOperators(filterVariant: FilterVariant, t?: (key: string) => string) {
   const operatorMap: Record<FilterVariant, { label: string; value: FilterOperator }[]> = {
     text: dataTableConfig.textOperators,
     number: dataTableConfig.numericOperators,
@@ -49,7 +49,12 @@ export function getFilterOperators(filterVariant: FilterVariant) {
     multiSelect: dataTableConfig.multiSelectOperators
   };
 
-  return operatorMap[filterVariant] ?? dataTableConfig.textOperators;
+  const operators = operatorMap[filterVariant] ?? dataTableConfig.textOperators;
+
+  return operators.map((operator) => ({
+    ...operator,
+    label: t && operator.label.includes('.') ? t(operator.label) : operator.label
+  }));
 }
 
 export function getDefaultFilterOperator(filterVariant: FilterVariant) {

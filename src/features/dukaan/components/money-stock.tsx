@@ -34,7 +34,11 @@ import {
   suppliersQueryOptions,
   unitsQueryOptions
 } from '../api/queries';
-import { expenseFormSchema, stockAdjustSchema, supplierPaymentFormSchema } from '../schemas/forms';
+import {
+  createExpenseFormSchema,
+  createStockAdjustSchema,
+  createSupplierPaymentFormSchema
+} from '../schemas/forms';
 import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { FormEntitySelect } from './form-entity-select';
 import {
@@ -75,6 +79,7 @@ type StockAdjustValues = {
 export function StockAdjustForm() {
   const qc = useQueryClient();
   const { data: units } = useSuspenseQuery(unitsQueryOptions());
+  const t = useT();
 
   const save = useMutation({
     mutationFn: (value: StockAdjustValues) =>
@@ -86,7 +91,7 @@ export function StockAdjustForm() {
         reason: value.reason
       }),
     onSuccess: () => {
-      toast.success('Stock updated');
+      toast.success(t('stock.stockUpdated'));
       form.reset();
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
     },
@@ -102,7 +107,7 @@ export function StockAdjustForm() {
       counted_quantity: 0,
       reason: ''
     } as StockAdjustValues,
-    validators: { onSubmit: stockAdjustSchema },
+    validators: { onSubmit: createStockAdjustSchema(t) },
     onSubmit: ({ value }) => {
       save.mutate(value);
     }
@@ -124,7 +129,7 @@ export function StockAdjustForm() {
             return (
               <FormEntitySelect<Product>
                 name={field.name}
-                label='Product'
+                label={t('stock.product')}
                 required
                 value={field.state.value}
                 onBlur={field.handleBlur}
@@ -137,8 +142,8 @@ export function StockAdjustForm() {
                 errors={field.state.meta.errors}
                 queryKey={dukaanKeys.products()}
                 fetchPage={(filters) => dukaan.listProducts(filters)}
-                placeholder='Product'
-                searchPlaceholder='Search products...'
+                placeholder={t('stock.product')}
+                searchPlaceholder={t('search.products')}
               />
             );
           }}
@@ -148,7 +153,7 @@ export function StockAdjustForm() {
           name='type'
           children={(field) => (
             <field.SelectField
-              label='Type'
+              label={t('stock.type')}
               required
               options={[
                 { value: 'ADJUSTMENT', label: formatLabel('ADJUSTMENT') },
@@ -170,9 +175,9 @@ export function StockAdjustForm() {
                 name='inventory_unit_id'
                 children={(field) => (
                   <field.SelectField
-                    label='IMEI1 / IMEI2'
+                    label={t('dukaan.sale.imeiPair')}
                     required
-                    placeholder='IMEI'
+                    placeholder={t('dukaan.sale.pickImei')}
                     options={units
                       .filter((u) => u.product_id === productId)
                       .map((u) => ({
@@ -185,7 +190,9 @@ export function StockAdjustForm() {
             ) : (
               <form.AppField
                 name='counted_quantity'
-                children={(field) => <field.TextField label='Counted quantity' type='number' />}
+                children={(field) => (
+                  <field.TextField label={t('stock.countedQuantity')} type='number' />
+                )}
               />
             )
           }
@@ -193,11 +200,11 @@ export function StockAdjustForm() {
 
         <form.AppField
           name='reason'
-          children={(field) => <field.TextareaField label='Reason' required />}
+          children={(field) => <field.TextareaField label={t('stock.reason')} required />}
         />
       </FieldGroup>
       <Button type='submit' isLoading={save.isPending}>
-        Save adjustment
+        {t('common.save')}
       </Button>
     </form>
   );
@@ -206,6 +213,7 @@ export function StockAdjustForm() {
 function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
   const qc = useQueryClient();
   const [warning, setWarning] = useState<SoftCashWarning | null>(null);
+  const t = useT();
 
   const create = useMutation({
     mutationFn: ({
@@ -230,10 +238,10 @@ function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
     onSuccess: (res) => {
       if (res.cash_warning) {
         setWarning(res.cash_warning);
-        toast.warning('Cash warning — confirm to continue');
+        toast.warning(t('stock.cashWarningConfirm'));
         return;
       }
-      toast.success('Expense saved');
+      toast.success(t('stock.expenseSaved'));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       onDone();
     },
@@ -247,7 +255,7 @@ function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
       expense_date: todayIsoDate(),
       description: ''
     },
-    validators: { onSubmit: expenseFormSchema },
+    validators: { onSubmit: createExpenseFormSchema(t) },
     onSubmit: ({ value }) => {
       create.mutate({ value, confirm_overdraft: false });
     }
@@ -269,7 +277,7 @@ function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
             return (
               <FormEntitySelect
                 name={field.name}
-                label='Category'
+                label={t('stock.category')}
                 required
                 value={field.state.value}
                 onBlur={field.handleBlur}
@@ -278,36 +286,43 @@ function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
                 errors={field.state.meta.errors}
                 queryKey={dukaanKeys.expenseCategories()}
                 fetchPage={(filters) => dukaan.listExpenseCategories(filters)}
-                placeholder='Select category'
-                searchPlaceholder='Search categories...'
+                placeholder={t('stock.selectCategory')}
+                searchPlaceholder={t('search.categories')}
               />
             );
           }}
         />
         <form.AppField
           name='amount'
-          children={(field) => <field.TextField label='Amount (Rs)' type='number' required />}
+          children={(field) => (
+            <field.TextField label={t('table.col.amount')} type='number' required />
+          )}
         />
         <form.AppField
           name='expense_date'
-          children={(field) => <field.TextField label='Expense date' type='date' required />}
+          children={(field) => (
+            <field.TextField label={t('stock.expenseDate')} type='date' required />
+          )}
         />
         <form.AppField
           name='description'
-          children={(field) => <field.TextareaField label='Description' />}
+          children={(field) => <field.TextareaField label={t('stock.description')} />}
         />
       </FieldGroup>
       {warning ? (
         <div className='text-sm'>
-          Soft overdraft: cash {formatPkr(warning.current_cash)} →{' '}
-          {formatPkr(warning.projected_cash)}
+          {t('dukaan.actions.softOverdraft')}:{' '}
+          {t('dukaan.actions.cashArrow', {
+            current: formatPkr(warning.current_cash),
+            projected: formatPkr(warning.projected_cash)
+          })}
           <div className='mt-2 flex gap-3'>
             <Button
               type='button'
               isLoading={create.isPending}
               onClick={() => create.mutate({ value: form.state.values, confirm_overdraft: true })}
             >
-              Confirm
+              {t('common.confirm')}
             </Button>
             <Button
               type='button'
@@ -315,7 +330,7 @@ function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
               disabled={create.isPending}
               onClick={() => setWarning(null)}
             >
-              Back
+              {t('common.back')}
             </Button>
           </div>
         </div>
@@ -362,11 +377,13 @@ export function ExpensesClient() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='sm:max-w-lg'>
           <DialogHeader>
-            <DialogTitle>Add expense</DialogTitle>
-            <DialogDescription>Record an operating expense from cash.</DialogDescription>
+            <DialogTitle>{t('common.addExpense')}</DialogTitle>
+            <DialogDescription>{t('dukaan.actions.expenseDescription')}</DialogDescription>
           </DialogHeader>
           {open ? (
-            <Suspense fallback={<p className='text-muted-foreground text-sm'>Loading…</p>}>
+            <Suspense
+              fallback={<p className='text-muted-foreground text-sm'>{t('common.loading')}</p>}
+            >
               <ExpenseCreateForm key={formKey} onDone={() => setOpen(false)} />
             </Suspense>
           ) : null}
@@ -418,6 +435,7 @@ export function CashLedgerClient() {
 
 function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
   const qc = useQueryClient();
+  const t = useT();
   const { data: suppliers } = useSuspenseQuery(suppliersQueryOptions({ limit: 100 }));
   const { data: purchases } = useSuspenseQuery(purchasesQueryOptions({ limit: 100 }));
   const [clientRequestId] = useState(() => createClientRequestId());
@@ -449,10 +467,10 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
     onSuccess: (res) => {
       if (res.cash_warning) {
         setWarning(res.cash_warning);
-        toast.warning('Cash warning — confirm to continue');
+        toast.warning(t('stock.cashWarningConfirm'));
         return;
       }
-      toast.success('Supplier payment saved');
+      toast.success(t('stock.supplierPaymentSaved'));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       onDone();
     },
@@ -467,7 +485,7 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
       payment_date: todayIsoDate(),
       notes: ''
     },
-    validators: { onSubmit: supplierPaymentFormSchema },
+    validators: { onSubmit: createSupplierPaymentFormSchema(t) },
     onSubmit: ({ value }) => {
       save.mutate({ value, confirm_overdraft: false });
     }
@@ -495,9 +513,9 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
           }}
           children={(field) => (
             <field.SelectField
-              label='Supplier'
+              label={t('stock.supplier')}
               required
-              placeholder='Supplier'
+              placeholder={t('stock.supplier')}
               options={supplierOptions}
             />
           )}
@@ -509,10 +527,10 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
               name='purchase_id'
               children={(field) => (
                 <field.SelectField
-                  label='Purchase (optional)'
-                  placeholder='Purchase'
+                  label={t('stock.purchaseOptional')}
+                  placeholder={t('stock.purchase')}
                   options={[
-                    { value: '__opening__', label: 'Opening balance / general' },
+                    { value: '__opening__', label: t('stock.openingBalance') },
                     ...purchases.items
                       .filter(
                         (p) =>
@@ -532,24 +550,31 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
         />
         <form.AppField
           name='amount'
-          children={(field) => <field.TextField label='Amount (Rs)' type='number' required />}
+          children={(field) => (
+            <field.TextField label={t('table.col.amount')} type='number' required />
+          )}
         />
         <form.AppField
           name='payment_date'
-          children={(field) => <field.TextField label='Payment date' type='date' required />}
+          children={(field) => (
+            <field.TextField label={t('stock.paymentDate')} type='date' required />
+          )}
         />
-        <form.AppField name='notes' children={(field) => <field.TextareaField label='Notes' />} />
+        <form.AppField
+          name='notes'
+          children={(field) => <field.TextareaField label={t('stock.notes')} />}
+        />
       </FieldGroup>
       {warning ? (
         <div className='text-sm'>
-          Soft overdraft confirm needed ({formatPkr(warning.projected_cash)})
+          {t('dukaan.actions.softOverdraft')} ({formatPkr(warning.projected_cash)})
           <div className='mt-2 flex gap-3'>
             <Button
               type='button'
               isLoading={save.isPending}
               onClick={() => save.mutate({ value: form.state.values, confirm_overdraft: true })}
             >
-              Confirm
+              {t('common.confirm')}
             </Button>
             <Button
               type='button'
@@ -557,7 +582,7 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
               disabled={save.isPending}
               onClick={() => setWarning(null)}
             >
-              Back
+              {t('common.back')}
             </Button>
           </div>
         </div>
@@ -606,13 +631,13 @@ export function SupplierPaymentsClient() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className='sm:max-w-lg'>
           <DialogHeader>
-            <DialogTitle>Add supplier payment</DialogTitle>
-            <DialogDescription>
-              Pay a supplier against a purchase or opening balance.
-            </DialogDescription>
+            <DialogTitle>{t('common.addPayment')}</DialogTitle>
+            <DialogDescription>{t('dukaan.actions.supplierPaymentDescription')}</DialogDescription>
           </DialogHeader>
           {open ? (
-            <Suspense fallback={<p className='text-muted-foreground text-sm'>Loading…</p>}>
+            <Suspense
+              fallback={<p className='text-muted-foreground text-sm'>{t('common.loading')}</p>}
+            >
               <SupplierPaymentCreateForm key={formKey} onDone={() => setOpen(false)} />
             </Suspense>
           ) : null}

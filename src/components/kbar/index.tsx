@@ -2,15 +2,17 @@
 import { navGroups } from '@/config/nav-config';
 import { KBarAnimator, KBarPortal, KBarPositioner, KBarProvider, KBarSearch } from 'kbar';
 import { Kbd } from '@/components/ui/kbd';
-import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import RenderResults from './render-result';
 import useThemeSwitching from './use-theme-switching';
 import { useFilteredNavGroups } from '@/hooks/use-nav';
+import { useRouter } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 export default function KBar({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const filteredGroups = useFilteredNavGroups(navGroups);
+  const t = useTranslations('kbar');
 
   // These action are for the navigation
   const actions = useMemo(() => {
@@ -26,12 +28,12 @@ export default function KBar({ children }: { children: React.ReactNode }) {
       const baseAction =
         navItem.url !== '#'
           ? {
-              id: `${navItem.title.toLowerCase()}Action`,
+              id: `${navItem.url}Action`,
               name: navItem.title,
               shortcut: navItem.shortcut,
               keywords: navItem.title.toLowerCase(),
-              section: 'Navigation',
-              subtitle: `Go to ${navItem.title}`,
+              section: t('section'),
+              subtitle: t('goToItem', { item: navItem.title }),
               perform: () => navigateTo(navItem.url)
             }
           : null;
@@ -39,19 +41,19 @@ export default function KBar({ children }: { children: React.ReactNode }) {
       // Map child items into actions
       const childActions =
         navItem.items?.map((childItem) => ({
-          id: `${childItem.title.toLowerCase()}Action`,
+          id: `${childItem.url}Action`,
           name: childItem.title,
           shortcut: childItem.shortcut,
           keywords: childItem.title.toLowerCase(),
           section: navItem.title,
-          subtitle: `Go to ${childItem.title}`,
+          subtitle: t('goToItem', { item: childItem.title }),
           perform: () => navigateTo(childItem.url)
         })) ?? [];
 
       // Return only valid actions (ignoring null base actions for containers)
       return baseAction ? [baseAction, ...childActions] : childActions;
     });
-  }, [router, filteredGroups]);
+  }, [router, filteredGroups, t]);
 
   return (
     <KBarProvider actions={actions}>
@@ -61,6 +63,7 @@ export default function KBar({ children }: { children: React.ReactNode }) {
 }
 const KBarComponent = ({ children }: { children: React.ReactNode }) => {
   useThemeSwitching();
+  const t = useTranslations('kbar');
 
   return (
     <>
@@ -68,7 +71,10 @@ const KBarComponent = ({ children }: { children: React.ReactNode }) => {
         <KBarPositioner className='bg-black/10 supports-backdrop-filter:backdrop-blur-xs fixed inset-0 z-99999 flex items-start! justify-center p-4! pt-[14vh]!'>
           <KBarAnimator className='bg-popover text-popover-foreground ring-foreground/10 relative mx-auto w-full max-w-[600px] overflow-hidden rounded-xl shadow-lg ring-1'>
             <div className='bg-popover sticky top-0 z-10 border-b'>
-              <KBarSearch className='placeholder:text-muted-foreground w-full border-none bg-transparent px-4 py-3.5 text-sm outline-hidden focus:ring-0 focus:outline-hidden' />
+              <KBarSearch
+                defaultPlaceholder={t('searchPlaceholder')}
+                className='placeholder:text-muted-foreground w-full border-none bg-transparent px-4 py-3.5 text-sm outline-hidden focus:ring-0 focus:outline-hidden'
+              />
             </div>
             <div className='h-[400px]'>
               <RenderResults />
@@ -76,13 +82,13 @@ const KBarComponent = ({ children }: { children: React.ReactNode }) => {
             <div className='text-muted-foreground flex items-center gap-3 border-t px-3 py-2 text-xs'>
               <span className='flex items-center gap-1'>
                 <Kbd>↑</Kbd>
-                <Kbd>↓</Kbd> navigate
+                <Kbd>↓</Kbd> {t('navigate')}
               </span>
               <span className='flex items-center gap-1'>
-                <Kbd>↵</Kbd> open
+                <Kbd>↵</Kbd> {t('open')}
               </span>
               <span className='flex items-center gap-1'>
-                <Kbd>esc</Kbd> close
+                <Kbd>esc</Kbd> {t('close')}
               </span>
             </div>
           </KBarAnimator>

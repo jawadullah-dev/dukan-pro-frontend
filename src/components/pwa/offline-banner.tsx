@@ -1,11 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 
 /** Slim banner when the device goes offline. */
 export function OfflineBanner() {
-  const t = useT();
+  const t = useTranslations();
   const [offline, setOffline] = React.useState(false);
 
   React.useEffect(() => {

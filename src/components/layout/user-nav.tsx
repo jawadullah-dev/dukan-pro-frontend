@@ -67,9 +67,9 @@ function AccountMenuItems({ userName, shopName }: { userName: string; shopName: 
       <DropdownMenuSeparator />
       <DropdownMenuItem variant='destructive' disabled={signingOut} onClick={onSignOut}>
         {signingOut ? (
-          <Spinner className='mr-2 size-4' aria-hidden />
+          <Spinner className='me-2 size-4' aria-hidden />
         ) : (
-          <Icons.logout className='mr-2 h-4 w-4' />
+          <Icons.logout className='me-2 h-4 w-4' />
         )}
         {signingOut ? t('nav.signingOut') : t('nav.signOut')}
       </DropdownMenuItem>
@@ -140,11 +140,11 @@ export function SidebarUserMenu() {
         }
       >
         <ProfileAvatar className='h-8 w-8 shrink-0' />
-        <div className='grid min-w-0 flex-1 text-left text-sm leading-tight'>
+        <div className='grid min-w-0 flex-1 text-start text-sm leading-tight'>
           <span className='truncate font-medium'>{data.user_name}</span>
           <span className='text-muted-foreground truncate text-xs'>{data.shop_name}</span>
         </div>
-        <Icons.chevronsUpDown className='ml-auto size-4 shrink-0' />
+        <Icons.chevronsUpDown className='ms-auto size-4 shrink-0' />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className='w-(--anchor-width) min-w-56 rounded-lg'

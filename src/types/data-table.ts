@@ -7,8 +7,9 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
     label?: string;
     placeholder?: string;
+    placeholderKey?: string;
     variant?: FilterVariant;
-    options?: Option[];
+    options?: Option[] | ((t: (key: string) => string) => Option[]);
     range?: [number, number];
     unit?: string;
     icon?: React.FC<React.SVGProps<SVGSVGElement>>;

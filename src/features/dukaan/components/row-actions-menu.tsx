@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { useT } from '@/i18n/use-t';
 
 export interface RowAction {
   label: string;
@@ -22,6 +23,7 @@ export interface RowAction {
 }
 
 export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
+  const t = useT();
   const router = useRouter();
   if (actions.length === 0) return null;
 
@@ -35,12 +37,12 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
           />
         }
       >
-        <span className='sr-only'>Open menu</span>
+        <span className='sr-only'>{t('common.openMenu')}</span>
         <Icons.ellipsis className='h-4 w-4' />
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-40'>
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuGroup>
           {actions.map((action) => {
@@ -56,7 +58,7 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
                   });
                 }}
               >
-                <Icon className='mr-2 h-4 w-4' />
+                <Icon className='me-2 h-4 w-4' />
                 {action.label}
               </DropdownMenuItem>
             );

@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 import { DataTableFiltersSheet } from './data-table-filters-sheet';
 import type { ContainerMode } from './use-container-mode';
 
@@ -29,7 +29,7 @@ export function DataTableToolbar<TData>({
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
-  const t = useT();
+  const t = useTranslations();
   const [filtersOpen, setFiltersOpen] = React.useState(false);
   const isFiltered = table.getState().columnFilters.length > 0;
   const filterCount =
@@ -62,7 +62,9 @@ export function DataTableToolbar<TData>({
           {textColumn ? (
             <Input
               placeholder={
-                textColumn.columnDef.meta?.placeholder ??
+                (textColumn.columnDef.meta?.placeholderKey
+                  ? t(textColumn.columnDef.meta.placeholderKey as any)
+                  : textColumn.columnDef.meta?.placeholder) ??
                 textColumn.columnDef.meta?.label ??
                 t('table.search')
               }
@@ -126,16 +128,33 @@ export function DataTableToolbar<TData>({
 }
 
 function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unknown> }) {
-  const t = useT();
+  const t = useTranslations();
   const columnMeta = column.columnDef.meta;
   if (!columnMeta?.variant) return null;
+
+  const getLabel = (label: string) => {
+    if (label.includes('.')) {
+      try {
+        return t(label as any);
+      } catch {
+        return label;
+      }
+    }
+    return label;
+  };
+
+  const label = columnMeta.label ? getLabel(columnMeta.label) : column.id;
 
   switch (columnMeta.variant) {
     case 'text':
       return (
         <Input
-          placeholder={columnMeta.placeholder ?? columnMeta.label}
-          aria-label={columnMeta.label ?? t('table.search')}
+          placeholder={
+            (columnMeta.placeholderKey
+              ? t(columnMeta.placeholderKey as any)
+              : columnMeta.placeholder) ?? label
+          }
+          aria-label={label ?? t('table.search')}
           value={(column.getFilterValue() as string) ?? ''}
           onChange={(event) => column.setFilterValue(event.target.value)}
           className='h-8 w-40 lg:w-56'
@@ -147,8 +166,12 @@ function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unkno
           <Input
             type='number'
             inputMode='numeric'
-            placeholder={columnMeta.placeholder ?? columnMeta.label}
-            aria-label={columnMeta.label ?? t('table.search')}
+            placeholder={
+              (columnMeta.placeholderKey
+                ? t(columnMeta.placeholderKey as any)
+                : columnMeta.placeholder) ?? label
+            }
+            aria-label={label ?? t('table.search')}
             value={(column.getFilterValue() as string) ?? ''}
             onChange={(event) => column.setFilterValue(event.target.value)}
             className={cn('h-8 w-[120px]', columnMeta.unit && 'pe-8')}
@@ -161,13 +184,13 @@ function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unkno
         </div>
       );
     case 'range':
-      return <DataTableSliderFilter column={column} title={columnMeta.label ?? column.id} />;
+      return <DataTableSliderFilter column={column} title={label} />;
     case 'date':
     case 'dateRange':
       return (
         <DataTableDateFilter
           column={column}
-          title={columnMeta.label ?? column.id}
+          title={label}
           multiple={columnMeta.variant === 'dateRange'}
         />
       );
@@ -176,8 +199,12 @@ function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unkno
       return (
         <DataTableFacetedFilter
           column={column}
-          title={columnMeta.label ?? column.id}
-          options={columnMeta.options ?? []}
+          title={label}
+          options={
+            typeof columnMeta.options === 'function'
+              ? columnMeta.options(t as any)
+              : (columnMeta.options ?? [])
+          }
           multiple={columnMeta.variant === 'multiSelect'}
         />
       );

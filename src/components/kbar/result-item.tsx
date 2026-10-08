@@ -37,8 +37,8 @@ const ResultItem = React.forwardRef(
               {ancestors.length > 0 &&
                 ancestors.map((ancestor) => (
                   <React.Fragment key={ancestor.id}>
-                    <span className='text-muted-foreground mr-2'>{ancestor.name}</span>
-                    <span className='mr-2'>&rsaquo;</span>
+                    <span className='text-muted-foreground me-2'>{ancestor.name}</span>
+                    <span className='me-2 inline-block rtl:rotate-180'>&rsaquo;</span>
                   </React.Fragment>
                 ))}
               <span>{action.name}</span>

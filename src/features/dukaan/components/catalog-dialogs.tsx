@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useT } from '@/i18n/use-t';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -16,7 +17,11 @@ import { dukaan } from '@/lib/dukaan';
 import { fromPaisa, toPaisa } from '@/lib/dukaan/numbers';
 import type { Brand, Category, Product } from '@/lib/dukaan/types';
 import { dukaanKeys } from '../api/queries';
-import { nameOnlySchema, productFormSchema, type ProductFormValues } from '../schemas/forms';
+import {
+  createNameOnlySchema,
+  createProductFormSchema,
+  type ProductFormValues
+} from '../schemas/forms';
 import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { FormEntitySelect } from './form-entity-select';
 
@@ -52,6 +57,7 @@ function CategoryDialogBody({
 }) {
   const qc = useQueryClient();
   const isEdit = Boolean(category);
+  const t = useT();
 
   const save = useMutation({
     mutationFn: async (name: string) => {
@@ -59,7 +65,7 @@ function CategoryDialogBody({
       return dukaan.createCategory(name);
     },
     onSuccess: () => {
-      toast.success(isEdit ? 'Category updated' : 'Category created');
+      toast.success(isEdit ? t('dukaan.category.updated') : t('dukaan.category.created'));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       onOpenChange(false);
     },
@@ -68,7 +74,7 @@ function CategoryDialogBody({
 
   const form = useAppForm({
     defaultValues: { name: category?.name ?? '' },
-    validators: { onSubmit: nameOnlySchema },
+    validators: { onSubmit: createNameOnlySchema(t) },
     onSubmit: ({ value }) => {
       save.mutate(value.name.trim());
     }
@@ -76,10 +82,12 @@ function CategoryDialogBody({
 
   return (
     <DialogContent className='sm:max-w-lg'>
-      <DialogHeader>
-        <DialogTitle>{isEdit ? 'Edit category' : 'Add category'}</DialogTitle>
+      <DialogHeader className='pe-12'>
+        <DialogTitle>
+          {isEdit ? t('dukaan.category.editTitle') : t('dukaan.category.addTitle')}
+        </DialogTitle>
         <DialogDescription>
-          {isEdit ? 'Update the category name.' : 'Create a new product category.'}
+          {isEdit ? t('dukaan.category.editDescription') : t('dukaan.category.addDescription')}
         </DialogDescription>
       </DialogHeader>
       <form
@@ -93,7 +101,12 @@ function CategoryDialogBody({
           <form.AppField
             name='name'
             children={(field) => (
-              <field.TextField label='Name' required placeholder='e.g. Mobile Phones' autoFocus />
+              <field.TextField
+                label={t('dukaan.party.name')}
+                required
+                placeholder={t('dukaan.category.namePlaceholder')}
+                autoFocus
+              />
             )}
           />
         </FieldGroup>
@@ -129,6 +142,7 @@ function BrandDialogBody({
 }) {
   const qc = useQueryClient();
   const isEdit = Boolean(brand);
+  const t = useT();
 
   const save = useMutation({
     mutationFn: async (name: string) => {
@@ -136,7 +150,7 @@ function BrandDialogBody({
       return dukaan.createBrand(name);
     },
     onSuccess: () => {
-      toast.success(isEdit ? 'Brand updated' : 'Brand created');
+      toast.success(isEdit ? t('dukaan.brand.updated') : t('dukaan.brand.created'));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       onOpenChange(false);
     },
@@ -145,7 +159,7 @@ function BrandDialogBody({
 
   const form = useAppForm({
     defaultValues: { name: brand?.name ?? '' },
-    validators: { onSubmit: nameOnlySchema },
+    validators: { onSubmit: createNameOnlySchema(t) },
     onSubmit: ({ value }) => {
       save.mutate(value.name.trim());
     }
@@ -153,10 +167,12 @@ function BrandDialogBody({
 
   return (
     <DialogContent className='sm:max-w-lg'>
-      <DialogHeader>
-        <DialogTitle>{isEdit ? 'Edit brand' : 'Add brand'}</DialogTitle>
+      <DialogHeader className='pe-12'>
+        <DialogTitle>
+          {isEdit ? t('dukaan.brand.editTitle') : t('dukaan.brand.addTitle')}
+        </DialogTitle>
         <DialogDescription>
-          {isEdit ? 'Update the brand name.' : 'Create a new product brand.'}
+          {isEdit ? t('dukaan.brand.editDescription') : t('dukaan.brand.addDescription')}
         </DialogDescription>
       </DialogHeader>
       <form
@@ -170,7 +186,12 @@ function BrandDialogBody({
           <form.AppField
             name='name'
             children={(field) => (
-              <field.TextField label='Name' required placeholder='e.g. Samsung' autoFocus />
+              <field.TextField
+                label={t('dukaan.party.name')}
+                required
+                placeholder={t('dukaan.brand.namePlaceholder')}
+                autoFocus
+              />
             )}
           />
         </FieldGroup>
@@ -248,6 +269,7 @@ function ProductDialogBody({
 }) {
   const qc = useQueryClient();
   const isEdit = Boolean(product);
+  const t = useT();
 
   const save = useMutation({
     mutationFn: async (value: ProductFormValues) => {
@@ -283,7 +305,7 @@ function ProductDialogBody({
       });
     },
     onSuccess: () => {
-      toast.success(isEdit ? 'Product updated' : 'Product created');
+      toast.success(isEdit ? t('dukaan.product.updated') : t('dukaan.product.created'));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       onOpenChange(false);
     },
@@ -292,7 +314,7 @@ function ProductDialogBody({
 
   const form = useAppForm({
     defaultValues: product ? productToForm(product) : emptyProductForm(),
-    validators: { onSubmit: productFormSchema },
+    validators: { onSubmit: createProductFormSchema(t) },
     onSubmit: ({ value }) => {
       save.mutate(value);
     }
@@ -300,12 +322,12 @@ function ProductDialogBody({
 
   return (
     <DialogContent className='flex max-h-[85vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl'>
-      <DialogHeader className='shrink-0 px-4 pt-4 pr-12'>
-        <DialogTitle>{isEdit ? 'Edit product' : 'Add product'}</DialogTitle>
+      <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
+        <DialogTitle>
+          {isEdit ? t('dukaan.product.editTitle') : t('dukaan.product.addTitle')}
+        </DialogTitle>
         <DialogDescription>
-          {isEdit
-            ? 'Update product details. Tracking type cannot change after create.'
-            : 'Create a serialized (phones) or quantity (accessories) product.'}
+          {isEdit ? t('dukaan.product.editDescription') : t('dukaan.product.addDescription')}
         </DialogDescription>
       </DialogHeader>
       <form
@@ -319,7 +341,7 @@ function ProductDialogBody({
           <FieldGroup className='gap-4'>
             <form.AppField
               name='name'
-              children={(field) => <field.TextField label='Name' required />}
+              children={(field) => <field.TextField label={t('dukaan.product.name')} required />}
             />
             <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
               <form.Field
@@ -329,7 +351,7 @@ function ProductDialogBody({
                   return (
                     <FormEntitySelect
                       name={field.name}
-                      label='Category'
+                      label={t('dukaan.product.category')}
                       required
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -338,8 +360,8 @@ function ProductDialogBody({
                       errors={field.state.meta.errors}
                       queryKey={dukaanKeys.categories()}
                       fetchPage={(filters) => dukaan.listCategories(filters)}
-                      placeholder='Select category'
-                      searchPlaceholder='Search categories...'
+                      placeholder={t('dukaan.product.selectCategory')}
+                      searchPlaceholder={t('dukaan.product.searchCategories')}
                     />
                   );
                 }}
@@ -351,7 +373,7 @@ function ProductDialogBody({
                   return (
                     <FormEntitySelect
                       name={field.name}
-                      label='Brand'
+                      label={t('dukaan.product.brand')}
                       required
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -360,8 +382,8 @@ function ProductDialogBody({
                       errors={field.state.meta.errors}
                       queryKey={dukaanKeys.brands()}
                       fetchPage={(filters) => dukaan.listBrands(filters)}
-                      placeholder='Select brand'
-                      searchPlaceholder='Search brands...'
+                      placeholder={t('dukaan.product.selectBrand')}
+                      searchPlaceholder={t('dukaan.product.searchBrands')}
                     />
                   );
                 }}
@@ -372,11 +394,11 @@ function ProductDialogBody({
                 name='tracking_type'
                 children={(field) => (
                   <field.SelectField
-                    label='Tracking type'
+                    label={t('dukaan.product.trackingType')}
                     required
                     options={[
-                      { value: 'SERIALIZED', label: 'Serialized (phones / IMEI)' },
-                      { value: 'QUANTITY', label: 'Quantity (accessories)' }
+                      { value: 'SERIALIZED', label: t('dukaan.product.serialized') },
+                      { value: 'QUANTITY', label: t('dukaan.product.quantity') }
                     ]}
                   />
                 )}
@@ -386,43 +408,67 @@ function ProductDialogBody({
               <form.AppField
                 name='default_purchase_price'
                 children={(field) => (
-                  <field.TextField label='Default purchase price (Rs)' type='number' required />
+                  <field.TextField
+                    label={t('dukaan.product.purchasePrice')}
+                    type='number'
+                    required
+                  />
                 )}
               />
               <form.AppField
                 name='default_selling_price'
                 children={(field) => (
-                  <field.TextField label='Default selling price (Rs)' type='number' required />
+                  <field.TextField
+                    label={t('dukaan.product.sellingPrice')}
+                    type='number'
+                    required
+                  />
                 )}
               />
             </div>
             <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
-              <form.AppField name='model' children={(field) => <field.TextField label='Model' />} />
-              <form.AppField name='color' children={(field) => <field.TextField label='Color' />} />
-            </div>
-            <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
-              <form.AppField name='ram' children={(field) => <field.TextField label='RAM' />} />
               <form.AppField
-                name='storage'
-                children={(field) => <field.TextField label='Storage' />}
+                name='model'
+                children={(field) => <field.TextField label={t('dukaan.product.model')} />}
+              />
+              <form.AppField
+                name='color'
+                children={(field) => <field.TextField label={t('dukaan.product.color')} />}
               />
             </div>
             <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
-              <form.AppField name='sku' children={(field) => <field.TextField label='SKU' />} />
+              <form.AppField
+                name='ram'
+                children={(field) => <field.TextField label={t('dukaan.product.ram')} />}
+              />
+              <form.AppField
+                name='storage'
+                children={(field) => <field.TextField label={t('dukaan.product.storage')} />}
+              />
+            </div>
+            <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
+              <form.AppField
+                name='sku'
+                children={(field) => <field.TextField label={t('dukaan.product.sku')} />}
+              />
               <form.AppField
                 name='barcode'
-                children={(field) => <field.TextField label='Barcode' />}
+                children={(field) => <field.TextField label={t('dukaan.product.barcode')} />}
               />
             </div>
             <form.AppField
               name='low_stock_threshold'
               children={(field) => (
-                <field.TextField label='Low stock threshold' type='number' required />
+                <field.TextField
+                  label={t('dukaan.product.lowStockThreshold')}
+                  type='number'
+                  required
+                />
               )}
             />
             <form.AppField
               name='description'
-              children={(field) => <field.TextareaField label='Description' />}
+              children={(field) => <field.TextareaField label={t('dukaan.product.description')} />}
             />
           </FieldGroup>
         </div>

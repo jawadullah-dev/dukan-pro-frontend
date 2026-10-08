@@ -15,6 +15,7 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Icons } from '@/components/icons';
+import { useT } from '@/i18n/use-t';
 import { t } from '@/i18n';
 import { cn } from '@/lib/utils';
 import type { ExpenseCategory } from '@/lib/dukaan/types';
@@ -85,20 +86,26 @@ const supplierColumns: ColumnDef<SupplierRow>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
-    cell: ({ row }) => (
-      <span>
-        {row.original.name}
-        {row.original.is_system ? (
-          <Badge className='ml-2' variant='outline'>
-            System
-          </Badge>
-        ) : null}
-      </span>
-    ),
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
+    },
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <span>
+          {row.original.name}
+          {row.original.is_system ? (
+            <Badge className='ms-2' variant='outline'>
+              {t('status.serialized')}
+            </Badge>
+          ) : null}
+        </span>
+      );
+    },
     meta: {
-      label: 'Name',
-      placeholder: 'Search suppliers...',
+      label: 'table.col.name',
+      placeholderKey: 'search.suppliers',
       variant: 'text',
       icon: Icons.search,
       type: 'text',
@@ -111,15 +118,21 @@ const supplierColumns: ColumnDef<SupplierRow>[] = [
   {
     id: 'phone',
     accessorKey: 'phone',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Phone' />,
-    meta: { label: 'Phone', type: 'phone', priority: 2, mobile: 'subtitle' }
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.phone')} />;
+    },
+    meta: { label: 'table.col.phone', type: 'phone', priority: 2, mobile: 'subtitle' }
   },
   {
     id: 'payable',
     accessorKey: 'payable',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Payable' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.payable')} />;
+    },
     meta: {
-      label: 'Payable',
+      label: 'table.col.payable',
       type: 'money',
       highlight: true,
       priority: 1,
@@ -130,14 +143,20 @@ const supplierColumns: ColumnDef<SupplierRow>[] = [
   {
     id: 'is_active',
     accessorKey: 'is_active',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-    meta: { label: 'Status', type: 'boolean', priority: 3, mobile: 'badge' },
-    cell: ({ row }) => (
-      <StatusBadge
-        status={row.original.is_active ? 'ACTIVE' : 'INACTIVE'}
-        label={row.original.is_active ? 'Active' : 'Inactive'}
-      />
-    )
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
+    meta: { label: 'table.col.status', type: 'boolean', priority: 3, mobile: 'badge' },
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <StatusBadge
+          status={row.original.is_active ? 'ACTIVE' : 'INACTIVE'}
+          label={row.original.is_active ? t('status.active') : t('status.inactive')}
+        />
+      );
+    }
   }
 ];
 
@@ -146,7 +165,10 @@ const supplierMobileItem: MobileItemConfig<SupplierRow> = {
   title: (row) => row.name,
   subtitle: (row) => row.phone,
   value: (row) => formatPkr(row.payable),
-  valueLabel: () => t('table.youOwe'),
+  valueLabel: () => {
+    const t = useT();
+    return t('table.youOwe');
+  },
   valueClassName: (row) =>
     cn(row.payable > 0 ? 'text-[var(--status-warning)]' : 'text-muted-foreground'),
   ariaLabel: (row) => `${row.name}, ${row.phone}, ${formatPkr(row.payable)}`
@@ -155,46 +177,54 @@ const supplierMobileItem: MobileItemConfig<SupplierRow> = {
 const supplierDetail: DetailConfig<SupplierRow> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => ({
-    label: row.is_active ? 'Active' : 'Inactive',
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
+  badge: (row) => {
+    const t = useT();
+    return {
+      label: row.is_active ? t('status.active') : t('status.inactive'),
+      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+    };
+  },
   value: (row) => formatPkr(row.payable),
-  sections: (row) => [
-    {
-      title: 'Contact',
-      fields: [
-        { label: 'Name', value: row.name },
-        {
-          label: 'Phone',
-          value: (
-            <a
-              className='text-primary underline-offset-2 hover:underline'
-              href={`tel:${row.phone}`}
-            >
-              {row.phone}
-            </a>
-          )
-        }
-      ]
-    },
-    {
-      title: 'Balance',
-      fields: [
-        { label: t('table.youOwe'), value: formatPkr(row.payable) },
-        {
-          label: 'Status',
-          value: (
-            <StatusBadge
-              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-              label={row.is_active ? 'Active' : 'Inactive'}
-            />
-          )
-        },
-        ...(row.is_system ? [{ label: 'Type', value: 'System' as ReactNode }] : [])
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('dukaan.party.name'),
+        fields: [
+          { label: t('table.col.name'), value: row.name },
+          {
+            label: t('table.col.phone'),
+            value: (
+              <a
+                className='text-primary underline-offset-2 hover:underline'
+                href={`tel:${row.phone}`}
+              >
+                {row.phone}
+              </a>
+            )
+          }
+        ]
+      },
+      {
+        title: t('table.balance'),
+        fields: [
+          { label: t('table.youOwe'), value: formatPkr(row.payable) },
+          {
+            label: t('table.col.status'),
+            value: (
+              <StatusBadge
+                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+                label={row.is_active ? t('status.active') : t('status.inactive')}
+              />
+            )
+          },
+          ...(row.is_system
+            ? [{ label: t('table.col.type'), value: t('status.serialized') as ReactNode }]
+            : [])
+        ]
+      }
+    ];
+  }
 };
 
 export function SuppliersTable({ toolbarAction }: TableToolbarProps) {
@@ -223,10 +253,13 @@ const customerColumns: ColumnDef<CustomerRow>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
+    },
     meta: {
-      label: 'Name',
-      placeholder: 'Search customers...',
+      label: 'table.col.name',
+      placeholderKey: 'search.customers',
       variant: 'text',
       icon: Icons.search,
       type: 'text',
@@ -239,15 +272,21 @@ const customerColumns: ColumnDef<CustomerRow>[] = [
   {
     id: 'phone',
     accessorKey: 'phone',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Phone' />,
-    meta: { label: 'Phone', type: 'phone', priority: 2, mobile: 'subtitle' }
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.phone')} />;
+    },
+    meta: { label: 'table.col.phone', type: 'phone', priority: 2, mobile: 'subtitle' }
   },
   {
     id: 'udhar',
     accessorKey: 'udhar',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Udhar' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.udhar')} />;
+    },
     meta: {
-      label: 'Udhar',
+      label: 'table.udhar',
       type: 'money',
       highlight: true,
       priority: 1,
@@ -258,13 +297,26 @@ const customerColumns: ColumnDef<CustomerRow>[] = [
   {
     id: 'udhar_state',
     accessorFn: (row) => (row.udhar > 0 ? 'owing' : 'settled'),
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Balance' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.balance')} />;
+    },
     meta: {
-      label: 'Balance',
+      label: 'table.balance',
       variant: 'select',
       options: [
-        { label: 'With Udhar', value: 'owing' },
-        { label: 'Settled', value: 'settled' }
+        {
+          get label() {
+            return t('table.withUdhar');
+          },
+          value: 'owing'
+        },
+        {
+          get label() {
+            return t('table.zeroUdhar');
+          },
+          value: 'settled'
+        }
       ],
       priority: 4,
       mobile: 'hidden'
@@ -278,19 +330,22 @@ const customerColumns: ColumnDef<CustomerRow>[] = [
     enableSorting: false,
     enableHiding: false,
     meta: { mobile: 'hidden' },
-    cell: ({ row }) => (
-      <div className='flex justify-end'>
-        <RowActionsMenu
-          actions={[
-            {
-              label: 'Ledger',
-              href: `/dashboard/customers/${row.original.id}`,
-              icon: Icons.page
-            }
-          ]}
-        />
-      </div>
-    )
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <div className='flex justify-end'>
+          <RowActionsMenu
+            actions={[
+              {
+                label: t('table.openLedger'),
+                href: `/dashboard/customers/${row.original.id}`,
+                icon: Icons.page
+              }
+            ]}
+          />
+        </div>
+      );
+    }
   }
 ];
 
@@ -298,9 +353,17 @@ const customerMobileItem: MobileItemConfig<CustomerRow> = {
   leading: 'avatar',
   title: (row) => row.name,
   subtitle: (row) => row.phone,
-  badge: (row) => (row.udhar > 0 ? { label: 'Owing', status: 'OVERDUE', tone: 'danger' } : null),
+  badge: (row) => {
+    const t = useT();
+    return row.udhar > 0
+      ? { label: t('table.col.owing'), status: 'OVERDUE', tone: 'danger' }
+      : null;
+  },
   value: (row) => formatPkr(row.udhar),
-  valueLabel: () => t('table.udhar'),
+  valueLabel: () => {
+    const t = useT();
+    return t('table.udhar');
+  },
   valueClassName: (row) =>
     cn(row.udhar > 0 ? 'text-[var(--status-warning)]' : 'text-muted-foreground'),
   ariaLabel: (row) => `${row.name}, ${row.phone}, ${formatPkr(row.udhar)}`
@@ -310,50 +373,43 @@ const customerDetail: DetailConfig<CustomerRow> = {
   mode: 'page',
   href: (row) => `/dashboard/customers/${row.id}`,
   title: (row) => row.name,
-  badge: (row) => (row.udhar > 0 ? { label: 'Owing', status: 'OVERDUE', tone: 'danger' } : null),
+  badge: (row) => {
+    const t = useT();
+    return row.udhar > 0
+      ? { label: t('table.col.owing'), status: 'OVERDUE', tone: 'danger' }
+      : null;
+  },
   value: (row) => formatPkr(row.udhar),
-  sections: (row) => [
-    {
-      title: 'Contact',
-      fields: [
-        { label: 'Name', value: row.name },
-        {
-          label: 'Phone',
-          value: (
-            <a
-              className='text-primary underline-offset-2 hover:underline'
-              href={`tel:${row.phone}`}
-            >
-              {row.phone}
-            </a>
-          )
-        }
-      ]
-    },
-    {
-      title: 'Balance',
-      fields: [{ label: t('table.udhar'), value: formatPkr(row.udhar) }]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('dukaan.party.name'),
+        fields: [
+          { label: t('table.col.name'), value: row.name },
+          {
+            label: t('table.col.phone'),
+            value: (
+              <a
+                className='text-primary underline-offset-2 hover:underline'
+                href={`tel:${row.phone}`}
+              >
+                {row.phone}
+              </a>
+            )
+          }
+        ]
+      },
+      {
+        title: t('table.balance'),
+        fields: [{ label: t('table.udhar'), value: formatPkr(row.udhar) }]
+      }
+    ];
+  }
 };
 
-const customerQuickFilters: QuickFilterChip[] = [
-  { id: 'all', label: t('table.all') },
-  {
-    id: 'owing',
-    label: t('table.withUdhar'),
-    columnId: 'udhar_state',
-    value: ['owing']
-  },
-  {
-    id: 'settled',
-    label: t('table.zeroUdhar'),
-    columnId: 'udhar_state',
-    value: ['settled']
-  }
-];
-
 export function CustomersTable({ toolbarAction }: TableToolbarProps) {
+  const t = useT();
   const router = useRouter();
   const columnIds = ['name', 'phone', 'udhar', 'udhar_state'];
   const { params, filters } = useDukaanListParams(columnIds, 'name', ['udhar_state']);
@@ -371,6 +427,22 @@ export function CustomersTable({ toolbarAction }: TableToolbarProps) {
       columnVisibility: { udhar_state: false }
     }
   });
+
+  const customerQuickFilters: QuickFilterChip[] = [
+    { id: 'all', label: t('table.all') },
+    {
+      id: 'owing',
+      label: t('table.withUdhar'),
+      columnId: 'udhar_state',
+      value: ['owing']
+    },
+    {
+      id: 'settled',
+      label: t('table.zeroUdhar'),
+      columnId: 'udhar_state',
+      value: ['settled']
+    }
+  ];
 
   return (
     <ResponsiveDataTable
@@ -406,10 +478,13 @@ const purchaseColumns: ColumnDef<PurchaseRow>[] = [
   {
     id: 'purchase_no',
     accessorKey: 'purchase_no',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='No' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.no')} />;
+    },
     meta: {
-      label: 'No',
-      placeholder: 'Search purchases...',
+      label: 'table.col.no',
+      placeholderKey: 'search.purchases',
       variant: 'text',
       icon: Icons.search,
       type: 'id',
@@ -422,29 +497,41 @@ const purchaseColumns: ColumnDef<PurchaseRow>[] = [
   {
     id: 'purchase_date',
     accessorKey: 'purchase_date',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
-    meta: { label: 'Date', type: 'date', priority: 2, mobile: 'meta' }
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.date')} />;
+    },
+    meta: { label: 'table.col.date', type: 'date', priority: 2, mobile: 'meta' }
   },
   {
     id: 'supplier_name',
     accessorKey: 'supplier_name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Supplier' />,
-    meta: { label: 'Supplier', type: 'text', priority: 2, mobile: 'subtitle' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.supplier')} />;
+    },
+    meta: { label: 'table.col.supplier', type: 'text', priority: 2, mobile: 'subtitle' },
     cell: ({ row }) => row.original.supplier_name ?? '—'
   },
   {
     id: 'supplier_invoice_ref',
     accessorKey: 'supplier_invoice_ref',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Supplier invoice' />,
-    meta: { label: 'Supplier invoice', type: 'text', priority: 3, mobile: 'hidden' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.supplierInvoice')} />;
+    },
+    meta: { label: 'table.col.supplierInvoice', type: 'text', priority: 3, mobile: 'hidden' },
     cell: ({ row }) => row.original.supplier_invoice_ref ?? '—'
   },
   {
     id: 'total_amount',
     accessorKey: 'total_amount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.total')} />;
+    },
     meta: {
-      label: 'Total',
+      label: 'table.col.total',
       type: 'money',
       highlight: true,
       priority: 1,
@@ -455,9 +542,12 @@ const purchaseColumns: ColumnDef<PurchaseRow>[] = [
   {
     id: 'status',
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
     meta: {
-      label: 'Status',
+      label: 'table.col.status',
       variant: 'multiSelect',
       options: [...RECORD_STATUS_OPTIONS],
       type: 'status',
@@ -465,14 +555,21 @@ const purchaseColumns: ColumnDef<PurchaseRow>[] = [
       mobile: 'badge'
     },
     enableColumnFilter: true,
-    cell: ({ row }) => (
-      <span className='inline-flex flex-wrap items-center gap-1'>
-        <StatusBadge status={row.original.status} />
-        {row.original.is_opening_stock ? (
-          <StatusBadge status='OPENING' label='Opening' tone='neutral' />
-        ) : null}
-      </span>
-    )
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <span className='inline-flex flex-wrap items-center gap-1'>
+          <StatusBadge status={row.original.status} />
+          {row.original.is_opening_stock ? (
+            <StatusBadge
+              status='OPENING'
+              label={t('dukaan.purchase.openingStockLabel')}
+              tone='neutral'
+            />
+          ) : null}
+        </span>
+      );
+    }
   },
   {
     id: 'actions',
@@ -480,19 +577,22 @@ const purchaseColumns: ColumnDef<PurchaseRow>[] = [
     enableSorting: false,
     enableHiding: false,
     meta: { mobile: 'hidden' },
-    cell: ({ row }) => (
-      <div className='flex justify-end'>
-        <RowActionsMenu
-          actions={[
-            {
-              label: 'Open',
-              href: `/dashboard/purchases/${row.original.id}`,
-              icon: Icons.page
-            }
-          ]}
-        />
-      </div>
-    )
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <div className='flex justify-end'>
+          <RowActionsMenu
+            actions={[
+              {
+                label: t('table.openRecord'),
+                href: `/dashboard/purchases/${row.original.id}`,
+                icon: Icons.page
+              }
+            ]}
+          />
+        </div>
+      );
+    }
   }
 ];
 
@@ -514,39 +614,34 @@ const purchaseDetail: DetailConfig<PurchaseRow> = {
   title: (row) => row.purchase_no,
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.total_amount),
-  sections: (row) => [
-    {
-      title: 'Purchase',
-      fields: [
-        { label: 'No', value: row.purchase_no },
-        { label: 'Date', value: row.purchase_date },
-        { label: 'Supplier', value: row.supplier_name ?? '—' },
-        { label: 'Supplier invoice', value: row.supplier_invoice_ref ?? '—' },
-        { label: 'Total', value: formatPkr(row.total_amount) },
-        { label: 'Status', value: <StatusBadge status={row.status} /> },
-        ...(row.is_opening_stock ? [{ label: 'Type', value: 'Opening stock' as ReactNode }] : [])
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('nav.purchases'),
+        fields: [
+          { label: t('table.col.no'), value: row.purchase_no },
+          { label: t('table.col.date'), value: row.purchase_date },
+          { label: t('table.col.supplier'), value: row.supplier_name ?? '—' },
+          { label: t('table.col.supplierInvoice'), value: row.supplier_invoice_ref ?? '—' },
+          { label: t('table.col.total'), value: formatPkr(row.total_amount) },
+          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> },
+          ...(row.is_opening_stock
+            ? [
+                {
+                  label: t('table.col.type'),
+                  value: t('dukaan.purchase.openingStockLabel') as ReactNode
+                }
+              ]
+            : [])
+        ]
+      }
+    ];
+  }
 };
 
-const purchaseQuickFilters: QuickFilterChip[] = [
-  { id: 'all', label: t('table.all') },
-  {
-    id: 'active',
-    label: 'Active',
-    columnId: 'status',
-    value: ['ACTIVE']
-  },
-  {
-    id: 'cancelled',
-    label: 'Cancelled',
-    columnId: 'status',
-    value: ['CANCELLED']
-  }
-];
-
 export function PurchasesTable({ toolbarAction }: TableToolbarProps) {
+  const t = useT();
   const router = useRouter();
   const columnIds = ['purchase_no', 'purchase_date', 'supplier_name', 'total_amount', 'status'];
   const { params, filters } = useDukaanListParams(columnIds, 'purchase_no', ['status']);
@@ -563,6 +658,22 @@ export function PurchasesTable({ toolbarAction }: TableToolbarProps) {
       pagination: { pageIndex: 0, pageSize: DUKAAN_DEFAULT_PAGE_SIZE }
     }
   });
+
+  const purchaseQuickFilters: QuickFilterChip[] = [
+    { id: 'all', label: t('table.all') },
+    {
+      id: 'active',
+      label: t('status.active'),
+      columnId: 'status',
+      value: ['ACTIVE']
+    },
+    {
+      id: 'cancelled',
+      label: t('status.cancelled'),
+      columnId: 'status',
+      value: ['CANCELLED']
+    }
+  ];
 
   return (
     <ResponsiveDataTable
@@ -597,10 +708,13 @@ const saleColumns: ColumnDef<SaleRow>[] = [
   {
     id: 'sale_no',
     accessorKey: 'sale_no',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='No' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.no')} />;
+    },
     meta: {
-      label: 'No',
-      placeholder: 'Search sales...',
+      label: 'table.col.no',
+      placeholderKey: 'search.sales',
       variant: 'text',
       icon: Icons.search,
       type: 'id',
@@ -613,22 +727,34 @@ const saleColumns: ColumnDef<SaleRow>[] = [
   {
     id: 'sale_date',
     accessorKey: 'sale_date',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
-    meta: { label: 'Date', type: 'date', priority: 2, mobile: 'meta' }
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.date')} />;
+    },
+    meta: { label: 'table.col.date', type: 'date', priority: 2, mobile: 'meta' }
   },
   {
     id: 'customer_name',
     accessorKey: 'customer_name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Customer' />,
-    meta: { label: 'Customer', type: 'text', priority: 2, mobile: 'subtitle' },
-    cell: ({ row }) => row.original.customer_name ?? 'Walk-in'
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.customer')} />;
+    },
+    meta: { label: 'table.col.customer', type: 'text', priority: 2, mobile: 'subtitle' },
+    cell: ({ row }) => {
+      const t = useT();
+      return row.original.customer_name ?? t('dukaan.sale.walkIn');
+    }
   },
   {
     id: 'total_amount',
     accessorKey: 'total_amount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.total')} />;
+    },
     meta: {
-      label: 'Total',
+      label: 'table.col.total',
       type: 'money',
       highlight: true,
       priority: 1,
@@ -639,16 +765,22 @@ const saleColumns: ColumnDef<SaleRow>[] = [
   {
     id: 'outstanding',
     accessorKey: 'outstanding',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Outstanding' />,
-    meta: { label: 'Outstanding', type: 'money', priority: 3, mobile: 'hidden' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.outstanding')} />;
+    },
+    meta: { label: 'table.col.outstanding', type: 'money', priority: 3, mobile: 'hidden' },
     cell: ({ row }) => formatPkr(row.original.outstanding)
   },
   {
     id: 'status',
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
     meta: {
-      label: 'Status',
+      label: 'table.col.status',
       variant: 'multiSelect',
       options: [...RECORD_STATUS_OPTIONS],
       type: 'status',
@@ -664,24 +796,27 @@ const saleColumns: ColumnDef<SaleRow>[] = [
     enableSorting: false,
     enableHiding: false,
     meta: { mobile: 'hidden' },
-    cell: ({ row }) => (
-      <div className='flex justify-end'>
-        <RowActionsMenu
-          actions={[
-            {
-              label: 'Open',
-              href: `/dashboard/sales/${row.original.id}`,
-              icon: Icons.page
-            },
-            {
-              label: 'Receipt',
-              href: `/dashboard/sales/${row.original.id}/receipt`,
-              icon: Icons.receipt
-            }
-          ]}
-        />
-      </div>
-    )
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <div className='flex justify-end'>
+          <RowActionsMenu
+            actions={[
+              {
+                label: t('table.openRecord'),
+                href: `/dashboard/sales/${row.original.id}`,
+                icon: Icons.page
+              },
+              {
+                label: t('common.receipt'),
+                href: `/dashboard/sales/${row.original.id}/receipt`,
+                icon: Icons.receipt
+              }
+            ]}
+          />
+        </div>
+      );
+    }
   }
 ];
 
@@ -689,12 +824,17 @@ const saleMobileItem: MobileItemConfig<SaleRow> = {
   leading: 'icon',
   leadingIcon: Icons.receipt,
   title: (row) => row.sale_no,
-  subtitle: (row) => row.customer_name ?? 'Walk-in',
+  subtitle: (row) => {
+    const t = useT();
+    return row.customer_name ?? t('dukaan.sale.walkIn');
+  },
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.total_amount),
   meta: [(row) => row.sale_date],
-  ariaLabel: (row) =>
-    `${row.sale_no}, ${row.customer_name ?? 'Walk-in'}, ${formatPkr(row.total_amount)}`
+  ariaLabel: (row) => {
+    const t = useT();
+    return `${row.sale_no}, ${row.customer_name ?? t('dukaan.sale.walkIn')}, ${formatPkr(row.total_amount)}`;
+  }
 };
 
 const saleDetail: DetailConfig<SaleRow> = {
@@ -703,38 +843,26 @@ const saleDetail: DetailConfig<SaleRow> = {
   title: (row) => row.sale_no,
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.total_amount),
-  sections: (row) => [
-    {
-      title: 'Sale',
-      fields: [
-        { label: 'No', value: row.sale_no },
-        { label: 'Date', value: row.sale_date },
-        { label: 'Customer', value: row.customer_name ?? 'Walk-in' },
-        { label: 'Total', value: formatPkr(row.total_amount) },
-        { label: 'Outstanding', value: formatPkr(row.outstanding) },
-        { label: 'Status', value: <StatusBadge status={row.status} /> }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('nav.sales'),
+        fields: [
+          { label: t('table.col.no'), value: row.sale_no },
+          { label: t('table.col.date'), value: row.sale_date },
+          { label: t('table.col.customer'), value: row.customer_name ?? t('dukaan.sale.walkIn') },
+          { label: t('table.col.total'), value: formatPkr(row.total_amount) },
+          { label: t('table.col.outstanding'), value: formatPkr(row.outstanding) },
+          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
+        ]
+      }
+    ];
+  }
 };
 
-const saleQuickFilters: QuickFilterChip[] = [
-  { id: 'all', label: t('table.all') },
-  {
-    id: 'active',
-    label: 'Active',
-    columnId: 'status',
-    value: ['ACTIVE']
-  },
-  {
-    id: 'cancelled',
-    label: 'Cancelled',
-    columnId: 'status',
-    value: ['CANCELLED']
-  }
-];
-
 export function SalesTable({ toolbarAction }: TableToolbarProps) {
+  const t = useT();
   const router = useRouter();
   const columnIds = [
     'sale_no',
@@ -758,6 +886,22 @@ export function SalesTable({ toolbarAction }: TableToolbarProps) {
       pagination: { pageIndex: 0, pageSize: DUKAAN_DEFAULT_PAGE_SIZE }
     }
   });
+
+  const saleQuickFilters: QuickFilterChip[] = [
+    { id: 'all', label: t('table.all') },
+    {
+      id: 'active',
+      label: t('status.active'),
+      columnId: 'status',
+      value: ['ACTIVE']
+    },
+    {
+      id: 'cancelled',
+      label: t('status.cancelled'),
+      columnId: 'status',
+      value: ['CANCELLED']
+    }
+  ];
 
   return (
     <ResponsiveDataTable
@@ -791,10 +935,13 @@ const expenseColumns: ColumnDef<ExpenseRow>[] = [
   {
     id: 'expense_date',
     accessorKey: 'expense_date',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.date')} />;
+    },
     meta: {
-      label: 'Date',
-      placeholder: 'Search expenses...',
+      label: 'table.col.date',
+      placeholderKey: 'search.expenses',
       variant: 'text',
       icon: Icons.search,
       type: 'date',
@@ -806,9 +953,12 @@ const expenseColumns: ColumnDef<ExpenseRow>[] = [
   {
     id: 'category_name',
     accessorKey: 'category_name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Category' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.category')} />;
+    },
     meta: {
-      label: 'Category',
+      label: 'table.col.category',
       type: 'text',
       primary: true,
       priority: 1,
@@ -819,9 +969,12 @@ const expenseColumns: ColumnDef<ExpenseRow>[] = [
   {
     id: 'amount',
     accessorKey: 'amount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.amount')} />;
+    },
     meta: {
-      label: 'Amount',
+      label: 'table.col.amount',
       type: 'money',
       highlight: true,
       priority: 1,
@@ -832,16 +985,22 @@ const expenseColumns: ColumnDef<ExpenseRow>[] = [
   {
     id: 'description',
     accessorKey: 'description',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Description' />,
-    meta: { label: 'Description', type: 'longtext', priority: 2, mobile: 'subtitle' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.description')} />;
+    },
+    meta: { label: 'table.col.description', type: 'longtext', priority: 2, mobile: 'subtitle' },
     cell: ({ row }) => row.original.description ?? '—'
   },
   {
     id: 'status',
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
     meta: {
-      label: 'Status',
+      label: 'table.col.status',
       variant: 'multiSelect',
       options: [...RECORD_STATUS_OPTIONS],
       type: 'status',
@@ -876,44 +1035,52 @@ const expenseMobileItem: MobileItemConfig<ExpenseRow> = {
 
 const expenseDetail: DetailConfig<ExpenseRow> = {
   mode: 'sheet',
-  title: (row) => row.category_name ?? 'Expense',
+  title: (row) => {
+    const t = useT();
+    return row.category_name ?? t('nav.expenses');
+  },
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.amount),
-  sections: (row) => [
-    {
-      title: 'Expense',
-      fields: [
-        { label: 'Date', value: row.expense_date },
-        { label: 'Category', value: row.category_name ?? '—' },
-        { label: 'Amount', value: formatPkr(row.amount) },
-        { label: 'Description', value: row.description ?? '—' },
-        { label: 'Status', value: <StatusBadge status={row.status} /> }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('nav.expenses'),
+        fields: [
+          { label: t('table.col.date'), value: row.expense_date },
+          { label: t('table.col.category'), value: row.category_name ?? '—' },
+          { label: t('table.col.amount'), value: formatPkr(row.amount) },
+          { label: t('table.col.description'), value: row.description ?? '—' },
+          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
+        ]
+      }
+    ];
+  }
 };
 
-const expenseQuickFilters: QuickFilterChip[] = [
-  { id: 'all', label: t('table.all') },
-  {
-    id: 'active',
-    label: 'Active',
-    columnId: 'status',
-    value: ['ACTIVE']
-  },
-  {
-    id: 'cancelled',
-    label: 'Cancelled',
-    columnId: 'status',
-    value: ['CANCELLED']
-  }
-];
-
 export function ExpensesTable({ toolbarAction }: TableToolbarProps) {
+  const t = useT();
   const columnIds = ['expense_date', 'category_name', 'amount', 'description', 'status'];
   const { params, filters } = useDukaanListParams(columnIds, 'expense_date', ['status']);
   const { data } = useSuspenseQuery(expensesQueryOptions(filters));
   const { table } = useDukaanTable(data.items, expenseColumns, data.total, params.perPage);
+
+  const expenseQuickFilters: QuickFilterChip[] = [
+    { id: 'all', label: t('table.all') },
+    {
+      id: 'active',
+      label: t('status.active'),
+      columnId: 'status',
+      value: ['ACTIVE']
+    },
+    {
+      id: 'cancelled',
+      label: t('status.cancelled'),
+      columnId: 'status',
+      value: ['CANCELLED']
+    }
+  ];
+
   return (
     <ResponsiveDataTable
       table={table}
@@ -931,10 +1098,13 @@ const expenseCategoryColumns: ColumnDef<ExpenseCategoryRow>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
+    },
     meta: {
-      label: 'Name',
-      placeholder: 'Search categories...',
+      label: 'table.col.name',
+      placeholderKey: 'search.categories',
       variant: 'text',
       icon: Icons.search,
       type: 'text',
@@ -947,14 +1117,20 @@ const expenseCategoryColumns: ColumnDef<ExpenseCategoryRow>[] = [
   {
     id: 'is_active',
     accessorKey: 'is_active',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-    meta: { label: 'Status', type: 'boolean', priority: 2, mobile: 'subtitle' },
-    cell: ({ row }) => (
-      <StatusBadge
-        status={row.original.is_active ? 'ACTIVE' : 'INACTIVE'}
-        label={row.original.is_active ? 'Active' : 'Inactive'}
-      />
-    )
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
+    meta: { label: 'table.col.status', type: 'boolean', priority: 2, mobile: 'subtitle' },
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <StatusBadge
+          status={row.original.is_active ? 'ACTIVE' : 'INACTIVE'}
+          label={row.original.is_active ? t('status.active') : t('status.inactive')}
+        />
+      );
+    }
   },
   {
     id: 'actions',
@@ -972,34 +1148,46 @@ const expenseCategoryColumns: ColumnDef<ExpenseCategoryRow>[] = [
 
 const expenseCategoryMobileItem: MobileItemConfig<ExpenseCategoryRow> = {
   title: (row) => row.name,
-  subtitle: (row) => (row.is_active ? 'Active' : 'Inactive'),
-  ariaLabel: (row) => `${row.name}, ${row.is_active ? 'Active' : 'Inactive'}`
+  subtitle: (row) => {
+    const t = useT();
+    return row.is_active ? t('status.active') : t('status.inactive');
+  },
+  ariaLabel: (row) => {
+    const t = useT();
+    return `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`;
+  }
 };
 
 const expenseCategoryDetail: DetailConfig<ExpenseCategoryRow> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => ({
-    label: row.is_active ? 'Active' : 'Inactive',
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
-  sections: (row) => [
-    {
-      title: 'Category',
-      fields: [
-        { label: 'Name', value: row.name },
-        {
-          label: 'Status',
-          value: (
-            <StatusBadge
-              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-              label={row.is_active ? 'Active' : 'Inactive'}
-            />
-          )
-        }
-      ]
-    }
-  ]
+  badge: (row) => {
+    const t = useT();
+    return {
+      label: row.is_active ? t('status.active') : t('status.inactive'),
+      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+    };
+  },
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('table.col.category'),
+        fields: [
+          { label: t('table.col.name'), value: row.name },
+          {
+            label: t('table.col.status'),
+            value: (
+              <StatusBadge
+                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+                label={row.is_active ? t('status.active') : t('status.inactive')}
+              />
+            )
+          }
+        ]
+      }
+    ];
+  }
 };
 
 export function ExpenseCategoriesTable({ toolbarAction }: TableToolbarProps) {
@@ -1032,11 +1220,14 @@ const cashColumns: ColumnDef<CashRow>[] = [
   {
     id: 'created_at',
     accessorKey: 'created_at',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='When' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.when')} />;
+    },
     cell: ({ row }) => formatDateTime(row.original.created_at),
     meta: {
-      label: 'When',
-      placeholder: 'Search cash ledger...',
+      label: 'table.col.when',
+      placeholderKey: 'search.cashLedger',
       variant: 'text',
       icon: Icons.search,
       type: 'date',
@@ -1048,9 +1239,12 @@ const cashColumns: ColumnDef<CashRow>[] = [
   {
     id: 'type',
     accessorKey: 'type',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.type')} />;
+    },
     meta: {
-      label: 'Type',
+      label: 'table.col.type',
       variant: 'multiSelect',
       options: [...CASH_TYPE_OPTIONS],
       type: 'text',
@@ -1059,23 +1253,29 @@ const cashColumns: ColumnDef<CashRow>[] = [
       mobile: 'title'
     },
     enableColumnFilter: true,
-    cell: ({ row }) => (
-      <span>
-        {formatLabel(row.original.type)}
-        {row.original.is_overdraft ? (
-          <Badge className='ml-2' variant='destructive'>
-            Overdraft
-          </Badge>
-        ) : null}
-      </span>
-    )
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <span>
+          {formatLabel(row.original.type)}
+          {row.original.is_overdraft ? (
+            <Badge className='ms-2' variant='destructive'>
+              {t('status.lowStock')}
+            </Badge>
+          ) : null}
+        </span>
+      );
+    }
   },
   {
     id: 'direction',
     accessorKey: 'direction',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Dir' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.dir')} />;
+    },
     meta: {
-      label: 'Dir',
+      label: 'table.col.dir',
       variant: 'multiSelect',
       options: [...CASH_DIRECTION_OPTIONS],
       type: 'status',
@@ -1088,9 +1288,12 @@ const cashColumns: ColumnDef<CashRow>[] = [
   {
     id: 'amount',
     accessorKey: 'amount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.amount')} />;
+    },
     meta: {
-      label: 'Amount',
+      label: 'table.col.amount',
       type: 'money',
       highlight: true,
       priority: 1,
@@ -1101,9 +1304,13 @@ const cashColumns: ColumnDef<CashRow>[] = [
   {
     id: 'note',
     accessorKey: 'note',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Note' />,
-    meta: { label: 'Note', type: 'longtext', priority: 3, mobile: 'subtitle' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.note')} />;
+    },
+    meta: { label: 'table.col.note', type: 'longtext', priority: 3, mobile: 'subtitle' },
     cell: ({ row }) => {
+      const t = useT();
       const note = row.original.note;
       const rev = row.original.reverses_movement_id;
       if (!note && !rev) return '—';
@@ -1139,26 +1346,31 @@ const cashMobileItem: MobileItemConfig<CashRow> = {
 const cashDetail: DetailConfig<CashRow> = {
   mode: 'sheet',
   title: (row) => formatLabel(row.type),
-  badge: (row) =>
-    row.is_overdraft
-      ? { label: 'Overdraft', status: 'OVERDUE', tone: 'danger' }
-      : { label: formatLabel(row.direction), status: row.direction },
+  badge: (row) => {
+    const t = useT();
+    return row.is_overdraft
+      ? { label: t('status.lowStock'), status: 'OVERDUE', tone: 'danger' }
+      : { label: formatLabel(row.direction), status: row.direction };
+  },
   value: (row) => formatPkr(row.amount),
-  sections: (row) => [
-    {
-      title: 'Cash movement',
-      fields: [
-        { label: 'When', value: formatDateTime(row.created_at) },
-        { label: 'Type', value: formatLabel(row.type) },
-        { label: 'Direction', value: formatLabel(row.direction) },
-        { label: 'Amount', value: formatPkr(row.amount) },
-        { label: 'Note', value: row.note ?? '—' },
-        ...(row.reverses_movement_id
-          ? [{ label: 'Reverses', value: row.reverses_movement_id }]
-          : [])
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('nav.cashLedger'),
+        fields: [
+          { label: t('table.col.when'), value: formatDateTime(row.created_at) },
+          { label: t('table.col.type'), value: formatLabel(row.type) },
+          { label: t('table.col.direction'), value: formatLabel(row.direction) },
+          { label: t('table.col.amount'), value: formatPkr(row.amount) },
+          { label: t('table.col.note'), value: row.note ?? '—' },
+          ...(row.reverses_movement_id
+            ? [{ label: t('table.reverses'), value: row.reverses_movement_id }]
+            : [])
+        ]
+      }
+    ];
+  }
 };
 
 export function CashTable() {
@@ -1189,10 +1401,13 @@ const stockColumns: ColumnDef<StockRow>[] = [
   {
     id: 'product_name',
     accessorKey: 'product_name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Product' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.product')} />;
+    },
     meta: {
-      label: 'Product',
-      placeholder: 'Search inventory...',
+      label: 'table.col.product',
+      placeholderKey: 'search.inventory',
       variant: 'text',
       icon: Icons.search,
       type: 'text',
@@ -1205,9 +1420,12 @@ const stockColumns: ColumnDef<StockRow>[] = [
   {
     id: 'tracking_type',
     accessorKey: 'tracking_type',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Tracking type' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.tracking')} />;
+    },
     meta: {
-      label: 'Tracking type',
+      label: 'table.col.tracking',
       variant: 'multiSelect',
       options: [...TRACKING_TYPE_OPTIONS],
       type: 'text',
@@ -1220,9 +1438,12 @@ const stockColumns: ColumnDef<StockRow>[] = [
   {
     id: 'quantity',
     accessorKey: 'quantity',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Qty' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.qty')} />;
+    },
     meta: {
-      label: 'Qty',
+      label: 'table.col.qty',
       type: 'number',
       highlight: true,
       priority: 1,
@@ -1232,16 +1453,22 @@ const stockColumns: ColumnDef<StockRow>[] = [
   {
     id: 'avg_unit_cost',
     accessorKey: 'avg_unit_cost',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Avg cost' />,
-    meta: { label: 'Avg cost', type: 'money', priority: 2, mobile: 'meta' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.cost')} />;
+    },
+    meta: { label: 'table.col.cost', type: 'money', priority: 2, mobile: 'meta' },
     cell: ({ row }) => formatPkr(row.original.avg_unit_cost)
   },
   {
     id: 'low_stock',
     accessorKey: 'low_stock',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Alert' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('status.lowStock')} />;
+    },
     meta: {
-      label: 'Alert',
+      label: 'status.lowStock',
       variant: 'multiSelect',
       options: [...LOW_STOCK_OPTIONS],
       type: 'status',
@@ -1249,63 +1476,70 @@ const stockColumns: ColumnDef<StockRow>[] = [
       mobile: 'badge'
     },
     enableColumnFilter: true,
-    cell: ({ row }) =>
-      row.original.low_stock ? (
-        <StatusBadge status='OVERDUE' label='Low' tone='danger' />
+    cell: ({ row }) => {
+      const t = useT();
+      return row.original.low_stock ? (
+        <StatusBadge status='OVERDUE' label={t('status.lowStock')} tone='danger' />
       ) : (
-        <StatusBadge status='ACTIVE' label='OK' tone='success' />
-      )
+        <StatusBadge status='ACTIVE' label={t('status.stockOk')} tone='success' />
+      );
+    }
   }
 ];
 
 const stockMobileItem: MobileItemConfig<StockRow> = {
   title: (row) => row.product_name,
   subtitle: (row) => formatLabel(row.tracking_type),
-  badge: (row) =>
-    row.low_stock ? { label: 'Low stock', status: 'OVERDUE', tone: 'danger' } : null,
+  badge: (row) => {
+    const t = useT();
+    return row.low_stock
+      ? { label: t('status.lowStock'), status: 'OVERDUE', tone: 'danger' }
+      : null;
+  },
   value: (row) => String(row.quantity),
   meta: [(row) => formatPkr(row.avg_unit_cost)],
-  ariaLabel: (row) => `${row.product_name}, qty ${row.quantity}, ${formatPkr(row.avg_unit_cost)}`
+  ariaLabel: (row) => {
+    const t = useT();
+    return `${row.product_name}, ${t('table.col.qty')} ${row.quantity}, ${formatPkr(row.avg_unit_cost)}`;
+  }
 };
 
 const stockDetail: DetailConfig<StockRow> = {
   mode: 'sheet',
   title: (row) => row.product_name,
-  badge: (row) =>
-    row.low_stock ? { label: 'Low stock', status: 'OVERDUE', tone: 'danger' } : null,
+  badge: (row) => {
+    const t = useT();
+    return row.low_stock
+      ? { label: t('status.lowStock'), status: 'OVERDUE', tone: 'danger' }
+      : null;
+  },
   value: (row) => String(row.quantity),
-  sections: (row) => [
-    {
-      title: 'Stock',
-      fields: [
-        { label: 'Product', value: row.product_name },
-        { label: 'Tracking', value: formatLabel(row.tracking_type) },
-        { label: 'Quantity', value: row.quantity },
-        { label: 'Avg cost', value: formatPkr(row.avg_unit_cost) },
-        {
-          label: 'Alert',
-          value: row.low_stock ? (
-            <StatusBadge status='OVERDUE' label='Low' tone='danger' />
-          ) : (
-            <StatusBadge status='ACTIVE' label='OK' tone='success' />
-          )
-        }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('nav.inventory'),
+        fields: [
+          { label: t('table.col.product'), value: row.product_name },
+          { label: t('table.col.tracking'), value: formatLabel(row.tracking_type) },
+          { label: t('table.col.qty'), value: row.quantity },
+          { label: t('table.col.cost'), value: formatPkr(row.avg_unit_cost) },
+          {
+            label: t('status.lowStock'),
+            value: row.low_stock ? (
+              <StatusBadge status='OVERDUE' label={t('status.lowStock')} tone='danger' />
+            ) : (
+              <StatusBadge status='ACTIVE' label={t('status.stockOk')} tone='success' />
+            )
+          }
+        ]
+      }
+    ];
+  }
 };
 
-const stockQuickFilters: QuickFilterChip[] = [
-  { id: 'all', label: t('table.all') },
-  {
-    id: 'low',
-    label: 'Low stock',
-    columnId: 'low_stock',
-    value: ['true']
-  }
-];
-
 export function InventoryTable() {
+  const t = useT();
   const columnIds = ['product_name', 'tracking_type', 'quantity', 'avg_unit_cost', 'low_stock'];
   const { params, filters } = useDukaanListParams(columnIds, 'product_name', [
     'tracking_type',
@@ -1313,6 +1547,17 @@ export function InventoryTable() {
   ]);
   const { data } = useSuspenseQuery(stockQueryOptions(filters));
   const { table } = useDukaanTable(data.items, stockColumns, data.total, params.perPage);
+
+  const stockQuickFilters: QuickFilterChip[] = [
+    { id: 'all', label: t('table.all') },
+    {
+      id: 'low',
+      label: t('status.lowStock'),
+      columnId: 'low_stock',
+      value: ['true']
+    }
+  ];
+
   return (
     <ResponsiveDataTable
       table={table}
@@ -1337,10 +1582,13 @@ const supplierPaymentColumns: ColumnDef<SupplierPaymentRow>[] = [
   {
     id: 'payment_date',
     accessorKey: 'payment_date',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.date')} />;
+    },
     meta: {
-      label: 'Date',
-      placeholder: 'Search payments...',
+      label: 'table.col.date',
+      placeholderKey: 'search.payments',
       variant: 'text',
       icon: Icons.search,
       type: 'date',
@@ -1352,9 +1600,12 @@ const supplierPaymentColumns: ColumnDef<SupplierPaymentRow>[] = [
   {
     id: 'supplier_name',
     accessorKey: 'supplier_name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Supplier' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.supplier')} />;
+    },
     meta: {
-      label: 'Supplier',
+      label: 'table.col.supplier',
       type: 'text',
       primary: true,
       priority: 1,
@@ -1365,9 +1616,12 @@ const supplierPaymentColumns: ColumnDef<SupplierPaymentRow>[] = [
   {
     id: 'amount',
     accessorKey: 'amount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.amount')} />;
+    },
     meta: {
-      label: 'Amount',
+      label: 'table.col.amount',
       type: 'money',
       highlight: true,
       priority: 1,
@@ -1378,16 +1632,22 @@ const supplierPaymentColumns: ColumnDef<SupplierPaymentRow>[] = [
   {
     id: 'notes',
     accessorKey: 'notes',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Notes' />,
-    meta: { label: 'Notes', type: 'longtext', priority: 3, mobile: 'subtitle' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.note')} />;
+    },
+    meta: { label: 'table.col.note', type: 'longtext', priority: 3, mobile: 'subtitle' },
     cell: ({ row }) => row.original.notes ?? '—'
   },
   {
     id: 'status',
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
     meta: {
-      label: 'Status',
+      label: 'table.col.status',
       variant: 'multiSelect',
       options: [...RECORD_STATUS_OPTIONS],
       type: 'status',
@@ -1422,21 +1682,27 @@ const supplierPaymentMobileItem: MobileItemConfig<SupplierPaymentRow> = {
 
 const supplierPaymentDetail: DetailConfig<SupplierPaymentRow> = {
   mode: 'sheet',
-  title: (row) => row.supplier_name ?? 'Payment',
+  title: (row) => {
+    const t = useT();
+    return row.supplier_name ?? t('nav.payments');
+  },
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.amount),
-  sections: (row) => [
-    {
-      title: 'Payment',
-      fields: [
-        { label: 'Date', value: row.payment_date },
-        { label: 'Supplier', value: row.supplier_name ?? '—' },
-        { label: 'Amount', value: formatPkr(row.amount) },
-        { label: 'Notes', value: row.notes ?? '—' },
-        { label: 'Status', value: <StatusBadge status={row.status} /> }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('nav.payments'),
+        fields: [
+          { label: t('table.col.date'), value: row.payment_date },
+          { label: t('table.col.supplier'), value: row.supplier_name ?? '—' },
+          { label: t('table.col.amount'), value: formatPkr(row.amount) },
+          { label: t('table.col.note'), value: row.notes ?? '—' },
+          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
+        ]
+      }
+    ];
+  }
 };
 
 export function SupplierPaymentsTable({ toolbarAction }: TableToolbarProps) {
@@ -1468,11 +1734,14 @@ const movementColumns: ColumnDef<MovementRow>[] = [
   {
     id: 'created_at',
     accessorKey: 'created_at',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='When' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.when')} />;
+    },
     cell: ({ row }) => formatDateTime(row.original.created_at),
     meta: {
-      label: 'When',
-      placeholder: 'Search movements...',
+      label: 'table.col.when',
+      placeholderKey: 'search.movements',
       variant: 'text',
       icon: Icons.search,
       type: 'date',
@@ -1484,9 +1753,12 @@ const movementColumns: ColumnDef<MovementRow>[] = [
   {
     id: 'type',
     accessorKey: 'type',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.type')} />;
+    },
     meta: {
-      label: 'Type',
+      label: 'table.col.type',
       variant: 'multiSelect',
       options: [...MOVEMENT_TYPE_OPTIONS],
       type: 'text',
@@ -1499,9 +1771,12 @@ const movementColumns: ColumnDef<MovementRow>[] = [
   {
     id: 'product_name',
     accessorKey: 'product_name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Product' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.product')} />;
+    },
     meta: {
-      label: 'Product',
+      label: 'table.col.product',
       type: 'text',
       primary: true,
       priority: 1,
@@ -1512,16 +1787,22 @@ const movementColumns: ColumnDef<MovementRow>[] = [
   {
     id: 'imei1',
     accessorKey: 'imei1',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='IMEI1' />,
-    meta: { label: 'IMEI1', type: 'id', priority: 3, mobile: 'hidden' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('dukaan.sale.imei1Header')} />;
+    },
+    meta: { label: 'dukaan.sale.imei1Header', type: 'id', priority: 3, mobile: 'hidden' },
     cell: ({ row }) => row.original.imei1 ?? '—'
   },
   {
     id: 'quantity_change',
     accessorKey: 'quantity_change',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Qty Δ' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={`${t('table.col.qty')} Δ`} />;
+    },
     meta: {
-      label: 'Qty Δ',
+      label: 'table.col.qty Δ',
       type: 'number',
       highlight: true,
       priority: 1,
@@ -1545,8 +1826,11 @@ const movementColumns: ColumnDef<MovementRow>[] = [
   {
     id: 'reason',
     accessorKey: 'reason',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Reason' />,
-    meta: { label: 'Reason', type: 'longtext', priority: 2, mobile: 'meta' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.description')} />;
+    },
+    meta: { label: 'table.col.description', type: 'longtext', priority: 2, mobile: 'meta' },
     cell: ({ row }) => row.original.reason ?? '—'
   }
 ];
@@ -1573,25 +1857,31 @@ const movementMobileItem: MobileItemConfig<MovementRow> = {
 
 const movementDetail: DetailConfig<MovementRow> = {
   mode: 'sheet',
-  title: (row) => row.product_name ?? 'Movement',
+  title: (row) => {
+    const t = useT();
+    return row.product_name ?? t('nav.movements');
+  },
   value: (row) => {
     const q = row.quantity_change;
     const prefix = q > 0 ? '+' : '';
     return `${prefix}${q}`;
   },
-  sections: (row) => [
-    {
-      title: 'Movement',
-      fields: [
-        { label: 'When', value: formatDateTime(row.created_at) },
-        { label: 'Type', value: formatLabel(row.type) },
-        { label: 'Product', value: row.product_name ?? '—' },
-        { label: 'IMEI1', value: row.imei1 ?? '—' },
-        { label: 'Qty Δ', value: row.quantity_change },
-        { label: 'Reason', value: row.reason ?? '—' }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('nav.movements'),
+        fields: [
+          { label: t('table.col.when'), value: formatDateTime(row.created_at) },
+          { label: t('table.col.type'), value: formatLabel(row.type) },
+          { label: t('table.col.product'), value: row.product_name ?? '—' },
+          { label: 'IMEI1', value: row.imei1 ?? '—' },
+          { label: `${t('table.col.qty')} Δ`, value: row.quantity_change },
+          { label: t('table.col.description'), value: row.reason ?? '—' }
+        ]
+      }
+    ];
+  }
 };
 
 export function MovementsTable() {
@@ -1624,11 +1914,14 @@ const paymentColumns: ColumnDef<PaymentRow>[] = [
   {
     id: 'created_at',
     accessorKey: 'created_at',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='When' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.when')} />;
+    },
     cell: ({ row }) => formatDateTime(row.original.created_at),
     meta: {
-      label: 'When',
-      placeholder: 'Search payments...',
+      label: 'table.col.when',
+      placeholderKey: 'search.payments',
       variant: 'text',
       icon: Icons.search,
       type: 'date',
@@ -1640,29 +1933,41 @@ const paymentColumns: ColumnDef<PaymentRow>[] = [
   {
     id: 'customer_name',
     accessorKey: 'customer_name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Customer' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.customer')} />;
+    },
     meta: {
-      label: 'Customer',
+      label: 'table.col.customer',
       type: 'text',
       primary: true,
       priority: 1,
       mobile: 'title'
     },
-    cell: ({ row }) => row.original.customer_name ?? 'Walk-in'
+    cell: ({ row }) => {
+      const t = useT();
+      return row.original.customer_name ?? t('dukaan.sale.walkIn');
+    }
   },
   {
     id: 'sale_no',
     accessorKey: 'sale_no',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Sale' />,
-    meta: { label: 'Sale', type: 'id', priority: 3, mobile: 'hidden' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('nav.sales')} />;
+    },
+    meta: { label: 'nav.sales', type: 'id', priority: 3, mobile: 'hidden' },
     cell: ({ row }) => row.original.sale_no ?? '—'
   },
   {
     id: 'amount',
     accessorKey: 'amount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.amount')} />;
+    },
     meta: {
-      label: 'Amount',
+      label: 'table.col.amount',
       type: 'money',
       highlight: true,
       priority: 1,
@@ -1675,9 +1980,12 @@ const paymentColumns: ColumnDef<PaymentRow>[] = [
   {
     id: 'method',
     accessorKey: 'method',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Method' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.method')} />;
+    },
     meta: {
-      label: 'Method',
+      label: 'table.col.method',
       variant: 'multiSelect',
       options: [...PAYMENT_METHOD_OPTIONS],
       type: 'text',
@@ -1690,8 +1998,11 @@ const paymentColumns: ColumnDef<PaymentRow>[] = [
   {
     id: 'receipt_group_id',
     accessorKey: 'receipt_group_id',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Receipt group' />,
-    meta: { label: 'Receipt group', type: 'id', priority: 4, mobile: 'hidden' },
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.receiptGroup')} />;
+    },
+    meta: { label: t('table.receiptGroup'), type: 'id', priority: 4, mobile: 'hidden' },
     cell: ({ row }) => (
       <span className='font-mono text-xs'>{row.original.receipt_group_id.slice(0, 12)}…</span>
     )
@@ -1699,9 +2010,12 @@ const paymentColumns: ColumnDef<PaymentRow>[] = [
   {
     id: 'status',
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
     meta: {
-      label: 'Status',
+      label: 'table.col.status',
       variant: 'multiSelect',
       options: [...RECORD_STATUS_OPTIONS],
       type: 'status',
@@ -1726,36 +2040,47 @@ const paymentColumns: ColumnDef<PaymentRow>[] = [
 ];
 
 const paymentMobileItem: MobileItemConfig<PaymentRow> = {
-  title: (row) => row.customer_name ?? 'Walk-in',
+  title: (row) => {
+    const t = useT();
+    return row.customer_name ?? t('dukaan.sale.walkIn');
+  },
   subtitle: (row) => formatLabel(row.method),
   value: (row) => formatPkr(row.amount),
   valueClassName: () => 'text-[var(--status-success)]',
   meta: [(row) => formatDateTime(row.created_at)],
-  ariaLabel: (row) =>
-    `${row.customer_name ?? 'Walk-in'}, ${formatLabel(row.method)}, ${formatPkr(row.amount)}`
+  ariaLabel: (row) => {
+    const t = useT();
+    return `${row.customer_name ?? t('dukaan.sale.walkIn')}, ${formatLabel(row.method)}, ${formatPkr(row.amount)}`;
+  }
 };
 
 const paymentDetail: DetailConfig<PaymentRow> = {
   mode: 'sheet',
-  title: (row) => row.customer_name ?? 'Walk-in',
+  title: (row) => {
+    const t = useT();
+    return row.customer_name ?? t('dukaan.sale.walkIn');
+  },
   value: (row) => <span className='text-[var(--status-success)]'>{formatPkr(row.amount)}</span>,
-  sections: (row) => [
-    {
-      title: 'Payment',
-      fields: [
-        { label: 'When', value: formatDateTime(row.created_at) },
-        { label: 'Customer', value: row.customer_name ?? 'Walk-in' },
-        { label: 'Sale', value: row.sale_no ?? '—' },
-        { label: 'Amount', value: formatPkr(row.amount) },
-        { label: 'Method', value: formatLabel(row.method) },
-        {
-          label: 'Receipt group',
-          value: <span className='font-mono text-xs'>{row.receipt_group_id.slice(0, 12)}…</span>
-        },
-        { label: 'Status', value: <StatusBadge status={row.status} /> }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('nav.payments'),
+        fields: [
+          { label: t('table.col.when'), value: formatDateTime(row.created_at) },
+          { label: t('table.col.customer'), value: row.customer_name ?? t('dukaan.sale.walkIn') },
+          { label: t('nav.sales'), value: row.sale_no ?? '—' },
+          { label: t('table.col.amount'), value: formatPkr(row.amount) },
+          { label: t('table.col.method'), value: formatLabel(row.method) },
+          {
+            label: `${t('table.col.receipt')} group`,
+            value: <span className='font-mono text-xs'>{row.receipt_group_id.slice(0, 12)}…</span>
+          },
+          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
+        ]
+      }
+    ];
+  }
 };
 
 export function PaymentsTable() {

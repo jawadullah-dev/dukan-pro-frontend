@@ -11,6 +11,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/use-t';
 
 interface DataTablePaginationProps<TData> extends React.ComponentProps<'div'> {
   table: Table<TData>;
@@ -23,6 +24,7 @@ export function DataTablePagination<TData>({
   className,
   ...props
 }: DataTablePaginationProps<TData>) {
+  const t = useT();
   return (
     <div
       className={cn(
@@ -34,16 +36,18 @@ export function DataTablePagination<TData>({
       <div className='text-muted-foreground text-sm whitespace-nowrap'>
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
           <>
-            {table.getFilteredSelectedRowModel().rows.length} of {table.getRowCount()} row(s)
-            selected.
+            {t('table.rowsSelected', {
+              selected: table.getFilteredSelectedRowModel().rows.length,
+              total: table.getRowCount()
+            })}
           </>
         ) : (
-          <>{table.getRowCount()} row(s) total.</>
+          <>{t('table.rowsTotal', { total: table.getRowCount() })}</>
         )}
       </div>
       <div className='flex items-center gap-2 sm:gap-6 lg:gap-8'>
-        <div className='hidden items-center space-x-2 sm:flex'>
-          <p className='text-sm font-medium whitespace-nowrap'>Rows per page</p>
+        <div className='hidden items-center gap-2 sm:flex'>
+          <p className='text-sm font-medium whitespace-nowrap'>{t('table.rowsPerPage')}</p>
           <Select
             items={pageSizeOptions.map((pageSize) => ({
               value: `${pageSize}`,
@@ -69,48 +73,51 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <div className='flex items-center justify-center text-sm font-medium whitespace-nowrap'>
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          {t('table.pageInfo', {
+            current: table.getState().pagination.pageIndex + 1,
+            total: table.getPageCount()
+          })}
         </div>
-        <div className='flex items-center space-x-1'>
+        <div className='flex items-center gap-1'>
           <Button
-            aria-label='Go to first page'
+            aria-label={t('table.firstPage')}
             variant='outline'
             size='icon'
             className='hidden size-8 lg:flex'
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
-            <Icons.chevronsLeft />
+            <Icons.chevronsLeft className='rtl:rotate-180' />
           </Button>
           <Button
-            aria-label='Go to previous page'
+            aria-label={t('table.prevPage')}
             variant='outline'
             size='icon'
             className='size-8'
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <Icons.chevronLeft />
+            <Icons.chevronLeft className='rtl:rotate-180' />
           </Button>
           <Button
-            aria-label='Go to next page'
+            aria-label={t('table.nextPage')}
             variant='outline'
             size='icon'
             className='size-8'
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <Icons.chevronRight />
+            <Icons.chevronRight className='rtl:rotate-180' />
           </Button>
           <Button
-            aria-label='Go to last page'
+            aria-label={t('table.lastPage')}
             variant='outline'
             size='icon'
             className='hidden size-8 lg:flex'
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
-            <Icons.chevronsRight />
+            <Icons.chevronsRight className='rtl:rotate-180' />
           </Button>
         </div>
       </div>

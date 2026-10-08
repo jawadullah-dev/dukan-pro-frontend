@@ -9,13 +9,14 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useT } from '@/i18n/use-t';
 
 /** Single date — Popover + Calendar per the shadcn date-picker pattern. */
 export function DatePickerField({
   label,
   description,
   required,
-  placeholder = 'Pick a date',
+  placeholder,
   disabledDates
 }: BaseFieldProps & {
   placeholder?: string;
@@ -23,6 +24,8 @@ export function DatePickerField({
 }) {
   const field = useFieldContext<Date | undefined>();
   const isInvalid = useFieldInvalid();
+  const t = useT();
+  const defaultPlaceholder = placeholder ?? t('common.pickDate');
 
   return (
     <Field data-invalid={isInvalid}>
@@ -39,14 +42,14 @@ export function DatePickerField({
               aria-invalid={isInvalid}
               aria-describedby={isInvalid ? `${field.name}-error` : undefined}
               className={cn(
-                'w-full justify-start text-left font-normal',
+                'w-full justify-start text-start font-normal',
                 !field.state.value && 'text-muted-foreground'
               )}
             />
           }
         >
-          <Icons.calendar className='mr-2 h-4 w-4' />
-          {field.state.value ? format(field.state.value, 'PPP') : <span>{placeholder}</span>}
+          <Icons.calendar className='ms-2 h-4 w-4' />
+          {field.state.value ? format(field.state.value, 'PPP') : <span>{defaultPlaceholder}</span>}
         </PopoverTrigger>
         <PopoverContent className='w-auto p-0' align='start'>
           <Calendar
@@ -69,11 +72,13 @@ export function DateRangeField({
   label,
   description,
   required,
-  placeholder = 'Pick a date range'
+  placeholder
 }: BaseFieldProps & { placeholder?: string }) {
   const field = useFieldContext<DateRange | undefined>();
   const isInvalid = useFieldInvalid();
   const range = field.state.value;
+  const t = useT();
+  const defaultPlaceholder = placeholder ?? t('common.pickDateRange');
 
   return (
     <Field data-invalid={isInvalid}>
@@ -90,13 +95,13 @@ export function DateRangeField({
               aria-invalid={isInvalid}
               aria-describedby={isInvalid ? `${field.name}-error` : undefined}
               className={cn(
-                'w-full justify-start text-left font-normal',
+                'w-full justify-start text-start font-normal',
                 !range?.from && 'text-muted-foreground'
               )}
             />
           }
         >
-          <Icons.calendar className='mr-2 h-4 w-4' />
+          <Icons.calendar className='ms-2 h-4 w-4' />
           {range?.from ? (
             range.to ? (
               <>
@@ -106,7 +111,7 @@ export function DateRangeField({
               format(range.from, 'LLL dd, y')
             )
           ) : (
-            <span>{placeholder}</span>
+            <span>{defaultPlaceholder}</span>
           )}
         </PopoverTrigger>
         <PopoverContent className='w-auto p-0' align='start'>

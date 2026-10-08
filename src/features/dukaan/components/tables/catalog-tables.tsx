@@ -13,6 +13,7 @@ import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-h
 import { useDataTable } from '@/hooks/use-data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Icons } from '@/components/icons';
+import { useT } from '@/i18n/use-t';
 import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type { Brand, Category, Product } from '@/lib/dukaan/types';
 import {
@@ -52,10 +53,13 @@ const categoryColumns: ColumnDef<Category>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
+    },
     meta: {
-      label: 'Name',
-      placeholder: 'Search categories...',
+      label: 'table.col.name',
+      placeholderKey: 'search.categories' as const,
       variant: 'text',
       icon: Icons.search,
       type: 'text',
@@ -67,13 +71,19 @@ const categoryColumns: ColumnDef<Category>[] = [
   {
     id: 'is_active',
     accessorKey: 'is_active',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-    meta: { label: 'Status', type: 'boolean', priority: 2 },
-    cell: ({ row }) => (
-      <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-        {row.original.is_active ? 'Active' : 'Inactive'}
-      </Badge>
-    )
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
+    meta: { label: 'table.col.status', type: 'boolean', priority: 2 },
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
+          {row.original.is_active ? t('status.active') : t('status.inactive')}
+        </Badge>
+      );
+    }
   },
   {
     id: 'actions',
@@ -93,34 +103,46 @@ const categoryMobileItem: MobileItemConfig<Category> = {
   leading: 'icon',
   leadingIcon: Icons.folder,
   title: (row) => row.name,
-  subtitle: (row) => (row.is_active ? 'Active' : 'Inactive'),
-  ariaLabel: (row) => `${row.name}, ${row.is_active ? 'Active' : 'Inactive'}`
+  subtitle: (row) => {
+    const t = useT();
+    return row.is_active ? t('status.active') : t('status.inactive');
+  },
+  ariaLabel: (row) => {
+    const t = useT();
+    return `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`;
+  }
 };
 
 const categoryDetail: DetailConfig<Category> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => ({
-    label: row.is_active ? 'Active' : 'Inactive',
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
-  sections: (row) => [
-    {
-      title: 'Category',
-      fields: [
-        { label: 'Name', value: row.name },
-        {
-          label: 'Status',
-          value: (
-            <StatusBadge
-              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-              label={row.is_active ? 'Active' : 'Inactive'}
-            />
-          )
-        }
-      ]
-    }
-  ]
+  badge: (row) => {
+    const t = useT();
+    return {
+      label: row.is_active ? t('status.active') : t('status.inactive'),
+      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+    };
+  },
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('table.col.category'),
+        fields: [
+          { label: t('table.col.name'), value: row.name },
+          {
+            label: t('table.col.status'),
+            value: (
+              <StatusBadge
+                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+                label={row.is_active ? t('status.active') : t('status.inactive')}
+              />
+            )
+          }
+        ]
+      }
+    ];
+  }
 };
 
 export function CategoriesTable({ toolbarAction }: TableToolbarProps) {
@@ -143,10 +165,13 @@ const brandColumns: ColumnDef<Brand>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
+    },
     meta: {
-      label: 'Name',
-      placeholder: 'Search brands...',
+      label: 'table.col.name',
+      placeholderKey: 'search.brands' as const,
       variant: 'text',
       icon: Icons.search,
       type: 'text',
@@ -158,13 +183,19 @@ const brandColumns: ColumnDef<Brand>[] = [
   {
     id: 'is_active',
     accessorKey: 'is_active',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-    meta: { label: 'Status', type: 'boolean', priority: 2 },
-    cell: ({ row }) => (
-      <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-        {row.original.is_active ? 'Active' : 'Inactive'}
-      </Badge>
-    )
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
+    meta: { label: 'table.col.status', type: 'boolean', priority: 2 },
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
+          {row.original.is_active ? t('status.active') : t('status.inactive')}
+        </Badge>
+      );
+    }
   },
   {
     id: 'actions',
@@ -184,34 +215,46 @@ const brandMobileItem: MobileItemConfig<Brand> = {
   leading: 'icon',
   leadingIcon: Icons.tag,
   title: (row) => row.name,
-  subtitle: (row) => (row.is_active ? 'Active' : 'Inactive'),
-  ariaLabel: (row) => `${row.name}, ${row.is_active ? 'Active' : 'Inactive'}`
+  subtitle: (row) => {
+    const t = useT();
+    return row.is_active ? t('status.active') : t('status.inactive');
+  },
+  ariaLabel: (row) => {
+    const t = useT();
+    return `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`;
+  }
 };
 
 const brandDetail: DetailConfig<Brand> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => ({
-    label: row.is_active ? 'Active' : 'Inactive',
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
-  sections: (row) => [
-    {
-      title: 'Brand',
-      fields: [
-        { label: 'Name', value: row.name },
-        {
-          label: 'Status',
-          value: (
-            <StatusBadge
-              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-              label={row.is_active ? 'Active' : 'Inactive'}
-            />
-          )
-        }
-      ]
-    }
-  ]
+  badge: (row) => {
+    const t = useT();
+    return {
+      label: row.is_active ? t('status.active') : t('status.inactive'),
+      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+    };
+  },
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('table.col.brand'),
+        fields: [
+          { label: t('table.col.name'), value: row.name },
+          {
+            label: t('table.col.status'),
+            value: (
+              <StatusBadge
+                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+                label={row.is_active ? t('status.active') : t('status.inactive')}
+              />
+            )
+          }
+        ]
+      }
+    ];
+  }
 };
 
 export function BrandsTable({ toolbarAction }: TableToolbarProps) {
@@ -234,10 +277,13 @@ const productColumns: ColumnDef<Product>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
+    },
     meta: {
-      label: 'Name',
-      placeholder: 'Search products...',
+      label: 'table.col.name',
+      placeholderKey: 'search.products' as const,
       variant: 'text',
       icon: Icons.search,
       type: 'text',
@@ -249,9 +295,12 @@ const productColumns: ColumnDef<Product>[] = [
   {
     id: 'tracking_type',
     accessorKey: 'tracking_type',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Tracking type' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('dukaan.product.trackingType')} />;
+    },
     meta: {
-      label: 'Tracking type',
+      label: 'dukaan.product.trackingType',
       variant: 'multiSelect',
       options: [...TRACKING_TYPE_OPTIONS],
       type: 'text',
@@ -263,9 +312,12 @@ const productColumns: ColumnDef<Product>[] = [
   {
     id: 'default_selling_price',
     accessorKey: 'default_selling_price',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Sell price' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.sellPrice')} />;
+    },
     meta: {
-      label: 'Sell price',
+      label: 'table.col.sellPrice',
       type: 'money',
       highlight: true,
       priority: 1
@@ -275,21 +327,27 @@ const productColumns: ColumnDef<Product>[] = [
   {
     id: 'is_active',
     accessorKey: 'is_active',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
     meta: {
-      label: 'Status',
+      label: 'table.col.status',
       variant: 'multiSelect',
       options: [...ACTIVE_STATUS_OPTIONS],
       type: 'status',
       priority: 1
     },
     enableColumnFilter: true,
-    cell: ({ row }) => (
-      <StatusBadge
-        status={row.original.is_active ? 'ACTIVE' : 'INACTIVE'}
-        label={row.original.is_active ? 'Active' : 'Inactive'}
-      />
-    )
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <StatusBadge
+          status={row.original.is_active ? 'ACTIVE' : 'INACTIVE'}
+          label={row.original.is_active ? t('status.active') : t('status.inactive')}
+        />
+      );
+    }
   },
   {
     id: 'actions',
@@ -310,10 +368,13 @@ const productMobileItem: MobileItemConfig<Product> = {
   leadingIcon: Icons.box,
   title: (row) => row.name,
   subtitle: (row) => formatLabel(row.tracking_type),
-  badge: (row) => ({
-    label: row.is_active ? 'Active' : 'Inactive',
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
+  badge: (row) => {
+    const t = useT();
+    return {
+      label: row.is_active ? t('status.active') : t('status.inactive'),
+      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+    };
+  },
   value: (row) => formatPkr(row.default_selling_price),
   ariaLabel: (row) =>
     `${row.name}, ${formatLabel(row.tracking_type)}, ${formatPkr(row.default_selling_price)}`
@@ -322,30 +383,36 @@ const productMobileItem: MobileItemConfig<Product> = {
 const productDetail: DetailConfig<Product> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => ({
-    label: row.is_active ? 'Active' : 'Inactive',
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
+  badge: (row) => {
+    const t = useT();
+    return {
+      label: row.is_active ? t('status.active') : t('status.inactive'),
+      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+    };
+  },
   value: (row) => formatPkr(row.default_selling_price),
-  sections: (row) => [
-    {
-      title: 'Product',
-      fields: [
-        { label: 'Name', value: row.name },
-        { label: 'Tracking type', value: formatLabel(row.tracking_type) },
-        { label: 'Sell price', value: formatPkr(row.default_selling_price) },
-        {
-          label: 'Status',
-          value: (
-            <StatusBadge
-              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-              label={row.is_active ? 'Active' : 'Inactive'}
-            />
-          )
-        }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('table.col.product'),
+        fields: [
+          { label: t('table.col.name'), value: row.name },
+          { label: t('dukaan.product.trackingType'), value: formatLabel(row.tracking_type) },
+          { label: t('table.col.sellPrice'), value: formatPkr(row.default_selling_price) },
+          {
+            label: t('table.col.status'),
+            value: (
+              <StatusBadge
+                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+                label={row.is_active ? t('status.active') : t('status.inactive')}
+              />
+            )
+          }
+        ]
+      }
+    ];
+  }
 };
 
 export function ProductsTable({ toolbarAction }: TableToolbarProps) {

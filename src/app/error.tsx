@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
 function isChunkLoadError(error: Error): boolean {
@@ -19,10 +20,11 @@ export default function AppError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations();
+
   useEffect(() => {
     Sentry.captureException(error);
     if (isChunkLoadError(error)) {
-      // Stale PWA cache after deploy — hard reload once.
       const key = 'pwa-chunk-reload';
       try {
         if (!sessionStorage.getItem(key)) {
@@ -37,10 +39,8 @@ export default function AppError({
 
   return (
     <main className='bg-background text-foreground flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center'>
-      <h1 className='text-xl font-semibold'>Something went wrong</h1>
-      <p className='text-muted-foreground max-w-sm text-sm'>
-        The page failed to load. Check your connection, then try again.
-      </p>
+      <h1 className='text-xl font-semibold'>{t('errors.genericTitle')}</h1>
+      <p className='text-muted-foreground max-w-sm text-sm'>{t('errors.genericDescription')}</p>
       <Button
         type='button'
         onClick={() => {
@@ -53,7 +53,7 @@ export default function AppError({
           window.location.reload();
         }}
       >
-        Reload
+        {t('errors.reload')}
       </Button>
     </main>
   );

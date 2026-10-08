@@ -3,12 +3,14 @@
 import { Badge } from '@/components/ui/badge';
 import { KanbanItem } from '@/components/ui/kanban';
 import type { Task } from '../utils/store';
+import { useT, translateMaybe } from '@/i18n/use-t';
 
 interface TaskCardProps extends Omit<React.ComponentProps<typeof KanbanItem>, 'value'> {
   task: Task;
 }
 
 export function TaskCard({ task, ...props }: TaskCardProps) {
+  const t = useT();
   return (
     <KanbanItem
       key={task.id}
@@ -29,7 +31,7 @@ export function TaskCard({ task, ...props }: TaskCardProps) {
             }
             className='pointer-events-none h-5 rounded-sm px-1.5 text-[11px] capitalize'
           >
-            {task.priority}
+            {task.priority ? translateMaybe('kanban.priority.' + task.priority, t) : ''}
           </Badge>
         </div>
         <div className='text-muted-foreground flex items-center justify-between text-xs'>

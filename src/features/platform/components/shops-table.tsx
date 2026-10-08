@@ -14,6 +14,7 @@ import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-h
 import { useDataTable } from '@/hooks/use-data-table';
 import { Icons } from '@/components/icons';
 import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
 import { RowActionsMenu } from '@/features/dukaan/components/row-actions-menu';
 import type { PlatformShop } from '../api/types';
 import { platformShopsQueryOptions } from '../api/queries';
@@ -24,7 +25,10 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Shop Name' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.shopName')} />;
+    },
     cell: ({ row }) => (
       <div className='min-w-40'>
         <p className='font-medium'>{row.original.name}</p>
@@ -32,8 +36,8 @@ const columns: ColumnDef<PlatformShop>[] = [
       </div>
     ),
     meta: {
-      label: 'Shop',
-      placeholder: 'Search shops by name, owner, phone…',
+      label: 'platform.shop',
+      placeholderKey: 'nav.searchShops',
       variant: 'text',
       icon: Icons.search,
       type: 'text',
@@ -45,22 +49,28 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'owner_name',
     accessorKey: 'owner_name',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Owner Name' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.ownerName')} />;
+    },
     cell: ({ row }) => (
       <div>
         <p className='font-medium'>{row.original.owner_name}</p>
         <p className='text-muted-foreground text-xs'>{row.original.owner_phone}</p>
       </div>
     ),
-    meta: { label: 'Owner', type: 'text', priority: 2 }
+    meta: { label: 'platform.owner', type: 'text', priority: 2 }
   },
   {
     id: 'city',
     accessorKey: 'city',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='City' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.city')} />;
+    },
     cell: ({ row }) => <span className='font-medium'>{row.original.city}</span>,
     meta: {
-      label: 'All Cities',
+      label: 'platform.allCities',
       variant: 'multiSelect',
       options: [...PLATFORM_CITY_OPTIONS],
       type: 'text',
@@ -71,10 +81,13 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'status',
     accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
+    },
     cell: ({ row }) => <ShopStatusBadge status={row.original.status} />,
     meta: {
-      label: 'All Statuses',
+      label: 'platform.allStatuses',
       variant: 'multiSelect',
       options: [...PLATFORM_STATUS_OPTIONS],
       type: 'status',
@@ -85,17 +98,23 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'trial_ends_at',
     accessorKey: 'trial_ends_at',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Trial Ends' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.trialEnds')} />;
+    },
     cell: ({ row }) => row.original.trial_ends_at ?? '—',
-    meta: { label: 'Trial Ends', type: 'date', priority: 3 }
+    meta: { label: 'platform.trialEnds', type: 'date', priority: 3 }
   },
   {
     id: 'next_due_at',
     accessorKey: 'next_due_at',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Next Due Date' />,
+    header: ({ column }) => {
+      const t = useT();
+      return <DataTableColumnHeader column={column} title={t('table.nextDueDate')} />;
+    },
     cell: ({ row }) => row.original.next_due_at ?? '—',
     meta: {
-      label: 'Next Due Date',
+      label: 'platform.nextDueDate',
       type: 'date',
       highlight: true,
       priority: 1
@@ -104,14 +123,20 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'actions',
     meta: { mobile: 'hidden' },
-    cell: ({ row }) => (
-      <RowActionsMenu
-        actions={[
-          { label: 'View shop', href: `/dashboard/platform/shops?shop=${row.original.id}` },
-          { label: 'Subscription', href: '/dashboard/platform/subscriptions' }
-        ]}
-      />
-    ),
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <RowActionsMenu
+          actions={[
+            {
+              label: t('table.viewShop'),
+              href: `/dashboard/platform/shops?shop=${row.original.id}`
+            },
+            { label: t('nav.subscriptions'), href: '/dashboard/platform/subscriptions' }
+          ]}
+        />
+      );
+    },
     enableSorting: false
   }
 ];
@@ -132,52 +157,45 @@ const shopDetail: DetailConfig<PlatformShop> = {
   title: (row) => row.name,
   badge: (row) => ({ label: row.status, status: row.status }),
   value: (row) => row.next_due_at ?? '—',
-  sections: (row) => [
-    {
-      title: 'Shop',
-      fields: [
-        { label: 'Name', value: row.name },
-        { label: 'Address', value: row.address },
-        { label: 'City', value: row.city },
-        { label: 'Status', value: <ShopStatusBadge status={row.status} /> }
-      ]
-    },
-    {
-      title: 'Owner',
-      fields: [
-        { label: 'Name', value: row.owner_name },
-        {
-          label: 'Phone',
-          value: (
-            <a
-              className='text-primary underline-offset-2 hover:underline'
-              href={`tel:${row.owner_phone}`}
-            >
-              {row.owner_phone}
-            </a>
-          )
-        }
-      ]
-    },
-    {
-      title: 'Billing',
-      fields: [
-        { label: 'Trial ends', value: row.trial_ends_at ?? '—' },
-        { label: t('table.due'), value: row.next_due_at ?? '—' }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('platform.shop'),
+        fields: [
+          { label: t('table.col.name'), value: row.name },
+          { label: t('table.address'), value: row.address },
+          { label: t('table.city'), value: row.city },
+          { label: t('table.col.status'), value: <ShopStatusBadge status={row.status} /> }
+        ]
+      },
+      {
+        title: t('platform.owner'),
+        fields: [
+          { label: t('table.col.name'), value: row.owner_name },
+          {
+            label: t('table.col.phone'),
+            value: (
+              <a
+                className='text-primary underline-offset-2 hover:underline'
+                href={`tel:${row.owner_phone}`}
+              >
+                {row.owner_phone}
+              </a>
+            )
+          }
+        ]
+      },
+      {
+        title: t('table.billing'),
+        fields: [
+          { label: t('table.trialEndsLabel'), value: row.trial_ends_at ?? '—' },
+          { label: t('table.due'), value: row.next_due_at ?? '—' }
+        ]
+      }
+    ];
+  }
 };
-
-const shopQuickFilters: QuickFilterChip[] = [
-  { id: 'all', label: t('table.all') },
-  ...PLATFORM_STATUS_OPTIONS.map((opt) => ({
-    id: opt.value,
-    label: opt.label,
-    columnId: 'status',
-    value: [opt.value]
-  }))
-];
 
 export function PlatformShopsTable() {
   const router = useRouter();
@@ -214,6 +232,16 @@ export function PlatformShopsTable() {
       columnPinning: { right: ['actions'] }
     }
   });
+
+  const shopQuickFilters: QuickFilterChip[] = [
+    { id: 'all', label: t('table.all') },
+    ...PLATFORM_STATUS_OPTIONS.map((opt) => ({
+      id: opt.value,
+      label: opt.label,
+      columnId: 'status',
+      value: [opt.value]
+    }))
+  ];
 
   return (
     <ResponsiveDataTable

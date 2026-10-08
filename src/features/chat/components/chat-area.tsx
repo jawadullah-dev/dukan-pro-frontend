@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useRef } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { useT } from '@/i18n/use-t';
 import type { Attachment, Conversation } from '../utils/types';
 import { ChatHeader } from './chat-header';
 import { MessageBubble } from './message-bubble';
@@ -26,6 +27,7 @@ export function ChatArea({
   onAddAttachments,
   onRemoveAttachment
 }: ChatAreaProps) {
+  const t = useT();
   const shouldReduceMotion = useReducedMotion();
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const liveRegionRef = useRef<HTMLDivElement | null>(null);
@@ -69,9 +71,9 @@ export function ChatArea({
 
           <div
             ref={messagesContainerRef}
-            className='[&::-webkit-scrollbar-thumb]:bg-muted relative min-h-0 flex-1 space-y-3 overflow-y-auto pr-2 sm:space-y-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full'
+            className='[&::-webkit-scrollbar-thumb]:bg-muted relative min-h-0 flex-1 space-y-3 overflow-y-auto pe-2 sm:space-y-4 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full'
             aria-live='off'
-            aria-label={'Message thread with ' + conversation.name}
+            aria-label={t('chat.messageThreadWith', { name: conversation.name })}
           >
             <AnimatePresence initial={false}>
               {conversation.messages.map((message) => (

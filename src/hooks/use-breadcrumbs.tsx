@@ -1,46 +1,56 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { useMemo } from 'react';
+import { useT } from '@/i18n/use-t';
+import { pageTitleKeyFromPath } from '@/lib/i18n/path-titles';
 
 type BreadcrumbItem = {
   title: string;
   link: string;
 };
 
-// This allows to add custom title as well
-const routeMapping: Record<string, BreadcrumbItem[]> = {
-  '/dashboard': [{ title: 'Dashboard', link: '/dashboard' }],
-  '/dashboard/employee': [
-    { title: 'Dashboard', link: '/dashboard' },
-    { title: 'Employee', link: '/dashboard/employee' }
-  ],
-  '/dashboard/product': [
-    { title: 'Dashboard', link: '/dashboard' },
-    { title: 'Product', link: '/dashboard/product' }
-  ]
-  // Add more custom mappings as needed
-};
-
 export function useBreadcrumbs() {
   const pathname = usePathname();
+  const t = useT();
 
   const breadcrumbs = useMemo(() => {
-    // Check if we have a custom mapping for this exact path
-    if (routeMapping[pathname]) {
-      return routeMapping[pathname];
-    }
-
-    // If no exact match, fall back to generating breadcrumbs from the path
     const segments = pathname.split('/').filter(Boolean);
+
+    const customKey = pageTitleKeyFromPath(pathname);
+    const lastTitle = customKey
+      ? (() => {
+          try {
+            return t(customKey);
+          } catch {
+            return null;
+          }
+        })()
+      : null;
+
     return segments.map((segment, index) => {
       const path = `/${segments.slice(0, index + 1).join('/')}`;
+      const isLast = index === segments.length - 1;
+
+      if (isLast && lastTitle) {
+        return { title: lastTitle, link: path };
+      }
+
+      const segKey = pageTitleKeyFromPath(`/${segments.slice(0, index + 1).join('/')}`);
+      if (segKey) {
+        try {
+          return { title: t(segKey), link: path };
+        } catch {
+          // fall through to default
+        }
+      }
+
       return {
         title: segment.charAt(0).toUpperCase() + segment.slice(1),
         link: path
       };
     });
-  }, [pathname]);
+  }, [pathname, t]);
 
   return breadcrumbs;
 }

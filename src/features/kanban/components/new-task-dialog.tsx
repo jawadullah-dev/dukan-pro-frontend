@@ -14,11 +14,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useTaskStore } from '../utils/store';
+import { useT } from '@/i18n/use-t';
 
 export default function NewTaskDialog() {
   const addTask = useTaskStore((state) => state.addTask);
   const [open, setOpen] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
+  const t = useT();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,7 +32,7 @@ export default function NewTaskDialog() {
 
     if (typeof title !== 'string' || typeof description !== 'string') return;
     if (!title.trim()) {
-      setTitleError('Please enter a task title.');
+      setTitleError(t('kanban.taskTitleRequired'));
       return;
     }
     setTitleError(null);
@@ -48,20 +50,20 @@ export default function NewTaskDialog() {
       }}
     >
       <DialogTrigger render={<Button variant='secondary' size='sm' />}>
-        + Add New Task
+        {t('kanban.addNewTask')}
       </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>Add New Task</DialogTitle>
-          <DialogDescription>What do you want to get done today?</DialogDescription>
+          <DialogTitle>{t('kanban.addNewTaskTitle')}</DialogTitle>
+          <DialogDescription>{t('kanban.dialogDescription')}</DialogDescription>
         </DialogHeader>
         <form id='task-form' className='grid gap-4 py-4' onSubmit={handleSubmit}>
           <div className='grid grid-cols-4 items-center gap-4'>
             <Input
               id='title'
               name='title'
-              placeholder='Task title...'
-              aria-label='Task title'
+              placeholder={t('kanban.taskTitlePlaceholder')}
+              aria-label={t('kanban.taskTitle')}
               required
               aria-invalid={!!titleError}
               aria-describedby={titleError ? 'task-title-error' : undefined}
@@ -77,15 +79,15 @@ export default function NewTaskDialog() {
             <Textarea
               id='description'
               name='description'
-              placeholder='Description...'
-              aria-label='Task description'
+              placeholder={t('kanban.taskDescriptionPlaceholder')}
+              aria-label={t('kanban.taskDescription')}
               className='col-span-4'
             />
           </div>
         </form>
         <DialogFooter>
           <Button type='submit' size='sm' form='task-form'>
-            Add Task
+            {t('kanban.addTask')}
           </Button>
         </DialogFooter>
       </DialogContent>

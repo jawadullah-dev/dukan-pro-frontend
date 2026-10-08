@@ -5,6 +5,7 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { FilePreview } from '@/components/ui/file-preview';
+import { useT } from '@/i18n/use-t';
 import type { Attachment } from '../utils/types';
 
 interface MessageComposerProps {
@@ -28,12 +29,17 @@ export function MessageComposer({
   onAddAttachments,
   onRemoveAttachment
 }: MessageComposerProps) {
+  const t = useT();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <form onSubmit={onSubmit} className='space-y-2 sm:space-y-3' aria-label='Reply composer'>
+    <form
+      onSubmit={onSubmit}
+      className='space-y-2 sm:space-y-3'
+      aria-label={t('chat.replyComposer')}
+    >
       <label htmlFor='messenger-editor' className='sr-only'>
-        Write a message
+        {t('chat.writeMessage')}
       </label>
       <div className='border-border/40 bg-background/80 flex items-end gap-2 rounded-2xl border p-3 backdrop-blur sm:gap-3 sm:rounded-3xl sm:p-4'>
         <div className='min-w-0 flex-1'>
@@ -61,11 +67,11 @@ export function MessageComposer({
                 }
               }
             }}
-            placeholder={'Message ' + contactName + ' (Enter to send, Shift+Enter for newline)'}
+            placeholder={t('chat.messagePlaceholder', { name: contactName })}
             rows={2}
             required={attachments.length === 0}
             className='text-foreground placeholder:text-muted-foreground/70 min-h-[3rem] w-full resize-none border-none bg-transparent text-xs focus-visible:ring-0 focus-visible:outline-none sm:min-h-[4rem] sm:text-sm'
-            aria-label={'Message ' + contactName}
+            aria-label={t('chat.messageAria', { name: contactName })}
           />
           <div className='mt-2 flex flex-wrap gap-1.5 sm:mt-3 sm:gap-2'>
             {quickReplies.map((reply) => (
@@ -83,7 +89,7 @@ export function MessageComposer({
         <div className='flex shrink-0 flex-col items-end gap-1.5 sm:w-24 sm:gap-2'>
           <input
             ref={fileInputRef}
-            aria-label='Add attachments'
+            aria-label={t('chat.addAttachments')}
             type='file'
             multiple
             className='hidden'
@@ -100,7 +106,7 @@ export function MessageComposer({
             variant='ghost'
             size='icon'
             className='border-border/40 bg-background/70 text-muted-foreground hover:bg-muted/50 focus-visible:ring-primary/40 focus-visible:ring-offset-background size-8 rounded-full border transition focus-visible:ring-2 focus-visible:ring-offset-2 sm:size-10'
-            aria-label='Attach a file'
+            aria-label={t('chat.attachFile')}
             onClick={() => fileInputRef.current?.click()}
           >
             <Icons.paperclip className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
@@ -110,7 +116,7 @@ export function MessageComposer({
             size='icon'
             className='bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-primary/40 focus-visible:ring-offset-background size-8 rounded-full shadow-lg transition focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:size-10'
             disabled={!draft.trim() && attachments.length === 0}
-            aria-label='Send message'
+            aria-label={t('chat.sendMessage')}
           >
             <Icons.send className='h-3.5 w-3.5 sm:h-4 sm:w-4' aria-hidden='true' />
           </Button>

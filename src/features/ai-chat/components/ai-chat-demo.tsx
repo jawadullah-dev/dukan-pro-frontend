@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
+import { translateMaybe, useT } from '@/i18n/use-t';
 import {
   MessageScroller,
   MessageScrollerButton,
@@ -29,6 +30,7 @@ type ToolPart = {
 };
 
 function ToolMarker({ part }: { part: ToolPart }) {
+  const t = useT();
   const name = part.toolName ?? part.type.replace(/^tool-/, '');
   const running = part.state === 'input-streaming' || part.state === 'input-available';
   const done = part.state === 'output-available';
@@ -41,10 +43,10 @@ function ToolMarker({ part }: { part: ToolPart }) {
           <Icons.code />
         </MarkerIcon>
         {running ? (
-          <MarkerContent className='shimmer'>Running {name}…</MarkerContent>
+          <MarkerContent className='shimmer'>{t('aiChat.running', { name })}</MarkerContent>
         ) : (
           <MarkerContent>
-            {errored ? 'Failed' : 'Called'}{' '}
+            {errored ? t('aiChat.failed') : t('aiChat.called')}{' '}
             <span className='text-foreground font-medium'>{name}</span>
           </MarkerContent>
         )}
@@ -64,6 +66,7 @@ function ToolMarker({ part }: { part: ToolPart }) {
 }
 
 export function AiChatDemo() {
+  const t = useT();
   const { messages, sendMessage, status, setMessages } = useChat<DemoUIMessage>({
     messages: initialMessages,
     transport: chatTransport
@@ -80,11 +83,11 @@ export function AiChatDemo() {
             <Icons.sparkles className='size-4' />
           </div>
           <div className='min-w-0'>
-            <p className='text-sm font-medium'>Release Assistant</p>
-            <p className='text-muted-foreground text-xs'>Scripted demo · streamed via useChat</p>
+            <p className='text-sm font-medium'>{t('aiChat.title')}</p>
+            <p className='text-muted-foreground text-xs'>{t('aiChat.subtitle')}</p>
           </div>
-          <Badge variant='outline' className='ml-auto capitalize'>
-            {status}
+          <Badge variant='outline' className='ms-auto capitalize'>
+            {translateMaybe(`aiChat.${status}`, t)}
           </Badge>
         </div>
 
@@ -95,10 +98,7 @@ export function AiChatDemo() {
                 {messages.length === 0 ? (
                   <div className='text-muted-foreground flex flex-1 flex-col items-center justify-center gap-2 text-center text-sm'>
                     <Icons.sparkles className='size-8' />
-                    <p>
-                      Press <span className='text-foreground font-medium'>Send</span> to stream the
-                      conversation.
-                    </p>
+                    <p>{t('aiChat.emptyPrompt')}</p>
                   </div>
                 ) : (
                   messages.map((message) => {
@@ -170,7 +170,7 @@ export function AiChatDemo() {
                       </MessageAvatar>
                       <MessageContent>
                         <Marker>
-                          <MarkerContent className='shimmer'>Thinking…</MarkerContent>
+                          <MarkerContent className='shimmer'>{t('aiChat.thinking')}</MarkerContent>
                         </Marker>
                       </MessageContent>
                     </Message>
@@ -189,12 +189,12 @@ export function AiChatDemo() {
             onClick={() => setMessages(demoChat.get(0))}
             disabled={isBusy || messages.length === 0}
           >
-            Restart
+            {t('aiChat.restart')}
           </Button>
           <LoadingButton
-            className='ml-auto'
+            className='ms-auto'
             loading={isBusy}
-            loadingLabel='Streaming response'
+            loadingLabel={t('aiChat.streaming')}
             disabled={!nextMessage}
             onClick={() => {
               if (nextMessage) void sendMessage(nextMessage);
@@ -202,10 +202,10 @@ export function AiChatDemo() {
           >
             {nextMessage ? (
               <>
-                <Icons.send className='size-4' /> Send next message
+                <Icons.send className='size-4' /> {t('aiChat.sendNext')}
               </>
             ) : (
-              'End of demo'
+              t('aiChat.endOfDemo')
             )}
           </LoadingButton>
         </div>

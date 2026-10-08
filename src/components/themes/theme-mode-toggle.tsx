@@ -8,9 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Kbd } from '@/components/ui/kbd';
 import { startThemeTransition } from '@/lib/theme-transition';
+import { useT } from '@/i18n/use-t';
 
 export function ThemeModeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
+  const t = useT();
 
   const handleThemeToggle = React.useCallback(
     (e?: React.MouseEvent) => {
@@ -55,10 +57,10 @@ export function ThemeModeToggle() {
         }
       >
         <Icons.brightness />
-        <span className='sr-only'>Toggle theme</span>
+        <span className='sr-only'>{t('appearance.theme')}</span>
       </TooltipTrigger>
       <TooltipContent>
-        Toggle theme <Kbd>⌘⇧D</Kbd> <Kbd>D D</Kbd>
+        {t('appearance.theme')} <Kbd>⌘⇧D</Kbd> <Kbd>D D</Kbd>
       </TooltipContent>
     </Tooltip>
   );

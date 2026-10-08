@@ -2,6 +2,7 @@
 
 import { useAppForm } from '@/lib/form';
 import * as z from 'zod';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { FieldGroup } from '@/components/ui/field';
 import {
@@ -15,23 +16,27 @@ import {
 } from '@/components/ui/sheet';
 import { Icons } from '@/components/icons';
 import { useState } from 'react';
+import { useT } from '@/i18n/use-t';
 
-const productSchema = z.object({
-  name: z.string().min(2, 'Product name must be at least 2 characters'),
-  category: z.string().min(1, 'Please select a category'),
-  price: z.number({ error: 'Price is required' }).min(0.01, 'Price must be greater than 0'),
-  description: z.string().min(10, 'Description must be at least 10 characters')
-});
-
-const categoryOptions = [
-  { value: 'beauty', label: 'Beauty Products' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'home', label: 'Home & Garden' },
-  { value: 'sports', label: 'Sports & Outdoors' }
+const categoryOptions = (t: (key: string) => string) => [
+  { value: 'beauty', label: t('categories.beautyProducts') },
+  { value: 'electronics', label: t('categories.electronics') },
+  { value: 'home', label: t('categories.homeGarden') },
+  { value: 'sports', label: t('categories.sportsOutdoors') }
 ];
 
 export default function SheetProductForm() {
   const [open, setOpen] = useState(false);
+  const t = useT();
+
+  const productSchema = z.object({
+    name: z.string().min(2, t('productSchemaZod.nameMin2')),
+    category: z.string().min(1, t('productSchemaZod.categoryRequired')),
+    price: z
+      .number({ error: t('productSchemaZod.priceRequired') })
+      .min(0.01, t('sheetFormZod.priceMin')),
+    description: z.string().min(10, t('productSchemaZod.descriptionMin10'))
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -44,7 +49,7 @@ export default function SheetProductForm() {
       onSubmit: productSchema
     },
     onSubmit: () => {
-      alert('Product created successfully!');
+      toast.success(t('demo.productCreated'));
       setOpen(false);
       form.reset();
     }
@@ -53,13 +58,13 @@ export default function SheetProductForm() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger render={<Button />}>
-        <Icons.add className='mr-2 h-4 w-4' />
-        Add Product
+        <Icons.add className='ms-2 h-4 w-4' />
+        {t('common.addProduct')}
       </SheetTrigger>
       <SheetContent className='flex flex-col'>
         <SheetHeader>
-          <SheetTitle>New Product</SheetTitle>
-          <SheetDescription>Fill in the details to create a new product.</SheetDescription>
+          <SheetTitle>{t('demo.newProduct')}</SheetTitle>
+          <SheetDescription>{t('demo.fillDetailsCreateProduct')}</SheetDescription>
         </SheetHeader>
 
         <div className='flex-1 overflow-auto'>
@@ -75,7 +80,11 @@ export default function SheetProductForm() {
               <form.AppField
                 name='name'
                 children={(field) => (
-                  <field.TextField label='Product Name' required placeholder='Enter product name' />
+                  <field.TextField
+                    label={t('common.productName')}
+                    required
+                    placeholder={t('common.enterProductName')}
+                  />
                 )}
               />
 
@@ -83,10 +92,10 @@ export default function SheetProductForm() {
                 name='category'
                 children={(field) => (
                   <field.SelectField
-                    label='Category'
+                    label={t('common.category')}
                     required
-                    options={categoryOptions}
-                    placeholder='Select category'
+                    options={categoryOptions(t)}
+                    placeholder={t('common.selectCategory')}
                   />
                 )}
               />
@@ -95,12 +104,12 @@ export default function SheetProductForm() {
                 name='price'
                 children={(field) => (
                   <field.TextField
-                    label='Price'
+                    label={t('common.price')}
                     required
                     type='number'
                     min={0}
                     step='0.01'
-                    placeholder='Enter price'
+                    placeholder={t('common.enterPrice')}
                   />
                 )}
               />
@@ -109,9 +118,9 @@ export default function SheetProductForm() {
                 name='description'
                 children={(field) => (
                   <field.TextareaField
-                    label='Description'
+                    label={t('common.description')}
                     required
-                    placeholder='Enter product description'
+                    placeholder={t('common.enterProductDescription')}
                     maxLength={500}
                     rows={4}
                     showCount
@@ -125,10 +134,10 @@ export default function SheetProductForm() {
         <SheetFooter>
           <form.AppForm>
             <Button type='button' variant='outline' onClick={() => setOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <form.SubmitButton type='submit' form='sheet-product-form'>
-              Create Product
+              {t('common.createProduct')}
             </form.SubmitButton>
           </form.AppForm>
         </SheetFooter>

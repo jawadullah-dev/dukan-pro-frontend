@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Icons } from '@/components/icons';
 import PageContainer from '@/components/layout/page-container';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,7 @@ const TABLER_ICONS_URL = 'https://tabler.io/icons';
 
 export default function IconsViewPage() {
   const [search, setSearch] = useState('');
+  const t = useTranslations();
 
   const iconEntries = Object.entries(Icons).filter(([name]) =>
     name.toLowerCase().includes(search.toLowerCase())
@@ -18,7 +20,8 @@ export default function IconsViewPage() {
 
   return (
     <PageContainer
-      pageTitle='Icons'
+      pageTitle='pages.icons.title'
+      pageDescription='pages.icons.description'
       pageHeaderAction={
         <Link
           href={TABLER_ICONS_URL}
@@ -26,14 +29,14 @@ export default function IconsViewPage() {
           rel='noopener noreferrer'
           className={buttonVariants({ variant: 'outline' })}
         >
-          <Icons.externalLink className='mr-2 h-4 w-4' />
-          <span className='hidden sm:inline'>Browse</span> Tabler Icons
+          <Icons.externalLink className='me-2 h-4 w-4' />
+          <span className='hidden sm:inline'>{t('common.browse')}</span> Tabler Icons
         </Link>
       }
     >
       <div className='space-y-4'>
         <Input
-          placeholder='Search icons...'
+          placeholder={t('icons.searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className='max-w-sm'
@@ -50,9 +53,12 @@ export default function IconsViewPage() {
           ))}
         </div>
         {iconEntries.length === 0 && (
-          <p className='text-muted-foreground py-8 text-center'>
-            No icons found matching &quot;{search}&quot;
-          </p>
+          <p
+            className='text-muted-foreground py-8 text-center'
+            dangerouslySetInnerHTML={{
+              __html: t('icons.noIconsFound', { search }).replace(/"/g, '&quot;')
+            }}
+          />
         )}
       </div>
     </PageContainer>

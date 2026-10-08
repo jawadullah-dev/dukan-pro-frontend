@@ -10,12 +10,13 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useT } from '@/i18n/use-t';
 
 export function SelectField({
   label,
   description,
   required,
-  placeholder = 'Select',
+  placeholder,
   options
 }: BaseFieldProps & {
   placeholder?: string;
@@ -23,6 +24,8 @@ export function SelectField({
 }) {
   const field = useFieldContext<string>();
   const isInvalid = useFieldInvalid();
+  const t = useT();
+  const effPlaceholder = placeholder ?? t('common.select');
 
   return (
     <Field data-invalid={isInvalid}>
@@ -41,7 +44,7 @@ export function SelectField({
           aria-invalid={isInvalid}
           aria-describedby={isInvalid ? `${field.name}-error` : undefined}
         >
-          <SelectValue placeholder={placeholder} />
+          <SelectValue placeholder={effPlaceholder} />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>

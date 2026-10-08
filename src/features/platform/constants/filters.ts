@@ -1,15 +1,47 @@
 import type { PlatformShopStatus, SubscriptionPlan } from '../api/types';
+import { t } from '@/i18n';
 
+/** Live-translated options — read `.label` at render time. */
 export const PLATFORM_STATUS_OPTIONS: { label: string; value: PlatformShopStatus }[] = [
-  { label: 'Active', value: 'ACTIVE' },
-  { label: 'Trial', value: 'TRIAL' },
-  { label: 'Expired', value: 'EXPIRED' }
+  {
+    get label() {
+      return t('status.active');
+    },
+    value: 'ACTIVE'
+  },
+  {
+    get label() {
+      return t('status.trial');
+    },
+    value: 'TRIAL'
+  },
+  {
+    get label() {
+      return t('status.expired');
+    },
+    value: 'EXPIRED'
+  }
 ];
 
 export const PLATFORM_PLAN_OPTIONS: { label: string; value: SubscriptionPlan }[] = [
-  { label: 'Trial', value: 'TRIAL' },
-  { label: 'Monthly', value: 'MONTHLY' },
-  { label: 'Yearly', value: 'YEARLY' }
+  {
+    get label() {
+      return t('plan.trial');
+    },
+    value: 'TRIAL'
+  },
+  {
+    get label() {
+      return t('plan.monthly');
+    },
+    value: 'MONTHLY'
+  },
+  {
+    get label() {
+      return t('plan.yearly');
+    },
+    value: 'YEARLY'
+  }
 ];
 
 export const PLATFORM_CITY_OPTIONS = [

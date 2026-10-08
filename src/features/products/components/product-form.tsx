@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { createProductMutation, updateProductMutation } from '../api/mutations';
 import type { Product } from '../api/types';
+import { translateMaybe } from '@/i18n/use-t';
 
 export default function ProductForm({
   initialData,
@@ -22,26 +24,27 @@ export default function ProductForm({
 }) {
   const router = useRouter();
   const isEdit = !!initialData;
+  const t = useTranslations();
 
   const createMutation = useMutation({
     ...createProductMutation,
     onSuccess: () => {
-      toast.success('Product created');
+      toast.success(t('common.productCreated'));
       router.push('/dashboard/product');
     },
     onError: () => {
-      toast.error("Couldn't create product. Try again.");
+      toast.error(t('common.productCreateFailed'));
     }
   });
 
   const updateMutation = useMutation({
     ...updateProductMutation,
     onSuccess: () => {
-      toast.success('Product updated');
+      toast.success(t('common.productUpdated'));
       router.push('/dashboard/product');
     },
     onError: () => {
-      toast.error("Couldn't update product. Try again.");
+      toast.error(t('common.productUpdateFailed'));
     }
   });
 
@@ -54,7 +57,7 @@ export default function ProductForm({
       description: initialData?.description ?? ''
     } as ProductFormValues,
     validators: {
-      onSubmit: productSchema
+      onSubmit: productSchema(t)
     },
     onSubmit: ({ value }) => {
       const payload = {
@@ -77,7 +80,9 @@ export default function ProductForm({
   return (
     <Card className='mx-auto w-full max-w-3xl'>
       <CardHeader>
-        <CardTitle className='text-left text-2xl font-bold'>{pageTitle}</CardTitle>
+        <CardTitle className='text-start text-2xl font-bold'>
+          {translateMaybe(pageTitle, t)}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form
@@ -92,8 +97,8 @@ export default function ProductForm({
               name='image'
               children={(field) => (
                 <field.FileUploadField
-                  label='Product Image'
-                  description='Upload a product image'
+                  label={t('common.productImage')}
+                  description={t('common.uploadProductImage')}
                   maxSize={5 * 1024 * 1024}
                   maxFiles={4}
                 />
@@ -104,7 +109,11 @@ export default function ProductForm({
               <form.AppField
                 name='name'
                 children={(field) => (
-                  <field.TextField label='Product Name' required placeholder='Enter product name' />
+                  <field.TextField
+                    label={t('common.productName')}
+                    required
+                    placeholder={t('common.enterProductName')}
+                  />
                 )}
               />
 
@@ -112,10 +121,13 @@ export default function ProductForm({
                 name='category'
                 children={(field) => (
                   <field.SelectField
-                    label='Category'
+                    label={t('common.category')}
                     required
-                    options={categoryOptions}
-                    placeholder='Select category'
+                    options={categoryOptions.map(({ value, labelKey }) => ({
+                      value,
+                      label: t(labelKey as never)
+                    }))}
+                    placeholder={t('common.selectCategory')}
                   />
                 )}
               />
@@ -124,12 +136,12 @@ export default function ProductForm({
                 name='price'
                 children={(field) => (
                   <field.TextField
-                    label='Price'
+                    label={t('common.price')}
                     required
                     type='number'
                     min={0}
                     step={0.01}
-                    placeholder='Enter price'
+                    placeholder={t('common.enterPrice')}
                   />
                 )}
               />
@@ -139,9 +151,9 @@ export default function ProductForm({
               name='description'
               children={(field) => (
                 <field.TextareaField
-                  label='Description'
+                  label={t('common.description')}
                   required
-                  placeholder='Enter product description'
+                  placeholder={t('common.enterProductDescription')}
                   maxLength={500}
                   rows={4}
                 />
@@ -156,10 +168,10 @@ export default function ProductForm({
               disabled={isPending}
               onClick={() => router.back()}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <LoadingButton loading={isPending} type='submit'>
-              {isEdit ? 'Update Product' : 'Add Product'}
+              {isEdit ? t('common.updateProduct') : t('common.addProduct')}
             </LoadingButton>
           </div>
         </form>

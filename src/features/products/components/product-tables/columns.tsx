@@ -7,12 +7,38 @@ import { Icons } from '@/components/icons';
 import Image from 'next/image';
 import { CellAction } from './cell-action';
 import { CATEGORY_OPTIONS } from './options';
+import { useT } from '@/i18n/use-t';
+
+function ImageColumnHeader() {
+  const t = useT();
+  return <span>{t('tableColumns.image')}</span>;
+}
+
+function NameColumnHeader({ column }: { column: Column<Product, unknown> }) {
+  const t = useT();
+  return <DataTableColumnHeader column={column} title={t('common.name')} />;
+}
+
+function CategoryColumnHeader({ column }: { column: Column<Product, unknown> }) {
+  const t = useT();
+  return <DataTableColumnHeader column={column} title={t('common.category')} />;
+}
+
+function PriceColumnHeader({ column }: { column: Column<Product, unknown> }) {
+  const t = useT();
+  return <DataTableColumnHeader column={column} title={t('common.price')} />;
+}
+
+function DescriptionColumnHeader({ column }: { column: Column<Product, unknown> }) {
+  const t = useT();
+  return <DataTableColumnHeader column={column} title={t('common.description')} />;
+}
 
 export const columns: ColumnDef<Product>[] = [
   {
     id: 'photo_url',
     accessorKey: 'photo_url',
-    header: 'IMAGE',
+    header: () => <ImageColumnHeader />,
     cell: ({ row }) => {
       return (
         <div className='relative aspect-square'>
@@ -26,18 +52,18 @@ export const columns: ColumnDef<Product>[] = [
         </div>
       );
     },
-    meta: { label: 'Image', type: 'image', priority: 2 }
+    meta: { label: 'tableColumns.image', type: 'image', priority: 2 }
   },
   {
     id: 'name',
     accessorKey: 'name',
     header: ({ column }: { column: Column<Product, unknown> }) => (
-      <DataTableColumnHeader column={column} title='Name' />
+      <NameColumnHeader column={column} />
     ),
     cell: ({ cell }) => <div>{cell.getValue<Product['name']>()}</div>,
     meta: {
-      label: 'Name',
-      placeholder: 'Search products...',
+      label: 'common.name',
+      placeholderKey: 'search.products' as const,
       variant: 'text',
       icon: Icons.text,
       type: 'text',
@@ -51,7 +77,7 @@ export const columns: ColumnDef<Product>[] = [
     accessorKey: 'category',
     enableSorting: false,
     header: ({ column }: { column: Column<Product, unknown> }) => (
-      <DataTableColumnHeader column={column} title='Category' />
+      <CategoryColumnHeader column={column} />
     ),
     cell: ({ cell }) => {
       const status = cell.getValue<Product['category']>();
@@ -66,7 +92,7 @@ export const columns: ColumnDef<Product>[] = [
     },
     enableColumnFilter: true,
     meta: {
-      label: 'categories',
+      label: 'common.category',
       variant: 'multiSelect',
       options: CATEGORY_OPTIONS,
       type: 'text',
@@ -77,10 +103,10 @@ export const columns: ColumnDef<Product>[] = [
     id: 'price',
     accessorKey: 'price',
     header: ({ column }: { column: Column<Product, unknown> }) => (
-      <DataTableColumnHeader column={column} title='Price' />
+      <PriceColumnHeader column={column} />
     ),
     meta: {
-      label: 'Price',
+      label: 'common.price',
       type: 'money',
       highlight: true,
       priority: 1
@@ -90,10 +116,10 @@ export const columns: ColumnDef<Product>[] = [
     id: 'description',
     accessorKey: 'description',
     header: ({ column }: { column: Column<Product, unknown> }) => (
-      <DataTableColumnHeader column={column} title='Description' />
+      <DescriptionColumnHeader column={column} />
     ),
     meta: {
-      label: 'Description',
+      label: 'common.description',
       type: 'longtext',
       priority: 4,
       mobile: 'hidden'

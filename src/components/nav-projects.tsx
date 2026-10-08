@@ -1,6 +1,7 @@
 'use client';
 
 import { Icons } from '@/components/icons';
+import { useT } from '@/i18n/use-t';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,15 +31,16 @@ export function NavProjects({
   }[];
 }) {
   const { isMobile } = useSidebar();
+  const t = useT();
 
   return (
     <SidebarGroup className='group-data-[collapsible=icon]:hidden'>
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      <SidebarGroupLabel>{t('navProjects.projects')}</SidebarGroupLabel>
       <SidebarMenu>
         {projects.length === 0 && (
           <SidebarMenuItem>
             <p className='text-sidebar-foreground/70 px-2 py-1.5 text-xs'>
-              No projects yet. Create one to see it here.
+              {t('navProjects.noProjects')}
             </p>
           </SidebarMenuItem>
         )}
@@ -51,7 +53,7 @@ export function NavProjects({
             <DropdownMenu>
               <DropdownMenuTrigger render={<SidebarMenuAction showOnHover />}>
                 <Icons.dots />
-                <span className='sr-only'>More</span>
+                <span className='sr-only'>{t('navProjects.more')}</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className='w-48 rounded-lg'
@@ -60,19 +62,19 @@ export function NavProjects({
               >
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Icons.workspace className='text-muted-foreground mr-2 h-4 w-4' />
-                    <span>View Project</span>
+                    <Icons.workspace className='text-muted-foreground me-2 h-4 w-4' />
+                    <span>{t('navProjects.viewProject')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Icons.share className='text-muted-foreground mr-2 h-4 w-4' />
-                    <span>Share Project</span>
+                    <Icons.share className='text-muted-foreground me-2 h-4 w-4' />
+                    <span>{t('navProjects.shareProject')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Icons.trash className='text-muted-foreground mr-2 h-4 w-4' />
-                    <span>Delete Project</span>
+                    <Icons.trash className='text-muted-foreground me-2 h-4 w-4' />
+                    <span>{t('navProjects.deleteProject')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>
@@ -82,7 +84,7 @@ export function NavProjects({
         <SidebarMenuItem>
           <SidebarMenuButton className='text-sidebar-foreground/70'>
             <Icons.dots className='text-sidebar-foreground/70' />
-            <span>More</span>
+            <span>{t('navProjects.more')}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

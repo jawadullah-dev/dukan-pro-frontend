@@ -7,10 +7,12 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { getSortingStateParser } from '@/lib/parsers';
+import { useT } from '@/i18n/use-t';
 import type { User } from '../../api/types';
 import { usersQueryOptions } from '../../api/queries';
-import { columns } from './columns';
+import { getColumns } from './columns';
 
+const columns = getColumns();
 const columnIds = columns.map((c) => c.id).filter(Boolean) as string[];
 
 const userMobileItem: MobileItemConfig<User> = {
@@ -26,28 +28,31 @@ const userDetail: DetailConfig<User> = {
   mode: 'sheet',
   title: (row) => `${row.first_name} ${row.last_name}`,
   badge: (row) => ({ label: row.status, status: row.status }),
-  sections: (row) => [
-    {
-      title: 'User',
-      fields: [
-        { label: 'Name', value: `${row.first_name} ${row.last_name}` },
-        { label: 'Email', value: row.email },
-        {
-          label: 'Phone',
-          value: (
-            <a
-              className='text-primary underline-offset-2 hover:underline'
-              href={`tel:${row.phone}`}
-            >
-              {row.phone}
-            </a>
-          )
-        },
-        { label: 'Role', value: row.role },
-        { label: 'Status', value: row.status }
-      ]
-    }
-  ]
+  sections: (row) => {
+    const t = useT();
+    return [
+      {
+        title: t('user.user'),
+        fields: [
+          { label: t('user.name'), value: `${row.first_name} ${row.last_name}` },
+          { label: t('user.email'), value: row.email },
+          {
+            label: t('user.phone'),
+            value: (
+              <a
+                className='text-primary underline-offset-2 hover:underline'
+                href={`tel:${row.phone}`}
+              >
+                {row.phone}
+              </a>
+            )
+          },
+          { label: t('user.role'), value: row.role },
+          { label: t('user.status'), value: row.status }
+        ]
+      }
+    ];
+  }
 };
 
 export function UsersTable() {

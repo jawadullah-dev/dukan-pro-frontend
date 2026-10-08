@@ -4,6 +4,7 @@ import type { FC } from 'react';
 import { Icons } from '@/components/icons';
 import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/use-t';
 
 export type NotificationStatus = 'unread' | 'read' | 'archived';
 export type ActionType = 'redirect' | 'api_call' | 'workflow' | 'modal';
@@ -30,7 +31,10 @@ export interface NotificationCardProps {
   className?: string;
 }
 
-const formatDate = (date: string | Date): string => {
+const formatDate = (
+  date: string | Date,
+  t: ReturnType<typeof import('next-intl').useTranslations>
+): string => {
   const d = new Date(date);
   const now = new Date();
   const diffMs = now.getTime() - d.getTime();
@@ -38,10 +42,10 @@ const formatDate = (date: string | Date): string => {
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffMins < 1) return t('time.justNow');
+  if (diffMins < 60) return t('time.minutesAgo', { count: diffMins });
+  if (diffHours < 24) return t('time.hoursAgo', { count: diffHours });
+  if (diffDays < 7) return t('time.daysAgo', { count: diffDays });
 
   return d.toLocaleDateString('en-US', {
     month: 'short',
@@ -77,6 +81,7 @@ export const NotificationCard: FC<NotificationCardProps> = ({
   loadingActionId,
   className
 }) => {
+  const t = useT();
   const isUnread = status === 'unread';
 
   return (
@@ -124,7 +129,7 @@ export const NotificationCard: FC<NotificationCardProps> = ({
                 'rounded-lg p-1.5 transition-colors',
                 'text-muted-foreground hover:bg-accent hover:text-foreground'
               )}
-              aria-label='Mark as read'
+              aria-label={t('common.markAsRead')}
             >
               <Icons.check size={16} />
             </button>
@@ -178,7 +183,7 @@ export const NotificationCard: FC<NotificationCardProps> = ({
           {/* Timestamp */}
           {createdAt && (
             <span className='text-muted-foreground/60 inline-block text-[11px]'>
-              {formatDate(createdAt)}
+              {formatDate(createdAt, t)}
             </span>
           )}
         </div>

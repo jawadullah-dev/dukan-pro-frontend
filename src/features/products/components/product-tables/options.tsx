@@ -1,10 +1,12 @@
-export const CATEGORY_OPTIONS = [
-  { value: 'Electronics', label: 'Electronics' },
-  { value: 'Furniture', label: 'Furniture' },
-  { value: 'Clothing', label: 'Clothing' },
-  { value: 'Toys', label: 'Toys' },
-  { value: 'Groceries', label: 'Groceries' },
-  { value: 'Books', label: 'Books' },
-  { value: 'Jewelry', label: 'Jewelry' },
-  { value: 'Beauty Products', label: 'Beauty Products' }
+import { useT } from '@/i18n/use-t';
+
+export const CATEGORY_OPTIONS = (t: (key: string) => string) => [
+  { value: 'Electronics', label: t('categories.electronics') },
+  { value: 'Furniture', label: t('categories.furniture') },
+  { value: 'Clothing', label: t('categories.clothing') },
+  { value: 'Toys', label: t('categories.toys') },
+  { value: 'Groceries', label: t('categories.groceries') },
+  { value: 'Books', label: t('categories.books') },
+  { value: 'Jewelry', label: t('categories.jewelry') },
+  { value: 'Beauty Products', label: t('categories.beautyProducts') }
 ];

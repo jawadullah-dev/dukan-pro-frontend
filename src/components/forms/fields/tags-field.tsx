@@ -7,6 +7,7 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useT } from '@/i18n/use-t';
 
 /**
  * Free-text tag list over a `string[]` value. Use with `mode='array'` on the
@@ -16,10 +17,11 @@ export function TagsField({
   label,
   description,
   required,
-  placeholder = 'Type and press Enter...'
+  placeholder
 }: BaseFieldProps & { placeholder?: string }) {
   const field = useFieldContext<string[]>();
   const isInvalid = useFieldInvalid();
+  const t = useT();
   const [tagInput, setTagInput] = React.useState('');
   const values = field.state.value || [];
 
@@ -47,13 +49,13 @@ export function TagsField({
               addTag();
             }
           }}
-          placeholder={placeholder}
+          placeholder={placeholder || t('common.add')}
           aria-label={`Add a ${label.toLowerCase().replace(/ \*$/, '')}`}
           aria-invalid={isInvalid}
           aria-describedby={isInvalid ? `${field.name}-error` : undefined}
         />
         <Button type='button' variant='secondary' onClick={addTag}>
-          Add
+          {t('common.add')}
         </Button>
       </div>
       {values.length > 0 && (
@@ -65,7 +67,7 @@ export function TagsField({
                 type='button'
                 onClick={() => field.removeValue(idx)}
                 aria-label={`Remove ${tag}`}
-                className='hover:text-destructive ml-0.5'
+                className='hover:text-destructive ms-0.5'
               >
                 <Icons.close className='h-3 w-3' />
               </button>

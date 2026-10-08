@@ -11,7 +11,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { Icons } from '@/components/icons';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 import { isIosInstallCandidate, isStandaloneDisplay } from '@/lib/pwa';
 import {
   AUTO_PROMPT_KEY,
@@ -83,7 +83,7 @@ interface InstallPromptProps {
  * 2) If not → show remove-old-app steps, then reload and auto-open install dialog.
  */
 export function InstallPrompt({ variant = 'both', className }: InstallPromptProps) {
-  const t = useT();
+  const t = useTranslations();
   const [standalone, setStandalone] = React.useState(false);
   const [alreadyInstalled, setAlreadyInstalled] = React.useState(false);
   const [canPrompt, setCanPrompt] = React.useState(false);

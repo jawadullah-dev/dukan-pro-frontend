@@ -29,7 +29,7 @@ import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { createClientRequestId, formatPkr, toPaisa } from '@/lib/dukaan/numbers';
 import { customerQueryOptions, dukaanKeys } from '../api/queries';
-import { partyFormSchema, receivePaymentSchema } from '../schemas/forms';
+import { createPartyFormSchema, createReceivePaymentSchema } from '../schemas/forms';
 import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { CustomersTable } from './tables/commerce-tables';
 
@@ -48,6 +48,7 @@ function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
 
 function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
   const qc = useQueryClient();
+  const t = useT();
 
   const create = useMutation({
     mutationFn: (value: {
@@ -65,7 +66,7 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
         opening_balance: toPaisa(value.opening_balance)
       }),
     onSuccess: () => {
-      toast.success('Customer added');
+      toast.success(t('dukaan.party.customerAdded'));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       onOpenChange(false);
     },
@@ -80,7 +81,7 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
       notes: '',
       opening_balance: 0
     },
-    validators: { onSubmit: partyFormSchema },
+    validators: { onSubmit: createPartyFormSchema(t) },
     onSubmit: ({ value }) => {
       create.mutate(value);
     }
@@ -88,9 +89,9 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
 
   return (
     <DialogContent className='flex max-h-[85vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-lg'>
-      <DialogHeader className='shrink-0 px-4 pt-4 pr-12'>
-        <DialogTitle>Add customer</DialogTitle>
-        <DialogDescription>Create a customer for sales and Udhar.</DialogDescription>
+      <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
+        <DialogTitle>{t('dukaan.party.customerAddTitle')}</DialogTitle>
+        <DialogDescription>{t('dukaan.party.customerAddDescription')}</DialogDescription>
       </DialogHeader>
       <form
         className='flex min-h-0 flex-1 flex-col'
@@ -103,16 +104,18 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
           <FieldGroup className='gap-4'>
             <form.AppField
               name='name'
-              children={(field) => <field.TextField label='Name' required autoFocus />}
+              children={(field) => (
+                <field.TextField label={t('dukaan.party.name')} required autoFocus />
+              )}
             />
             <form.AppField
               name='phone'
               children={(field) => (
                 <field.TextField
-                  label='Phone'
+                  label={t('dukaan.party.phone')}
                   type='tel'
                   inputMode='numeric'
-                  placeholder='03XXXXXXXXX'
+                  placeholder={t('users.phonePlaceholder')}
                   startIcon={Icons.phone}
                   required
                 />
@@ -120,15 +123,17 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
             />
             <form.AppField
               name='address'
-              children={(field) => <field.TextField label='Address' />}
+              children={(field) => <field.TextField label={t('dukaan.party.address')} />}
             />
             <form.AppField
               name='opening_balance'
-              children={(field) => <field.TextField label='Opening Udhar (Rs)' type='number' />}
+              children={(field) => (
+                <field.TextField label={t('dukaan.party.customerOpeningBalance')} type='number' />
+              )}
             />
             <form.AppField
               name='notes'
-              children={(field) => <field.TextareaField label='Notes' />}
+              children={(field) => <field.TextareaField label={t('dukaan.party.notes')} />}
             />
           </FieldGroup>
         </div>
@@ -173,6 +178,7 @@ export function CustomersListClient() {
 
 export function CustomerLedgerClient({ id }: { id: string }) {
   const qc = useQueryClient();
+  const t = useT();
   const { data } = useSuspenseQuery(customerQueryOptions(id));
   const [clientRequestId, setClientRequestId] = useState(() => createClientRequestId());
 
@@ -187,8 +193,8 @@ export function CustomerLedgerClient({ id }: { id: string }) {
       const group = res.payments[0]?.receipt_group_id;
       toast.success(
         group
-          ? `Payment recorded (oldest first · receipt group ${group.slice(0, 12)}…)`
-          : 'Payment recorded (oldest first)'
+          ? t('dukaan.party.paymentRecordedWithGroup', { group: group.slice(0, 12) })
+          : t('dukaan.party.paymentRecorded')
       );
       setClientRequestId(createClientRequestId());
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
@@ -198,7 +204,7 @@ export function CustomerLedgerClient({ id }: { id: string }) {
 
   const form = useAppForm({
     defaultValues: { amount: undefined as number | undefined },
-    validators: { onSubmit: receivePaymentSchema },
+    validators: { onSubmit: createReceivePaymentSchema(t) },
     onSubmit: async ({ value }) => {
       await pay.mutateAsync(value.amount!);
       form.reset();
@@ -210,7 +216,7 @@ export function CustomerLedgerClient({ id }: { id: string }) {
       <div>
         <h3 className='text-xl font-semibold'>{data.name}</h3>
         <p className='text-muted-foreground text-sm'>
-          {data.phone} · Current Udhar {formatPkr(data.udhar)}
+          {data.phone} · {t('dukaan.party.currentUdhar')} {formatPkr(data.udhar)}
         </p>
         {data.address ? <p className='text-muted-foreground text-sm'>{data.address}</p> : null}
         {data.notes ? <p className='text-muted-foreground text-sm'>{data.notes}</p> : null}
@@ -228,26 +234,26 @@ export function CustomerLedgerClient({ id }: { id: string }) {
             name='amount'
             children={(field) => (
               <field.TextField
-                label='Receive Udhar payment (Rs)'
+                label={t('dukaan.party.receivePayment')}
                 type='number'
                 required
-                description='Allocates oldest first · same receipt_group_id for the group'
+                description={t('dukaan.party.paymentAllocationHint')}
               />
             )}
           />
         </div>
         <Button type='submit' isLoading={pay.isPending}>
-          Save payment
+          {t('dukaan.party.savePayment')}
         </Button>
       </form>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Entry</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Running</TableHead>
+            <TableHead>{t('dukaan.party.date')}</TableHead>
+            <TableHead>{t('dukaan.party.entry')}</TableHead>
+            <TableHead>{t('dukaan.party.amount')}</TableHead>
+            <TableHead>{t('dukaan.party.running')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

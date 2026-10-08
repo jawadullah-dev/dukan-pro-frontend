@@ -40,8 +40,7 @@ import {
 import type { SoftCashWarning } from '@/lib/dukaan/types';
 import type { Product } from '@/lib/dukaan/types';
 import { dukaanKeys, saleQueryOptions, unitsQueryOptions } from '../api/queries';
-import { ACTION_LABELS } from '../constants/ui';
-import { reasonSchema, saleFormSchema } from '../schemas/forms';
+import { createReasonSchema, createSaleFormSchema } from '../schemas/forms';
 import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { FormEntitySelect } from './form-entity-select';
 import { SalesTable } from './tables/commerce-tables';
@@ -56,6 +55,7 @@ function SaleCreateDialog({
   clearDefaultQuery?: boolean;
 }) {
   const router = useRouter();
+  const t = useT();
 
   return (
     <Dialog
@@ -67,13 +67,13 @@ function SaleCreateDialog({
     >
       <DialogContent className='flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl'>
         <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
-          <DialogTitle>New sale</DialogTitle>
-          <DialogDescription>
-            Phones require a customer; walk-in accessories OK; Udhar needs customer
-          </DialogDescription>
+          <DialogTitle>{t('dukaan.sale.newTitle')}</DialogTitle>
+          <DialogDescription>{t('dukaan.sale.newDescription')}</DialogDescription>
         </DialogHeader>
         <div className='no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4'>
-          <Suspense fallback={<p className='text-muted-foreground text-sm'>Loading…</p>}>
+          <Suspense
+            fallback={<p className='text-muted-foreground text-sm'>{t('dukaan.sale.loading')}</p>}
+          >
             <SaleCreateForm onDone={() => onOpenChange(false)} />
           </Suspense>
         </div>
@@ -126,6 +126,7 @@ const emptySaleLine: {
 
 export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
   const qc = useQueryClient();
+  const t = useT();
   const { data: units } = useSuspenseQuery(unitsQueryOptions());
   const [clientRequestId] = useState(() => createClientRequestId());
 
@@ -158,9 +159,9 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
       }),
     onSuccess: (res) => {
       if (res.below_cost_warning) {
-        toast.warning('One or more items sold below cost (allowed)');
+        toast.warning(t('dukaan.sale.saleBelowCostWarning'));
       }
-      toast.success(`Sale ${res.sale.sale_no} saved`);
+      toast.success(t('dukaan.sale.saved', { saleNo: res.sale.sale_no }));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       window.location.href = `/dashboard/sales/${res.sale.id}`;
     },
@@ -175,7 +176,7 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
       method: 'CASH' as 'CASH' | 'BANK' | 'MOBILE_WALLET',
       lines: [{ ...emptySaleLine }]
     },
-    validators: { onSubmit: saleFormSchema },
+    validators: { onSubmit: createSaleFormSchema(t) },
     onSubmit: ({ value }) => {
       save.mutate(value);
     }
@@ -204,8 +205,8 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
                       name={field.name}
                       label={
                         hasPhone
-                          ? 'Customer (required for phones)'
-                          : 'Customer (required for Udhar)'
+                          ? t('dukaan.sale.customerRequiredPhones')
+                          : t('dukaan.sale.customerRequiredUdhar')
                       }
                       value={field.state.value}
                       onBlur={field.handleBlur}
@@ -214,13 +215,15 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
                       errors={field.state.meta.errors}
                       queryKey={dukaanKeys.customers()}
                       fetchPage={(filters) => dukaan.listCustomers(filters)}
-                      placeholder='Walk-in or customer'
-                      searchPlaceholder='Search customers...'
-                      selectedLabel={field.state.value === '__walkin__' ? 'Walk-in' : undefined}
+                      placeholder={t('dukaan.sale.walkInOrCustomer')}
+                      searchPlaceholder={t('dukaan.sale.searchCustomers')}
+                      selectedLabel={
+                        field.state.value === '__walkin__' ? t('dukaan.sale.walkIn') : undefined
+                      }
                       extraItems={[
                         {
                           id: '__walkin__',
-                          name: 'Walk-in (accessories, full cash only)'
+                          name: t('dukaan.sale.walkInCashOnly')
                         }
                       ]}
                     />
@@ -241,18 +244,18 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
               {field.state.value.map((_, idx) => (
                 <div
                   key={idx}
-                  className='relative grid gap-2 rounded-lg border p-3 pr-24 md:grid-cols-4'
+                  className='relative grid gap-2 rounded-lg border p-3 pe-24 md:grid-cols-4'
                 >
                   {field.state.value.length > 1 && (
                     <Button
                       type='button'
                       variant='ghost'
                       size='sm'
-                      className='absolute right-2 top-2 h-7 text-muted-foreground hover:text-destructive'
+                      className='absolute end-2 top-2 h-7 text-muted-foreground hover:text-destructive'
                       onClick={() => field.removeValue(idx)}
                     >
-                      <Icons.trash className='mr-1 h-4 w-4' />
-                      {ACTION_LABELS.remove}
+                      <Icons.trash className='me-1 h-4 w-4' />
+                      {t('common.remove')}
                     </Button>
                   )}
                   <div className='md:col-span-2'>
@@ -264,7 +267,7 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
                         return (
                           <FormEntitySelect<Product>
                             name={subField.name}
-                            label='Product'
+                            label={t('dukaan.sale.product')}
                             required
                             value={subField.state.value}
                             onBlur={subField.handleBlur}
@@ -285,8 +288,8 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
                             errors={subField.state.meta.errors}
                             queryKey={dukaanKeys.products()}
                             fetchPage={(filters) => dukaan.listProducts(filters)}
-                            placeholder='Product'
-                            searchPlaceholder='Search products...'
+                            placeholder={t('dukaan.sale.product')}
+                            searchPlaceholder={t('dukaan.sale.searchProducts')}
                           />
                         );
                       }}
@@ -304,9 +307,9 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
                             name={`lines[${idx}].inventory_unit_id`}
                             children={(subField) => (
                               <subField.SelectField
-                                label='IMEI1 / IMEI2'
+                                label={t('dukaan.sale.imeiPair')}
                                 required
-                                placeholder='Pick IMEI'
+                                placeholder={t('dukaan.sale.pickImei')}
                                 options={units
                                   .filter((u) => u.product_id === productId)
                                   .map((u) => ({
@@ -321,7 +324,11 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
                         <form.AppField
                           name={`lines[${idx}].quantity`}
                           children={(subField) => (
-                            <subField.TextField label='Qty' type='number' required />
+                            <subField.TextField
+                              label={t('dukaan.sale.quantity')}
+                              type='number'
+                              required
+                            />
                           )}
                         />
                       )
@@ -330,7 +337,11 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
                   <form.AppField
                     name={`lines[${idx}].unit_price`}
                     children={(subField) => (
-                      <subField.TextField label='Unit price (Rs)' type='number' required />
+                      <subField.TextField
+                        label={t('dukaan.sale.unitPrice')}
+                        type='number'
+                        required
+                      />
                     )}
                   />
                 </div>
@@ -341,8 +352,8 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
                   variant='outline'
                   onClick={() => field.pushValue({ ...emptySaleLine })}
                 >
-                  <Icons.add className='mr-2 h-4 w-4' />
-                  Add item
+                  <Icons.add className='me-2 h-4 w-4' />
+                  {t('dukaan.sale.addItem')}
                 </Button>
               </div>
             </>
@@ -354,23 +365,25 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
         <form.AppField
           name='discount'
           children={(field) => (
-            <field.TextField label='Sale discount (Rs)' type='number' required />
+            <field.TextField label={t('dukaan.sale.discount')} type='number' required />
           )}
         />
         <form.AppField
           name='paid_now'
-          children={(field) => <field.TextField label='Paid now (Rs)' type='number' required />}
+          children={(field) => (
+            <field.TextField label={t('dukaan.sale.paidNow')} type='number' required />
+          )}
         />
         <form.AppField
           name='method'
           children={(field) => (
             <field.SelectField
-              label='Payment method'
+              label={t('dukaan.sale.paymentMethod')}
               required
               options={[
-                { value: 'CASH', label: 'Cash' },
-                { value: 'BANK', label: 'Bank' },
-                { value: 'MOBILE_WALLET', label: 'Mobile wallet' }
+                { value: 'CASH', label: t('status.cash') },
+                { value: 'BANK', label: t('status.bank') },
+                { value: 'MOBILE_WALLET', label: t('status.mobileWallet') }
               ]}
             />
           )}
@@ -390,8 +403,11 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
             const udharRs = Math.max(0, totalRs - (Number(paidNow) || 0));
             return (
               <p className='flex items-center text-muted-foreground text-sm sm:col-span-2'>
-                Subtotal {formatPkr(toPaisa(subtotalRs))} · Total {formatPkr(toPaisa(totalRs))} ·
-                Udhar {formatPkr(toPaisa(udharRs))}
+                {t('dukaan.sale.summary', {
+                  subtotal: formatPkr(toPaisa(subtotalRs)),
+                  total: formatPkr(toPaisa(totalRs)),
+                  udhar: formatPkr(toPaisa(udharRs))
+                })}
               </p>
             );
           }}
@@ -410,6 +426,7 @@ export function SaleDetailClient({ id }: { id: string }) {
   const qc = useQueryClient();
   const { data } = useSuspenseQuery(saleQueryOptions(id));
   const [warning, setWarning] = useState<SoftCashWarning | null>(null);
+  const t = useT();
 
   const cancel = useMutation({
     mutationFn: ({ reason, confirm }: { reason: string; confirm?: boolean }) =>
@@ -417,10 +434,10 @@ export function SaleDetailClient({ id }: { id: string }) {
     onSuccess: (res) => {
       if (res.cash_warning) {
         setWarning(res.cash_warning);
-        toast.warning('Cash would go below zero — confirm to reverse payment');
+        toast.warning(t('dukaan.actions.cashBelowZeroWarning'));
         return;
       }
-      toast.success('Sale cancelled');
+      toast.success(t('dukaan.sale.cancelled'));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
     },
     onError: (e: Error) => toast.error(e.message)
@@ -428,7 +445,7 @@ export function SaleDetailClient({ id }: { id: string }) {
 
   const form = useAppForm({
     defaultValues: { reason: '' },
-    validators: { onSubmit: reasonSchema },
+    validators: { onSubmit: createReasonSchema(t) },
     onSubmit: ({ value }) => {
       cancel.mutate({ reason: value.reason.trim(), confirm: false });
     }
@@ -440,8 +457,8 @@ export function SaleDetailClient({ id }: { id: string }) {
         <div>
           <h3 className='text-xl font-semibold'>{data.sale_no}</h3>
           <p className='text-muted-foreground text-sm'>
-            {data.customer?.name ?? 'Walk-in'} · {data.sale_date} · Outstanding{' '}
-            {formatPkr(data.outstanding)}
+            {data.customer?.name ?? t('dukaan.sale.walkInLabel')} · {data.sale_date} ·{' '}
+            {t('dukaan.sale.outstanding')} {formatPkr(data.outstanding)}
           </p>
           <Badge variant={data.status === 'ACTIVE' ? 'default' : 'secondary'}>
             {formatLabel(data.status)}
@@ -451,19 +468,19 @@ export function SaleDetailClient({ id }: { id: string }) {
           href={`/dashboard/sales/${id}/receipt`}
           className='border-border inline-flex h-8 items-center rounded-lg border px-2.5 text-sm'
         >
-          PDF / Print receipt
+          {t('dukaan.sale.pdfPrintReceipt')}
         </Link>
       </div>
 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Item</TableHead>
-            <TableHead>IMEI1</TableHead>
-            <TableHead>IMEI2</TableHead>
-            <TableHead>Qty</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Line</TableHead>
+            <TableHead>{t('dukaan.sale.itemHeader')}</TableHead>
+            <TableHead>{t('dukaan.sale.imei1Header')}</TableHead>
+            <TableHead>{t('dukaan.sale.imei2Header')}</TableHead>
+            <TableHead>{t('dukaan.sale.qtyHeader')}</TableHead>
+            <TableHead>{t('dukaan.sale.priceHeader')}</TableHead>
+            <TableHead>{t('dukaan.sale.lineHeader')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -482,20 +499,20 @@ export function SaleDetailClient({ id }: { id: string }) {
 
       {data.payments.length > 0 ? (
         <div className='space-y-1 text-sm'>
-          <p className='font-medium'>Payments</p>
+          <p className='font-medium'>{t('dukaan.sale.payments')}</p>
           {data.payments.map((p) => (
             <p key={p.id} className='text-muted-foreground'>
-              {formatPkr(p.amount)} · {formatLabel(p.method)} · group{' '}
+              {formatPkr(p.amount)} · {formatLabel(p.method)} · {t('dukaan.sale.receiptGroup')}{' '}
               <span className='font-mono text-xs'>{p.receipt_group_id}</span>
-              {p.status === 'CANCELLED' ? ' (cancelled)' : ''}
+              {p.status === 'CANCELLED' ? ` ${t('dukaan.sale.cancelledStatus')}` : ''}
             </p>
           ))}
         </div>
       ) : null}
 
       <p className='text-sm'>
-        Subtotal {formatPkr(data.subtotal)} · Discount {formatPkr(data.discount)} · Total{' '}
-        {formatPkr(data.total_amount)}
+        {t('common.subtotal')} {formatPkr(data.subtotal)} · {t('common.discount')}{' '}
+        {formatPkr(data.discount)} · {t('common.total')} {formatPkr(data.total_amount)}
       </p>
 
       {data.status === 'ACTIVE' ? (
@@ -509,12 +526,17 @@ export function SaleDetailClient({ id }: { id: string }) {
           <FieldGroup>
             <form.AppField
               name='reason'
-              children={(field) => <field.TextareaField label='Cancel with reason' required />}
+              children={(field) => (
+                <field.TextareaField label={t('dukaan.sale.cancelWithReason')} required />
+              )}
             />
           </FieldGroup>
           {warning ? (
             <div className='text-sm'>
-              Cash {formatPkr(warning.current_cash)} → {formatPkr(warning.projected_cash)}. Confirm?
+              {t('dukaan.sale.cashWarning', {
+                current: formatPkr(warning.current_cash),
+                projected: formatPkr(warning.projected_cash)
+              })}
               <div className='mt-2 flex gap-3'>
                 <Button
                   type='button'
@@ -526,7 +548,7 @@ export function SaleDetailClient({ id }: { id: string }) {
                     })
                   }
                 >
-                  Confirm cancel
+                  {t('dukaan.sale.confirmCancel')}
                 </Button>
                 <Button
                   type='button'
@@ -534,19 +556,22 @@ export function SaleDetailClient({ id }: { id: string }) {
                   disabled={cancel.isPending}
                   onClick={() => setWarning(null)}
                 >
-                  Back
+                  {t('dukaan.sale.back')}
                 </Button>
               </div>
             </div>
           ) : (
             <Button type='submit' variant='destructive' isLoading={cancel.isPending}>
-              Cancel sale
+              {t('dukaan.sale.cancelTitle')}
             </Button>
           )}
         </form>
       ) : (
         <p className='text-muted-foreground text-sm'>
-          Cancelled: {data.cancel_reason} ({data.cancelled_at})
+          {t('dukaan.sale.cancelledInfo', {
+            reason: data.cancel_reason ?? '',
+            date: data.cancelled_at ?? ''
+          })}
         </p>
       )}
     </div>
@@ -554,6 +579,7 @@ export function SaleDetailClient({ id }: { id: string }) {
 }
 
 export function SaleReceiptClient({ id }: { id: string }) {
+  const t = useT();
   const { data } = useSuspenseQuery(saleQueryOptions(id));
   const receiptGroup = data.payments.find((p) => p.status === 'ACTIVE')?.receipt_group_id;
   return (
@@ -561,23 +587,27 @@ export function SaleReceiptClient({ id }: { id: string }) {
       <div className='text-center'>
         <h1 className='text-xl font-bold'>{data.shop?.name}</h1>
         <p className='text-sm'>{data.shop?.address}</p>
-        <p className='mt-2 font-medium'>Receipt {data.sale_no}</p>
+        <p className='mt-2 font-medium'>
+          {t('dukaan.sale.receipt')} {data.sale_no}
+        </p>
         <p className='text-sm'>{data.sale_date}</p>
         {receiptGroup ? (
-          <p className='text-muted-foreground text-xs'>Group {receiptGroup}</p>
+          <p className='text-muted-foreground text-xs'>
+            {t('dukaan.sale.receiptGroup')} {receiptGroup}
+          </p>
         ) : null}
       </div>
       <div className='text-sm'>
-        Customer: {data.customer?.name ?? 'Walk-in'}
+        {t('dukaan.party.name')}: {data.customer?.name ?? t('dukaan.sale.walkInLabel')}
         {data.customer?.phone ? ` · ${data.customer.phone}` : ''}
       </div>
       <table className='w-full text-sm'>
         <thead>
-          <tr className='border-b text-left'>
-            <th className='py-1'>Item</th>
-            <th>IMEI</th>
-            <th>Qty</th>
-            <th className='text-right'>Amount</th>
+          <tr className='border-b text-start'>
+            <th className='py-1'>{t('dukaan.sale.receiptItem')}</th>
+            <th>{t('dukaan.sale.receiptImei')}</th>
+            <th>{t('dukaan.sale.receiptQty')}</th>
+            <th className='text-end'>{t('dukaan.sale.receiptAmount')}</th>
           </tr>
         </thead>
         <tbody>
@@ -586,35 +616,35 @@ export function SaleReceiptClient({ id }: { id: string }) {
               <td className='py-1'>{item.product?.name}</td>
               <td>{item.unit ? imeiLabel(item.unit.imei1, item.unit.imei2) : '—'}</td>
               <td>{item.quantity}</td>
-              <td className='text-right'>{formatPkr(item.total)}</td>
+              <td className='text-end'>{formatPkr(item.total)}</td>
             </tr>
           ))}
         </tbody>
       </table>
       <div className='space-y-1 text-sm'>
         <div className='flex justify-between'>
-          <span>Subtotal</span>
+          <span>{t('dukaan.sale.receiptSubtotal')}</span>
           <span>{formatPkr(data.subtotal)}</span>
         </div>
         <div className='flex justify-between'>
-          <span>Discount</span>
+          <span>{t('dukaan.sale.receiptDiscount')}</span>
           <span>{formatPkr(data.discount)}</span>
         </div>
         <div className='flex justify-between font-semibold'>
-          <span>Total</span>
+          <span>{t('dukaan.sale.receiptTotal')}</span>
           <span>{formatPkr(data.total_amount)}</span>
         </div>
         <div className='flex justify-between'>
-          <span>Paid</span>
+          <span>{t('dukaan.sale.receiptPaid')}</span>
           <span>{formatPkr(data.total_amount - data.outstanding)}</span>
         </div>
         <div className='flex justify-between'>
-          <span>Balance</span>
+          <span>{t('dukaan.sale.receiptBalance')}</span>
           <span>{formatPkr(data.outstanding)}</span>
         </div>
       </div>
       <Button className='print:hidden' onClick={() => window.print()}>
-        Print
+        {t('dukaan.sale.receiptPrint')}
       </Button>
     </div>
   );

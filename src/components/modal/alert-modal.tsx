@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
+import { useT } from '@/i18n/use-t';
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface AlertModalProps {
   title?: string;
   description?: string;
   confirmLabel?: string;
+  cancelLabel?: string;
 }
 
 export function AlertModal({
@@ -26,10 +28,17 @@ export function AlertModal({
   onClose,
   onConfirm,
   loading,
-  title = 'Are you sure?',
-  description = 'This action cannot be undone.',
-  confirmLabel = 'Continue'
+  title,
+  description,
+  confirmLabel,
+  cancelLabel
 }: AlertModalProps) {
+  const t = useT();
+  const resolvedTitle = title ?? t('common.areYouSure');
+  const resolvedDescription = description ?? t('common.cannotUndo');
+  const resolvedConfirm = confirmLabel ?? t('common.continue');
+  const resolvedCancel = cancelLabel ?? t('common.cancel');
+
   return (
     <AlertDialog
       open={isOpen}
@@ -39,11 +48,11 @@ export function AlertModal({
     >
       <AlertDialogContent size='default'>
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle>{resolvedTitle}</AlertDialogTitle>
+          <AlertDialogDescription>{resolvedDescription}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>{resolvedCancel}</AlertDialogCancel>
           <AlertDialogAction
             variant='destructive'
             isLoading={loading}
@@ -52,7 +61,7 @@ export function AlertModal({
               onConfirm();
             }}
           >
-            {confirmLabel}
+            {resolvedConfirm}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

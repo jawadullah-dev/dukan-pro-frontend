@@ -4,6 +4,7 @@ import type { Option } from '@/types/data-table';
 import type { Column } from '@tanstack/react-table';
 import { Icons } from '@/components/icons';
 import { DataTableFilterClear } from '@/components/ui/table/data-table-filter-clear';
+import { useT } from '@/i18n/use-t';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,6 +35,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   options,
   multiple
 }: DataTableFacetedFilterProps<TData, TValue>) {
+  const t = useT();
   const [open, setOpen] = React.useState(false);
 
   const columnFilterValue = column?.getFilterValue();
@@ -89,7 +91,7 @@ export function DataTableFacetedFilter<TData, TValue>({
             <div className='hidden items-center gap-1 lg:flex'>
               {selectedValues.size > 2 ? (
                 <Badge variant='secondary' className='rounded-sm px-1 font-normal'>
-                  {selectedValues.size} selected
+                  {selectedValues.size} {t('common.selected')}
                 </Badge>
               ) : (
                 options
@@ -112,7 +114,7 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Command>
           <CommandInput placeholder={title} />
           <CommandList className='max-h-full'>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{t('table.noResults')}</CommandEmpty>
             <CommandGroup className='max-h-[18.75rem] overflow-x-hidden overflow-y-auto'>
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value);
@@ -130,7 +132,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     {option.icon && <option.icon />}
                     <span className='truncate'>{option.label}</span>
                     {option.count && (
-                      <span className='ml-auto font-mono text-xs'>{option.count}</span>
+                      <span className='ms-auto font-mono text-xs'>{option.count}</span>
                     )}
                   </CommandItem>
                 );
@@ -141,7 +143,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem onSelect={() => onReset()} className='justify-center text-center'>
-                    Clear filters
+                    {t('table.resetFilters')}
                   </CommandItem>
                 </CommandGroup>
               </>

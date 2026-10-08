@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { Icons } from '@/components/icons';
+import { useT } from '@/i18n/use-t';
 
 interface DataTableToolbarProps<TData> extends React.ComponentProps<'div'> {
   table: Table<TData>;
@@ -22,6 +23,7 @@ export function DataTableToolbar<TData>({
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
+  const t = useT();
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const columns = React.useMemo(
@@ -46,14 +48,14 @@ export function DataTableToolbar<TData>({
         ))}
         {isFiltered && (
           <Button
-            aria-label='Reset filters'
+            aria-label={t('table.resetFilters')}
             variant='outline'
             size='sm'
             className='border-dashed'
             onClick={onReset}
           >
             <Icons.close />
-            Reset
+            {t('table.resetFilters')}
           </Button>
         )}
       </div>
@@ -69,6 +71,7 @@ interface DataTableToolbarFilterProps<TData> {
 }
 
 function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<TData>) {
+  const t = useT();
   {
     const columnMeta = column.columnDef.meta;
 
@@ -80,7 +83,7 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
           return (
             <Input
               placeholder={columnMeta.placeholder ?? columnMeta.label}
-              aria-label={columnMeta.label ?? 'Filter'}
+              aria-label={columnMeta.label ?? t('table.filter')}
               value={(column.getFilterValue() as string) ?? ''}
               onChange={(event) => column.setFilterValue(event.target.value)}
               className='h-8 w-40 lg:w-56'
@@ -94,13 +97,13 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
                 type='number'
                 inputMode='numeric'
                 placeholder={columnMeta.placeholder ?? columnMeta.label}
-                aria-label={columnMeta.label ?? 'Filter'}
+                aria-label={columnMeta.label ?? t('table.filter')}
                 value={(column.getFilterValue() as string) ?? ''}
                 onChange={(event) => column.setFilterValue(event.target.value)}
-                className={cn('h-8 w-[120px]', columnMeta.unit && 'pr-8')}
+                className={cn('h-8 w-[120px]', columnMeta.unit && 'pe-8')}
               />
               {columnMeta.unit && (
-                <span className='bg-accent text-muted-foreground absolute top-0 right-0 bottom-0 flex items-center rounded-r-md px-2 text-sm'>
+                <span className='bg-accent text-muted-foreground absolute top-0 end-0 bottom-0 flex items-center rounded-e-md px-2 text-sm'>
                   {columnMeta.unit}
                 </span>
               )}
@@ -126,7 +129,11 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
             <DataTableFacetedFilter
               column={column}
               title={columnMeta.label ?? column.id}
-              options={columnMeta.options ?? []}
+              options={
+                typeof columnMeta.options === 'function'
+                  ? columnMeta.options(t as any)
+                  : (columnMeta.options ?? [])
+              }
               multiple={columnMeta.variant === 'multiSelect'}
             />
           );
@@ -134,7 +141,7 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
         default:
           return null;
       }
-    }, [column, columnMeta]);
+    }, [column, columnMeta, t]);
 
     return onFilterRender();
   }

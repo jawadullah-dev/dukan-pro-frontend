@@ -12,30 +12,36 @@ import { useAppForm } from '@/lib/form';
 import { useFormStepper } from '@/hooks/use-stepper';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useT } from '@/i18n/use-t';
 
 // --- Schema ---
 
-const productFormSchema = z.object({
-  name: z.string().min(2, 'Product name must be at least 2 characters'),
-  category: z.string().min(1, 'Please select a category'),
-  price: z.number({ error: 'Price is required' }).min(0.01, 'Price must be greater than 0'),
-  description: z.string().min(10, 'Description must be at least 10 characters')
-});
+const createProductFormSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(2, t('schemaZod.productNameMin2')),
+    category: z.string().min(1, t('schemaZod.categoryRequired')),
+    price: z.number({ error: t('schemaZod.priceRequired') }).min(0.01, t('schemaZod.priceMin')),
+    description: z.string().min(10, t('schemaZod.descriptionMin10'))
+  });
 
-const stepSchemas = [
-  // Step 1: Basic Info
-  productFormSchema.pick({ name: true, category: true, price: true }),
-  // Step 2: Details
-  productFormSchema.pick({ description: true }),
-  // Step 3: Review (no validation)
-  z.object({})
-];
+const stepSchemas = (t: (key: string) => string) => {
+  const productFormSchema = createProductFormSchema(t);
 
-const categoryOptions = [
-  { value: 'beauty', label: 'Beauty Products' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'home', label: 'Home & Garden' },
-  { value: 'sports', label: 'Sports & Outdoors' }
+  return [
+    // Step 1: Basic Info
+    productFormSchema.pick({ name: true, category: true, price: true }),
+    // Step 2: Details
+    productFormSchema.pick({ description: true }),
+    // Step 3: Review (no validation)
+    z.object({})
+  ];
+};
+
+const categoryOptions = (t: (key: string) => string) => [
+  { value: 'beauty', label: t('categories.beautyProducts') },
+  { value: 'electronics', label: t('categories.electronics') },
+  { value: 'home', label: t('categories.homeGarden') },
+  { value: 'sports', label: t('categories.sportsOutdoors') }
 ];
 
 // --- Review summary (reads form values) ---
@@ -50,24 +56,31 @@ function ReviewSummary({
     description: string;
   };
 }) {
+  const t = useT();
   return (
     <div className='space-y-3'>
       <Separator />
       <div className='grid gap-3'>
         <div>
-          <p className='text-muted-foreground text-xs font-medium uppercase'>Name</p>
+          <p className='text-muted-foreground text-xs font-medium uppercase'>
+            {t('dukaan.party.name')}
+          </p>
           <p className='text-sm'>{values.name || '—'}</p>
         </div>
         <div>
-          <p className='text-muted-foreground text-xs font-medium uppercase'>Category</p>
+          <p className='text-muted-foreground text-xs font-medium uppercase'>
+            {t('common.category')}
+          </p>
           <p className='text-sm capitalize'>{values.category || '—'}</p>
         </div>
         <div>
-          <p className='text-muted-foreground text-xs font-medium uppercase'>Price</p>
+          <p className='text-muted-foreground text-xs font-medium uppercase'>{t('common.price')}</p>
           <p className='text-sm'>{values.price != null ? `$${values.price}` : '—'}</p>
         </div>
         <div>
-          <p className='text-muted-foreground text-xs font-medium uppercase'>Description</p>
+          <p className='text-muted-foreground text-xs font-medium uppercase'>
+            {t('common.description')}
+          </p>
           <p className='text-sm'>{values.description || '—'}</p>
         </div>
       </div>
@@ -85,6 +98,8 @@ type ProductFormValues = {
 };
 
 export default function MultiStepProductForm() {
+  const t = useT();
+  const productFormSchema = createProductFormSchema(t);
   const {
     currentValidator,
     step,
@@ -92,7 +107,7 @@ export default function MultiStepProductForm() {
     isFirstStep,
     handleCancelOrBack,
     handleNextStepOrSubmit
-  } = useFormStepper(stepSchemas, { fullSchema: productFormSchema });
+  } = useFormStepper(stepSchemas(t), { fullSchema: productFormSchema });
 
   const form = useAppForm({
     defaultValues: {
@@ -107,7 +122,7 @@ export default function MultiStepProductForm() {
       onDynamicAsyncDebounceMs: 500
     },
     onSubmit: () => {
-      toast.success('Product created successfully!');
+      toast.success(t('forms.createSuccess'));
     }
   });
 
@@ -136,7 +151,7 @@ export default function MultiStepProductForm() {
       <div className='flex flex-col gap-2 pt-3'>
         <div className='flex flex-col items-center justify-start gap-1'>
           <span className='text-muted-foreground text-sm'>
-            Step {currentStep} of {totalSteps}
+            {t('steps.stepOf', { current: currentStep, total: totalSteps })}
           </span>
           <Progress value={(currentStep / totalSteps) * 100} />
         </div>
@@ -152,16 +167,16 @@ export default function MultiStepProductForm() {
           >
             {currentStep === 1 && (
               <FieldGroup className='space-y-4'>
-                <h3 className='text-lg font-semibold'>Basic Info</h3>
-                <FieldDescription>Enter the product name, category, and price.</FieldDescription>
+                <h3 className='text-lg font-semibold'>{t('pages.forms.basicInfo')}</h3>
+                <FieldDescription>{t('pages.forms.basicInfoDescription')}</FieldDescription>
 
                 <form.AppField
                   name='name'
                   children={(field) => (
                     <field.TextField
-                      label='Product Name'
+                      label={t('common.productName')}
                       required
-                      placeholder='Enter product name'
+                      placeholder={t('common.enterProductName')}
                     />
                   )}
                 />
@@ -170,10 +185,10 @@ export default function MultiStepProductForm() {
                   name='category'
                   children={(field) => (
                     <field.SelectField
-                      label='Category'
+                      label={t('common.category')}
                       required
-                      options={categoryOptions}
-                      placeholder='Select category'
+                      options={categoryOptions(t)}
+                      placeholder={t('common.selectCategory')}
                     />
                   )}
                 />
@@ -182,12 +197,12 @@ export default function MultiStepProductForm() {
                   name='price'
                   children={(field) => (
                     <field.TextField
-                      label='Price'
+                      label={t('common.price')}
                       required
                       type='number'
                       min={0}
                       step={0.01}
-                      placeholder='Enter price'
+                      placeholder={t('common.enterPrice')}
                     />
                   )}
                 />
@@ -196,16 +211,16 @@ export default function MultiStepProductForm() {
 
             {currentStep === 2 && (
               <FieldGroup className='space-y-4'>
-                <h3 className='text-lg font-semibold'>Details</h3>
-                <FieldDescription>Add a detailed product description.</FieldDescription>
+                <h3 className='text-lg font-semibold'>{t('pages.forms.details')}</h3>
+                <FieldDescription>{t('pages.forms.detailsDescription')}</FieldDescription>
 
                 <form.AppField
                   name='description'
                   children={(field) => (
                     <field.TextareaField
-                      label='Description'
+                      label={t('common.description')}
                       required
-                      placeholder='Enter product description'
+                      placeholder={t('common.enterProductDescription')}
                       maxLength={500}
                       rows={5}
                     />
@@ -216,8 +231,8 @@ export default function MultiStepProductForm() {
 
             {currentStep === 3 && (
               <div className='space-y-4'>
-                <h3 className='text-lg font-semibold'>Review & Submit</h3>
-                <FieldDescription>Review the details below before submitting.</FieldDescription>
+                <h3 className='text-lg font-semibold'>{t('pages.forms.reviewSubmit')}</h3>
+                <FieldDescription>{t('pages.forms.reviewDescription')}</FieldDescription>
                 <ReviewSummary values={formValues} />
               </div>
             )}
@@ -232,7 +247,7 @@ export default function MultiStepProductForm() {
             disabled={isFirstStep}
             onClick={() => handleCancelOrBack({ onBack: () => {} })}
           >
-            <Icons.chevronLeft /> Previous
+            <Icons.chevronLeft className='rtl:rotate-180' /> {t('common.back')}
           </Button>
           <div className='flex w-full items-center justify-end gap-3 pt-3'>
             {!isDefault && (
@@ -243,16 +258,16 @@ export default function MultiStepProductForm() {
                 variant='outline'
                 size='sm'
               >
-                Reset
+                {t('appearance.reset')}
               </Button>
             )}
             {step.isCompleted ? (
               <form.AppForm>
-                <form.SubmitButton type='submit'>Submit</form.SubmitButton>
+                <form.SubmitButton type='submit'>{t('common.confirm')}</form.SubmitButton>
               </form.AppForm>
             ) : (
               <Button size='sm' variant='ghost' type='button' onClick={() => void handleNext()}>
-                Next <Icons.chevronRight />
+                {t('common.continue')} <Icons.chevronRight className='rtl:rotate-180' />
               </Button>
             )}
           </div>

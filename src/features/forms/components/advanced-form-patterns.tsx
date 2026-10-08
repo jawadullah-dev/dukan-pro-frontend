@@ -12,6 +12,7 @@ import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useAppForm } from '@/lib/form';
+import { translateMaybe, useT } from '@/i18n/use-t';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -35,60 +36,69 @@ type AdvancedFormValues = {
 // Country / State data
 // ---------------------------------------------------------------------------
 
-const countryStateMap: Record<string, { value: string; label: string }[]> = {
+const countryStateMap: Record<string, { value: string; labelKey: string }[]> = {
   us: [
-    { value: 'ca', label: 'California' },
-    { value: 'ny', label: 'New York' },
-    { value: 'tx', label: 'Texas' }
+    { value: 'ca', labelKey: 'formOptions.states.california' },
+    { value: 'ny', labelKey: 'formOptions.states.newYork' },
+    { value: 'tx', labelKey: 'formOptions.states.texas' }
   ],
   uk: [
-    { value: 'ldn', label: 'London' },
-    { value: 'mnc', label: 'Manchester' },
-    { value: 'brm', label: 'Birmingham' }
+    { value: 'ldn', labelKey: 'formOptions.states.london' },
+    { value: 'mnc', labelKey: 'formOptions.states.manchester' },
+    { value: 'brm', labelKey: 'formOptions.states.birmingham' }
   ],
   au: [
-    { value: 'nsw', label: 'New South Wales' },
-    { value: 'vic', label: 'Victoria' },
-    { value: 'qld', label: 'Queensland' }
+    { value: 'nsw', labelKey: 'formOptions.states.newSouthWales' },
+    { value: 'vic', labelKey: 'formOptions.states.victoria' },
+    { value: 'qld', labelKey: 'formOptions.states.queensland' }
   ]
 };
 
-const countryOptions = [
-  { value: 'us', label: 'United States' },
-  { value: 'uk', label: 'United Kingdom' },
-  { value: 'au', label: 'Australia' }
+const countryOptionKeys = [
+  { value: 'us', labelKey: 'formOptions.countries.us' },
+  { value: 'uk', labelKey: 'formOptions.countries.uk' },
+  { value: 'au', labelKey: 'formOptions.countries.au' }
 ];
 
 // ---------------------------------------------------------------------------
 // Form-level Zod schema (cross-field validation on submit)
 // ---------------------------------------------------------------------------
 
-const advancedSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters'),
-  email: z.string().email('Invalid email'),
-  password: z.string().min(8, 'Must be at least 8 characters'),
-  confirmPassword: z.string().min(1, 'Please confirm your password'),
-  team: z.object({
-    name: z.string().min(2, 'Team name must be at least 2 characters'),
-    size: z.number().min(1, 'At least 1 member').max(100, 'Max 100 members')
-  }),
-  members: z
-    .array(
-      z.object({
-        name: z.string().min(1, 'Member name is required'),
-        role: z.string().min(1, 'Role is required')
-      })
-    )
-    .min(1, 'Add at least one member'),
-  country: z.string().min(1, 'Select a country'),
-  state: z.string().min(1, 'Select a state')
-});
-
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
 export default function AdvancedFormPatterns() {
+  const t = useT();
+  const countryOptions = countryOptionKeys.map(({ value, labelKey }) => ({
+    value,
+    label: translateMaybe(labelKey, t)
+  }));
+
+  const advancedSchema = z.object({
+    username: z.string().min(3, t('advancedFormZod.usernameMin3')),
+    email: z.string().email(t('advancedFormZod.emailInvalid')),
+    password: z.string().min(8, t('advancedFormZod.passwordMin8')),
+    confirmPassword: z.string().min(1, t('advancedFormZod.confirmPasswordRequired')),
+    team: z.object({
+      name: z.string().min(2, t('advancedFormZod.teamNameMin2')),
+      size: z
+        .number()
+        .min(1, t('advancedFormZod.teamSizeMin1'))
+        .max(100, t('advancedFormZod.teamSizeMax100'))
+    }),
+    members: z
+      .array(
+        z.object({
+          name: z.string().min(1, t('advancedFormZod.memberNameRequired')),
+          role: z.string().min(1, t('advancedFormZod.memberRoleRequired'))
+        })
+      )
+      .min(1, t('advancedFormZod.membersRequired')),
+    country: z.string().min(1, t('advancedFormZod.countryRequired')),
+    state: z.string().min(1, t('advancedFormZod.stateRequired'))
+  });
+
   const form = useAppForm({
     defaultValues: {
       username: '',
@@ -107,22 +117,22 @@ export default function AdvancedFormPatterns() {
       onSubmit: advancedSchema
     },
     onSubmit: () => {
-      toast.success('Team registered successfully!');
+      toast.success(t('advancedForm.registeredSuccess'));
     }
   });
 
   // Read current country reactively for dependent state field
   const selectedCountry = useStore(form.store, (s) => s.values.country);
-  const stateOptions = countryStateMap[selectedCountry] ?? [];
+  const stateOptions = (countryStateMap[selectedCountry] ?? []).map(({ value, labelKey }) => ({
+    value,
+    label: translateMaybe(labelKey, t)
+  }));
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className='text-2xl font-bold'>Team Registration</CardTitle>
-        <p className='text-muted-foreground'>
-          Demonstrates async validation, linked fields, nested objects, dynamic arrays, and listener
-          side effects.
-        </p>
+        <CardTitle className='text-2xl font-bold'>{t('advancedForm.teamRegistration')}</CardTitle>
+        <p className='text-muted-foreground'>{t('advancedForm.formDescription')}</p>
       </CardHeader>
       <CardContent>
         <form
@@ -134,8 +144,8 @@ export default function AdvancedFormPatterns() {
         >
           {/* ─── Section 1: Account ─── */}
           <div className='space-y-1'>
-            <h3 className='text-lg font-semibold'>Account</h3>
-            <p className='text-muted-foreground text-sm'>Async validation, linked fields</p>
+            <h3 className='text-lg font-semibold'>{t('advancedForm.sectionAccount')}</h3>
+            <p className='text-muted-foreground text-sm'>{t('advancedForm.sectionAccountDesc')}</p>
           </div>
 
           <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -148,13 +158,17 @@ export default function AdvancedFormPatterns() {
                   if (!value || value.length < 3) return undefined;
                   await new Promise((r) => setTimeout(r, 500));
                   if (value === 'admin' || value === 'test') {
-                    return { message: 'Username is taken' };
+                    return { message: t('advancedFormZod.usernameTaken') };
                   }
                   return undefined;
                 }
               }}
               children={(field) => (
-                <field.TextField label='Username' required placeholder='Choose a username' />
+                <field.TextField
+                  label={t('advancedForm.username')}
+                  required
+                  placeholder={t('advancedForm.usernamePlaceholder')}
+                />
               )}
             />
 
@@ -162,10 +176,10 @@ export default function AdvancedFormPatterns() {
               name='email'
               children={(field) => (
                 <field.TextField
-                  label='Email'
+                  label={t('advancedForm.email')}
                   required
                   type='email'
-                  placeholder='you@example.com'
+                  placeholder={t('advancedForm.emailPlaceholder')}
                 />
               )}
             />
@@ -174,10 +188,10 @@ export default function AdvancedFormPatterns() {
               name='password'
               children={(field) => (
                 <field.TextField
-                  label='Password'
+                  label={t('advancedForm.password')}
                   required
                   type='password'
-                  placeholder='Min 8 characters'
+                  placeholder={t('advancedForm.passwordPlaceholder')}
                 />
               )}
             />
@@ -190,17 +204,17 @@ export default function AdvancedFormPatterns() {
                 onChange: ({ value, fieldApi }) => {
                   const password = fieldApi.form.getFieldValue('password');
                   if (value && value !== password) {
-                    return { message: 'Passwords do not match' };
+                    return { message: t('advancedFormZod.passwordsDoNotMatch') };
                   }
                   return undefined;
                 }
               }}
               children={(field) => (
                 <field.TextField
-                  label='Confirm Password'
+                  label={t('advancedForm.confirmPassword')}
                   required
                   type='password'
-                  placeholder='Confirm password'
+                  placeholder={t('advancedForm.confirmPasswordPlaceholder')}
                 />
               )}
             />
@@ -210,22 +224,26 @@ export default function AdvancedFormPatterns() {
 
           {/* ─── Section 2: Team Info (nested objects) ─── */}
           <div className='space-y-1'>
-            <h3 className='text-lg font-semibold'>Team Info</h3>
-            <p className='text-muted-foreground text-sm'>Nested objects with dot-notation paths</p>
+            <h3 className='text-lg font-semibold'>{t('advancedForm.sectionTeam')}</h3>
+            <p className='text-muted-foreground text-sm'>{t('advancedForm.sectionTeamDesc')}</p>
           </div>
 
           <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             <form.AppField
               name='team.name'
               children={(field) => (
-                <field.TextField label='Team Name' required placeholder='e.g. Alpha Squad' />
+                <field.TextField
+                  label={t('advancedForm.teamName')}
+                  required
+                  placeholder={t('advancedForm.teamNamePlaceholder')}
+                />
               )}
             />
             <form.AppField
               name='team.size'
               children={(field) => (
                 <field.TextField
-                  label='Team Size'
+                  label={t('advancedForm.teamSize')}
                   required
                   type='number'
                   min={1}
@@ -240,8 +258,8 @@ export default function AdvancedFormPatterns() {
 
           {/* ─── Section 3: Members (dynamic array rows — raw form.Field) ─── */}
           <div className='space-y-1'>
-            <h3 className='text-lg font-semibold'>Members</h3>
-            <p className='text-muted-foreground text-sm'>Dynamic array rows with add / remove</p>
+            <h3 className='text-lg font-semibold'>{t('advancedForm.sectionMembers')}</h3>
+            <p className='text-muted-foreground text-sm'>{t('advancedForm.sectionMembersDesc')}</p>
           </div>
 
           <form.Field
@@ -261,11 +279,11 @@ export default function AdvancedFormPatterns() {
                             <Input
                               id={`member-name-${i}`}
                               name={subField.name}
-                              placeholder='Member name'
+                              placeholder={t('advancedForm.memberNamePlaceholder')}
                               value={subField.state.value}
                               onChange={(e) => subField.handleChange(e.target.value)}
                               onBlur={subField.handleBlur}
-                              aria-label={`Member ${i + 1} name`}
+                              aria-label={t('advancedForm.memberNameAria', { n: i + 1 })}
                               aria-invalid={isSubInvalid}
                               aria-describedby={isSubInvalid ? `member-name-${i}-error` : undefined}
                             />
@@ -289,11 +307,11 @@ export default function AdvancedFormPatterns() {
                             <Input
                               id={`member-role-${i}`}
                               name={subField.name}
-                              placeholder='Role'
+                              placeholder={t('advancedForm.memberRolePlaceholder')}
                               value={subField.state.value}
                               onChange={(e) => subField.handleChange(e.target.value)}
                               onBlur={subField.handleBlur}
-                              aria-label={`Member ${i + 1} role`}
+                              aria-label={t('advancedForm.memberRoleAria', { n: i + 1 })}
                               aria-invalid={isSubInvalid}
                               aria-describedby={isSubInvalid ? `member-role-${i}-error` : undefined}
                             />
@@ -312,7 +330,7 @@ export default function AdvancedFormPatterns() {
                       variant='ghost'
                       size='icon'
                       onClick={() => field.removeValue(i)}
-                      aria-label={`Remove member ${i + 1}`}
+                      aria-label={t('advancedForm.removeMemberAria', { n: i + 1 })}
                     >
                       <Icons.close className='h-4 w-4' />
                     </Button>
@@ -324,7 +342,7 @@ export default function AdvancedFormPatterns() {
                   size='sm'
                   onClick={() => field.pushValue({ name: '', role: '' })}
                 >
-                  <Icons.add className='mr-2 h-4 w-4' /> Add Member
+                  <Icons.add className='me-2 h-4 w-4' /> {t('advancedForm.addMember')}
                 </Button>
                 {field.state.value.length > 0 && (
                   <div className='flex flex-wrap gap-1'>
@@ -346,9 +364,9 @@ export default function AdvancedFormPatterns() {
 
           {/* ─── Section 4: Preferences (listeners / side effects) ─── */}
           <div className='space-y-1'>
-            <h3 className='text-lg font-semibold'>Preferences</h3>
+            <h3 className='text-lg font-semibold'>{t('advancedForm.sectionPreferences')}</h3>
             <p className='text-muted-foreground text-sm'>
-              Listener side effects — country resets state
+              {t('advancedForm.sectionPreferencesDesc')}
             </p>
           </div>
 
@@ -362,10 +380,10 @@ export default function AdvancedFormPatterns() {
               }}
               children={(field) => (
                 <field.SelectField
-                  label='Country'
+                  label={t('advancedForm.country')}
                   required
                   options={countryOptions}
-                  placeholder='Select a country'
+                  placeholder={t('advancedForm.countryPlaceholder')}
                 />
               )}
             />
@@ -373,10 +391,14 @@ export default function AdvancedFormPatterns() {
               name='state'
               children={(field) => (
                 <field.SelectField
-                  label='State / Region'
+                  label={t('advancedForm.stateRegion')}
                   required
                   options={stateOptions}
-                  placeholder={selectedCountry ? 'Select state' : 'Select a country first'}
+                  placeholder={
+                    selectedCountry
+                      ? t('advancedForm.statePlaceholder')
+                      : t('advancedForm.stateFirstCountry')
+                  }
                 />
               )}
             />
@@ -387,10 +409,12 @@ export default function AdvancedFormPatterns() {
           {/* ─── Submit ─── */}
           <div className='flex gap-4 pt-2'>
             <Button type='button' variant='outline' onClick={() => form.reset()} className='flex-1'>
-              Reset
+              {t('advancedForm.reset')}
             </Button>
             <form.AppForm>
-              <form.SubmitButton className='flex-1'>Register Team</form.SubmitButton>
+              <form.SubmitButton className='flex-1'>
+                {t('advancedForm.registerTeam')}
+              </form.SubmitButton>
             </form.AppForm>
           </div>
         </form>

@@ -1,30 +1,53 @@
-import { en, type MessageKey } from './messages/en';
-import { ur } from './messages/ur';
-import { ps } from './messages/ps';
+// Re-export everything from next-intl-based modules
+export * from './request';
+export * from './use-t';
 
-export type AppLocale = 'en' | 'ur' | 'ps';
+export { default as messagesEn } from './messages/en';
+export { default as messagesUr } from './messages/ur';
+export { default as messagesPs } from './messages/ps';
 
-const catalogs: Record<AppLocale, Record<MessageKey, string>> = {
-  en,
-  ur,
-  ps
-};
+import type messagesEn from './messages/en';
+export type MessagesShape = typeof messagesEn;
 
-/** Active UI locale. Wire to appearance/settings later. */
-let activeLocale: AppLocale = 'en';
+// ── Legacy shim ──────────────────────────────────────────────────────────────
+// The following exports preserve backward-compatibility for files that still
+// import `t`, `setLocale`, `getLocale` from '@/i18n' before they are fully
+// migrated to useTranslations() / next-intl server APIs.
 
-export function setLocale(locale: AppLocale): void {
+import en from '../../messages/en.json';
+import ur from '../../messages/ur.json';
+import ps from '../../messages/ps.json';
+
+type LegacyLocale = 'en' | 'ur' | 'ps';
+
+const catalogs = { en, ur, ps } satisfies Record<LegacyLocale, object>;
+let activeLocale: LegacyLocale = 'en';
+
+export function setLocale(locale: LegacyLocale): void {
   activeLocale = locale;
 }
 
-export function getLocale(): AppLocale {
+export function getLocale(): LegacyLocale {
   return activeLocale;
 }
 
-/** Translate a key; `{name}` placeholders replaced from `vars`. */
-export function t(key: MessageKey, vars?: Record<string, string | number>): string {
+function getMessage(catalog: object, key: string): string | undefined {
+  let value: unknown = catalog;
+
+  for (const segment of key.split('.')) {
+    if (typeof value !== 'object' || value === null || !(segment in value)) {
+      return undefined;
+    }
+    value = (value as Record<string, unknown>)[segment];
+  }
+
+  return typeof value === 'string' ? value : undefined;
+}
+
+/** Translate a key using the in-memory catalog. Falls back to the key itself. */
+export function t(key: string, vars?: Record<string, string | number>): string {
   const catalog = catalogs[activeLocale] ?? en;
-  let text = catalog[key] ?? en[key] ?? key;
+  let text = getMessage(catalog, key) ?? getMessage(en, key) ?? key;
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
       text = text.replaceAll(`{${name}}`, String(value));
@@ -32,5 +55,3 @@ export function t(key: MessageKey, vars?: Record<string, string | number>): stri
   }
   return text;
 }
-
-export type { MessageKey };

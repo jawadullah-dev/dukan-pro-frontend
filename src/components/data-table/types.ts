@@ -24,8 +24,8 @@ export interface MobileItemConfig<TData> {
 }
 
 export interface DetailField {
-  label: string;
-  value: React.ReactNode;
+  label: string | ((row: any) => string);
+  value: React.ReactNode | ((row: any) => React.ReactNode);
 }
 
 export interface DetailSection {

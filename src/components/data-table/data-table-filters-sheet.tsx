@@ -14,7 +14,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { DataTableFacetedFilter } from '@/components/ui/table/data-table-faceted-filter';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 interface DataTableFiltersSheetProps<TData> {
@@ -32,7 +32,7 @@ export function DataTableFiltersSheet<TData>({
   onOpenChange,
   pageSizeOptions = [20, 30, 50, 100]
 }: DataTableFiltersSheetProps<TData>) {
-  const t = useT();
+  const t = useTranslations();
   const filterColumns = React.useMemo(
     () =>
       table
@@ -165,17 +165,20 @@ export function DataTableFiltersSheet<TData>({
 }
 
 function FilterBlock<TData>({ column }: { column: Column<TData, unknown> }) {
+  const t = useTranslations();
   const meta = column.columnDef.meta;
   if (!meta?.variant) return null;
 
   if (meta.variant === 'select' || meta.variant === 'multiSelect') {
+    const options =
+      typeof meta.options === 'function' ? meta.options(t as any) : (meta.options ?? []);
     return (
       <div className='grid gap-2'>
         <Label>{meta.label ?? column.id}</Label>
         <DataTableFacetedFilter
           column={column}
           title={meta.label ?? column.id}
-          options={meta.options ?? []}
+          options={options}
           multiple={meta.variant === 'multiSelect'}
         />
       </div>

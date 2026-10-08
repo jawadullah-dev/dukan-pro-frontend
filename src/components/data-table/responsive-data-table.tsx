@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 import { useContainerMode } from './use-container-mode';
 import { isColumnVisibleInMode } from './column-visibility';
 import { DataTableToolbar } from './data-table-toolbar';
@@ -57,17 +57,17 @@ export function ResponsiveDataTable<TData>({
   ledger,
   className
 }: ResponsiveDataTableProps<TData>) {
-  const t = useT();
+  const t = useTranslations();
   const router = useRouter();
   const { ref, mode, wideCompact, measured } = useContainerMode();
   const [sideRow, setSideRow] = React.useState<Row<TData> | null>(null);
   const isList = mode === 'list' || mode === 'cards';
 
   const mobileItem = React.useMemo(
-    () => mobileItemProp ?? buildMobileItemFromTable(table),
+    () => mobileItemProp ?? buildMobileItemFromTable(table, (key) => t(key as any)),
     // table identity changes with data; rebuild when column defs / rows change
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
-    [mobileItemProp, table.options.columns, table.options.data]
+    [mobileItemProp, table.options.columns, table.options.data, t]
   );
 
   const detail = React.useMemo(() => {
@@ -79,9 +79,9 @@ export function ResponsiveDataTable<TData>({
     ) {
       return detailProp as DetailConfig<TData>;
     }
-    return buildDetailFromTable(table, detailProp);
+    return buildDetailFromTable(table, detailProp, (key) => t(key as any));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
-  }, [detailProp, table.options.columns, table.options.data]);
+  }, [detailProp, table.options.columns, table.options.data, t]);
 
   return (
     <div
@@ -189,7 +189,7 @@ function CompactOrFullTable<TData>({
   wideCompact: boolean;
   onRowClick?: (row: Row<TData>) => void;
 }) {
-  const t = useT();
+  const t = useTranslations();
   const stickyFirst = mode === 'compact';
 
   return (

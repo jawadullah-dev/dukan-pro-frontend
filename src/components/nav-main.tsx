@@ -15,9 +15,11 @@ import {
   SidebarMenuSubItem
 } from '@/components/ui/sidebar';
 import { Icon } from '@/components/icons';
+import { useTranslations } from 'next-intl';
 
 export function NavMain({
-  items
+  items,
+  groupLabel
 }: {
   items: {
     title: string;
@@ -29,10 +31,13 @@ export function NavMain({
       url: string;
     }[];
   }[];
+  groupLabel?: string;
 }) {
+  const t = useTranslations('nav.group');
+  const label = groupLabel ?? t('management');
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarGroupContent className='flex flex-col gap-2'>
         <SidebarMenu>
           {items.map((item) => (
@@ -47,7 +52,7 @@ export function NavMain({
               >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
-                <Icons.chevronRight className='ml-auto transition-transform duration-200 group-data-panel-open/collapsible:rotate-90' />
+                <Icons.chevronRight className='ms-auto transition-transform duration-200 group-data-panel-open/collapsible:rotate-90 rtl:rotate-180' />
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>

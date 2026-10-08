@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useT } from '@/i18n/use-t';
 import { Icons } from '@/components/icons';
 import {
   Dialog,
@@ -17,7 +18,7 @@ import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { dukaanKeys } from '../api/queries';
-import { reasonSchema } from '../schemas/forms';
+import { createReasonSchema } from '../schemas/forms';
 import { DialogCancelButton, DialogConfirmButton } from './dialog-actions';
 import { RowActionsMenu } from './row-actions-menu';
 
@@ -31,6 +32,7 @@ interface ExpenseActionRow {
 
 export function ExpenseCellAction({ data }: { data: ExpenseActionRow }) {
   const qc = useQueryClient();
+  const t = useT();
   const [open, setOpen] = useState(false);
 
   if (data.status !== 'ACTIVE') return null;
@@ -40,7 +42,7 @@ export function ExpenseCellAction({ data }: { data: ExpenseActionRow }) {
       <RowActionsMenu
         actions={[
           {
-            label: 'Cancel',
+            label: t('dukaan.actions.cancel'),
             icon: Icons.trash,
             variant: 'destructive',
             onClick: () => setOpen(true)
@@ -73,10 +75,11 @@ function ExpenseCancelBody({
   onClose: () => void;
   onSuccess: () => void;
 }) {
+  const t = useT();
   const cancel = useMutation({
     mutationFn: (reason: string) => dukaan.cancelExpense(data.id, reason),
     onSuccess: () => {
-      toast.success('Expense cancelled');
+      toast.success(t('dukaan.actions.expenseCancelled'));
       onSuccess();
     },
     onError: (e: Error) => toast.error(e.message)
@@ -84,7 +87,7 @@ function ExpenseCancelBody({
 
   const form = useAppForm({
     defaultValues: { reason: '' },
-    validators: { onSubmit: reasonSchema },
+    validators: { onSubmit: createReasonSchema(t) },
     onSubmit: ({ value }) => {
       cancel.mutate(value.reason.trim());
     }
@@ -93,7 +96,7 @@ function ExpenseCancelBody({
   return (
     <DialogContent className='sm:max-w-lg'>
       <DialogHeader>
-        <DialogTitle>Cancel expense</DialogTitle>
+        <DialogTitle>{t('dukaan.actions.cancelExpenseTitle')}</DialogTitle>
         <DialogDescription>
           {data.expense_date} · {formatPkr(data.amount)}
           {data.description ? ` · ${data.description}` : ''}
@@ -111,9 +114,9 @@ function ExpenseCancelBody({
             name='reason'
             children={(field) => (
               <field.TextareaField
-                label='Reason'
+                label={t('stock.reason')}
                 required
-                placeholder='Why are you cancelling this expense?'
+                placeholder={t('dukaan.actions.cancelExpensePlaceholder')}
                 autoFocus
               />
             )}

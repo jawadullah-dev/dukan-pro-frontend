@@ -21,7 +21,7 @@ import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { toPaisa } from '@/lib/dukaan/numbers';
 import { dukaanKeys } from '../api/queries';
-import { partyFormSchema } from '../schemas/forms';
+import { createPartyFormSchema } from '../schemas/forms';
 import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { SuppliersTable } from './tables/commerce-tables';
 
@@ -40,6 +40,7 @@ function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
 
 function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
   const qc = useQueryClient();
+  const t = useT();
 
   const create = useMutation({
     mutationFn: (value: {
@@ -57,7 +58,7 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
         opening_balance: toPaisa(value.opening_balance)
       }),
     onSuccess: () => {
-      toast.success('Supplier added');
+      toast.success(t('dukaan.party.supplierAdded'));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
       onOpenChange(false);
     },
@@ -72,7 +73,7 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
       notes: '',
       opening_balance: 0
     },
-    validators: { onSubmit: partyFormSchema },
+    validators: { onSubmit: createPartyFormSchema(t) },
     onSubmit: ({ value }) => {
       create.mutate(value);
     }
@@ -80,9 +81,9 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
 
   return (
     <DialogContent className='flex max-h-[85vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-lg'>
-      <DialogHeader className='shrink-0 px-4 pt-4 pr-12'>
-        <DialogTitle>Add supplier</DialogTitle>
-        <DialogDescription>Create a supplier for purchases and dues.</DialogDescription>
+      <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
+        <DialogTitle>{t('dukaan.party.supplierAddTitle')}</DialogTitle>
+        <DialogDescription>{t('dukaan.party.supplierAddDescription')}</DialogDescription>
       </DialogHeader>
       <form
         className='flex min-h-0 flex-1 flex-col'
@@ -95,16 +96,18 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
           <FieldGroup className='gap-4'>
             <form.AppField
               name='name'
-              children={(field) => <field.TextField label='Name' required autoFocus />}
+              children={(field) => (
+                <field.TextField label={t('dukaan.party.name')} required autoFocus />
+              )}
             />
             <form.AppField
               name='phone'
               children={(field) => (
                 <field.TextField
-                  label='Phone'
+                  label={t('dukaan.party.phone')}
                   type='tel'
                   inputMode='numeric'
-                  placeholder='03XXXXXXXXX'
+                  placeholder={t('users.phonePlaceholder')}
                   startIcon={Icons.phone}
                   required
                 />
@@ -112,17 +115,17 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
             />
             <form.AppField
               name='address'
-              children={(field) => <field.TextField label='Address' />}
+              children={(field) => <field.TextField label={t('dukaan.party.address')} />}
             />
             <form.AppField
               name='opening_balance'
               children={(field) => (
-                <field.TextField label='Opening balance (Rs, old dues)' type='number' />
+                <field.TextField label={t('dukaan.party.supplierOpeningBalance')} type='number' />
               )}
             />
             <form.AppField
               name='notes'
-              children={(field) => <field.TextareaField label='Notes' />}
+              children={(field) => <field.TextareaField label={t('dukaan.party.notes')} />}
             />
           </FieldGroup>
         </div>

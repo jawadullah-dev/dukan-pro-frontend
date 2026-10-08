@@ -1,5 +1,4 @@
 import type { AppearanceState } from './store';
-import { setLocale, type AppLocale } from '@/i18n';
 
 const RADIUS_REM: Record<AppearanceState['radius'], string> = {
   sharp: '0.25rem',
@@ -17,7 +16,7 @@ const ACCENT_OKLCH: Record<AppearanceState['accent'], string> = {
 };
 
 export function applyAppearancePrefs(
-  prefs: Pick<AppearanceState, 'density' | 'radius' | 'accent' | 'language' | 'digits'>
+  prefs: Pick<AppearanceState, 'density' | 'radius' | 'accent' | 'digits'>
 ): void {
   if (typeof document === 'undefined') return;
 
@@ -28,7 +27,4 @@ export function applyAppearancePrefs(
   root.dataset.appearanceDensity = prefs.density;
   root.dataset.appearanceDigits = prefs.digits;
   delete root.dataset.appearanceFont;
-  root.lang = prefs.language === 'en' ? 'en' : prefs.language === 'ur' ? 'ur' : 'ps';
-  root.dir = prefs.language === 'en' ? 'ltr' : 'rtl';
-  setLocale(prefs.language as AppLocale);
 }

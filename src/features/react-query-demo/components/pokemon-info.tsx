@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { pokemonOptions } from '../api/queries';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,17 +21,17 @@ const POKEMON_IDS = [25, 1, 4, 7, 6, 150, 133, 39, 143, 94];
 export function PokemonInfo() {
   const [pokemonId, setPokemonId] = useState(25);
   const { data } = useSuspenseQuery(pokemonOptions(pokemonId));
+  const t = useTranslations();
+  const height = (data.height / 10).toFixed(1);
+  const weight = (data.weight / 10).toFixed(1);
 
   return (
     <div className='space-y-6'>
       {/* Pokemon selector */}
       <Card>
         <CardHeader>
-          <CardTitle>Pick a Pokemon</CardTitle>
-          <CardDescription>
-            Each selection triggers <code>useSuspenseQuery</code> — cached results are instant, new
-            fetches show the Suspense fallback.
-          </CardDescription>
+          <CardTitle>{t('reactQueryDemo.pickPokemon')}</CardTitle>
+          <CardDescription>{t('reactQueryDemo.pickPokemonDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className='flex flex-wrap gap-2'>
@@ -61,9 +62,7 @@ export function PokemonInfo() {
               ))}
             </div>
           </div>
-          <CardDescription>
-            Height: {data.height / 10}m &middot; Weight: {data.weight / 10}kg
-          </CardDescription>
+          <CardDescription>{t('reactQueryDemo.heightWeight', { height, weight })}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className='flex flex-col items-center gap-6 sm:flex-row'>
@@ -89,9 +88,7 @@ export function PokemonInfo() {
           </div>
         </CardContent>
         <CardFooter>
-          <p className='text-muted-foreground text-xs'>
-            Data from PokeAPI &middot; Prefetched on server, hydrated on client
-          </p>
+          <p className='text-muted-foreground text-xs'>{t('reactQueryDemo.dataSource')}</p>
         </CardFooter>
       </Card>
     </div>

@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next';
 import { createRequire } from 'node:module';
 import { withSerwist } from '@serwist/turbopack';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 const baseConfig: NextConfig = {
   output: process.env.BUILD_STANDALONE === 'true' ? 'standalone' : undefined,
@@ -17,6 +20,7 @@ const baseConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production'
   },
+  skipProxyUrlNormalize: true,
   async headers() {
     return [
       {
@@ -38,8 +42,7 @@ const baseConfig: NextConfig = {
 };
 
 const sentryEnabled =
-  Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN) &&
-  process.env.NEXT_PUBLIC_SENTRY_DISABLED !== 'true';
+  Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN) && process.env.NEXT_PUBLIC_SENTRY_DISABLED !== 'true';
 
 function withOptionalSentry(config: NextConfig): NextConfig {
   if (!sentryEnabled) return config;
@@ -68,5 +71,5 @@ function withOptionalSentry(config: NextConfig): NextConfig {
   });
 }
 
-const nextConfig = withSerwist(withOptionalSentry(baseConfig));
+const nextConfig = withSerwist(withOptionalSentry(withNextIntl(baseConfig)));
 export default nextConfig;

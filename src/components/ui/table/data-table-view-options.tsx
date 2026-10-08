@@ -2,6 +2,7 @@
 
 import type { Table } from '@tanstack/react-table';
 import { Icons } from '@/components/icons';
+import { useT, translateMaybe } from '@/i18n/use-t';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,6 +22,7 @@ interface DataTableViewOptionsProps<TData> {
 }
 
 export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps<TData>) {
+  const t = useT();
   const columns = React.useMemo(
     () =>
       table
@@ -34,22 +36,22 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
       <PopoverTrigger
         render={
           <Button
-            aria-label='Toggle columns'
+            aria-label={t('table.toggleColumns')}
             variant='outline'
             size='sm'
-            className='ml-auto hidden h-8 lg:flex'
+            className='ms-auto hidden h-8 lg:flex'
           />
         }
       >
         <Icons.adjustments />
-        View
-        <Icons.chevronsUpDown className='ml-auto opacity-50' />
+        {t('table.view')}
+        <Icons.chevronsUpDown className='ms-auto opacity-50' />
       </PopoverTrigger>
       <PopoverContent align='end' className='w-44 p-0'>
         <Command>
-          <CommandInput placeholder='Search columns...' />
+          <CommandInput placeholder={t('table.searchColumns')} />
           <CommandList>
-            <CommandEmpty>No columns found.</CommandEmpty>
+            <CommandEmpty>{t('table.noColumnsFound')}</CommandEmpty>
             <CommandGroup>
               {columns.map((column) => (
                 <CommandItem
@@ -57,11 +59,13 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                   onSelect={() => column.toggleVisibility(!column.getIsVisible())}
                 >
                   <span className='truncate'>
-                    {column.columnDef.meta?.label ?? column.id.replaceAll('_', ' ')}
+                    {column.columnDef.meta?.label
+                      ? translateMaybe(column.columnDef.meta.label, t)
+                      : column.id.replaceAll('_', ' ')}
                   </span>
                   <Icons.check
                     className={cn(
-                      'ml-auto size-4 shrink-0',
+                      'ms-auto size-4 shrink-0',
                       column.getIsVisible() ? 'opacity-100' : 'opacity-0'
                     )}
                   />

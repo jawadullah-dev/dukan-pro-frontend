@@ -26,28 +26,17 @@ import {
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icons } from '@/components/icons';
+import { useT } from '@/i18n/use-t';
 
 // ---------------------------------------------------------------------------
 // Schemas
 // ---------------------------------------------------------------------------
 
-const sheetFormSchema = z.object({
-  name: z.string().min(2, 'Product name must be at least 2 characters'),
-  category: z.string().min(1, 'Please select a category'),
-  price: z.number({ error: 'Price is required' }).min(0.01, 'Price must be greater than 0'),
-  description: z.string().min(10, 'Description must be at least 10 characters')
-});
-
-const dialogFormSchema = z.object({
-  rating: z.number().min(0).max(10),
-  feedback: z.string().min(5, 'Feedback must be at least 5 characters')
-});
-
-const categoryOptions = [
-  { value: 'beauty', label: 'Beauty Products' },
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'home', label: 'Home & Garden' },
-  { value: 'sports', label: 'Sports & Outdoors' }
+const categoryOptions = (t: (key: string) => string) => [
+  { value: 'beauty', label: t('categories.beautyProducts') },
+  { value: 'electronics', label: t('categories.electronics') },
+  { value: 'home', label: t('categories.homeGarden') },
+  { value: 'sports', label: t('categories.sportsOutdoors') }
 ];
 
 // ---------------------------------------------------------------------------
@@ -56,6 +45,16 @@ const categoryOptions = [
 
 function SheetFormSection() {
   const [open, setOpen] = useState(false);
+  const t = useT();
+
+  const sheetFormSchema = z.object({
+    name: z.string().min(2, t('sheetFormZod.nameMin2')),
+    category: z.string().min(1, t('sheetFormZod.categoryRequired')),
+    price: z
+      .number({ error: t('sheetFormZod.priceRequired') })
+      .min(0.01, t('sheetFormZod.priceMin')),
+    description: z.string().min(10, t('sheetFormZod.descriptionMin10'))
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -68,8 +67,8 @@ function SheetFormSection() {
       onSubmit: sheetFormSchema
     },
     onSubmit: ({ value }) => {
-      toast.success('Product created successfully!', {
-        description: `${value.name} has been added.`
+      toast.success(t('demo.productCreated'), {
+        description: t('demo.productAdded', { name: value.name })
       });
       setOpen(false);
       form.reset();
@@ -79,25 +78,19 @@ function SheetFormSection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sheet Form</CardTitle>
-        <CardDescription>
-          A product creation form inside a Sheet. The submit button lives in the SheetFooter,
-          outside the form element, connected via the HTML{' '}
-          <code className='bg-muted rounded px-1 text-sm'>form</code> attribute.
-        </CardDescription>
+        <CardTitle>{t('demo.sheetForm')}</CardTitle>
+        <CardDescription>{t('demo.sheetFormDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger render={<Button />}>
-            <Icons.add className='mr-2 h-4 w-4' />
-            Add Product
+            <Icons.add className='ms-2 h-4 w-4' />
+            {t('common.addProduct')}
           </SheetTrigger>
           <SheetContent className='flex flex-col'>
             <SheetHeader>
-              <SheetTitle>New Product</SheetTitle>
-              <SheetDescription>
-                Fill in the details below to create a new product.
-              </SheetDescription>
+              <SheetTitle>{t('demo.newProduct')}</SheetTitle>
+              <SheetDescription>{t('demo.fillDetailsBelowCreateProduct')}</SheetDescription>
             </SheetHeader>
 
             <form
@@ -113,9 +106,9 @@ function SheetFormSection() {
                   name='name'
                   children={(field) => (
                     <field.TextField
-                      label='Product Name'
+                      label={t('common.productName')}
                       required
-                      placeholder='Enter product name'
+                      placeholder={t('common.enterProductName')}
                     />
                   )}
                 />
@@ -124,10 +117,10 @@ function SheetFormSection() {
                   name='category'
                   children={(field) => (
                     <field.SelectField
-                      label='Category'
+                      label={t('common.category')}
                       required
-                      options={categoryOptions}
-                      placeholder='Select a category'
+                      options={categoryOptions(t)}
+                      placeholder={t('demo.selectCategory')}
                     />
                   )}
                 />
@@ -136,7 +129,7 @@ function SheetFormSection() {
                   name='price'
                   children={(field) => (
                     <field.TextField
-                      label='Price'
+                      label={t('common.price')}
                       required
                       type='number'
                       min={0}
@@ -150,9 +143,9 @@ function SheetFormSection() {
                   name='description'
                   children={(field) => (
                     <field.TextareaField
-                      label='Description'
+                      label={t('common.description')}
                       required
-                      placeholder='Enter product description'
+                      placeholder={t('common.enterProductDescription')}
                       maxLength={500}
                       rows={4}
                     />
@@ -164,10 +157,10 @@ function SheetFormSection() {
             <SheetFooter className='pt-4'>
               <form.AppForm>
                 <Button type='button' variant='outline' onClick={() => setOpen(false)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <form.SubmitButton type='submit' form='sheet-form-id'>
-                  Create Product
+                  {t('common.createProduct')}
                 </form.SubmitButton>
               </form.AppForm>
             </SheetFooter>
@@ -184,6 +177,12 @@ function SheetFormSection() {
 
 function DialogFormSection() {
   const [open, setOpen] = useState(false);
+  const t = useT();
+
+  const dialogFormSchema = z.object({
+    rating: z.number().min(0).max(10),
+    feedback: z.string().min(5, t('sheetFormZod.feedbackMin5'))
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -194,8 +193,8 @@ function DialogFormSection() {
       onSubmit: dialogFormSchema
     },
     onSubmit: ({ value }) => {
-      toast.success('Feedback submitted!', {
-        description: `Rating: ${value.rating}/10. Thank you!`
+      toast.success(t('demo.ratingSubmitted'), {
+        description: t('demo.ratingSubmitted', { rating: value.rating })
       });
       setOpen(false);
       form.reset();
@@ -205,21 +204,19 @@ function DialogFormSection() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Dialog Form</CardTitle>
-        <CardDescription>
-          A quick feedback form inside a Dialog with the submit button in the DialogFooter.
-        </CardDescription>
+        <CardTitle>{t('demo.dialogForm')}</CardTitle>
+        <CardDescription>{t('demo.dialogFormDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger render={<Button variant='outline' />}>
-            <Icons.send className='mr-2 h-4 w-4' />
-            Send Feedback
+            <Icons.send className='ms-2 h-4 w-4' />
+            {t('demo.sendFeedback')}
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Quick Feedback</DialogTitle>
-              <DialogDescription>Rate your experience and leave a comment.</DialogDescription>
+              <DialogTitle>{t('demo.quickFeedback')}</DialogTitle>
+              <DialogDescription>{t('demo.rateExperience')}</DialogDescription>
             </DialogHeader>
 
             <form
@@ -235,8 +232,8 @@ function DialogFormSection() {
                   name='rating'
                   children={(field) => (
                     <field.SliderField
-                      label='Rating'
-                      description='Rate your experience (0-10)'
+                      label={t('demo.rating')}
+                      description={t('demo.ratingDescription')}
                       min={0}
                       max={10}
                       step={1}
@@ -248,9 +245,9 @@ function DialogFormSection() {
                   name='feedback'
                   children={(field) => (
                     <field.TextareaField
-                      label='Feedback'
+                      label={t('demo.feedback')}
                       required
-                      placeholder='Tell us what you think...'
+                      placeholder={t('demo.feedbackPlaceholder')}
                       maxLength={300}
                       rows={3}
                     />
@@ -262,10 +259,10 @@ function DialogFormSection() {
             <DialogFooter>
               <form.AppForm>
                 <Button type='button' variant='outline' onClick={() => setOpen(false)}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <form.SubmitButton type='submit' form='dialog-form-id'>
-                  Submit Feedback
+                  {t('demo.submitFeedback')}
                 </form.SubmitButton>
               </form.AppForm>
             </DialogFooter>
@@ -281,46 +278,45 @@ function DialogFormSection() {
 // ---------------------------------------------------------------------------
 
 function ToastDemoSection() {
+  const t = useT();
   return (
     <Card className='md:col-span-2'>
       <CardHeader>
-        <CardTitle>Toast Notifications</CardTitle>
-        <CardDescription>
-          Trigger different toast variants to preview notification styles.
-        </CardDescription>
+        <CardTitle>{t('demo.toastNotifications')}</CardTitle>
+        <CardDescription>{t('demo.toastNotificationsDescription')}</CardDescription>
       </CardHeader>
       <CardContent className='flex flex-wrap gap-2'>
-        <Button variant='outline' onClick={() => toast('Default toast notification')}>
-          Default
+        <Button variant='outline' onClick={() => toast(t('demo.defaultToast'))}>
+          {t('demo.default')}
         </Button>
-        <Button variant='outline' onClick={() => toast.success('Action completed successfully!')}>
-          <Icons.circleCheck className='mr-2 h-4 w-4' />
-          Success
+        <Button variant='outline' onClick={() => toast.success(t('demo.successToast'))}>
+          <Icons.circleCheck className='ms-2 h-4 w-4' />
+          {t('demo.success')}
         </Button>
-        <Button variant='outline' onClick={() => toast.error('Something went wrong.')}>
-          <Icons.circleX className='mr-2 h-4 w-4' />
-          Error
+        <Button variant='outline' onClick={() => toast.error(t('demo.errorToast'))}>
+          <Icons.circleX className='ms-2 h-4 w-4' />
+          {t('demo.error')}
         </Button>
-        <Button variant='outline' onClick={() => toast.warning('Please review before continuing.')}>
-          <Icons.warning className='mr-2 h-4 w-4' />
-          Warning
+        <Button variant='outline' onClick={() => toast.warning(t('demo.warningToast'))}>
+          <Icons.warning className='ms-2 h-4 w-4' />
+          {t('demo.warning')}
         </Button>
-        <Button variant='outline' onClick={() => toast.info('Here is some useful information.')}>
-          <Icons.info className='mr-2 h-4 w-4' />
-          Info
+        <Button variant='outline' onClick={() => toast.info(t('demo.infoToast'))}>
+          <Icons.info className='ms-2 h-4 w-4' />
+          {t('demo.info')}
         </Button>
         <Button
           variant='outline'
           onClick={() =>
             toast.promise(new Promise((resolve) => setTimeout(resolve, 2000)), {
-              loading: 'Loading...',
-              success: 'Data loaded!',
-              error: 'Failed to load.'
+              loading: t('demo.loading'),
+              success: t('demo.dataLoaded'),
+              error: t('demo.failedToLoad')
             })
           }
         >
-          <Icons.spinner className='mr-2 h-4 w-4' />
-          Promise
+          <Icons.spinner className='ms-2 h-4 w-4' />
+          {t('demo.promise')}
         </Button>
       </CardContent>
     </Card>

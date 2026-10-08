@@ -5,11 +5,13 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { useInfobar, type InfobarContent } from '@/components/ui/infobar';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/use-t';
 
 interface InfoButtonProps extends Omit<React.ComponentProps<typeof Button>, 'content'> {
   content: InfobarContent;
   variant?: 'default' | 'ghost' | 'outline' | 'secondary' | 'destructive' | 'link';
   size?: 'default' | 'sm' | 'lg' | 'icon';
+  label?: string;
 }
 
 export function InfoButton({
@@ -17,9 +19,12 @@ export function InfoButton({
   className,
   variant = 'ghost',
   size = 'icon',
+  label,
   ...props
 }: InfoButtonProps) {
   const { setContent, setOpen } = useInfobar();
+  const t = useT();
+  const resolvedLabel = label ?? t('infoButton.showInformation');
 
   // Set content on mount so the infobar has it ready, but don't force it open
   const contentRef = React.useRef(content);
@@ -41,11 +46,11 @@ export function InfoButton({
       size={size}
       className={cn('shrink-0', className)}
       onClick={handleClick}
-      aria-label='Show information'
+      aria-label={resolvedLabel}
       {...props}
     >
       <Icons.info className='h-4 w-4' />
-      <span className='sr-only'>Show information</span>
+      <span className='sr-only'>{resolvedLabel}</span>
     </Button>
   );
 }

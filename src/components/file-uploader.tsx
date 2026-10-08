@@ -4,6 +4,7 @@ import { Icons } from '@/components/icons';
 import Image from 'next/image';
 import * as React from 'react';
 import Dropzone, { type DropzoneProps, type FileRejection } from 'react-dropzone';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -108,16 +109,17 @@ export function FileUploader(props: FileUploaderProps) {
     prop: valueProp,
     onChange: onValueChange
   });
+  const t = useTranslations();
 
   const onDrop = React.useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       if (!multiple && maxFiles === 1 && acceptedFiles.length > 1) {
-        toast.error('Cannot upload more than 1 file at a time');
+        toast.error(t('fileUploader.maxOneFile'));
         return;
       }
 
       if ((files?.length ?? 0) + acceptedFiles.length > maxFiles) {
-        toast.error(`Cannot upload more than ${maxFiles} files`);
+        toast.error(t('fileUploader.multiFileLimit', { max: maxFiles }));
         return;
       }
 
@@ -133,25 +135,26 @@ export function FileUploader(props: FileUploaderProps) {
 
       if (rejectedFiles.length > 0) {
         rejectedFiles.forEach(({ file }) => {
-          toast.error(`File ${file.name} was rejected`);
+          toast.error(t('fileUploader.fileRejected', { file: file.name }));
         });
       }
 
       if (onUpload && updatedFiles.length > 0 && updatedFiles.length <= maxFiles) {
-        const target = updatedFiles.length > 0 ? `${updatedFiles.length} files` : `file`;
+        const target =
+          updatedFiles.length > 1 ? t('fileUploader.filesPlural') : t('fileUploader.filesSingular');
 
         toast.promise(onUpload(updatedFiles), {
-          loading: `Uploading ${target}...`,
+          loading: t('fileUploader.uploadingTarget', { target }),
           success: () => {
             setFiles([]);
-            return `${target} uploaded`;
+            return t('fileUploader.uploadedTarget', { target });
           },
-          error: `Failed to upload ${target}`
+          error: t('fileUploader.failedTarget', { target })
         });
       }
     },
 
-    [files, maxFiles, multiple, onUpload, setFiles]
+    [files, maxFiles, multiple, onUpload, setFiles, t]
   );
 
   function onRemove(index: number) {
@@ -198,13 +201,13 @@ export function FileUploader(props: FileUploaderProps) {
             )}
             {...dropzoneProps}
           >
-            <input {...getInputProps()} aria-label='Upload files' />
+            <input {...getInputProps()} aria-label={t('fileUploader.uploadAria')} />
             {isDragActive ? (
               <div className='flex flex-col items-center justify-center gap-4 sm:px-5'>
                 <div className='rounded-full border border-dashed p-3'>
                   <Icons.upload className='text-muted-foreground size-7' aria-hidden='true' />
                 </div>
-                <p className='text-muted-foreground font-medium'>Drop the files here</p>
+                <p className='text-muted-foreground font-medium'>{t('fileUploader.dropHere')}</p>
               </div>
             ) : (
               <div className='flex flex-col items-center justify-center gap-4 sm:px-5'>
@@ -213,14 +216,11 @@ export function FileUploader(props: FileUploaderProps) {
                 </div>
                 <div className='space-y-px'>
                   <p className='text-muted-foreground font-medium'>
-                    Drag {`'n'`} drop files here, or click to select files
+                    {t('fileUploader.dragOrClick')}
                   </p>
                   <p className='text-muted-foreground/70 text-sm'>
-                    You can upload
-                    {maxFiles > 1
-                      ? ` ${maxFiles === Infinity ? 'multiple' : maxFiles}
-                      files (up to ${formatBytes(maxSize)} each)`
-                      : ` a file with ${formatBytes(maxSize)}`}
+                    {t('fileUploader.canUploadUpTo', { max: maxFiles })}
+                    {maxFiles === 1 ? ` (${formatBytes(maxSize)})` : ''}
                   </p>
                 </div>
               </div>
@@ -253,9 +253,11 @@ interface FileCardProps {
 }
 
 function FileCard({ file, progress, onRemove }: FileCardProps) {
+  const t = useTranslations();
+
   return (
-    <div className='relative flex items-center space-x-4'>
-      <div className='flex flex-1 space-x-4'>
+    <div className='relative flex items-center gap-x-4'>
+      <div className='flex flex-1 gap-x-4'>
         {isFileWithPreview(file) ? (
           <Image
             src={file.preview}
@@ -284,7 +286,7 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
           className='size-8 rounded-full'
         >
           <Icons.close className='text-muted-foreground' />
-          <span className='sr-only'>Remove file</span>
+          <span className='sr-only'>{t('fileUploader.removeFile')}</span>
         </Button>
       </div>
     </div>

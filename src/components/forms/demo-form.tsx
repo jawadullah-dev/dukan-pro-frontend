@@ -12,40 +12,43 @@ import { Separator } from '@/components/ui/separator';
 import { ToggleGroupItem } from '@/components/ui/toggle-group';
 import type { DateRange } from 'react-day-picker';
 import { Icons } from '@/components/icons';
+import { translateMaybe, useT } from '@/i18n/use-t';
+import { toast } from 'sonner';
 
 // Schema — validated on submit, errors display next to each field
-const demoFormSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.email('Invalid email address'),
-  age: z.number({ error: 'Age is required' }).min(18, 'Must be at least 18 years old'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  phone: z.string().min(10, 'Phone must be at least 10 digits'),
-  website: z.string().url('Invalid URL').or(z.literal('')),
-  bio: z.string().min(10, 'Bio must be at least 10 characters'),
-  country: z.string().min(1, 'Please select a country'),
-  framework: z.string().min(1, 'Please select a framework'),
-  interests: z.array(z.string()).min(1, 'Select at least one interest'),
-  gender: z.string().min(1, 'Please select gender'),
-  newsletter: z.boolean(),
-  rating: z.number().min(0).max(10),
-  birthDate: z.date().optional(),
-  dateRange: z.any().optional(),
-  eventTime: z.string().optional(),
-  favoriteColor: z.string().optional(),
-  otp: z.string().min(6, 'Please enter 6 digits'),
-  formatting: z.array(z.string()).optional(),
-  tags: z.array(z.string()).min(1, 'Add at least one tag'),
-  terms: z.boolean().refine((val) => val === true, 'You must accept the terms'),
-  avatar: z.array(z.any()).optional()
-});
+const demoFormSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z.string().min(2, t('demoFormZod.nameMin2')),
+    email: z.email(t('demoFormZod.emailInvalid')),
+    age: z.number({ error: t('demoFormZod.ageRequired') }).min(18, t('demoFormZod.ageMin18')),
+    password: z.string().min(8, t('demoFormZod.passwordMin8')),
+    phone: z.string().min(10, t('demoFormZod.phoneMin10')),
+    website: z.string().url(t('demoFormZod.urlInvalid')).or(z.literal('')),
+    bio: z.string().min(10, t('demoFormZod.bioMin10')),
+    country: z.string().min(1, t('demoFormZod.countryRequired')),
+    framework: z.string().min(1, t('demoFormZod.frameworkRequired')),
+    interests: z.array(z.string()).min(1, t('demoFormZod.interestsRequired')),
+    gender: z.string().min(1, t('demoFormZod.genderRequired')),
+    newsletter: z.boolean(),
+    rating: z.number().min(0).max(10),
+    birthDate: z.date().optional(),
+    dateRange: z.any().optional(),
+    eventTime: z.string().optional(),
+    favoriteColor: z.string().optional(),
+    otp: z.string().min(6, t('demoFormZod.otpMin6')),
+    formatting: z.array(z.string()).optional(),
+    tags: z.array(z.string()).min(1, t('demoFormZod.tagsRequired')),
+    terms: z.boolean().refine((val) => val === true, t('demoFormZod.termsRequired')),
+    avatar: z.array(z.any()).optional()
+  });
 
-const countryOptions = [
-  { value: 'us', label: 'United States' },
-  { value: 'ca', label: 'Canada' },
-  { value: 'uk', label: 'United Kingdom' },
-  { value: 'au', label: 'Australia' },
-  { value: 'de', label: 'Germany' },
-  { value: 'fr', label: 'France' }
+const countryOptionKeys = [
+  { value: 'us', labelKey: 'formOptions.countries.us' },
+  { value: 'ca', labelKey: 'formOptions.countries.ca' },
+  { value: 'uk', labelKey: 'formOptions.countries.uk' },
+  { value: 'au', labelKey: 'formOptions.countries.au' },
+  { value: 'de', labelKey: 'formOptions.countries.de' },
+  { value: 'fr', labelKey: 'formOptions.countries.fr' }
 ];
 
 const frameworkOptions = [
@@ -57,20 +60,20 @@ const frameworkOptions = [
   { value: 'angular', label: 'Angular' }
 ];
 
-const interestOptions = [
-  { value: 'technology', label: 'Technology' },
-  { value: 'sports', label: 'Sports' },
-  { value: 'music', label: 'Music' },
-  { value: 'travel', label: 'Travel' },
-  { value: 'cooking', label: 'Cooking' },
-  { value: 'reading', label: 'Reading' }
+const interestOptionKeys = [
+  { value: 'technology', labelKey: 'formOptions.interests.technology' },
+  { value: 'sports', labelKey: 'formOptions.interests.sports' },
+  { value: 'music', labelKey: 'formOptions.interests.music' },
+  { value: 'travel', labelKey: 'formOptions.interests.travel' },
+  { value: 'cooking', labelKey: 'formOptions.interests.cooking' },
+  { value: 'reading', labelKey: 'formOptions.interests.reading' }
 ];
 
-const genderOptions = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' },
-  { value: 'other', label: 'Other' },
-  { value: 'prefer-not-to-say', label: 'Prefer not to say' }
+const genderOptionKeys = [
+  { value: 'male', labelKey: 'formOptions.genders.male' },
+  { value: 'female', labelKey: 'formOptions.genders.female' },
+  { value: 'other', labelKey: 'formOptions.genders.other' },
+  { value: 'prefer-not-to-say', labelKey: 'formOptions.genders.preferNotToSay' }
 ];
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
@@ -112,6 +115,20 @@ type DemoFormValues = {
 };
 
 export default function DemoForm() {
+  const t = useT();
+  const countryOptions = countryOptionKeys.map(({ value, labelKey }) => ({
+    value,
+    label: translateMaybe(labelKey, t)
+  }));
+  const interestOptions = interestOptionKeys.map(({ value, labelKey }) => ({
+    value,
+    label: translateMaybe(labelKey, t)
+  }));
+  const genderOptions = genderOptionKeys.map(({ value, labelKey }) => ({
+    value,
+    label: translateMaybe(labelKey, t)
+  }));
+
   const form = useAppForm({
     defaultValues: {
       name: '',
@@ -138,10 +155,10 @@ export default function DemoForm() {
       avatar: []
     } as DemoFormValues,
     validators: {
-      onSubmit: demoFormSchema
+      onSubmit: demoFormSchema(t)
     },
     onSubmit: () => {
-      alert('Form submitted successfully!');
+      toast.success(t('demoForm.submittedSuccess'));
     }
   });
 
@@ -152,10 +169,8 @@ export default function DemoForm() {
     <div className='grid grid-cols-1 gap-6 xl:grid-cols-[1fr_320px]'>
       <Card>
         <CardHeader>
-          <CardTitle className='text-2xl font-bold'>All Form Inputs Demo</CardTitle>
-          <p className='text-muted-foreground'>
-            Every possible form input — built with TanStack Form + shadcn/ui
-          </p>
+          <CardTitle className='text-2xl font-bold'>{t('demoForm.title')}</CardTitle>
+          <p className='text-muted-foreground'>{t('demoForm.description')}</p>
         </CardHeader>
         <CardContent>
           <form
@@ -168,13 +183,13 @@ export default function DemoForm() {
             }}
           >
             {/* ─── TEXT INPUTS ─── */}
-            <SectionTitle>Text Inputs</SectionTitle>
+            <SectionTitle>{t('demoForm.sectionText')}</SectionTitle>
 
             <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <form.AppField
                 name='name'
                 children={(field) => (
-                  <field.TextField label='Full Name' required placeholder='John Doe' />
+                  <field.TextField label={t('demoForm.fullName')} required placeholder='John Doe' />
                 )}
               />
 
@@ -187,14 +202,14 @@ export default function DemoForm() {
                     if (!value || value.length < 3) return undefined;
                     await new Promise((r) => setTimeout(r, 500));
                     if (value === 'taken@example.com') {
-                      return { message: 'This email is already registered' };
+                      return { message: t('demoFormZod.emailAlreadyRegistered') };
                     }
                     return undefined;
                   }
                 }}
                 children={(field) => (
                   <field.TextField
-                    label='Email'
+                    label={t('demoForm.email')}
                     required
                     type='email'
                     placeholder='john@example.com'
@@ -206,10 +221,10 @@ export default function DemoForm() {
                 name='password'
                 children={(field) => (
                   <field.TextField
-                    label='Password'
+                    label={t('demoForm.password')}
                     required
                     type='password'
-                    placeholder='Min 8 characters'
+                    placeholder={t('demoForm.passwordPlaceholder')}
                   />
                 )}
               />
@@ -218,7 +233,7 @@ export default function DemoForm() {
                 name='age'
                 children={(field) => (
                   <field.TextField
-                    label='Age'
+                    label={t('demoForm.age')}
                     required
                     type='number'
                     min={18}
@@ -232,7 +247,7 @@ export default function DemoForm() {
                 name='phone'
                 children={(field) => (
                   <field.TextField
-                    label='Phone'
+                    label={t('demoForm.phone')}
                     required
                     type='tel'
                     placeholder='+1 (555) 000-0000'
@@ -243,7 +258,11 @@ export default function DemoForm() {
               <form.AppField
                 name='website'
                 children={(field) => (
-                  <field.TextField label='Website' type='url' placeholder='https://example.com' />
+                  <field.TextField
+                    label={t('demoForm.website')}
+                    type='url'
+                    placeholder='https://example.com'
+                  />
                 )}
               />
             </FieldGroup>
@@ -253,9 +272,9 @@ export default function DemoForm() {
               name='bio'
               children={(field) => (
                 <field.TextareaField
-                  label='Bio'
+                  label={t('demoForm.bio')}
                   required
-                  placeholder='Tell us about yourself...'
+                  placeholder={t('demoForm.bioPlaceholder')}
                   maxLength={500}
                   rows={4}
                   showCount
@@ -264,17 +283,17 @@ export default function DemoForm() {
             />
 
             {/* ─── SELECT & COMBOBOX ─── */}
-            <SectionTitle>Select & Combobox</SectionTitle>
+            <SectionTitle>{t('demoForm.sectionSelect')}</SectionTitle>
 
             <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <form.AppField
                 name='country'
                 children={(field) => (
                   <field.SelectField
-                    label='Country'
+                    label={t('demoForm.country')}
                     required
                     options={countryOptions}
-                    placeholder='Select your country'
+                    placeholder={t('demoForm.countryPlaceholder')}
                   />
                 )}
               />
@@ -283,27 +302,27 @@ export default function DemoForm() {
                 name='framework'
                 children={(field) => (
                   <field.ComboboxField
-                    label='Framework'
+                    label={t('demoForm.framework')}
                     required
-                    description='Searchable dropdown'
+                    description={t('demoForm.frameworkDesc')}
                     options={frameworkOptions}
-                    placeholder='Search frameworks...'
+                    placeholder={t('demoForm.frameworkPlaceholder')}
                   />
                 )}
               />
             </FieldGroup>
 
             {/* ─── CHECKBOX & RADIO ─── */}
-            <SectionTitle>Checkbox & Radio</SectionTitle>
+            <SectionTitle>{t('demoForm.sectionCheckbox')}</SectionTitle>
 
             <form.AppField
               name='interests'
               mode='array'
               children={(field) => (
                 <field.CheckboxGroupField
-                  label='Interests'
+                  label={t('demoForm.interests')}
                   required
-                  description='Select all that apply'
+                  description={t('demoForm.interestsDesc')}
                   options={interestOptions}
                   className='grid grid-cols-2 gap-3 md:grid-cols-3'
                 />
@@ -322,19 +341,23 @@ export default function DemoForm() {
             <form.AppField
               name='gender'
               children={(field) => (
-                <field.RadioGroupField label='Gender' required options={genderOptions} />
+                <field.RadioGroupField
+                  label={t('demoForm.gender')}
+                  required
+                  options={genderOptions}
+                />
               )}
             />
 
             {/* ─── TOGGLE & SWITCH ─── */}
-            <SectionTitle>Toggle & Switch</SectionTitle>
+            <SectionTitle>{t('demoForm.sectionToggle')}</SectionTitle>
 
             <form.AppField
               name='newsletter'
               children={(field) => (
                 <field.SwitchField
-                  label='Subscribe to Newsletter'
-                  description='Receive updates about new features and products'
+                  label={t('demoForm.newsletter')}
+                  description={t('demoForm.newsletterDesc')}
                 />
               )}
             />
@@ -344,16 +367,16 @@ export default function DemoForm() {
               mode='array'
               children={(field) => (
                 <field.ToggleGroupField
-                  label='Text Formatting'
-                  description='Multi-select toggle group'
+                  label={t('demoForm.formatting')}
+                  description={t('demoForm.formattingDesc')}
                 >
-                  <ToggleGroupItem value='bold' aria-label='Bold'>
+                  <ToggleGroupItem value='bold' aria-label={t('demoForm.bold')}>
                     <Icons.bold className='h-4 w-4' />
                   </ToggleGroupItem>
-                  <ToggleGroupItem value='italic' aria-label='Italic'>
+                  <ToggleGroupItem value='italic' aria-label={t('demoForm.italic')}>
                     <Icons.italic className='h-4 w-4' />
                   </ToggleGroupItem>
-                  <ToggleGroupItem value='underline' aria-label='Underline'>
+                  <ToggleGroupItem value='underline' aria-label={t('demoForm.underline')}>
                     <Icons.underline className='h-4 w-4' />
                   </ToggleGroupItem>
                 </field.ToggleGroupField>
@@ -362,20 +385,18 @@ export default function DemoForm() {
 
             <form.AppField
               name='terms'
-              children={(field) => (
-                <field.CheckboxField label='I agree to the Terms and Conditions' required />
-              )}
+              children={(field) => <field.CheckboxField label={t('demoForm.terms')} required />}
             />
 
             {/* ─── SLIDER ─── */}
-            <SectionTitle>Slider</SectionTitle>
+            <SectionTitle>{t('demoForm.sectionSlider')}</SectionTitle>
 
             <form.AppField
               name='rating'
               children={(field) => (
                 <field.SliderField
-                  label='Overall Rating'
-                  description='Rate your experience (0-10)'
+                  label={t('demoForm.rating')}
+                  description={t('demoForm.ratingDesc')}
                   min={0}
                   max={10}
                   step={0.5}
@@ -384,14 +405,14 @@ export default function DemoForm() {
             />
 
             {/* ─── DATE & TIME ─── */}
-            <SectionTitle>Date & Time</SectionTitle>
+            <SectionTitle>{t('demoForm.sectionDate')}</SectionTitle>
 
             <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <form.AppField
                 name='birthDate'
                 children={(field) => (
                   <field.DatePickerField
-                    label='Birth Date'
+                    label={t('demoForm.birthDate')}
                     disabledDates={(date) => date > new Date()}
                   />
                 )}
@@ -399,26 +420,28 @@ export default function DemoForm() {
 
               <form.AppField
                 name='eventTime'
-                children={(field) => <field.TextField label='Event Time' type='time' />}
+                children={(field) => (
+                  <field.TextField label={t('demoForm.eventTime')} type='time' />
+                )}
               />
             </FieldGroup>
 
             <form.AppField
               name='dateRange'
-              children={(field) => <field.DateRangeField label='Date Range' />}
+              children={(field) => <field.DateRangeField label={t('demoForm.dateRange')} />}
             />
 
             {/* ─── SPECIAL INPUTS ─── */}
-            <SectionTitle>Special Inputs</SectionTitle>
+            <SectionTitle>{t('demoForm.sectionSpecial')}</SectionTitle>
 
             <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <form.AppField
                 name='otp'
                 children={(field) => (
                   <field.OtpField
-                    label='Verification Code'
+                    label={t('demoForm.verificationCode')}
                     required
-                    description='6-digit OTP input'
+                    description={t('demoForm.otpDesc')}
                   />
                 )}
               />
@@ -427,8 +450,8 @@ export default function DemoForm() {
                 name='favoriteColor'
                 children={(field) => (
                   <field.ColorField
-                    label='Favorite Color'
-                    description='Native color picker with hex'
+                    label={t('demoForm.favoriteColor')}
+                    description={t('demoForm.colorDesc')}
                   />
                 )}
               />
@@ -439,22 +462,22 @@ export default function DemoForm() {
               mode='array'
               children={(field) => (
                 <field.TagsField
-                  label='Tags'
+                  label={t('demoForm.tags')}
                   required
-                  description='Press Enter or click Add to create tags'
+                  description={t('demoForm.tagsDesc')}
                 />
               )}
             />
 
             {/* ─── FILE UPLOAD ─── */}
-            <SectionTitle>File Upload</SectionTitle>
+            <SectionTitle>{t('demoForm.sectionFile')}</SectionTitle>
 
             <form.AppField
               name='avatar'
               children={(field) => (
                 <field.FileUploadField
-                  label='Profile Picture'
-                  description='Drag & drop or click to upload (max 5MB)'
+                  label={t('demoForm.profilePicture')}
+                  description={t('demoForm.profilePictureDesc')}
                   maxSize={5000000}
                   maxFiles={1}
                 />
@@ -470,10 +493,10 @@ export default function DemoForm() {
                 onClick={() => form.reset()}
                 className='flex-1'
               >
-                Reset
+                {t('demoForm.reset')}
               </Button>
               <form.AppForm>
-                <form.SubmitButton className='flex-1'>Submit Form</form.SubmitButton>
+                <form.SubmitButton className='flex-1'>{t('demoForm.submit')}</form.SubmitButton>
               </form.AppForm>
             </div>
           </form>
@@ -484,7 +507,7 @@ export default function DemoForm() {
       <div className='xl:sticky xl:top-16 xl:self-start'>
         <Card>
           <CardHeader>
-            <CardTitle>Form Data Preview</CardTitle>
+            <CardTitle>{t('demoForm.preview')}</CardTitle>
           </CardHeader>
           <CardContent>
             <pre className='bg-muted max-h-[calc(100vh-8rem)] overflow-auto rounded-lg p-4 text-xs'>

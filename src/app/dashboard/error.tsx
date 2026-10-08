@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 
 function isChunkLoadError(error: Error): boolean {
@@ -19,6 +20,8 @@ export default function DashboardError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations();
+
   useEffect(() => {
     Sentry.captureException(error);
     if (isChunkLoadError(error)) {
@@ -36,10 +39,8 @@ export default function DashboardError({
 
   return (
     <main className='flex min-h-[50vh] flex-col items-center justify-center gap-4 px-6 text-center'>
-      <h1 className='text-lg font-semibold'>Couldn’t load this screen</h1>
-      <p className='text-muted-foreground max-w-sm text-sm'>
-        A network hiccup interrupted the page. Reload and continue where you left off.
-      </p>
+      <h1 className='text-lg font-semibold'>{t('errors.screenLoadTitle')}</h1>
+      <p className='text-muted-foreground max-w-sm text-sm'>{t('errors.screenLoadDescription')}</p>
       <Button
         type='button'
         onClick={() => {
@@ -52,7 +53,7 @@ export default function DashboardError({
           window.location.reload();
         }}
       >
-        Reload
+        {t('errors.reload')}
       </Button>
     </main>
   );

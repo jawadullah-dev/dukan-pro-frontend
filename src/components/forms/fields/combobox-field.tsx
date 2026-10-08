@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useT } from '@/i18n/use-t';
 
 /** Searchable select — Popover + Command per the shadcn combobox pattern. */
 export function ComboboxField({
@@ -22,9 +23,9 @@ export function ComboboxField({
   description,
   required,
   options,
-  placeholder = 'Select an option',
-  searchPlaceholder = 'Search...',
-  emptyMessage = 'No results found.'
+  placeholder,
+  searchPlaceholder,
+  emptyMessage
 }: BaseFieldProps & {
   options: { value: string; label: string; disabled?: boolean }[];
   placeholder?: string;
@@ -33,6 +34,10 @@ export function ComboboxField({
 }) {
   const field = useFieldContext<string>();
   const isInvalid = useFieldInvalid();
+  const t = useT();
+  const effPlaceholder = placeholder ?? t('select.option');
+  const effSearchPlaceholder = searchPlaceholder ?? t('search.option');
+  const effEmptyMessage = emptyMessage ?? t('search.noResults');
   const [open, setOpen] = React.useState(false);
   const selected = options.find((o) => o.value === field.state.value);
   const listboxId = `${field.name}-listbox`;
@@ -67,14 +72,14 @@ export function ComboboxField({
             />
           }
         >
-          {selected?.label ?? placeholder}
-          <Icons.chevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+          {selected?.label ?? effPlaceholder}
+          <Icons.chevronsUpDown className='ms-2 h-4 w-4 shrink-0 opacity-50' />
         </PopoverTrigger>
         <PopoverContent className='w-(--anchor-width) p-0'>
           <Command>
-            <CommandInput placeholder={searchPlaceholder} />
+            <CommandInput placeholder={effSearchPlaceholder} />
             <CommandList id={listboxId}>
-              <CommandEmpty>{emptyMessage}</CommandEmpty>
+              <CommandEmpty>{effEmptyMessage}</CommandEmpty>
               <CommandGroup>
                 {options.map((opt) => (
                   <CommandItem
@@ -89,7 +94,7 @@ export function ComboboxField({
                   >
                     <Icons.check
                       className={cn(
-                        'mr-2 h-4 w-4',
+                        'me-2 h-4 w-4',
                         field.state.value === opt.value ? 'opacity-100' : 'opacity-0'
                       )}
                     />

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useKBar } from 'kbar';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 import { Breadcrumbs } from '../breadcrumbs';
@@ -13,8 +13,9 @@ import { NotificationCenter } from '@/features/notifications/components/notifica
 import { UserNav } from '@/components/layout/user-nav';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 import { pageTitleKeyFromPath } from '@/lib/i18n/path-titles';
+import { usePathname } from '@/i18n/navigation';
 
 /** Detail routes need an in-app back control (standalone PWA has no browser chrome). */
 function isDetailPath(pathname: string): boolean {
@@ -24,12 +25,12 @@ function isDetailPath(pathname: string): boolean {
 }
 
 export default function Header() {
-  const t = useT();
+  const t = useTranslations();
   const { query } = useKBar();
   const pathname = usePathname();
   const router = useRouter();
   const titleKey = pageTitleKeyFromPath(pathname);
-  const title = titleKey ? t(titleKey) : 'Dukaan';
+  const title = titleKey ? t(titleKey) : t('Metadata.title', { appName: 'Dukaan' });
   const showBack = isDetailPath(pathname);
 
   return (
@@ -44,7 +45,7 @@ export default function Header() {
             aria-label={t('nav.back')}
             onClick={() => router.back()}
           >
-            <Icons.chevronLeft className='size-5' />
+            <Icons.chevronLeft className='size-5 rtl:rotate-180' />
           </Button>
         ) : (
           <SidebarTrigger className='-ms-1' aria-label={t('nav.menu')} />

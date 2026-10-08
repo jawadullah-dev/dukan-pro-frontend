@@ -12,6 +12,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
 
 type IconComponent = React.ComponentType<{ className?: string }>;
@@ -41,6 +42,7 @@ export function TextField({
   ...inputProps
 }: TextFieldProps) {
   const field = useFieldContext<string | number | undefined>();
+  const t = useTranslations();
   const isInvalid = useFieldInvalid();
   const isValidating = field.state.meta.isValidating;
   const [showPassword, setShowPassword] = React.useState(false);
@@ -92,7 +94,7 @@ export function TextField({
             <InputGroupAddon align='inline-end'>
               <InputGroupButton
                 size='icon-xs'
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? <Icons.eyeOff /> : <Icons.eye />}
@@ -108,9 +110,7 @@ export function TextField({
       ) : (
         <div className='relative'>
           <Input className={className} {...sharedInputProps} />
-          {isValidating && (
-            <Spinner className='absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2' />
-          )}
+          {isValidating && <Spinner className='absolute top-1/2 end-3 h-4 w-4 -translate-y-1/2' />}
         </div>
       )}
       {description && <FieldDescription>{description}</FieldDescription>}

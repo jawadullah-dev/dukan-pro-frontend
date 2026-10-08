@@ -3,7 +3,7 @@
 import * as React from 'react';
 import type { Row, Table } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 import { RecordDetail } from './record-detail';
 import type { DetailConfig, MobileItemConfig } from './types';
 
@@ -29,7 +29,7 @@ export function GroupedLedgerList<TData>({
   detail,
   onNavigate
 }: GroupedLedgerListProps<TData>) {
-  const t = useT();
+  const t = useTranslations();
   const [active, setActive] = React.useState<Row<TData> | null>(null);
   const rows = table.getRowModel().rows;
 

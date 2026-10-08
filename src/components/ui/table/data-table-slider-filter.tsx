@@ -12,6 +12,7 @@ import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { Icons } from '@/components/icons';
 import { DataTableFilterClear } from '@/components/ui/table/data-table-filter-clear';
+import { useT } from '@/i18n/use-t';
 
 interface Range {
   min: number;
@@ -36,6 +37,7 @@ interface DataTableSliderFilterProps<TData> {
 
 export function DataTableSliderFilter<TData>({ column, title }: DataTableSliderFilterProps<TData>) {
   const id = React.useId();
+  const t = useT();
 
   const columnFilterValue = getIsValidRange(column.getFilterValue())
     ? (column.getFilterValue() as RangeValue)
@@ -141,7 +143,7 @@ export function DataTableSliderFilter<TData>({ column, title }: DataTableSliderF
           </p>
           <div className='flex items-center gap-4'>
             <Label htmlFor={`${id}-from`} className='sr-only'>
-              From
+              {t('table.from')}
             </Label>
             <div className='relative'>
               <Input
@@ -156,16 +158,16 @@ export function DataTableSliderFilter<TData>({ column, title }: DataTableSliderF
                 max={max}
                 value={range[0]?.toString()}
                 onChange={onFromInputChange}
-                className={cn('h-8 w-24', unit && 'pr-8')}
+                className={cn('h-8 w-24', unit && 'pe-8')}
               />
               {unit && (
-                <span className='bg-accent text-muted-foreground absolute top-0 right-0 bottom-0 flex items-center rounded-r-md px-2 text-sm'>
+                <span className='bg-accent text-muted-foreground absolute top-0 end-0 bottom-0 flex items-center rounded-e-md px-2 text-sm'>
                   {unit}
                 </span>
               )}
             </div>
             <Label htmlFor={`${id}-to`} className='sr-only'>
-              to
+              {t('table.to')}
             </Label>
             <div className='relative'>
               <Input
@@ -180,10 +182,10 @@ export function DataTableSliderFilter<TData>({ column, title }: DataTableSliderF
                 max={max}
                 value={range[1]?.toString()}
                 onChange={onToInputChange}
-                className={cn('h-8 w-24', unit && 'pr-8')}
+                className={cn('h-8 w-24', unit && 'pe-8')}
               />
               {unit && (
-                <span className='bg-accent text-muted-foreground absolute top-0 right-0 bottom-0 flex items-center rounded-r-md px-2 text-sm'>
+                <span className='bg-accent text-muted-foreground absolute top-0 end-0 bottom-0 flex items-center rounded-e-md px-2 text-sm'>
                   {unit}
                 </span>
               )}
@@ -201,8 +203,13 @@ export function DataTableSliderFilter<TData>({ column, title }: DataTableSliderF
             onValueChange={onSliderValueChange}
           />
         </div>
-        <Button aria-label={`Clear ${title} filter`} variant='outline' size='sm' onClick={onReset}>
-          Clear
+        <Button
+          aria-label={t('table.clearColumnFilter', { title: title ?? column.id })}
+          variant='outline'
+          size='sm'
+          onClick={onReset}
+        >
+          {t('table.clear')}
         </Button>
       </PopoverContent>
     </Popover>

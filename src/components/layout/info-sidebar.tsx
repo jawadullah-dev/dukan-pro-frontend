@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { Icons } from '@/components/icons';
 import Link from 'next/link';
+import { translateMaybe, useT } from '@/i18n/use-t';
 import {
   Infobar,
   InfobarContent,
@@ -16,14 +17,14 @@ import {
 
 // Default/fallback data when no content is set
 const defaultData = {
-  title: 'Documentation',
+  title: 'info.documentation',
   sections: [
     {
-      title: 'Getting Started',
-      description: 'Learn how to get started with this application.',
+      title: 'info.gettingStarted',
+      description: 'info.gettingStartedDescription',
       links: [
         {
-          title: 'Installation Guide',
+          title: 'info.installationGuide',
           url: '#'
         }
       ]
@@ -33,13 +34,14 @@ const defaultData = {
 
 export function InfoSidebar({ ...props }: React.ComponentProps<typeof Infobar>) {
   const { content } = useInfobar();
+  const t = useT();
   const data = content || defaultData;
 
   return (
     <Infobar {...props}>
       <InfobarHeader className='bg-sidebar sticky top-0 z-10 flex flex-row items-center justify-between gap-2 border-b px-4 py-3'>
         <div className='min-w-0 flex-1'>
-          <h2 className='text-lg font-semibold wrap-break-word'>{data.title}</h2>
+          <h2 className='text-lg font-semibold wrap-break-word'>{translateMaybe(data.title, t)}</h2>
         </div>
         <div className='shrink-0'>
           <InfobarTrigger />
@@ -53,17 +55,19 @@ export function InfoSidebar({ ...props }: React.ComponentProps<typeof Infobar>) 
                 data.sections.map((section) => (
                   <div key={section.title} className='flex flex-col gap-3'>
                     {section.title && (
-                      <h3 className='text-foreground text-sm font-semibold'>{section.title}</h3>
+                      <h3 className='text-foreground text-sm font-semibold'>
+                        {translateMaybe(section.title, t)}
+                      </h3>
                     )}
                     {section.description && (
                       <p className='text-muted-foreground text-sm leading-relaxed'>
-                        {section.description}
+                        {translateMaybe(section.description, t)}
                       </p>
                     )}
                     {section.links && section.links.length > 0 && (
                       <div className='flex flex-col gap-2'>
                         <h4 className='text-muted-foreground text-xs font-medium tracking-wide uppercase'>
-                          Learn more
+                          {t('info.learnMore')}
                         </h4>
                         <ul className='flex flex-col gap-1.5'>
                           {section.links.map((link) => (
@@ -74,8 +78,8 @@ export function InfoSidebar({ ...props }: React.ComponentProps<typeof Infobar>) 
                                 target='_blank'
                                 rel='noopener noreferrer'
                               >
-                                <span>{link.title}</span>
-                                <Icons.chevronRight className='h-3 w-3' />
+                                <span>{translateMaybe(link.title, t)}</span>
+                                <Icons.chevronRight className='h-3 w-3 rtl:rotate-180' />
                               </Link>
                             </li>
                           ))}
@@ -86,7 +90,7 @@ export function InfoSidebar({ ...props }: React.ComponentProps<typeof Infobar>) 
                 ))
               ) : (
                 <div className='text-muted-foreground px-2 py-4 text-center text-sm'>
-                  No content available
+                  {t('errors.genericDescription')}
                 </div>
               )}
             </div>

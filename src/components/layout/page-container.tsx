@@ -7,10 +7,11 @@ import { cn } from '@/lib/utils';
 import { useT, translateMaybe } from '@/i18n/use-t';
 
 function PageSkeleton() {
+  const t = useT();
   return (
     <div
       role='status'
-      aria-label='Loading page'
+      aria-label={t('common.loadingPage')}
       className='flex flex-1 animate-pulse flex-col gap-4'
     >
       <div className='flex items-center justify-between'>

@@ -127,7 +127,7 @@ export const FilePreview: FC<FilePreviewProps> = ({
                 : 'bg-muted hover:bg-muted/80',
               file.type.startsWith('image/') && file.url
                 ? 'h-14 w-14 justify-center'
-                : 'max-w-[220px] min-w-[180px] p-2 pr-8'
+                : 'max-w-[220px] min-w-[180px] p-2 pe-8'
             )}
           >
             {file.isUploading && (
@@ -141,7 +141,7 @@ export const FilePreview: FC<FilePreviewProps> = ({
                 type='button'
                 onClick={() => onRemove(file.id)}
                 className={cn(
-                  'absolute -top-1 -right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full',
+                  'absolute -top-1 -end-1 z-10 flex h-5 w-5 items-center justify-center rounded-full',
                   'scale-75 opacity-0 transition-all duration-150 group-hover/file:scale-100 group-hover/file:opacity-100',
                   'bg-muted-foreground/60 hover:bg-muted-foreground/80 cursor-pointer'
                 )}
@@ -165,7 +165,7 @@ export const FilePreview: FC<FilePreviewProps> = ({
               <>
                 <div
                   className={cn(
-                    'mr-3 flex h-10 w-10 items-center justify-center rounded-lg',
+                    'me-3 flex h-10 w-10 items-center justify-center rounded-lg',
                     isInverted ? 'bg-primary-foreground/10' : 'bg-muted-foreground/10'
                   )}
                 >

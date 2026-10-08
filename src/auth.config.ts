@@ -38,8 +38,10 @@ export const authConfig = {
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
       const isLoggedIn = !!auth?.user;
-      const isLoginPage = pathname.startsWith('/login');
-      const isDashboard = pathname.startsWith('/dashboard');
+      const isLoginPage =
+        /(\/|^)(en|ur|ps)\/login(\/|$)/.test(pathname) || pathname.startsWith('/login');
+      const isDashboard =
+        /(\/|^)(en|ur|ps)\/dashboard(\/|$)/.test(pathname) || pathname.startsWith('/dashboard');
       const isAuthApi = pathname.startsWith('/api/auth');
 
       if (isAuthApi) return true;

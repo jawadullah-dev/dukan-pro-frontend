@@ -18,6 +18,7 @@ import { dukaan } from '@/lib/dukaan';
 import type { Brand, Category, Product } from '@/lib/dukaan/types';
 import { dukaanKeys } from '../api/queries';
 import { BrandDialog, CategoryDialog, ProductDialog } from './catalog-dialogs';
+import { useT } from '@/i18n/use-t';
 
 interface ActionMenuProps {
   onEdit: () => void;
@@ -25,15 +26,16 @@ interface ActionMenuProps {
 }
 
 function ActionMenu({ onEdit, onDelete }: ActionMenuProps) {
+  const t = useT();
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-        <span className='sr-only'>Open menu</span>
+        <span className='sr-only'>{t('common.openMenu')}</span>
         <Icons.ellipsis className='h-4 w-4' />
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuGroup>
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DropdownMenuItem
@@ -41,14 +43,14 @@ function ActionMenu({ onEdit, onDelete }: ActionMenuProps) {
               requestAnimationFrame(onEdit);
             }}
           >
-            <Icons.edit className='mr-2 h-4 w-4' /> Edit
+            <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => {
               requestAnimationFrame(onDelete);
             }}
           >
-            <Icons.trash className='mr-2 h-4 w-4' /> Delete
+            <Icons.trash className='me-2 h-4 w-4' /> {t('common.delete')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
@@ -57,6 +59,7 @@ function ActionMenu({ onEdit, onDelete }: ActionMenuProps) {
 }
 
 export function CategoryCellAction({ data }: { data: Category }) {
+  const t = useT();
   const qc = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -64,7 +67,7 @@ export function CategoryCellAction({ data }: { data: Category }) {
   const remove = useMutation({
     mutationFn: () => dukaan.deleteCategory(data.id),
     onSuccess: () => {
-      toast.success('Category deleted');
+      toast.success(t('dukaan.category.deleted'));
       setDeleteOpen(false);
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
     },
@@ -78,9 +81,9 @@ export function CategoryCellAction({ data }: { data: Category }) {
         onClose={() => setDeleteOpen(false)}
         onConfirm={() => remove.mutate()}
         loading={remove.isPending}
-        title='Delete category?'
-        description='If this category is used by products it will be deactivated instead of removed.'
-        confirmLabel='Delete'
+        title={t('dukaan.category.deleteTitle')}
+        description={t('dukaan.category.deleteDescription')}
+        confirmLabel={t('common.delete')}
       />
       <CategoryDialog open={editOpen} onOpenChange={setEditOpen} category={data} />
       <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
@@ -89,6 +92,7 @@ export function CategoryCellAction({ data }: { data: Category }) {
 }
 
 export function BrandCellAction({ data }: { data: Brand }) {
+  const t = useT();
   const qc = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -96,7 +100,7 @@ export function BrandCellAction({ data }: { data: Brand }) {
   const remove = useMutation({
     mutationFn: () => dukaan.deleteBrand(data.id),
     onSuccess: () => {
-      toast.success('Brand deleted');
+      toast.success(t('dukaan.brand.deleted'));
       setDeleteOpen(false);
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
     },
@@ -110,9 +114,9 @@ export function BrandCellAction({ data }: { data: Brand }) {
         onClose={() => setDeleteOpen(false)}
         onConfirm={() => remove.mutate()}
         loading={remove.isPending}
-        title='Delete brand?'
-        description='If this brand is used by products it will be deactivated instead of removed.'
-        confirmLabel='Delete'
+        title={t('dukaan.brand.deleteTitle')}
+        description={t('dukaan.brand.deleteDescription')}
+        confirmLabel={t('common.delete')}
       />
       <BrandDialog open={editOpen} onOpenChange={setEditOpen} brand={data} />
       <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
@@ -121,6 +125,7 @@ export function BrandCellAction({ data }: { data: Brand }) {
 }
 
 export function ProductCellAction({ data }: { data: Product }) {
+  const t = useT();
   const qc = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -128,7 +133,7 @@ export function ProductCellAction({ data }: { data: Product }) {
   const remove = useMutation({
     mutationFn: () => dukaan.deleteProduct(data.id),
     onSuccess: () => {
-      toast.success('Product deleted');
+      toast.success(t('dukaan.product.deleted'));
       setDeleteOpen(false);
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
     },
@@ -142,9 +147,9 @@ export function ProductCellAction({ data }: { data: Product }) {
         onClose={() => setDeleteOpen(false)}
         onConfirm={() => remove.mutate()}
         loading={remove.isPending}
-        title='Delete product?'
-        description='If this product has stock or sales history it will be deactivated instead of removed.'
-        confirmLabel='Delete'
+        title={t('dukaan.product.deleteTitle')}
+        description={t('dukaan.product.deleteDescription')}
+        confirmLabel={t('common.delete')}
       />
       <ProductDialog open={editOpen} onOpenChange={setEditOpen} product={data} />
       <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />

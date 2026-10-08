@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -40,10 +41,15 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  closeLabel,
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
+  closeLabel?: string;
 }) {
+  const t = useTranslations();
+  const resolvedCloseLabel = closeLabel ?? t('common.close');
+
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -59,10 +65,10 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot='dialog-close'
-            render={<Button variant='ghost' className='absolute top-2 right-2' size='icon-sm' />}
+            render={<Button variant='ghost' className='absolute top-2 end-2' size='icon-sm' />}
           >
             <IconX />
-            <span className='sr-only'>Close</span>
+            <span className='sr-only'>{resolvedCloseLabel}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -79,11 +85,16 @@ function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
 function DialogFooter({
   className,
   showCloseButton = false,
+  closeLabel,
   children,
   ...props
 }: React.ComponentProps<'div'> & {
   showCloseButton?: boolean;
+  closeLabel?: string;
 }) {
+  const t = useTranslations();
+  const resolvedCloseLabel = closeLabel ?? t('common.close');
+
   return (
     <div
       data-slot='dialog-footer'
@@ -95,7 +106,9 @@ function DialogFooter({
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close render={<Button variant='outline' />}>Close</DialogPrimitive.Close>
+        <DialogPrimitive.Close render={<Button variant='outline' />}>
+          {resolvedCloseLabel}
+        </DialogPrimitive.Close>
       )}
     </div>
   );

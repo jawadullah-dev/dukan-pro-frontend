@@ -1,13 +1,15 @@
 import { KBarResults, useMatches } from 'kbar';
 import ResultItem from './result-item';
+import { useT } from '@/i18n/use-t';
 
 export default function RenderResults() {
   const { results, rootActionId } = useMatches();
+  const t = useT();
 
   if (!results.length) {
     return (
       <div className='text-muted-foreground flex h-full items-center justify-center px-4 text-center text-sm'>
-        No results found.
+        {t('kbar.noResults')}
       </div>
     );
   }

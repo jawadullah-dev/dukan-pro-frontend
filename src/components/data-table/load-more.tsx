@@ -2,7 +2,7 @@
 
 import type { Table } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
-import { useT } from '@/i18n/use-t';
+import { useTranslations } from 'next-intl';
 
 interface LoadMoreProps<TData> {
   table: Table<TData>;
@@ -14,7 +14,7 @@ interface LoadMoreProps<TData> {
  * Shows "Showing X of Y" + Load more until all rows are loaded.
  */
 export function LoadMore<TData>({ table, step = 20 }: LoadMoreProps<TData>) {
-  const t = useT();
+  const t = useTranslations();
   const total = table.getRowCount();
   const pageSize = table.getState().pagination.pageSize;
   const showing = Math.min(pageSize, total);

@@ -15,17 +15,22 @@ import {
 import { Icons } from '../icons';
 import { Kbd } from '@/components/ui/kbd';
 import { THEMES } from './theme.config';
+import { translateMaybe, useT } from '@/i18n/use-t';
 
 export function ThemeSelector() {
   const { activeTheme, setActiveTheme } = useThemeConfig();
+  const t = useT();
 
   return (
     <div className='flex items-center gap-2'>
       <Label htmlFor='theme-selector' className='sr-only'>
-        Theme
+        {t('appearance.theme')}
       </Label>
       <Select
-        items={THEMES.map((theme) => ({ value: theme.value, label: theme.name }))}
+        items={THEMES.map((theme) => ({
+          value: theme.value,
+          label: translateMaybe(`appearance.themeNames.${theme.value}`, t)
+        }))}
         value={activeTheme}
         onValueChange={(value) => {
           if (value !== null) setActiveTheme(value);
@@ -38,18 +43,18 @@ export function ThemeSelector() {
           <span className='text-muted-foreground hidden sm:block'>
             <Icons.palette />
           </span>
-          <span className='text-muted-foreground block sm:hidden'>Theme</span>
-          <SelectValue placeholder='Select a theme' />
+          <span className='text-muted-foreground block sm:hidden'>{t('appearance.theme')}</span>
+          <SelectValue placeholder={t('appearance.selectTheme')} />
           <Kbd>T T</Kbd>
         </SelectTrigger>
         <SelectContent align='end'>
           {THEMES.length > 0 && (
             <>
               <SelectGroup>
-                <SelectLabel>themes</SelectLabel>
+                <SelectLabel>{t('appearance.themes')}</SelectLabel>
                 {THEMES.map((theme) => (
                   <SelectItem key={theme.name} value={theme.value}>
-                    {theme.name}
+                    {translateMaybe(`appearance.themeNames.${theme.value}`, t)}
                   </SelectItem>
                 ))}
               </SelectGroup>

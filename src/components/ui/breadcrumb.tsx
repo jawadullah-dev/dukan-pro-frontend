@@ -1,13 +1,23 @@
+'use client';
+
 import * as React from 'react';
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
+import { useTranslations } from 'next-intl';
 
 import { cn } from '@/lib/utils';
 import { IconChevronRight, IconDots } from '@tabler/icons-react';
 
 function Breadcrumb({ className, ...props }: React.ComponentProps<'nav'>) {
+  const t = useTranslations();
+
   return (
-    <nav aria-label='breadcrumb' data-slot='breadcrumb' className={cn(className)} {...props} />
+    <nav
+      aria-label={t('breadcrumb.ariaLabel')}
+      data-slot='breadcrumb'
+      className={cn(className)}
+      {...props}
+    />
   );
 }
 
@@ -69,7 +79,7 @@ function BreadcrumbSeparator({ children, className, ...props }: React.ComponentP
       data-slot='breadcrumb-separator'
       role='presentation'
       aria-hidden='true'
-      className={cn('[&>svg]:size-3.5', className)}
+      className={cn('[&>svg]:size-3.5 rtl:[&>svg]:rotate-180', className)}
       {...props}
     >
       {children ?? <IconChevronRight />}
@@ -77,7 +87,13 @@ function BreadcrumbSeparator({ children, className, ...props }: React.ComponentP
   );
 }
 
-function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
+function BreadcrumbEllipsis({
+  className,
+  label,
+  ...props
+}: React.ComponentProps<'span'> & { label?: string }) {
+  const t = useTranslations();
+
   return (
     <span
       data-slot='breadcrumb-ellipsis'
@@ -87,7 +103,7 @@ function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<'span'
       {...props}
     >
       <IconDots />
-      <span className='sr-only'>More</span>
+      <span className='sr-only'>{label ?? t('nav.more')}</span>
     </span>
   );
 }

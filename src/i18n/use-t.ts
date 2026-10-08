@@ -1,22 +1,32 @@
 'use client';
 
-import { useAppearanceStore } from '@/lib/appearance/store';
-import { en, type MessageKey } from './messages/en';
-import { getLocale, setLocale, t, type AppLocale } from './index';
+import { useTranslations } from 'next-intl';
 
-/** Keep module locale in sync and re-render when language changes. */
-export function useT(): typeof t {
-  const language = useAppearanceStore((s) => s.language) as AppLocale;
-  if (getLocale() !== language) {
-    setLocale(language);
-  }
-  // Depend on language so callers re-render when it changes.
-  void language;
-  return t;
+/**
+ * Shorthand for `useTranslations()` on the root namespace.
+ * Mirrors the call signature so `t('pages.dashboard.title')` works.
+ */
+export function useT() {
+  return useTranslations();
 }
 
-/** Translate if `value` is a known message key; otherwise return as-is (mock/data). */
-export function translateMaybe(value: string, translate: typeof t = t): string {
-  if (value in en) return translate(value as MessageKey);
-  return value;
+/**
+ * Accept either a dot-notation message key (e.g. `pages.sales.title`)
+ * or a plain pre-translated string. If the value looks like a key
+ * (contains a dot) and the translation resolves, the translated value
+ * is returned; otherwise the original string is passed through unchanged.
+ *
+ * This lets page containers accept both i18n keys (for regular pages)
+ * and literal titles (for one-off demo / feature pages) without a
+ * hard requirement on the message registry.
+ */
+export function translateMaybe(keyOrText: string, t: ReturnType<typeof useTranslations>): string {
+  if (!keyOrText) return '';
+  if (!keyOrText.includes('.')) return keyOrText;
+  try {
+    const translated = t(keyOrText as never);
+    return translated == null ? keyOrText : String(translated);
+  } catch {
+    return keyOrText;
+  }
 }

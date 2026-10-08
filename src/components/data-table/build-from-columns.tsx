@@ -34,13 +34,21 @@ function readValue<TData>(row: TData, columnDef: ColumnDef<TData, unknown>): unk
   return undefined;
 }
 
-function formatByType(value: unknown, type?: ColumnSemanticType): React.ReactNode {
+type TranslateFn = (key: string) => string;
+
+function formatByType(value: unknown, type?: ColumnSemanticType, t?: TranslateFn): React.ReactNode {
   if (value == null || value === '') return '—';
   switch (type) {
     case 'money':
       return formatPkr(Number(value));
     case 'boolean':
-      return value ? 'Active' : 'Inactive';
+      return t
+        ? value
+          ? t('status.active')
+          : t('status.inactive')
+        : value
+          ? 'Active'
+          : 'Inactive';
     case 'status':
       return formatLabel(String(value));
     case 'number':
@@ -56,7 +64,10 @@ function columnById<TData>(table: Table<TData>, id: string | null): Column<TData
 }
 
 /** Build MobileItemConfig from TanStack columns (auto-layout). */
-export function buildMobileItemFromTable<TData>(table: Table<TData>): MobileItemConfig<TData> {
+export function buildMobileItemFromTable<TData>(
+  table: Table<TData>,
+  t?: TranslateFn
+): MobileItemConfig<TData> {
   const layouts = table.getAllColumns().map(metaOf);
   const slots = resolveMobileSlots(layouts);
 
@@ -72,13 +83,13 @@ export function buildMobileItemFromTable<TData>(table: Table<TData>): MobileItem
     title: (row) => {
       const col = columnById(table, slots.titleColumnId);
       if (!col) return '—';
-      return formatByType(readValue(row, col.columnDef), col.columnDef.meta?.type);
+      return formatByType(readValue(row, col.columnDef), col.columnDef.meta?.type, t);
     },
     subtitle: slots.subtitleColumnId
       ? (row) => {
           const col = columnById(table, slots.subtitleColumnId);
           if (!col) return null;
-          return formatByType(readValue(row, col.columnDef), col.columnDef.meta?.type);
+          return formatByType(readValue(row, col.columnDef), col.columnDef.meta?.type, t);
         }
       : undefined,
     badge: slots.badgeColumnId
@@ -89,7 +100,13 @@ export function buildMobileItemFromTable<TData>(table: Table<TData>): MobileItem
           if (raw == null || raw === '') return null;
           if (typeof raw === 'boolean') {
             return {
-              label: raw ? 'Active' : 'Inactive',
+              label: t
+                ? raw
+                  ? t('status.active')
+                  : t('status.inactive')
+                : raw
+                  ? 'Active'
+                  : 'Inactive',
               status: raw ? 'ACTIVE' : 'INACTIVE',
               tone: raw ? ('success' as const) : ('neutral' as const)
             };
@@ -102,7 +119,11 @@ export function buildMobileItemFromTable<TData>(table: Table<TData>): MobileItem
       ? (row) => {
           const col = columnById(table, slots.valueColumnId);
           if (!col) return null;
-          return formatByType(readValue(row, col.columnDef), col.columnDef.meta?.type ?? 'money');
+          return formatByType(
+            readValue(row, col.columnDef),
+            col.columnDef.meta?.type ?? 'money',
+            t
+          );
         }
       : undefined,
     valueLabel: slots.valueColumnId
@@ -111,12 +132,12 @@ export function buildMobileItemFromTable<TData>(table: Table<TData>): MobileItem
     meta: slots.metaColumnIds.map((id) => (row: TData) => {
       const col = columnById(table, id);
       if (!col) return null;
-      return formatByType(readValue(row, col.columnDef), col.columnDef.meta?.type);
+      return formatByType(readValue(row, col.columnDef), col.columnDef.meta?.type, t);
     }),
     ariaLabel: (row) => {
       const col = columnById(table, slots.titleColumnId);
       const title = col ? String(readValue(row, col.columnDef) ?? '') : '';
-      return title || 'Row';
+      return title || (t ? t('table.row') : 'Row');
     }
   };
 }
@@ -124,9 +145,10 @@ export function buildMobileItemFromTable<TData>(table: Table<TData>): MobileItem
 /** Auto detail sections from all non-action columns. */
 export function buildDetailFromTable<TData>(
   table: Table<TData>,
-  overrides?: Partial<DetailConfig<TData>>
+  overrides?: Partial<DetailConfig<TData>>,
+  t?: TranslateFn
 ): DetailConfig<TData> {
-  const mobile = buildMobileItemFromTable(table);
+  const mobile = buildMobileItemFromTable(table, t);
   const columns = table
     .getAllColumns()
     .filter(
@@ -145,7 +167,7 @@ export function buildDetailFromTable<TData>(
         const fields = columns.map((col) => {
           const type = col.columnDef.meta?.type;
           const raw = readValue(row, col.columnDef);
-          let value: React.ReactNode = formatByType(raw, type);
+          let value: React.ReactNode = formatByType(raw, type, t);
           if (type === 'status' && raw != null) {
             value = <StatusBadge status={String(raw)} />;
           } else if (type === 'phone' && raw) {
@@ -159,7 +181,15 @@ export function buildDetailFromTable<TData>(
             value = (
               <StatusBadge
                 status={raw ? 'ACTIVE' : 'INACTIVE'}
-                label={raw ? 'Active' : 'Inactive'}
+                label={
+                  t
+                    ? raw
+                      ? t('status.active')
+                      : t('status.inactive')
+                    : raw
+                      ? 'Active'
+                      : 'Inactive'
+                }
                 tone={raw ? 'success' : 'neutral'}
               />
             );
@@ -169,7 +199,7 @@ export function buildDetailFromTable<TData>(
             value
           };
         });
-        const section: DetailSection = { title: 'Details', fields };
+        const section: DetailSection = { title: t ? t('table.details') : 'Details', fields };
         return [section];
       }),
     actions: overrides?.actions

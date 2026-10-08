@@ -20,12 +20,7 @@ import type { User } from '../api/types';
 import { toast } from 'sonner';
 import { userSchema, type UserFormValues } from '../schemas/user';
 import { ROLE_OPTIONS } from './users-table/options';
-
-const STATUS_OPTIONS = [
-  { value: 'Active', label: 'Active' },
-  { value: 'Inactive', label: 'Inactive' },
-  { value: 'Invited', label: 'Invited' }
-];
+import { useT } from '@/i18n/use-t';
 
 interface UserFormSheetProps {
   user?: User;
@@ -34,25 +29,32 @@ interface UserFormSheetProps {
 }
 
 export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) {
+  const t = useT();
   const isEdit = !!user;
+
+  const STATUS_OPTIONS = [
+    { value: 'Active', label: t('status.active') },
+    { value: 'Inactive', label: t('status.inactive') },
+    { value: 'Invited', label: t('status.invited') }
+  ];
 
   const createMutation = useMutation({
     ...createUserMutation,
     onSuccess: () => {
-      toast.success('User created');
+      toast.success(t('users.created'));
       onOpenChange(false);
       form.reset();
     },
-    onError: () => toast.error("Couldn't create user. Try again.")
+    onError: () => toast.error(t('users.createFailed'))
   });
 
   const updateMutation = useMutation({
     ...updateUserMutation,
     onSuccess: () => {
-      toast.success('User updated');
+      toast.success(t('users.updated'));
       onOpenChange(false);
     },
-    onError: () => toast.error("Couldn't update user. Try again.")
+    onError: () => toast.error(t('users.updateFailed'))
   });
 
   const form = useAppForm({
@@ -65,11 +67,11 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
       status: user?.status ?? 'Active'
     } as UserFormValues,
     validators: {
-      onSubmit: userSchema
+      onSubmit: userSchema(t)
     },
     onSubmit: async ({ value }) => {
       if (isEdit) {
-        await updateMutation.mutateAsync({ id: user.id, values: value });
+        await updateMutation.mutateAsync({ id: user!.id, values: value });
       } else {
         await createMutation.mutateAsync(value);
       }
@@ -82,11 +84,9 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className='flex flex-col'>
         <SheetHeader>
-          <SheetTitle>{isEdit ? 'Edit User' : 'New User'}</SheetTitle>
+          <SheetTitle>{isEdit ? t('users.editTitle') : t('users.addTitle')}</SheetTitle>
           <SheetDescription>
-            {isEdit
-              ? 'Update the user details below.'
-              : 'Fill in the details to create a new user.'}
+            {isEdit ? t('users.editDescription') : t('users.addDescription')}
           </SheetDescription>
         </SheetHeader>
 
@@ -104,13 +104,21 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
                 <form.AppField
                   name='first_name'
                   children={(field) => (
-                    <field.TextField label='First Name' required placeholder='John' />
+                    <field.TextField
+                      label={t('users.firstName')}
+                      required
+                      placeholder={t('users.firstNamePlaceholder')}
+                    />
                   )}
                 />
                 <form.AppField
                   name='last_name'
                   children={(field) => (
-                    <field.TextField label='Last Name' required placeholder='Doe' />
+                    <field.TextField
+                      label={t('users.lastName')}
+                      required
+                      placeholder={t('users.lastNamePlaceholder')}
+                    />
                   )}
                 />
               </div>
@@ -119,10 +127,10 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
                 name='email'
                 children={(field) => (
                   <field.TextField
-                    label='Email'
+                    label={t('users.email')}
                     required
                     type='email'
-                    placeholder='john@example.com'
+                    placeholder={t('users.emailPlaceholder')}
                     startIcon={Icons.mail}
                   />
                 )}
@@ -132,11 +140,11 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
                 name='phone'
                 children={(field) => (
                   <field.TextField
-                    label='Phone'
+                    label={t('users.phone')}
                     required
                     type='tel'
                     inputMode='numeric'
-                    placeholder='03XXXXXXXXX'
+                    placeholder={t('users.phonePlaceholder')}
                     startIcon={Icons.phone}
                   />
                 )}
@@ -146,10 +154,10 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
                 name='role'
                 children={(field) => (
                   <field.SelectField
-                    label='Role'
+                    label={t('users.role')}
                     required
-                    options={ROLE_OPTIONS}
-                    placeholder='Select role'
+                    options={ROLE_OPTIONS(t as any)}
+                    placeholder={t('users.selectRole')}
                   />
                 )}
               />
@@ -158,10 +166,10 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
                 name='status'
                 children={(field) => (
                   <field.SelectField
-                    label='Status'
+                    label={t('users.status')}
                     required
                     options={STATUS_OPTIONS}
-                    placeholder='Select status'
+                    placeholder={t('users.selectStatus')}
                   />
                 )}
               />
@@ -176,10 +184,10 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
             disabled={isPending}
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <LoadingButton loading={isPending} type='submit' form='user-form-sheet'>
-            {isEdit ? 'Update User' : 'Create User'}
+            {isEdit ? t('users.update') : t('users.create')}
           </LoadingButton>
         </SheetFooter>
       </SheetContent>
@@ -188,12 +196,13 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
 }
 
 export function UserFormSheetTrigger() {
+  const t = useT();
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        <Icons.add className='mr-2 h-4 w-4' /> Add User
+        <Icons.add className='me-2 h-4 w-4' /> {t('users.create')}
       </Button>
       <UserFormSheet open={open} onOpenChange={setOpen} />
     </>

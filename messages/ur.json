@@ -170,6 +170,10 @@
     "createNewShop": "نیا دکان بنائیں"
   },
   "common": {
+    "somethingWentWrong": "کچھ غلط ہو گیا",
+    "unexpectedError": "ایک غیر متوقع خرابی پیش آگئی",
+    "tryAgain": "دوبارہ کوشش کریں",
+    "reloadPage": "صفحہ دوبارہ لوڈ کریں",
     "close": "بند کریں",
     "add": "شامل کریں",
     "edit": "ترمیم کریں",

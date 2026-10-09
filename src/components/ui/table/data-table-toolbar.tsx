@@ -131,7 +131,7 @@ function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<T
               title={columnMeta.label ?? column.id}
               options={
                 typeof columnMeta.options === 'function'
-                  ? columnMeta.options(t as any)
+                  ? columnMeta.options((key: string) => t(key))
                   : (columnMeta.options ?? [])
               }
               multiple={columnMeta.variant === 'multiSelect'}

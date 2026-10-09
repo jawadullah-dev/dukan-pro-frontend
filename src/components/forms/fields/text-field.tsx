@@ -19,19 +19,9 @@ type IconComponent = React.ComponentType<{ className?: string }>;
 
 type TextFieldProps = BaseFieldProps &
   Omit<React.ComponentProps<typeof Input>, 'value' | 'onChange' | 'onBlur'> & {
-    /** Leading icon inside the input (e.g. phone, search). */
     startIcon?: IconComponent;
   };
 
-/**
- * Text-style input (text, email, password, tel, url, time, number).
- * For `type='number'` the value converts at the edge: clearing writes
- * `undefined` so a required `z.number({ error: '…' })` reports a human
- * message instead of a type error.
- *
- * `type='password'` gets a show/hide eye toggle. Pass `startIcon` for a
- * leading glyph (phone, lock, search, etc.).
- */
 export function TextField({
   label,
   description,

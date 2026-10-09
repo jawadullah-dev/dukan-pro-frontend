@@ -39,7 +39,7 @@ interface InfiniteEntitySelectProps<T extends NamedEntity> {
   activeOnly?: boolean;
   disabled?: boolean;
   className?: string;
-  /** Always shown at the top of the list (e.g. Walk-in). */
+
   extraItems?: NamedEntity[];
 }
 

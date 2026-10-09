@@ -40,9 +40,7 @@ export function useBreadcrumbs() {
       if (segKey) {
         try {
           return { title: t(segKey), link: path };
-        } catch {
-          // fall through to default
-        }
+        } catch {}
       }
 
       return {

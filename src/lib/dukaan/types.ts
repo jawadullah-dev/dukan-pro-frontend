@@ -288,7 +288,6 @@ export interface DukaanStore {
   expense_categories: ExpenseCategory[];
   expenses: Expense[];
   cash_movements: CashMovement[];
-  /** idempotency map: client_request_id -> entity type + id */
   request_index: Record<string, { type: string; id: string }>;
 }
 
@@ -296,9 +295,7 @@ export interface ListFilters {
   page?: number;
   limit?: number;
   search?: string;
-  /** JSON string of TanStack sorting state, e.g. `[{"id":"name","desc":false}]` */
   sort?: string;
-  /** Comma-separated values from table faceted filters */
   status?: string;
   category_id?: string;
   brand_id?: string;
@@ -308,7 +305,6 @@ export interface ListFilters {
   method?: string;
   low_stock?: string;
   is_active?: string;
-  /** Customer list: `owing` | `settled` (comma-separated facets) */
   udhar_state?: string;
 }
 

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-// import { persist } from 'zustand/middleware';
+
 import type { NotificationStatus, NotificationAction } from '@/components/ui/notification-card';
 
 export type Notification = {
@@ -98,40 +98,33 @@ const mockNotifications: Notification[] = [
   }
 ];
 
-export const useNotificationStore = create<NotificationState>()(
-  // To enable persistence across refreshes, uncomment the persist wrapper below:
-  // persist(
-  (set, get) => ({
-    notifications: mockNotifications,
+export const useNotificationStore = create<NotificationState>()((set, get) => ({
+  notifications: mockNotifications,
 
-    markAsRead: (id) =>
-      set((state) => ({
-        notifications: state.notifications.map((n) =>
-          n.id === id ? { ...n, status: 'read' as const } : n
-        )
-      })),
+  markAsRead: (id) =>
+    set((state) => ({
+      notifications: state.notifications.map((n) =>
+        n.id === id ? { ...n, status: 'read' as const } : n
+      )
+    })),
 
-    markAllAsRead: () =>
-      set((state) => ({
-        notifications: state.notifications.map((n) => ({
-          ...n,
-          status: 'read' as const
-        }))
-      })),
+  markAllAsRead: () =>
+    set((state) => ({
+      notifications: state.notifications.map((n) => ({
+        ...n,
+        status: 'read' as const
+      }))
+    })),
 
-    removeNotification: (id) =>
-      set((state) => ({
-        notifications: state.notifications.filter((n) => n.id !== id)
-      })),
+  removeNotification: (id) =>
+    set((state) => ({
+      notifications: state.notifications.filter((n) => n.id !== id)
+    })),
 
-    addNotification: (notification) =>
-      set((state) => ({
-        notifications: [{ ...notification, status: 'unread' as const }, ...state.notifications]
-      })),
+  addNotification: (notification) =>
+    set((state) => ({
+      notifications: [{ ...notification, status: 'unread' as const }, ...state.notifications]
+    })),
 
-    unreadCount: () => get().notifications.filter((n) => n.status === 'unread').length
-  })
-  //   ,
-  //   { name: 'notifications' }
-  // )
-);
+  unreadCount: () => get().notifications.filter((n) => n.status === 'unread').length
+}));

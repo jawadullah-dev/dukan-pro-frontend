@@ -30,7 +30,11 @@ interface SupplierPaymentActionRow {
   supplier_name?: string;
 }
 
-export function SupplierPaymentCellAction({ data }: { data: SupplierPaymentActionRow }) {
+interface SupplierPaymentCellActionProps {
+  data: SupplierPaymentActionRow;
+}
+
+export function SupplierPaymentCellAction({ data }: SupplierPaymentCellActionProps) {
   const qc = useQueryClient();
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -66,15 +70,13 @@ export function SupplierPaymentCellAction({ data }: { data: SupplierPaymentActio
   );
 }
 
-function SupplierPaymentCancelBody({
-  data,
-  onClose,
-  onSuccess
-}: {
+interface SupplierPaymentCancelBodyProps {
   data: SupplierPaymentActionRow;
   onClose: () => void;
   onSuccess: () => void;
-}) {
+}
+
+function SupplierPaymentCancelBody({ data, onClose, onSuccess }: SupplierPaymentCancelBodyProps) {
   const t = useT();
   const cancel = useMutation({
     mutationFn: (reason: string) => dukaan.cancelPayment(data.id, reason, 'supplier'),

@@ -48,13 +48,12 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
   );
 }
 
-function CategoryDialogBody({
-  category,
-  onOpenChange
-}: {
+interface CategoryDialogBodyProps {
   category?: Category | null;
   onOpenChange: (open: boolean) => void;
-}) {
+}
+
+function CategoryDialogBody({ category, onOpenChange }: CategoryDialogBodyProps) {
   const qc = useQueryClient();
   const isEdit = Boolean(category);
   const t = useT();
@@ -133,13 +132,12 @@ export function BrandDialog({ open, onOpenChange, brand }: BrandDialogProps) {
   );
 }
 
-function BrandDialogBody({
-  brand,
-  onOpenChange
-}: {
+interface BrandDialogBodyProps {
   brand?: Brand | null;
   onOpenChange: (open: boolean) => void;
-}) {
+}
+
+function BrandDialogBody({ brand, onOpenChange }: BrandDialogBodyProps) {
   const qc = useQueryClient();
   const isEdit = Boolean(brand);
   const t = useT();
@@ -260,13 +258,12 @@ export function ProductDialog({ open, onOpenChange, product }: ProductDialogProp
   );
 }
 
-function ProductDialogBody({
-  product,
-  onOpenChange
-}: {
+interface ProductDialogBodyProps {
   product?: Product | null;
   onOpenChange: (open: boolean) => void;
-}) {
+}
+
+function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
   const qc = useQueryClient();
   const isEdit = Boolean(product);
   const t = useT();

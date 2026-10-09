@@ -18,7 +18,11 @@ export default function ProductViewPage({ productId }: TProductViewPageProps) {
   return <EditProductView productId={Number(productId)} />;
 }
 
-function EditProductView({ productId }: { productId: number }) {
+interface EditProductViewProps {
+  productId: number;
+}
+
+function EditProductView({ productId }: EditProductViewProps) {
   const { data } = useSuspenseQuery(productByIdOptions(productId));
 
   if (!data?.success || !data?.product) {

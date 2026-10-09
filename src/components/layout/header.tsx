@@ -17,7 +17,6 @@ import { useTranslations } from 'next-intl';
 import { pageTitleKeyFromPath } from '@/lib/i18n/path-titles';
 import { usePathname } from '@/i18n/navigation';
 
-/** Detail routes need an in-app back control (standalone PWA has no browser chrome). */
 function isDetailPath(pathname: string): boolean {
   const parts = pathname.split('/').filter(Boolean);
   if (parts[0] !== 'dashboard') return false;

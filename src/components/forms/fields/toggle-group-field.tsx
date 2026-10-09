@@ -5,10 +5,6 @@ import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { ToggleGroup } from '@/components/ui/toggle-group';
 import { useFieldContext, type BaseFieldProps } from '@/lib/form-context';
 
-/**
- * Multi-select toggle group over a `string[]` value. Pass `ToggleGroupItem`s
- * as children; use with `mode='array'` on the `<form.AppField>`.
- */
 export function ToggleGroupField({
   label,
   description,

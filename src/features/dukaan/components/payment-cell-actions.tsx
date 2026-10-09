@@ -1,5 +1,10 @@
 'use client';
 
+interface CancelPaymentVariables {
+  reason: string;
+  confirm?: boolean;
+}
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -34,7 +39,11 @@ interface PaymentActionRow {
   sale_no?: string;
 }
 
-export function PaymentCellAction({ data }: { data: PaymentActionRow }) {
+interface PaymentCellActionProps {
+  data: PaymentActionRow;
+}
+
+export function PaymentCellAction({ data }: PaymentCellActionProps) {
   const qc = useQueryClient();
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -70,20 +79,18 @@ export function PaymentCellAction({ data }: { data: PaymentActionRow }) {
   );
 }
 
-function PaymentCancelBody({
-  data,
-  onClose,
-  onSuccess
-}: {
+interface PaymentCancelBodyProps {
   data: PaymentActionRow;
   onClose: () => void;
   onSuccess: () => void;
-}) {
+}
+
+function PaymentCancelBody({ data, onClose, onSuccess }: PaymentCancelBodyProps) {
   const [warning, setWarning] = useState<SoftCashWarning | null>(null);
   const t = useT();
 
   const cancel = useMutation({
-    mutationFn: ({ reason, confirm }: { reason: string; confirm?: boolean }) =>
+    mutationFn: ({ reason, confirm }: CancelPaymentVariables) =>
       dukaan.cancelPayment(data.id, reason, 'customer', confirm),
     onSuccess: (res) => {
       if (res.cash_warning) {

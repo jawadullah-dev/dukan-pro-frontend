@@ -18,7 +18,7 @@ import type { ContainerMode } from './use-container-mode';
 interface DataTableToolbarProps<TData> extends React.ComponentProps<'div'> {
   table: Table<TData>;
   mode: ContainerMode;
-  /** Desktop/tablet end-side actions (e.g. New purchase). Hidden in cards mode. */
+
   children?: React.ReactNode;
 }
 
@@ -52,7 +52,6 @@ export function DataTableToolbar<TData>({
       <div
         role='toolbar'
         className={cn(
-          // top-0: app header sits outside the page scrollport (dashboard shell).
           'bg-background/95 sticky top-0 z-10 -mx-1 flex shrink-0 flex-col gap-2 border-b border-border/60 px-1 py-2 backdrop-blur-md',
           className
         )}
@@ -63,7 +62,7 @@ export function DataTableToolbar<TData>({
             <Input
               placeholder={
                 (textColumn.columnDef.meta?.placeholderKey
-                  ? t(textColumn.columnDef.meta.placeholderKey as any)
+                  ? (t as (k: string) => string)(textColumn.columnDef.meta.placeholderKey)
                   : textColumn.columnDef.meta?.placeholder) ??
                 textColumn.columnDef.meta?.label ??
                 t('table.search')
@@ -127,15 +126,20 @@ export function DataTableToolbar<TData>({
   );
 }
 
-function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unknown> }) {
+interface DataTableToolbarFilterProps<TData> {
+  column: Column<TData, unknown>;
+}
+
+function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<TData>) {
   const t = useTranslations();
+  const translate = (k: string) => (t as (key: string) => string)(k);
   const columnMeta = column.columnDef.meta;
   if (!columnMeta?.variant) return null;
 
   const getLabel = (label: string) => {
     if (label.includes('.')) {
       try {
-        return t(label as any);
+        return translate(label);
       } catch {
         return label;
       }
@@ -151,7 +155,7 @@ function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unkno
         <Input
           placeholder={
             (columnMeta.placeholderKey
-              ? t(columnMeta.placeholderKey as any)
+              ? translate(columnMeta.placeholderKey)
               : columnMeta.placeholder) ?? label
           }
           aria-label={label ?? t('table.search')}
@@ -168,7 +172,7 @@ function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unkno
             inputMode='numeric'
             placeholder={
               (columnMeta.placeholderKey
-                ? t(columnMeta.placeholderKey as any)
+                ? translate(columnMeta.placeholderKey)
                 : columnMeta.placeholder) ?? label
             }
             aria-label={label ?? t('table.search')}
@@ -202,7 +206,7 @@ function DataTableToolbarFilter<TData>({ column }: { column: Column<TData, unkno
           title={label}
           options={
             typeof columnMeta.options === 'function'
-              ? columnMeta.options(t as any)
+              ? columnMeta.options(translate)
               : (columnMeta.options ?? [])
           }
           multiple={columnMeta.variant === 'multiSelect'}

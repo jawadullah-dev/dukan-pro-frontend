@@ -13,7 +13,11 @@ export async function generateMetadata() {
   };
 }
 
-export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export default async function Page({ params }: PageProps) {
   const { id } = await params;
   const qc = getQueryClient();
   void qc.prefetchQuery(saleQueryOptions(id));

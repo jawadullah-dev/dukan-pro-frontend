@@ -2,8 +2,7 @@ import { NavGroup } from '@/types';
 import type { SessionRole } from '@/lib/dukaan/session';
 import { platformNavGroups } from '@/config/platform-nav-config';
 
-/** Dukan shop owner / admin navigation — titles/labels are i18n keys. */
-export const shopNavGroups: NavGroup[] = [
+const shopNavGroups: NavGroup[] = [
   {
     label: 'nav.group.overview',
     items: [
@@ -168,5 +167,4 @@ export function getNavGroupsForRole(role: SessionRole | undefined): NavGroup[] {
   return shopNavGroups;
 }
 
-/** @deprecated Use getNavGroupsForRole — kept for legacy imports. */
 export const navGroups = shopNavGroups;

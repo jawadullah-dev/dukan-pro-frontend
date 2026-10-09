@@ -1,0 +1,61 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+
+  "entry": [
+    "src/app/**/{layout,page,error,not-found,global-error,loading,default}.tsx",
+    "src/app/**/route.ts",
+    "src/app/manifest.ts",
+    "src/app/sw.ts",
+    "src/app/sw-network-retry.ts",
+    "src/app/serwist/**/*.ts",
+    "src/instrumentation.ts",
+    "src/instrumentation-client.ts",
+    "src/i18n/request.ts",
+    "src/auth.ts",
+    "src/auth.config.ts",
+    "src/proxy.ts",
+    "src/middleware.ts",
+    "scripts/run-checks.mjs",
+    "scripts/generate-icons.mjs",
+    "scripts/check-list-tables.mjs",
+    "scripts/code/*.cjs"
+  ],
+
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.{mjs,cjs,js}"],
+
+  "ignore": ["src/components/ui/**", "src/styles/**"],
+
+  "ignoreDependencies": [
+    "tw-animate-css",
+    "tailwindcss-animate",
+    "tailwindcss",
+    "@tailwindcss/postcss",
+    "postcss",
+    "@serwist/turbopack",
+    "sharp",
+    "esbuild",
+    "@types/node",
+    "@types/react",
+    "@types/react-dom",
+    "@types/sort-by",
+    "knip",
+    "jscpd",
+    "@babel/parser",
+    "@babel/traverse",
+    "lint-staged"
+  ],
+
+  "ignoreExportsUsedInFile": true,
+
+  "next": {
+    "entry": [
+      "next.config.{js,ts,mjs}",
+      "src/app/**/{layout,page,error,not-found,global-error,loading}.tsx",
+      "src/app/**/route.ts",
+      "src/app/manifest.ts",
+      "src/middleware.ts",
+      "src/instrumentation.ts",
+      "src/instrumentation-client.ts"
+    ]
+  }
+}

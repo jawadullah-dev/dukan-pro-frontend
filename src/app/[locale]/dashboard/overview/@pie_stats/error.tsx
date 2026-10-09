@@ -7,7 +7,12 @@ import { useEffect, useTransition } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { useT } from '@/i18n/use-t';
 
-export default function PieStatsError({ error, reset }: { error: Error; reset: () => void }) {
+interface PieStatsErrorProps {
+  error: Error;
+  reset: () => void;
+}
+
+export default function PieStatsError({ error, reset }: PieStatsErrorProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const t = useT();
@@ -16,7 +21,6 @@ export default function PieStatsError({ error, reset }: { error: Error; reset: (
     Sentry.captureException(error);
   }, [error]);
 
-  // Defer the refresh until the next render phase so React settles pending states first
   const retry = () => {
     startTransition(() => {
       router.refresh();

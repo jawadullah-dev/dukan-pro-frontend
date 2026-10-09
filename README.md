@@ -20,19 +20,35 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Scripts
+## Scripts & Quality Tooling
 
 | Command | Description |
 | --- | --- |
 | `npm run dev` | Start development server (service worker **disabled**) |
 | `npm run build` | Production build (generates Serwist worker) |
 | `npm run start` | Start production server |
-| `npm run pwa:prod` | Build + start — use this to test install / SW locally |
-| `npm run generate:icons` | Build all PWA icons from `public/icons/source.svg` |
-| `npm run typecheck` | TypeScript check |
-| `npm run lint` | Lint |
-| `npm run format` | Format |
-| `npm test` | Unit tests + table guard + typecheck |
+| `npm run check` | Run all custom checks + dead code (knip) + clone detection (jscpd) |
+| `npm run knip` | Scan for unused files, exports, and dependencies |
+| `npm run duplicates` | Scan for copy-pasted code via jscpd |
+| `npm run lint` | Oxlint fast linting |
+| `npm run format` | Code formatting with oxfmt |
+| `npm run typecheck` | TypeScript strict check |
+| `npm test` | Unit tests |
+
+## Tooling & Architecture Rules
+
+Custom checks under `scripts/` guard project architectural invariants that standard linters miss:
+- **`check-types`**: Bans `any`, non-null assertions (`!`), `@ts-ignore`, and untyped objects.
+- **`check-nest-type`**: Bans inline/nested object type literals in function parameters and component props.
+- **`check-arch-rules`**: Guards `process.env` access, bans inline `style`, enforces RTL logical classes (`ms-`, `me-`, `ps-`, `pe-`), and bans hardcoded hex colors.
+- **`check-hardcoded-text`**: Ensures all UI strings are localized via `next-intl`.
+- **`check-metadata`**: Verifies every Next.js `page.tsx` is a server component with SEO metadata.
+- **`check-structure`**: Enforces feature-sliced architecture and allowed `src/` top-level directories.
+- **`check-comments`**: Enforces zero-comments rule for self-documenting code.
+- **`check-api-urls`**: Bans hardcoded endpoints outside `src/config/`.
+- **`knip`**: Dead code, unused exports, and unneeded dependencies detection.
+- **`jscpd`**: Copy-paste / code clone detection.
+
 
 ## Progressive Web App (PWA)
 

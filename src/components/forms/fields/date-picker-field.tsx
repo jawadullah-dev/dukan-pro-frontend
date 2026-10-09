@@ -11,7 +11,6 @@ import type { DateRange } from 'react-day-picker';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
 import { useT } from '@/i18n/use-t';
 
-/** Single date — Popover + Calendar per the shadcn date-picker pattern. */
 export function DatePickerField({
   label,
   description,
@@ -67,7 +66,6 @@ export function DatePickerField({
   );
 }
 
-/** Date range — two-month Calendar in range mode. */
 export function DateRangeField({
   label,
   description,

@@ -1,8 +1,3 @@
-/**
- * Auto-layout: pick list slots from column semantic metadata.
- * Explicit `mobileItem` on ResponsiveDataTable always wins over this.
- */
-
 export type ColumnSemanticType =
   | 'text'
   | 'id'
@@ -21,7 +16,6 @@ export interface ColumnLayoutMeta {
   priority?: 1 | 2 | 3 | 4;
   primary?: boolean;
   highlight?: boolean;
-  /** Legacy Prompt 03 slot hint — still respected when present. */
   mobile?: 'title' | 'subtitle' | 'badge' | 'value' | 'meta' | 'hidden';
   label?: string;
 }
@@ -34,7 +28,6 @@ export interface ResolvedMobileSlots {
   metaColumnIds: string[];
   leading: 'avatar' | 'icon' | 'thumbnail' | null;
   imageColumnId: string | null;
-  /** Columns that belong only in the detail view. */
   detailOnlyColumnIds: string[];
 }
 
@@ -59,10 +52,6 @@ function pickFirst(
   return cols.filter((c) => !used.has(c.id) && pred(c)).toSorted(byPriority)[0];
 }
 
-/**
- * Resolve which columns fill title / subtitle / badge / value / meta.
- * Never returns more than 4 main slots + 2 meta.
- */
 export function resolveMobileSlots(columns: ColumnLayoutMeta[]): ResolvedMobileSlots {
   const cols = columns.filter(isListable);
   const used = new Set<string>();
@@ -84,7 +73,6 @@ export function resolveMobileSlots(columns: ColumnLayoutMeta[]): ResolvedMobileS
       ? 'avatar'
       : 'icon';
 
-  // Legacy mobile hints win for slot assignment.
   const hintedTitle = take(cols.find((c) => c.mobile === 'title'));
   const hintedSubtitle = take(cols.find((c) => c.mobile === 'subtitle'));
   const hintedBadge = take(cols.find((c) => c.mobile === 'badge'));
@@ -118,7 +106,6 @@ export function resolveMobileSlots(columns: ColumnLayoutMeta[]): ResolvedMobileS
   for (const m of metaAuto) used.add(m.id);
   const metaColumnIds = [...metaFromHints, ...metaAuto].map((c) => c.id);
 
-  // 2–3 field tables: drop badge/meta noise when very sparse.
   const fieldCount = cols.length;
   let badgeColumnId = badge?.id ?? null;
   let finalMeta = metaColumnIds;
@@ -145,7 +132,6 @@ export function resolveMobileSlots(columns: ColumnLayoutMeta[]): ResolvedMobileS
   };
 }
 
-/** Dev / test guard: every table needs a resolvable title. */
 export function hasResolvableTitle(slots: ResolvedMobileSlots): boolean {
   return slots.titleColumnId != null;
 }

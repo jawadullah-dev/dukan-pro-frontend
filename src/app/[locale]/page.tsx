@@ -3,7 +3,11 @@ import { homePathForRole, shortcutPathForRole, localize } from '@/lib/auth/route
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ to?: string }> }) {
+interface RootPageProps {
+  searchParams: Promise<{ to?: string }>;
+}
+
+export default async function Page({ searchParams }: RootPageProps) {
   const session = await auth();
   const locale = await getLocale();
   if (!session?.user) {

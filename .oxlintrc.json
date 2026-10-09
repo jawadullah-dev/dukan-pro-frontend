@@ -6,7 +6,7 @@
     "browser": true,
     "node": true
   },
-  "ignorePatterns": [".next/**", "out/**", "build/**", "next-env.d.ts", "scripts/**"],
+  "ignorePatterns": [".next/**", "out/**", "build/**", "next-env.d.ts", "scripts/**", "src/components/ui/**"],
   "settings": {
     "jsx-a11y": {
       "components": {
@@ -20,14 +20,24 @@
     "suspicious": "warn"
   },
   "rules": {
-    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-console": "error",
+    "no-debugger": "error",
+    "no-empty": "error",
+    "no-var": "error",
+    "eqeqeq": "error",
+    "no-warning-comments": "warn",
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-non-null-assertion": "error",
+    "@typescript-eslint/ban-ts-comment": "error",
+    "max-lines": ["warn", { "max": 300, "skipBlankLines": true, "skipComments": true }],
+    "unicorn/filename-case": ["warn", { "case": "kebabCase" }],
+
     "no-underscore-dangle": [
       "warn",
       { "allow": ["__dukaanStore", "__dukaanSeedVersion"] }
     ],
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
     "no-unused-expressions": "warn",
-    "@typescript-eslint/no-explicit-any": "warn",
 
     "react/react-in-jsx-scope": "off",
     "react/no-unknown-property": "off",

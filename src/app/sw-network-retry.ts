@@ -1,16 +1,10 @@
 import { Strategy, type StrategyHandler } from 'serwist';
 
 interface NetworkOnlyWithRetryOptions {
-  /** Total fetch attempts (default 3). */
   maxAttempts?: number;
-  /** Base delay in ms; doubles each retry (default 280). */
   retryDelayMs?: number;
 }
 
-/**
- * Network-only strategy with short retries for flaky mobile radios.
- * Never writes to Cache API — safe for /dashboard and /api.
- */
 export class NetworkOnlyWithRetry extends Strategy {
   private readonly maxAttempts: number;
   private readonly retryDelayMs: number;

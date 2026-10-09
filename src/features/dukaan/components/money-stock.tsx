@@ -1,5 +1,30 @@
 'use client';
 
+interface SupplierPaymentMutationValue {
+  supplier_id: string;
+  purchase_id: string;
+  amount: number;
+  payment_date: string;
+  notes: string;
+}
+
+interface SupplierPaymentMutationVariables {
+  value: SupplierPaymentMutationValue;
+  confirm_overdraft?: boolean;
+}
+
+interface ExpenseMutationValue {
+  category_id: string;
+  amount: number;
+  expense_date: string;
+  description: string;
+}
+
+interface ExpenseMutationVariables {
+  value: ExpenseMutationValue;
+  confirm_overdraft?: boolean;
+}
+
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useState } from 'react';
 import { toast } from 'sonner';
@@ -210,24 +235,17 @@ export function StockAdjustForm() {
   );
 }
 
-function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
+interface ExpenseCreateFormProps {
+  onDone: () => void;
+}
+
+function ExpenseCreateForm({ onDone }: ExpenseCreateFormProps) {
   const qc = useQueryClient();
   const [warning, setWarning] = useState<SoftCashWarning | null>(null);
   const t = useT();
 
   const create = useMutation({
-    mutationFn: ({
-      value,
-      confirm_overdraft
-    }: {
-      value: {
-        category_id: string;
-        amount: number;
-        expense_date: string;
-        description: string;
-      };
-      confirm_overdraft?: boolean;
-    }) =>
+    mutationFn: ({ value, confirm_overdraft }: ExpenseMutationVariables) =>
       dukaan.createExpense({
         category_id: value.category_id,
         amount: toPaisa(value.amount),
@@ -344,13 +362,12 @@ function ExpenseCreateForm({ onDone }: { onDone: () => void }) {
   );
 }
 
-export function ExpensesHeaderAction({
-  className,
-  onAdd
-}: {
+interface ExpensesHeaderActionProps {
   className?: string;
   onAdd: () => void;
-}) {
+}
+
+export function ExpensesHeaderAction({ className, onAdd }: ExpensesHeaderActionProps) {
   const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
@@ -393,7 +410,11 @@ export function ExpensesClient() {
   );
 }
 
-export function ExpenseCategoriesHeaderAction({ onAdd }: { onAdd?: () => void }) {
+interface ExpenseCategoriesHeaderActionProps {
+  onAdd?: () => void;
+}
+
+export function ExpenseCategoriesHeaderAction({ onAdd }: ExpenseCategoriesHeaderActionProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
@@ -433,7 +454,11 @@ export function CashLedgerClient() {
   );
 }
 
-function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
+interface SupplierPaymentCreateFormProps {
+  onDone: () => void;
+}
+
+function SupplierPaymentCreateForm({ onDone }: SupplierPaymentCreateFormProps) {
   const qc = useQueryClient();
   const t = useT();
   const { data: suppliers } = useSuspenseQuery(suppliersQueryOptions({ limit: 100 }));
@@ -442,19 +467,7 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
   const [warning, setWarning] = useState<SoftCashWarning | null>(null);
 
   const save = useMutation({
-    mutationFn: ({
-      value,
-      confirm_overdraft
-    }: {
-      value: {
-        supplier_id: string;
-        purchase_id: string;
-        amount: number;
-        payment_date: string;
-        notes: string;
-      };
-      confirm_overdraft?: boolean;
-    }) =>
+    mutationFn: ({ value, confirm_overdraft }: SupplierPaymentMutationVariables) =>
       dukaan.createSupplierPayment({
         supplier_id: value.supplier_id,
         purchase_id: value.purchase_id === '__opening__' ? undefined : value.purchase_id,
@@ -596,13 +609,15 @@ function SupplierPaymentCreateForm({ onDone }: { onDone: () => void }) {
   );
 }
 
+interface SupplierPaymentsHeaderActionProps {
+  className?: string;
+  onAdd: () => void;
+}
+
 export function SupplierPaymentsHeaderAction({
   className,
   onAdd
-}: {
-  className?: string;
-  onAdd: () => void;
-}) {
+}: SupplierPaymentsHeaderActionProps) {
   const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>

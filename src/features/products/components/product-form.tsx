@@ -15,13 +15,12 @@ import { createProductMutation, updateProductMutation } from '../api/mutations';
 import type { Product } from '../api/types';
 import { translateMaybe } from '@/i18n/use-t';
 
-export default function ProductForm({
-  initialData,
-  pageTitle
-}: {
+export interface ProductFormProps {
   initialData: Product | null;
   pageTitle: string;
-}) {
+}
+
+export default function ProductForm({ initialData, pageTitle }: ProductFormProps) {
   const router = useRouter();
   const isEdit = !!initialData;
   const t = useTranslations();
@@ -63,7 +62,7 @@ export default function ProductForm({
       const payload = {
         name: value.name,
         category: value.category,
-        price: value.price!,
+        price: value.price ?? 0,
         description: value.description
       };
 

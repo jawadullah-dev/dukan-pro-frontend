@@ -1,7 +1,6 @@
 import { t } from '@/i18n';
 
-/** Shared action labels for dukaan dialogs and toolbars (translated). */
-export function getActionLabels() {
+function getActionLabels() {
   return {
     add: t('common.add'),
     edit: t('common.edit'),
@@ -12,7 +11,6 @@ export function getActionLabels() {
   } as const;
 }
 
-/** @deprecated Prefer getActionLabels() so locale updates apply. */
 export const ACTION_LABELS = {
   get add() {
     return t('common.add');

@@ -5,10 +5,9 @@ import { useMemo } from 'react';
 import { getSortingStateParser } from '@/lib/parsers';
 import type { ListFilters } from '@/lib/dukaan';
 
-export const DUKAAN_PAGE_SIZE_OPTIONS = [20, 30, 50, 100] as const;
+const DUKAAN_PAGE_SIZE_OPTIONS = [20, 30, 50, 100] as const;
 export const DUKAAN_DEFAULT_PAGE_SIZE = 20;
 
-/** Read comma-separated faceted filter values from the URL into ListFilters. */
 function pickFilterValue(values: string[] | null | undefined): string | undefined {
   if (!values?.length) return undefined;
   return values.join(',');

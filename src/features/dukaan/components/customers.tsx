@@ -1,5 +1,13 @@
 'use client';
 
+interface CustomerMutationValue {
+  name: string;
+  phone: string;
+  address: string;
+  notes: string;
+  opening_balance: number;
+}
+
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -46,18 +54,16 @@ function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
   );
 }
 
-function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
+interface CustomerDialogBodyProps {
+  onOpenChange: (open: boolean) => void;
+}
+
+function CustomerDialogBody({ onOpenChange }: CustomerDialogBodyProps) {
   const qc = useQueryClient();
   const t = useT();
 
   const create = useMutation({
-    mutationFn: (value: {
-      name: string;
-      phone: string;
-      address: string;
-      notes: string;
-      opening_balance: number;
-    }) =>
+    mutationFn: (value: CustomerMutationValue) =>
       dukaan.createCustomer({
         name: value.name.trim(),
         phone: value.phone.trim(),
@@ -146,7 +152,11 @@ function CustomerDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
   );
 }
 
-export function CustomersHeaderAction({ onAdd }: { onAdd?: () => void }) {
+interface CustomersHeaderActionProps {
+  onAdd?: () => void;
+}
+
+export function CustomersHeaderAction({ onAdd }: CustomersHeaderActionProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
@@ -176,7 +186,11 @@ export function CustomersListClient() {
   );
 }
 
-export function CustomerLedgerClient({ id }: { id: string }) {
+interface CustomerLedgerClientProps {
+  id: string;
+}
+
+export function CustomerLedgerClient({ id }: CustomerLedgerClientProps) {
   const qc = useQueryClient();
   const t = useT();
   const { data } = useSuspenseQuery(customerQueryOptions(id));
@@ -206,7 +220,7 @@ export function CustomerLedgerClient({ id }: { id: string }) {
     defaultValues: { amount: undefined as number | undefined },
     validators: { onSubmit: createReceivePaymentSchema(t) },
     onSubmit: async ({ value }) => {
-      await pay.mutateAsync(value.amount!);
+      if (value.amount != null) await pay.mutateAsync(value.amount);
       form.reset();
     }
   });

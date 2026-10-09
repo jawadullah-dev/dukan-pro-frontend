@@ -1,6 +1,3 @@
-/// <reference lib="esnext" />
-/// <reference lib="webworker" />
-
 import type { PrecacheEntry, SerwistGlobalConfig, SerwistPlugin } from 'serwist';
 import {
   ExpirationPlugin,
@@ -20,10 +17,8 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope;
 
-/** Bump when runtime cache rules change so phones drop stale buckets. */
 const CACHE_VERSION = 'v2';
 
-/** Paths that must never be stored in a Cache API bucket. */
 function isBusinessPath(pathname: string): boolean {
   return (
     pathname.startsWith('/api/') ||
@@ -32,7 +27,6 @@ function isBusinessPath(pathname: string): boolean {
   );
 }
 
-/** Never cache redirect responses (e.g. `/` → `/dashboard` or `/login`). */
 const skipRedirectCachePlugin: SerwistPlugin = {
   cacheWillUpdate: async ({ response }) => {
     if (!response) return null;
@@ -49,28 +43,27 @@ const businessNetwork = new NetworkOnlyWithRetry({
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
-  // Wait for user confirmation before activating (see PwaUpdateBanner).
+
   skipWaiting: false,
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
-    // Mutations — never cache
     {
       matcher: ({ request }) => request.method !== 'GET' && request.method !== 'HEAD',
       handler: new NetworkOnly()
     },
-    // Auth + API — retry, never cache
+
     {
       matcher: ({ url, sameOrigin }) =>
         sameOrigin && (url.pathname.startsWith('/api/') || url.pathname.startsWith('/monitoring')),
       handler: businessNetwork
     },
-    // Dashboard (navigations, RSC, prefetch) — retry, never cache
+
     {
       matcher: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/dashboard'),
       handler: businessNetwork
     },
-    // Static fonts / media / next assets
+
     {
       matcher: /\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,
       handler: new StaleWhileRevalidate({
@@ -85,7 +78,7 @@ const serwist = new Serwist({
         plugins: [new ExpirationPlugin({ maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 })]
       })
     },
-    // Hashed Next chunks — SWR so a new deploy is not stuck on stale CacheFirst JS
+
     {
       matcher: /\/_next\/static.+\.js$/i,
       handler: new StaleWhileRevalidate({
@@ -124,7 +117,7 @@ const serwist = new Serwist({
         ]
       })
     },
-    // `/` always redirects — never cache documents for it
+
     {
       matcher: ({ request, url, sameOrigin }) =>
         sameOrigin &&
@@ -132,7 +125,7 @@ const serwist = new Serwist({
         (request.mode === 'navigate' || request.destination === 'document'),
       handler: businessNetwork
     },
-    // Other public pages (login, offline) — network-first, no redirects in cache
+
     {
       matcher: ({ request, url, sameOrigin }) =>
         sameOrigin &&
@@ -148,7 +141,7 @@ const serwist = new Serwist({
         ]
       })
     },
-    // Same-origin fallback for other non-API GETs
+
     {
       matcher: ({ url, sameOrigin }) =>
         sameOrigin && !isBusinessPath(url.pathname) && url.pathname !== '/',
@@ -161,7 +154,7 @@ const serwist = new Serwist({
         ]
       })
     },
-    // Cross-origin: network only
+
     {
       matcher: ({ sameOrigin }) => !sameOrigin,
       handler: new NetworkOnly()
@@ -172,7 +165,6 @@ const serwist = new Serwist({
       {
         url: '/~offline',
         matcher({ request }) {
-          // Android Chrome often leaves destination empty on navigations.
           return (
             request.mode === 'navigate' ||
             request.destination === 'document' ||
@@ -210,8 +202,5 @@ self.addEventListener('message', (event) => {
     );
   }
 });
-
-// Future: push notifications can hook here without restructuring the worker.
-// self.addEventListener('push', (event) => { ... });
 
 serwist.addEventListeners();

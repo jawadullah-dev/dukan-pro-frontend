@@ -5,13 +5,12 @@ import QueryProvider from '@/components/layout/query-provider';
 import { AuthProvider } from '@/components/layout/auth-provider';
 import { AppearanceProvider } from '@/components/appearance/appearance-provider';
 
-export default function Providers({
-  activeThemeValue,
-  children
-}: {
+interface ProvidersProps {
   activeThemeValue: string;
   children: React.ReactNode;
-}) {
+}
+
+export default function Providers({ activeThemeValue, children }: ProvidersProps) {
   return (
     <ActiveThemeProvider initialTheme={activeThemeValue}>
       <AppearanceProvider>

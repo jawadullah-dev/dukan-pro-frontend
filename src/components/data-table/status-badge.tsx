@@ -6,7 +6,6 @@ import { formatLabel } from '@/lib/dukaan/numbers';
 
 export type StatusTone = 'success' | 'warning' | 'neutral' | 'danger';
 
-/** Map domain status strings to a semantic tone (not brand/primary red). */
 export function statusTone(status: string): StatusTone {
   const key = status.trim().toUpperCase().replace(/\s+/g, '_');
 
@@ -65,7 +64,6 @@ interface StatusBadgeProps {
   tone?: StatusTone;
 }
 
-/** Semantic status chip — active/paid = green, cancelled = red, draft = muted. */
 export function StatusBadge({ status, label, className, tone }: StatusBadgeProps) {
   const resolved = tone ?? statusTone(status);
   return (

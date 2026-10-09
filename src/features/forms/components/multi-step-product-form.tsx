@@ -14,8 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useT } from '@/i18n/use-t';
 
-// --- Schema ---
-
 const createProductFormSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(2, t('schemaZod.productNameMin2')),
@@ -28,11 +26,10 @@ const stepSchemas = (t: (key: string) => string) => {
   const productFormSchema = createProductFormSchema(t);
 
   return [
-    // Step 1: Basic Info
     productFormSchema.pick({ name: true, category: true, price: true }),
-    // Step 2: Details
+
     productFormSchema.pick({ description: true }),
-    // Step 3: Review (no validation)
+
     z.object({})
   ];
 };
@@ -44,18 +41,18 @@ const categoryOptions = (t: (key: string) => string) => [
   { value: 'sports', label: t('categories.sportsOutdoors') }
 ];
 
-// --- Review summary (reads form values) ---
+interface ReviewSummaryValues {
+  name: string;
+  category: string;
+  price?: number;
+  description: string;
+}
 
-function ReviewSummary({
-  values
-}: {
-  values: {
-    name: string;
-    category: string;
-    price?: number;
-    description: string;
-  };
-}) {
+interface ReviewSummaryProps {
+  values: ReviewSummaryValues;
+}
+
+function ReviewSummary({ values }: ReviewSummaryProps) {
   const t = useT();
   return (
     <div className='space-y-3'>
@@ -87,8 +84,6 @@ function ReviewSummary({
     </div>
   );
 }
-
-// --- Main Form ---
 
 type ProductFormValues = {
   name: string;
@@ -136,9 +131,6 @@ export default function MultiStepProductForm() {
   const totalSteps = 3;
 
   return (
-    /* Every submit (Enter key, the review step's submit button) routes
-       through the stepper gate — calling form.handleSubmit directly on a
-       non-final step would validate only that step's schema and submit. */
     <form
       onSubmit={(e) => {
         e.preventDefault();

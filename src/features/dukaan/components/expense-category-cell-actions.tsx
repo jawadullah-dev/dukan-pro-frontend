@@ -20,7 +20,11 @@ import { dukaanKeys } from '../api/queries';
 import { ExpenseCategoryDialog } from './expense-category-dialogs';
 import { useT } from '@/i18n/use-t';
 
-export function ExpenseCategoryCellAction({ data }: { data: ExpenseCategory }) {
+interface ExpenseCategoryCellActionProps {
+  data: ExpenseCategory;
+}
+
+export function ExpenseCategoryCellAction({ data }: ExpenseCategoryCellActionProps) {
   const t = useT();
   const qc = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);

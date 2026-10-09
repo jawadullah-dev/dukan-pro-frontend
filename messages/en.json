@@ -170,6 +170,10 @@
     "createNewShop": "Create New Shop"
   },
   "common": {
+    "somethingWentWrong": "Something went wrong",
+    "unexpectedError": "An unexpected error occurred",
+    "tryAgain": "Try again",
+    "reloadPage": "Reload page",
     "close": "Close",
     "add": "Add",
     "edit": "Edit",

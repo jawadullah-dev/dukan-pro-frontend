@@ -1,5 +1,17 @@
 'use client';
 
+export interface PageContainerProps {
+  children: React.ReactNode;
+  isLoading?: boolean;
+  access?: boolean;
+  accessFallback?: React.ReactNode;
+  pageTitle?: string;
+  pageDescription?: string;
+  infoContent?: InfobarContent;
+  pageHeaderAction?: React.ReactNode;
+  fill?: boolean;
+}
+
 import React from 'react';
 import { Heading } from '../ui/heading';
 import type { InfobarContent } from '@/components/ui/infobar';
@@ -35,23 +47,9 @@ export default function PageContainer({
   pageDescription,
   infoContent,
   pageHeaderAction,
-  /**
-   * When true, children fill remaining height (no page scroll).
-   * Use for mobile table/list screens so only the table body scrolls.
-   */
+
   fill = false
-}: {
-  children: React.ReactNode;
-  isLoading?: boolean;
-  access?: boolean;
-  accessFallback?: React.ReactNode;
-  /** Plain text or i18n message key (e.g. pages.sales.title). */
-  pageTitle?: string;
-  pageDescription?: string;
-  infoContent?: InfobarContent;
-  pageHeaderAction?: React.ReactNode;
-  fill?: boolean;
-}) {
+}: PageContainerProps) {
   const t = useT();
   const title = pageTitle ? translateMaybe(pageTitle, t) : '';
   const description = pageDescription ? translateMaybe(pageDescription, t) : '';
@@ -74,7 +72,6 @@ export default function PageContainer({
     <div className='flex min-h-0 min-w-0 flex-1 flex-col'>
       {hasHeader ? (
         <div className='mb-3 flex shrink-0 flex-col gap-2 px-4 pt-4 sm:mb-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4 md:px-6 md:pt-6'>
-          {/* Phones already show the title in the top bar — avoid duplicate H1. */}
           <div className='hidden sm:block'>
             <Heading title={title} description={description} infoContent={infoContent} />
           </div>

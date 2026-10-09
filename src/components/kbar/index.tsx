@@ -9,14 +9,16 @@ import { useFilteredNavGroups } from '@/hooks/use-nav';
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
 
-export default function KBar({ children }: { children: React.ReactNode }) {
+interface KBarProps {
+  children: React.ReactNode;
+}
+
+export default function KBar({ children }: KBarProps) {
   const router = useRouter();
   const filteredGroups = useFilteredNavGroups(navGroups);
   const t = useTranslations('kbar');
 
-  // These action are for the navigation
   const actions = useMemo(() => {
-    // Define navigateTo inside the useMemo callback to avoid dependency array issues
     const navigateTo = (url: string) => {
       router.push(url);
     };
@@ -24,7 +26,6 @@ export default function KBar({ children }: { children: React.ReactNode }) {
     const allItems = filteredGroups.flatMap((group) => group.items);
 
     return allItems.flatMap((navItem) => {
-      // Only include base action if the navItem has a real URL and is not just a container
       const baseAction =
         navItem.url !== '#'
           ? {
@@ -38,7 +39,6 @@ export default function KBar({ children }: { children: React.ReactNode }) {
             }
           : null;
 
-      // Map child items into actions
       const childActions =
         navItem.items?.map((childItem) => ({
           id: `${childItem.url}Action`,
@@ -50,7 +50,6 @@ export default function KBar({ children }: { children: React.ReactNode }) {
           perform: () => navigateTo(childItem.url)
         })) ?? [];
 
-      // Return only valid actions (ignoring null base actions for containers)
       return baseAction ? [baseAction, ...childActions] : childActions;
     });
   }, [router, filteredGroups, t]);
@@ -61,7 +60,11 @@ export default function KBar({ children }: { children: React.ReactNode }) {
     </KBarProvider>
   );
 }
-const KBarComponent = ({ children }: { children: React.ReactNode }) => {
+interface KBarComponentProps {
+  children: React.ReactNode;
+}
+
+const KBarComponent = ({ children }: KBarComponentProps) => {
   useThemeSwitching();
   const t = useTranslations('kbar');
 

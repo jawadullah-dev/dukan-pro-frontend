@@ -1,11 +1,6 @@
 import type { NextAuthConfig } from 'next-auth';
 import type { AuthAccountRole } from '@/lib/auth/accounts';
 
-/**
- * Edge-safe Auth.js config (no Node crypto / bcrypt).
- * JWT/session callbacks live here so `proxy.ts` gets `user.role`.
- * Credentials provider lives in `auth.ts`.
- */
 export const authConfig = {
   pages: {
     signIn: '/login'

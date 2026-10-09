@@ -9,13 +9,12 @@ import { useT } from '@/i18n/use-t';
 import { ProductDialog } from './catalog-dialogs';
 import { ProductsTable } from './tables/catalog-tables';
 
-export function ProductsHeaderAction({
-  className,
-  onAdd
-}: {
+interface ProductsHeaderActionProps {
   className?: string;
   onAdd: () => void;
-}) {
+}
+
+export function ProductsHeaderAction({ className, onAdd }: ProductsHeaderActionProps) {
   const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
@@ -25,7 +24,11 @@ export function ProductsHeaderAction({
   );
 }
 
-export function ProductsListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) {
+interface ProductsListClientProps {
+  defaultOpenAdd?: boolean;
+}
+
+export function ProductsListClient({ defaultOpenAdd = false }: ProductsListClientProps) {
   const t = useT();
   const router = useRouter();
   const [open, setOpen] = useState(defaultOpenAdd);

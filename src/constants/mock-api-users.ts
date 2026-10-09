@@ -1,13 +1,10 @@
-////////////////////////////////////////////////////////////////////////////////
-// 🛑 Nothing in here has anything to do with Nextjs, it's just a fake database
-////////////////////////////////////////////////////////////////////////////////
-
 import { faker } from '@faker-js/faker';
+import { applySortParam } from './mock-api';
 import { matchSorter } from 'match-sorter';
 
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export type User = {
+export interface User {
   id: number;
   first_name: string;
   last_name: string;
@@ -17,7 +14,7 @@ export type User = {
   role: string;
   created_at: string;
   updated_at: string;
-};
+}
 
 function generateRandomUserData(id: number): User {
   const roles = ['Developer', 'Designer', 'Manager', 'QA', 'DevOps', 'Product Owner'];
@@ -36,7 +33,19 @@ function generateRandomUserData(id: number): User {
   };
 }
 
-// Mock user data store
+export interface GetAllUsersParams {
+  roles?: string[];
+  search?: string;
+}
+
+export interface GetUsersParams {
+  page?: number;
+  limit?: number;
+  roles?: string | string[];
+  search?: string;
+  sort?: string;
+}
+
 export const fakeUsers = {
   records: [] as User[],
 
@@ -49,7 +58,7 @@ export const fakeUsers = {
     this.records = sampleUsers;
   },
 
-  async getAll({ roles = [], search }: { roles?: string[]; search?: string }) {
+  async getAll({ roles = [], search }: GetAllUsersParams = {}) {
     let users = [...this.records];
 
     if (roles.length > 0) {
@@ -94,7 +103,7 @@ export const fakeUsers = {
     }
 
     this.records[index] = {
-      ...this.records[index],
+      ...(this.records[index] as User),
       ...data,
       updated_at: new Date().toISOString()
     };
@@ -123,52 +132,21 @@ export const fakeUsers = {
     };
   },
 
-  async getUsers({
-    page = 1,
-    limit = 10,
-    roles,
-    search,
-    sort
-  }: {
-    page?: number;
-    limit?: number;
-    roles?: string | string[];
-    search?: string;
-    sort?: string;
-  }) {
+  async getUsers({ page = 1, limit = 10, roles, search, sort }: GetUsersParams = {}) {
     await delay(800);
     const rolesArray = roles ? (Array.isArray(roles) ? roles : String(roles).split(/[.,]/)) : [];
-    const allUsers = await this.getAll({
+    let allUsers = await this.getAll({
       roles: rolesArray,
       search
     });
 
-    // Sorting
     if (sort) {
-      try {
-        const sortItems = JSON.parse(sort) as {
-          id: string;
-          desc: boolean;
-        }[];
-        if (sortItems.length > 0) {
-          const { id, desc } = sortItems[0];
-          allUsers.sort((a, b) => {
-            // Handle computed 'name' column
-            const aVal =
-              id === 'name' ? `${a.first_name} ${a.last_name}` : (a as Record<string, unknown>)[id];
-            const bVal =
-              id === 'name' ? `${b.first_name} ${b.last_name}` : (b as Record<string, unknown>)[id];
-            if (typeof aVal === 'number' && typeof bVal === 'number') {
-              return desc ? bVal - aVal : aVal - bVal;
-            }
-            const aStr = String(aVal ?? '').toLowerCase();
-            const bStr = String(bVal ?? '').toLowerCase();
-            return desc ? bStr.localeCompare(aStr) : aStr.localeCompare(bStr);
-          });
+      allUsers = applySortParam(allUsers, sort, {
+        name: (u) => {
+          const user = u as (typeof allUsers)[0];
+          return `${user.first_name} ${user.last_name}`;
         }
-      } catch {
-        // Invalid sort param — ignore
-      }
+      });
     }
 
     const totalUsers = allUsers.length;

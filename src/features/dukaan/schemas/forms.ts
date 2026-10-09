@@ -50,7 +50,7 @@ export const createPartyFormSchema = (t: Translator) =>
       .min(0, t('validation.valueNonNegative'))
   });
 
-export type PartyFormValues = z.infer<ReturnType<typeof createPartyFormSchema>>;
+type PartyFormValues = z.infer<ReturnType<typeof createPartyFormSchema>>;
 
 export const createReceivePaymentSchema = (t: Translator) =>
   z.object({

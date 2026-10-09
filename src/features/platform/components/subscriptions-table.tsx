@@ -170,9 +170,8 @@ export function PlatformSubscriptionsTable() {
 
   const { data } = useSuspenseQuery(platformSubscriptionsQueryOptions(filters));
 
-  // Client-side plan filter (API supports status + search)
   const items = facetValues.plan?.length
-    ? data.items.filter((row) => facetValues.plan!.includes(row.plan))
+    ? data.items.filter((row) => Boolean(facetValues.plan?.includes(row.plan)))
     : data.items;
 
   const pageCount = Math.max(1, Math.ceil(data.total_items / perPage));

@@ -29,7 +29,7 @@ export const platformSubscriptionsQueryOptions = (filters: PlatformSubscriptionF
     queryFn: () => platform.listPlatformSubscriptions(filters)
   });
 
-export const platformCitiesQueryOptions = () =>
+const platformCitiesQueryOptions = () =>
   queryOptions({
     queryKey: platformKeys.cities(),
     queryFn: () => platform.listPlatformCities()

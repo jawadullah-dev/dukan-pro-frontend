@@ -13,14 +13,8 @@ type Tools = {
   };
 };
 
-/** The message shape for this demo (typed tools, no data parts). */
 export type DemoUIMessage = UIMessage<unknown, Record<string, never>, Tools>;
 
-/**
- * A scripted AI conversation. It streams through the real `useChat` lifecycle
- * via `transport()` — no model, API route, network request, or API key. The
- * script shows off reasoning, a tool call, and streamed text across two turns.
- */
 export const demoChat = createChat<DemoUIMessage>()
   .user('How did revenue do last month, and what should I focus on next?')
   .sleep(500)
@@ -56,8 +50,6 @@ export const demoChat = createChat<DemoUIMessage>()
     );
   });
 
-/** Empty initial transcript — the demo streams as the user presses Send. */
 export const initialMessages = demoChat.get(0);
 
-/** Local transport that streams the scripted responses through `useChat`. */
 export const chatTransport = demoChat.transport({ delayMs: 30 });

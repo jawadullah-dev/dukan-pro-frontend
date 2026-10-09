@@ -17,7 +17,7 @@ import { useTranslations } from 'next-intl';
 interface DataTablePaginationProps<TData> extends React.ComponentProps<'div'> {
   table: Table<TData>;
   pageSizeOptions?: number[];
-  /** Compact: range + prev/next only (phones). */
+
   variant?: 'compact' | 'full';
 }
 

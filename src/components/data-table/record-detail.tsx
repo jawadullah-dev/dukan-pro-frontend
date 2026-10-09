@@ -17,13 +17,12 @@ import type { DetailConfig } from './types';
 interface RecordDetailProps<TData> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** sheet = bottom on phones; side = end panel on tablet/desktop. */
+
   presentation: 'sheet' | 'side';
   data: TData | null;
   detail: DetailConfig<TData>;
 }
 
-/** Shared record detail for bottom sheet or end-side panel. */
 export function RecordDetail<TData>({
   open,
   onOpenChange,

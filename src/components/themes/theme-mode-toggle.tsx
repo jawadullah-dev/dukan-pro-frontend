@@ -17,14 +17,12 @@ export function ThemeModeToggle() {
   const handleThemeToggle = React.useCallback(
     (e?: React.MouseEvent) => {
       const newMode = resolvedTheme === 'dark' ? 'light' : 'dark';
-      // Circular reveal from the click point (falls back to center for the
-      // keyboard shortcut, which passes no event).
+
       startThemeTransition(() => setTheme(newMode), e);
     },
     [resolvedTheme, setTheme]
   );
 
-  // Cmd/Ctrl+Shift+D toggles the theme; kbar separately handles the 'D D' sequence
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() !== 'd' || !e.shiftKey || !(e.metaKey || e.ctrlKey)) return;

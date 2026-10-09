@@ -1,7 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { delocalize } from '@/lib/auth/routes';
 
-/** Map dashboard path segments / paths to page title keys. */
 const PATH_TITLE_KEYS: Record<string, string> = {
   overview: 'pages.dashboard.title',
   products: 'pages.products.title',
@@ -44,7 +43,7 @@ export function pageTitleKeyFromPath(pathname: string): string | null {
   return 'pages.dashboard.title';
 }
 
-export async function getTranslatedPageTitle(pathname: string): Promise<string | null> {
+async function getTranslatedPageTitle(pathname: string): Promise<string | null> {
   const key = pageTitleKeyFromPath(pathname);
   if (!key) return null;
   const t = await getTranslations();

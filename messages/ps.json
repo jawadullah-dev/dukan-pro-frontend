@@ -170,6 +170,10 @@
     "createNewShop": "نوی دوکان جوړ کړئ"
   },
   "common": {
+    "somethingWentWrong": "څه ستونزه رامنځته شوه",
+    "unexpectedError": "یوه غیر متوقع تېروتنه رامنځته شوه",
+    "tryAgain": "بیا هڅه وکړئ",
+    "reloadPage": "پاڼه بیا لوډ کړئ",
     "close": "بندول",
     "add": "زیات کړئ",
     "edit": "سمون",

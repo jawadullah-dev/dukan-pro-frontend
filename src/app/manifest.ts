@@ -24,8 +24,7 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: PWA_THEME_COLOR_LIGHT,
     background_color: PWA_BACKGROUND_COLOR,
     categories: ['business', 'productivity'],
-    // Self-reference so desktop Chrome can report install via getInstalledRelatedApps.
-    // prefer_related_applications must stay false — true would block PWA install.
+
     prefer_related_applications: false,
     related_applications: [
       {
@@ -70,8 +69,7 @@ export default function manifest(): MetadataRoute.Manifest {
         label: `${APP_NAME} mobile`
       }
     ],
-    // Shortcuts go through `/` so cold PWA launches hit the public entry first
-    // (auth redirect), instead of a hard NetworkOnly miss on /dashboard/*.
+
     shortcuts: [
       {
         name: 'New sale',

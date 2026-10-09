@@ -11,7 +11,6 @@ interface QuickFilterChipsProps<TData> {
   className?: string;
 }
 
-/** Horizontally scrollable status chips under search (phones). */
 export function QuickFilterChips<TData>({ table, chips, className }: QuickFilterChipsProps<TData>) {
   if (chips.length === 0) return null;
 

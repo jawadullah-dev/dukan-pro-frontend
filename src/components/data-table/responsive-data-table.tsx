@@ -33,21 +33,16 @@ export interface LedgerListConfig<TData> {
 interface ResponsiveDataTableProps<TData> {
   table: TanstackTable<TData>;
   toolbarAction?: React.ReactNode;
-  /** Explicit slots; when omitted, auto-layout from column meta. */
+
   mobileItem?: MobileItemConfig<TData>;
-  /** Explicit detail; when omitted, built from all columns. */
+
   detail?: DetailConfig<TData> | Partial<DetailConfig<TData>>;
   quickFilters?: QuickFilterChip[];
-  /** Banking-style date-grouped list on phones. */
+
   ledger?: LedgerListConfig<TData>;
   className?: string;
 }
 
-/**
- * One engine for all tables: list / compact / full by container width.
- * Auto-layout from column `meta.type` / `primary` / `highlight` when
- * `mobileItem` is omitted.
- */
 export function ResponsiveDataTable<TData>({
   table,
   toolbarAction,
@@ -64,9 +59,9 @@ export function ResponsiveDataTable<TData>({
   const isList = mode === 'list' || mode === 'cards';
 
   const mobileItem = React.useMemo(
-    () => mobileItemProp ?? buildMobileItemFromTable(table, (key) => t(key as any)),
-    // table identity changes with data; rebuild when column defs / rows change
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
+    () =>
+      mobileItemProp ?? buildMobileItemFromTable(table, (key) => (t as (k: string) => string)(key)),
+
     [mobileItemProp, table.options.columns, table.options.data, t]
   );
 
@@ -79,19 +74,14 @@ export function ResponsiveDataTable<TData>({
     ) {
       return detailProp as DetailConfig<TData>;
     }
-    return buildDetailFromTable(table, detailProp, (key) => t(key as any));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
+    return buildDetailFromTable(table, detailProp, (key) => (t as (k: string) => string)(key));
   }, [detailProp, table.options.columns, table.options.data, t]);
 
   return (
     <div
       ref={ref}
       data-slot='responsive-data-table'
-      className={cn(
-        // Fill TablePageBody / PageContainer(fill); rows scroll in the inner pane.
-        'flex min-h-0 w-full min-w-0 flex-1 flex-col gap-3 overflow-hidden',
-        className
-      )}
+      className={cn('flex min-h-0 w-full min-w-0 flex-1 flex-col gap-3 overflow-hidden', className)}
     >
       {!measured ? (
         <div className='flex flex-col gap-2' aria-busy='true'>
@@ -112,7 +102,6 @@ export function ResponsiveDataTable<TData>({
           ) : null}
 
           <div className='min-h-0 flex-1 overflow-y-auto overscroll-y-contain'>
-            {/* p-px keeps list/table borders & rings inside the scrollport */}
             <div className='p-px'>
               {isList ? (
                 <>
@@ -163,7 +152,9 @@ export function ResponsiveDataTable<TData>({
                   return [
                     {
                       label: t('table.openRecord'),
-                      onClick: () => router.push(detail.href!(row))
+                      onClick: () => {
+                        if (detail.href) router.push(detail.href(row));
+                      }
                     },
                     ...base
                   ];
@@ -178,17 +169,19 @@ export function ResponsiveDataTable<TData>({
   );
 }
 
+interface CompactOrFullTableProps<TData> {
+  table: TanstackTable<TData>;
+  mode: 'compact' | 'full';
+  wideCompact: boolean;
+  onRowClick?: (row: Row<TData>) => void;
+}
+
 function CompactOrFullTable<TData>({
   table,
   mode,
   wideCompact,
   onRowClick
-}: {
-  table: TanstackTable<TData>;
-  mode: 'compact' | 'full';
-  wideCompact: boolean;
-  onRowClick?: (row: Row<TData>) => void;
-}) {
+}: CompactOrFullTableProps<TData>) {
   const t = useTranslations();
   const stickyFirst = mode === 'compact';
 

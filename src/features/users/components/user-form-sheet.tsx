@@ -70,8 +70,8 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
       onSubmit: userSchema(t)
     },
     onSubmit: async ({ value }) => {
-      if (isEdit) {
-        await updateMutation.mutateAsync({ id: user!.id, values: value });
+      if (isEdit && user) {
+        await updateMutation.mutateAsync({ id: user.id, values: value });
       } else {
         await createMutation.mutateAsync(value);
       }
@@ -156,7 +156,7 @@ export function UserFormSheet({ user, open, onOpenChange }: UserFormSheetProps) 
                   <field.SelectField
                     label={t('users.role')}
                     required
-                    options={ROLE_OPTIONS(t as any)}
+                    options={ROLE_OPTIONS((key) => t(key))}
                     placeholder={t('users.selectRole')}
                   />
                 )}

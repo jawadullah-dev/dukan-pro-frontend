@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { useTranslations } from 'next-intl';
 
-/** Slim banner when the device goes offline. */
 export function OfflineBanner() {
   const t = useTranslations();
   const [offline, setOffline] = React.useState(false);
@@ -32,8 +31,7 @@ export function OfflineBanner() {
   );
 }
 
-/** Hook for disabling forms while offline. */
-export function useIsOnline(): boolean {
+function useIsOnline(): boolean {
   const [online, setOnline] = React.useState(true);
   React.useEffect(() => {
     const sync = () => setOnline(navigator.onLine);

@@ -33,7 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         return {
           id: account.id,
-          // NextAuth session shape expects email; store phone so UI can show it.
+
           email: account.phone,
           name: account.name,
           role: account.role,

@@ -94,7 +94,7 @@ export function UsersTable() {
   );
 }
 
-export function UsersTableSkeleton() {
+function UsersTableSkeleton() {
   return (
     <div className='flex flex-1 animate-pulse flex-col gap-4'>
       <div className='bg-muted h-10 w-full rounded' />

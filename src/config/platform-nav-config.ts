@@ -1,6 +1,5 @@
 import { NavGroup } from '@/types';
 
-/** Platform super-admin navigation — titles/labels are i18n keys. */
 export const platformNavGroups: NavGroup[] = [
   {
     label: 'nav.group.overview',

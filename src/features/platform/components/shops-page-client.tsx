@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { useT } from '@/i18n/use-t';
 import { PlatformShopsTable } from './shops-table';
 
-/** Desktop/tablet header action (pageHeaderAction is hidden on phones). */
 export function CreateShopHeaderAction() {
   const t = useT();
   return (
@@ -23,7 +22,7 @@ export function PlatformShopsListClient() {
   return (
     <TablePageBody>
       <PlatformShopsTable />
-      {/* Create-shop dialog not wired yet — FAB mirrors header affordance on phones. */}
+
       <FloatingActionButton label={t('nav.createNewShop')} onClick={() => {}} />
     </TablePageBody>
   );

@@ -31,3 +31,8 @@ export type ProductMutationPayload = {
   price: number;
   description: string;
 };
+
+export interface UpdateProductVariables {
+  id: number;
+  values: ProductMutationPayload;
+}

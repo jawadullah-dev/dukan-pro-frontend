@@ -35,7 +35,7 @@ export interface NavItemWithOptionalChildren extends NavItem {
   items?: NavItemWithChildren[];
 }
 
-export interface FooterItem {
+interface FooterItem {
   title: string;
   items: {
     title: string;
@@ -44,6 +44,6 @@ export interface FooterItem {
   }[];
 }
 
-export type MainNavItem = NavItemWithOptionalChildren;
+type MainNavItem = NavItemWithOptionalChildren;
 
-export type SidebarNavItem = NavItemWithChildren;
+type SidebarNavItem = NavItemWithChildren;

@@ -1,9 +1,3 @@
-/**
- * Shared install-prompt state for multiple InstallPrompt mounts
- * (banner + menu + settings). Chrome fires `beforeinstallprompt` once;
- * only one caller may invoke `prompt()` at a time.
- */
-
 import { isStandaloneDisplay } from '@/lib/pwa';
 
 export type BeforeInstallPromptEvent = Event & {
@@ -14,7 +8,6 @@ export type BeforeInstallPromptEvent = Event & {
 type Listener = () => void;
 
 const INSTALLED_FLAG_KEY = 'pwa-app-installed';
-/** Set before reload — next page load auto-opens the native install dialog. */
 export const AUTO_PROMPT_KEY = 'pwa-auto-prompt-install';
 
 let deferred: BeforeInstallPromptEvent | null = null;
@@ -39,9 +32,7 @@ function readInstalledFlag(): boolean {
 function writeInstalledFlag(): void {
   try {
     localStorage.setItem(INSTALLED_FLAG_KEY, '1');
-  } catch {
-    // ignore
-  }
+  } catch {}
 }
 
 export function subscribeInstallState(listener: Listener): () => void {
@@ -51,7 +42,7 @@ export function subscribeInstallState(listener: Listener): () => void {
   };
 }
 
-export function getDeferredPrompt(): BeforeInstallPromptEvent | null {
+function getDeferredPrompt(): BeforeInstallPromptEvent | null {
   return deferred;
 }
 
@@ -59,14 +50,11 @@ export function isInstallMarkedInstalled(): boolean {
   return installed || readInstalledFlag();
 }
 
-/** After the user uninstalls in Chrome, call this so Install can show again. */
 export function clearInstalledMark(): void {
   installed = false;
   try {
     localStorage.removeItem(INSTALLED_FLAG_KEY);
-  } catch {
-    // ignore
-  }
+  } catch {}
   emit();
 }
 
@@ -74,12 +62,10 @@ export function isInstallPrompting(): boolean {
   return prompting;
 }
 
-/** True when Chromium can show the native install UI right now. */
 export function canPromptNativeInstall(): boolean {
   return Boolean(deferred) && !prompting && !installed;
 }
 
-/** Call once from any InstallPrompt mount — safe if called many times. */
 export function ensureInstallListeners(): void {
   if (typeof window === 'undefined' || bound) return;
   bound = true;
@@ -91,13 +77,11 @@ export function ensureInstallListeners(): void {
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferred = e as BeforeInstallPromptEvent;
-    // Fresh BIP means the browser can install again (e.g. after uninstall).
+
     installed = false;
     try {
       localStorage.removeItem(INSTALLED_FLAG_KEY);
-    } catch {
-      // ignore
-    }
+    } catch {}
     emit();
   });
 
@@ -110,10 +94,8 @@ export function ensureInstallListeners(): void {
   });
 }
 
-// Capture BIP as early as this module loads (before React mounts).
 ensureInstallListeners();
 
-/** Bump visit counter once per full page load (not per component mount). */
 export function bumpInstallVisitsOnce(): number {
   if (typeof window === 'undefined') return 0;
   try {
@@ -129,11 +111,6 @@ export function bumpInstallVisitsOnce(): number {
   }
 }
 
-/**
- * Show the native Chromium install UI (desktop + Android Chrome).
- * That dialog is what creates the Start menu / desktop icon (like home screen on phone).
- * Safe to call repeatedly — never throws to the UI.
- */
 export async function promptNativeInstall(): Promise<'accepted' | 'dismissed' | 'unavailable'> {
   if (prompting) return 'unavailable';
   const event = deferred;
@@ -160,7 +137,6 @@ export async function promptNativeInstall(): Promise<'accepted' | 'dismissed' | 
   }
 }
 
-/** Desktop Chromium / wide viewport — not iPhone-style install. */
 export function isDesktopInstallSurface(): boolean {
   if (typeof window === 'undefined') return true;
   return window.matchMedia('(min-width: 640px)').matches;
@@ -168,10 +144,6 @@ export function isDesktopInstallSurface(): boolean {
 
 type RelatedApp = { platform: string; url?: string; id?: string };
 
-/**
- * True when Chrome already installed this PWA (address bar shows "Open in app").
- * In that case BIP will not fire — user needs a desktop shortcut, not another install.
- */
 export async function detectPwaAlreadyInstalled(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
   if (isStandaloneDisplay()) return true;
@@ -188,34 +160,24 @@ export async function detectPwaAlreadyInstalled(): Promise<boolean> {
         emit();
         return true;
       }
-      // API says not installed — clear a stale local flag from a deleted shortcut.
+
       installed = false;
       try {
         localStorage.removeItem(INSTALLED_FLAG_KEY);
-      } catch {
-        // ignore
-      }
+      } catch {}
       emit();
       return false;
     }
-  } catch {
-    // ignore
-  }
+  } catch {}
 
-  // Fallback when the browser cannot report related apps.
   return installed || readInstalledFlag();
 }
 
-/** Chrome / Edge apps page URL for uninstalling the PWA. */
 export function getBrowserAppsUrl(): string {
   if (typeof navigator === 'undefined') return 'chrome://apps';
-  return /Edg\//.test(navigator.userAgent) ? 'edge://apps' : 'chrome://apps';
+  return navigator.userAgent.includes('Edg') ? 'edge://apps' : 'chrome://apps';
 }
 
-/**
- * Wait briefly for beforeinstallprompt, then open the native install UI.
- * Used after "I removed it" reloads the page.
- */
 export async function waitAndPromptNativeInstall(
   timeoutMs = 4000
 ): Promise<'accepted' | 'dismissed' | 'unavailable'> {

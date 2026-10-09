@@ -28,20 +28,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 
-// ---------------------------------------------------------------------------
-// Schemas
-// ---------------------------------------------------------------------------
-
 const categoryOptions = (t: (key: string) => string) => [
   { value: 'beauty', label: t('categories.beautyProducts') },
   { value: 'electronics', label: t('categories.electronics') },
   { value: 'home', label: t('categories.homeGarden') },
   { value: 'sports', label: t('categories.sportsOutdoors') }
 ];
-
-// ---------------------------------------------------------------------------
-// Sheet Form
-// ---------------------------------------------------------------------------
 
 function SheetFormSection() {
   const [open, setOpen] = useState(false);
@@ -171,10 +163,6 @@ function SheetFormSection() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Dialog Form
-// ---------------------------------------------------------------------------
-
 function DialogFormSection() {
   const [open, setOpen] = useState(false);
   const t = useT();
@@ -273,10 +261,6 @@ function DialogFormSection() {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Toast Demo
-// ---------------------------------------------------------------------------
-
 function ToastDemoSection() {
   const t = useT();
   return (
@@ -322,10 +306,6 @@ function ToastDemoSection() {
     </Card>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Main Demo
-// ---------------------------------------------------------------------------
 
 export default function SheetFormDemo() {
   return (

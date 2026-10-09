@@ -1,0 +1,31 @@
+{
+  "path": ["src"],
+
+  "pattern": "**/*.{ts,tsx}",
+
+  "ignore": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/src/components/ui/**",
+    "**/src/styles/**"
+  ],
+
+  "minLines": 8,
+
+  "minTokens": 70,
+
+  "threshold": 2,
+
+  "format": ["typescript"],
+
+  "reporters": ["console"],
+
+  "exitCode": 1,
+
+  "skipLocal": false,
+
+  "absolute": false,
+
+  "silent": false
+}
+

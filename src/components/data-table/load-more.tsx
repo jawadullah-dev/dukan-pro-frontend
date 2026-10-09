@@ -9,10 +9,6 @@ interface LoadMoreProps<TData> {
   step?: number;
 }
 
-/**
- * Phone pagination: grows page size instead of numbered pages.
- * Shows "Showing X of Y" + Load more until all rows are loaded.
- */
 export function LoadMore<TData>({ table, step = 20 }: LoadMoreProps<TData>) {
   const t = useTranslations();
   const total = table.getRowCount();

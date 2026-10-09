@@ -1,14 +1,35 @@
-////////////////////////////////////////////////////////////////////////////////
-// 🛑 Nothing in here has anything to do with Nextjs, it's just a fake database
-////////////////////////////////////////////////////////////////////////////////
-
 import { faker } from '@faker-js/faker';
-import { matchSorter } from 'match-sorter'; // For filtering
+import { matchSorter } from 'match-sorter';
 
 export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Define the shape of Product data
-export type Product = {
+export function applySortParam<T>(
+  items: T[],
+  sort: string | undefined,
+  computedFields?: Record<string, (item: T) => unknown>
+): T[] {
+  if (!sort) return items;
+  try {
+    const sortItems = JSON.parse(sort) as Array<{ id: string; desc: boolean }>;
+    const firstSort = sortItems[0];
+    if (!firstSort) return items;
+    const { id, desc } = firstSort;
+    return [...items].sort((a, b) => {
+      const aVal = computedFields?.[id]?.(a) ?? (a as Record<string, unknown>)[id];
+      const bVal = computedFields?.[id]?.(b) ?? (b as Record<string, unknown>)[id];
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return desc ? bVal - aVal : aVal - bVal;
+      }
+      const aStr = String(aVal ?? '').toLowerCase();
+      const bStr = String(bVal ?? '').toLowerCase();
+      return desc ? bStr.localeCompare(aStr) : aStr.localeCompare(bStr);
+    });
+  } catch {
+    return items;
+  }
+}
+
+export interface Product {
   photo_url: string;
   name: string;
   description: string;
@@ -17,7 +38,7 @@ export type Product = {
   id: number;
   category: string;
   updated_at: string;
-};
+}
 
 function generateRandomProductData(id: number): Product {
   const categories = [
@@ -43,14 +64,25 @@ function generateRandomProductData(id: number): Product {
   };
 }
 
-// Mock product data store
-export const fakeProducts = {
-  records: [] as Product[], // Holds the list of product objects
+export interface GetAllProductsParams {
+  categories?: string[];
+  search?: string;
+}
 
-  // Initialize with sample data
+export interface GetProductsParams {
+  page?: number;
+  limit?: number;
+  categories?: string | string[];
+  search?: string;
+  sort?: string;
+}
+
+export const fakeProducts = {
+  records: [] as Product[],
+
   initialize() {
     const sampleProducts: Product[] = [];
-    // Generate remaining records
+
     for (let i = 1; i <= 20; i++) {
       sampleProducts.push(generateRandomProductData(i));
     }
@@ -58,16 +90,13 @@ export const fakeProducts = {
     this.records = sampleProducts;
   },
 
-  // Get all products with optional category filtering and search
-  async getAll({ categories = [], search }: { categories?: string[]; search?: string }) {
+  async getAll({ categories = [], search }: GetAllProductsParams = {}) {
     let products = [...this.records];
 
-    // Filter products based on selected categories
     if (categories.length > 0) {
       products = products.filter((product) => categories.includes(product.category));
     }
 
-    // Search functionality across multiple fields
     if (search) {
       products = matchSorter(products, search, {
         keys: ['name', 'description', 'category']
@@ -77,66 +106,29 @@ export const fakeProducts = {
     return products;
   },
 
-  // Get paginated results with optional category filtering, search, and sorting
-  async getProducts({
-    page = 1,
-    limit = 10,
-    categories,
-    search,
-    sort
-  }: {
-    page?: number;
-    limit?: number;
-    categories?: string | string[];
-    search?: string;
-    sort?: string;
-  }) {
+  async getProducts({ page = 1, limit = 10, categories, search, sort }: GetProductsParams = {}) {
     await delay(1000);
     const categoriesArray = categories
       ? Array.isArray(categories)
         ? categories
         : String(categories).split(/[.,]/)
       : [];
-    const allProducts = await this.getAll({
+    let allProducts = await this.getAll({
       categories: categoriesArray,
       search
     });
 
-    // Sorting
     if (sort) {
-      try {
-        const sortItems = JSON.parse(sort) as {
-          id: string;
-          desc: boolean;
-        }[];
-        if (sortItems.length > 0) {
-          const { id, desc } = sortItems[0];
-          allProducts.sort((a, b) => {
-            const aVal = (a as Record<string, unknown>)[id];
-            const bVal = (b as Record<string, unknown>)[id];
-            if (typeof aVal === 'number' && typeof bVal === 'number') {
-              return desc ? bVal - aVal : aVal - bVal;
-            }
-            const aStr = String(aVal ?? '').toLowerCase();
-            const bStr = String(bVal ?? '').toLowerCase();
-            return desc ? bStr.localeCompare(aStr) : aStr.localeCompare(bStr);
-          });
-        }
-      } catch {
-        // Invalid sort param — ignore
-      }
+      allProducts = applySortParam(allProducts, sort);
     }
 
     const totalProducts = allProducts.length;
 
-    // Pagination logic
     const offset = (page - 1) * limit;
     const paginatedProducts = allProducts.slice(offset, offset + limit);
 
-    // Mock current time
     const currentTime = new Date().toISOString();
 
-    // Return paginated response
     return {
       success: true,
       time: currentTime,
@@ -148,11 +140,9 @@ export const fakeProducts = {
     };
   },
 
-  // Get a specific product by its ID
   async getProductById(id: number) {
-    await delay(3000); // Simulate a slow API call
+    await delay(3000);
 
-    // Find the product by its ID
     const product = this.records.find((product) => product.id === id);
 
     if (!product) {
@@ -162,7 +152,6 @@ export const fakeProducts = {
       };
     }
 
-    // Mock current time
     const currentTime = new Date().toISOString();
 
     return {
@@ -173,7 +162,6 @@ export const fakeProducts = {
     };
   },
 
-  // Create a new product
   async createProduct(data: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'photo_url'>) {
     await delay(1000);
 
@@ -194,7 +182,6 @@ export const fakeProducts = {
     };
   },
 
-  // Update an existing product
   async updateProduct(
     id: number,
     data: Omit<Product, 'id' | 'created_at' | 'updated_at' | 'photo_url'>
@@ -211,7 +198,7 @@ export const fakeProducts = {
     }
 
     this.records[index] = {
-      ...this.records[index],
+      ...(this.records[index] as Product),
       ...data,
       updated_at: new Date().toISOString()
     };
@@ -223,7 +210,6 @@ export const fakeProducts = {
     };
   },
 
-  // Delete a product
   async deleteProduct(id: number) {
     await delay(1000);
 
@@ -242,5 +228,4 @@ export const fakeProducts = {
   }
 };
 
-// Initialize sample products
 fakeProducts.initialize();

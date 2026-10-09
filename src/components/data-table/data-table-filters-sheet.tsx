@@ -21,11 +21,10 @@ interface DataTableFiltersSheetProps<TData> {
   table: Table<TData>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Include page-size control (phones hide it from footer). */
+
   pageSizeOptions?: number[];
 }
 
-/** Phone filters + sort sheet. Mutates the same TanStack table / nuqs state. */
 export function DataTableFiltersSheet<TData>({
   table,
   open,
@@ -164,14 +163,20 @@ export function DataTableFiltersSheet<TData>({
   );
 }
 
-function FilterBlock<TData>({ column }: { column: Column<TData, unknown> }) {
+interface FilterBlockProps<TData> {
+  column: Column<TData, unknown>;
+}
+
+function FilterBlock<TData>({ column }: FilterBlockProps<TData>) {
   const t = useTranslations();
   const meta = column.columnDef.meta;
   if (!meta?.variant) return null;
 
   if (meta.variant === 'select' || meta.variant === 'multiSelect') {
     const options =
-      typeof meta.options === 'function' ? meta.options(t as any) : (meta.options ?? []);
+      typeof meta.options === 'function'
+        ? meta.options((key: string) => t(key))
+        : (meta.options ?? []);
     return (
       <div className='grid gap-2'>
         <Label>{meta.label ?? column.id}</Label>

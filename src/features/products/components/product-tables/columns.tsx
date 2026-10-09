@@ -14,22 +14,26 @@ function ImageColumnHeader() {
   return <span>{t('tableColumns.image')}</span>;
 }
 
-function NameColumnHeader({ column }: { column: Column<Product, unknown> }) {
+interface ProductColumnProps {
+  column: Column<Product, unknown>;
+}
+
+function NameColumnHeader({ column }: ProductColumnProps) {
   const t = useT();
   return <DataTableColumnHeader column={column} title={t('common.name')} />;
 }
 
-function CategoryColumnHeader({ column }: { column: Column<Product, unknown> }) {
+function CategoryColumnHeader({ column }: ProductColumnProps) {
   const t = useT();
   return <DataTableColumnHeader column={column} title={t('common.category')} />;
 }
 
-function PriceColumnHeader({ column }: { column: Column<Product, unknown> }) {
+function PriceColumnHeader({ column }: ProductColumnProps) {
   const t = useT();
   return <DataTableColumnHeader column={column} title={t('common.price')} />;
 }
 
-function DescriptionColumnHeader({ column }: { column: Column<Product, unknown> }) {
+function DescriptionColumnHeader({ column }: ProductColumnProps) {
   const t = useT();
   return <DataTableColumnHeader column={column} title={t('common.description')} />;
 }
@@ -57,9 +61,7 @@ export const columns: ColumnDef<Product>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }: { column: Column<Product, unknown> }) => (
-      <NameColumnHeader column={column} />
-    ),
+    header: ({ column }: ProductColumnProps) => <NameColumnHeader column={column} />,
     cell: ({ cell }) => <div>{cell.getValue<Product['name']>()}</div>,
     meta: {
       label: 'common.name',
@@ -76,9 +78,7 @@ export const columns: ColumnDef<Product>[] = [
     id: 'category',
     accessorKey: 'category',
     enableSorting: false,
-    header: ({ column }: { column: Column<Product, unknown> }) => (
-      <CategoryColumnHeader column={column} />
-    ),
+    header: ({ column }: ProductColumnProps) => <CategoryColumnHeader column={column} />,
     cell: ({ cell }) => {
       const status = cell.getValue<Product['category']>();
       const Icon = status === 'active' ? Icons.circleCheck : Icons.xCircle;
@@ -102,9 +102,7 @@ export const columns: ColumnDef<Product>[] = [
   {
     id: 'price',
     accessorKey: 'price',
-    header: ({ column }: { column: Column<Product, unknown> }) => (
-      <PriceColumnHeader column={column} />
-    ),
+    header: ({ column }: ProductColumnProps) => <PriceColumnHeader column={column} />,
     meta: {
       label: 'common.price',
       type: 'money',
@@ -115,9 +113,7 @@ export const columns: ColumnDef<Product>[] = [
   {
     id: 'description',
     accessorKey: 'description',
-    header: ({ column }: { column: Column<Product, unknown> }) => (
-      <DescriptionColumnHeader column={column} />
-    ),
+    header: ({ column }: ProductColumnProps) => <DescriptionColumnHeader column={column} />,
     meta: {
       label: 'common.description',
       type: 'longtext',

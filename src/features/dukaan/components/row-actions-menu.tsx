@@ -22,7 +22,11 @@ export interface RowAction {
   variant?: 'default' | 'destructive';
 }
 
-export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
+export interface RowActionsMenuProps {
+  actions: RowAction[];
+}
+
+export function RowActionsMenu({ actions }: RowActionsMenuProps) {
   const t = useT();
   const router = useRouter();
   if (actions.length === 0) return null;

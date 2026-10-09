@@ -1,4 +1,3 @@
-/** Clear service-worker runtime caches (call on logout). */
 export async function clearPwaCaches(): Promise<void> {
   if (typeof window === 'undefined') return;
 
@@ -7,16 +6,12 @@ export async function clearPwaCaches(): Promise<void> {
       const keys = await caches.keys();
       await Promise.all(keys.map((key) => caches.delete(key)));
     }
-  } catch {
-    // ignore
-  }
+  } catch {}
 
   try {
     const reg = await navigator.serviceWorker?.getRegistration();
     reg?.active?.postMessage({ type: 'CLEAR_RUNTIME_CACHES' });
-  } catch {
-    // ignore
-  }
+  } catch {}
 }
 
 export function isStandaloneDisplay(): boolean {
@@ -28,7 +23,7 @@ export function isStandaloneDisplay(): boolean {
   return mq || ios;
 }
 
-export function isIosSafari(): boolean {
+function isIosSafari(): boolean {
   if (typeof window === 'undefined') return false;
   const ua = window.navigator.userAgent;
   const iOS =
@@ -39,7 +34,6 @@ export function isIosSafari(): boolean {
   return iOS && webkit;
 }
 
-/** True for any iOS browser that needs Add to Home Screen (Safari share sheet). */
 export function isIosInstallCandidate(): boolean {
   if (typeof window === 'undefined') return false;
   const ua = window.navigator.userAgent;

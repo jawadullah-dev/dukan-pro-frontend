@@ -3,19 +3,14 @@ import * as React from 'react';
 import { Kbd } from '@/components/ui/kbd';
 import { cn } from '@/lib/utils';
 
+interface ResultItemProps {
+  action: ActionImpl;
+  active: boolean;
+  currentRootActionId: ActionId;
+}
+
 const ResultItem = React.forwardRef(
-  (
-    {
-      action,
-      active,
-      currentRootActionId
-    }: {
-      action: ActionImpl;
-      active: boolean;
-      currentRootActionId: ActionId;
-    },
-    ref: React.Ref<HTMLDivElement>
-  ) => {
+  ({ action, active, currentRootActionId }: ResultItemProps, ref: React.Ref<HTMLDivElement>) => {
     const ancestors = React.useMemo(() => {
       if (!currentRootActionId) return action.ancestors;
       const index = action.ancestors.findIndex((ancestor) => ancestor.id === currentRootActionId);

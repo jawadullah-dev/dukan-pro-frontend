@@ -4,19 +4,16 @@ import * as React from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
+import { env } from '@/config/env';
 
-/**
- * Shows a toast when a waiting service worker is ready.
- * Does not auto-reload (avoids interrupting sales/forms).
- */
 export function PwaUpdateBanner() {
   const t = useTranslations();
-  // Capture translation strings before the effect so they're stable
+
   const updateLabel = t('pwa.updateAvailable');
   const reloadLabel = t('pwa.reload');
 
   React.useEffect(() => {
-    if (process.env.NODE_ENV !== 'production') return;
+    if (env.NODE_ENV !== 'production') return;
     if (!('serviceWorker' in navigator)) return;
 
     let registration: ServiceWorkerRegistration | undefined;
@@ -31,7 +28,7 @@ export function PwaUpdateBanner() {
           label: reloadLabel,
           onClick: () => {
             reg.waiting?.postMessage({ type: 'SKIP_WAITING' });
-            // Reload after the new worker takes control
+
             navigator.serviceWorker.addEventListener(
               'controllerchange',
               () => {
@@ -58,9 +55,7 @@ export function PwaUpdateBanner() {
       });
     });
 
-    const onControllerChange = () => {
-      // handled by reload on user action
-    };
+    const onControllerChange = () => {};
     navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
 
     const interval = window.setInterval(
@@ -79,8 +74,11 @@ export function PwaUpdateBanner() {
   return null;
 }
 
-/** Compact inline banner alternative (optional mount). */
-export function PwaUpdateInline({ onReload }: { onReload: () => void }) {
+interface PwaUpdateInlineProps {
+  onReload: () => void;
+}
+
+function PwaUpdateInline({ onReload }: PwaUpdateInlineProps) {
   const t = useTranslations();
   return (
     <div

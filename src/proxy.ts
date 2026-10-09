@@ -11,25 +11,10 @@ import {
 } from '@/lib/auth/routes';
 import { routing } from '@/i18n/routing';
 
-/**
- * Combined middleware:
- *  1. next-intl handles locale prefixing (/ → /en redirect + NEXT_LOCALE cookie + Accept-Language)
- *  2. NextAuth authorizes users and reads role from JWT
- *  3. Role + login-state based redirects run inside the auth() callback
- *
- * Middleware pattern: compose by running intl first, then auth with its matcher
- * via the exported combined handler.
- */
-
 const handleI18nRouting = createIntlMiddleware(routing);
 
 const { auth } = NextAuth(authConfig);
 
-/**
- * Auth-aware redirect handler. Runs AFTER next-intl has already set the locale
- * cookie and redirected to the prefixed URL. All URLs at this point start with
- * /en, /ur, or /ps (except PWA / API / _next assets).
- */
 function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string } } | null) {
   const { pathname } = req.nextUrl;
   const repeatedLocalePrefix = pathname.match(/^\/(en|ur|ps)(?:\/(?:en|ur|ps))+(?=\/|$)/);
@@ -44,7 +29,7 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
   const role = session?.user?.role;
 
   const isLoginPage = pathname.endsWith('/login') || /\/[a-z]{2}\/login(\/|$)/.test(pathname);
-  // Strip locale before dashboard check
+
   const startsWithDashboard = /^\/(en|ur|ps)\/dashboard(\/|$)/.test(pathname);
   const isAuthApi = pathname.startsWith('/api/auth');
   const isPwaAsset =
@@ -81,7 +66,6 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     return NextResponse.redirect(new URL(homePathForRole(role, locale), req.nextUrl));
   }
 
-  // Bare "/" — next-intl normalizes this, but we redirect logged-in users to dashboard.
   if ((pathname === '/' || /^\/(en|ur|ps)\/?$/.test(pathname)) && isLoggedIn) {
     const to = req.nextUrl.searchParams.get('to');
     const shortcut = shortcutPathForRole(to, role, locale);
@@ -92,7 +76,6 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     return NextResponse.redirect(new URL(loginPath(locale), req.nextUrl));
   }
 
-  // /[locale]/dashboard exact without trailing
   if (/^\/(en|ur|ps)\/dashboard\/?$/.test(pathname) && isLoggedIn) {
     return NextResponse.redirect(new URL(homePathForRole(role, locale), req.nextUrl));
   }
@@ -101,12 +84,10 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
 }
 
 export const proxy = auth((req) => {
-  // next-intl uses createIntlMiddleware to rewrite URLs with locale, we compose it.
   return handleAuthRedirects(req, req.auth ?? null);
-}) as unknown as (req: NextRequest) => Promise<NextResponse<unknown>>;
+}) as never as (req: NextRequest) => Promise<NextResponse<unknown>>;
 
 export const config = {
-  // Match all paths except static files / _next.
   matcher: [
     '/',
     '/(en|ur|ps)/:path*',

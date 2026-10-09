@@ -7,7 +7,6 @@ export const metadata = {
   robots: { index: false, follow: false }
 };
 
-/** Branded offline fallback — precached by the service worker. */
 export default async function OfflinePage() {
   const t = await getTranslations('offlinePage');
   const title = t('title');

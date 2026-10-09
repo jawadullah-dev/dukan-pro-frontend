@@ -165,10 +165,7 @@ const supplierMobileItem: MobileItemConfig<SupplierRow> = {
   title: (row) => row.name,
   subtitle: (row) => row.phone,
   value: (row) => formatPkr(row.payable),
-  valueLabel: () => {
-    const t = useT();
-    return t('table.youOwe');
-  },
+  valueLabel: () => t('table.youOwe'),
   valueClassName: (row) =>
     cn(row.payable > 0 ? 'text-[var(--status-warning)]' : 'text-muted-foreground'),
   ariaLabel: (row) => `${row.name}, ${row.phone}, ${formatPkr(row.payable)}`
@@ -177,54 +174,48 @@ const supplierMobileItem: MobileItemConfig<SupplierRow> = {
 const supplierDetail: DetailConfig<SupplierRow> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => {
-    const t = useT();
-    return {
-      label: row.is_active ? t('status.active') : t('status.inactive'),
-      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-    };
-  },
+  badge: (row) => ({
+    label: row.is_active ? t('status.active') : t('status.inactive'),
+    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+  }),
   value: (row) => formatPkr(row.payable),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('dukaan.party.name'),
-        fields: [
-          { label: t('table.col.name'), value: row.name },
-          {
-            label: t('table.col.phone'),
-            value: (
-              <a
-                className='text-primary underline-offset-2 hover:underline'
-                href={`tel:${row.phone}`}
-              >
-                {row.phone}
-              </a>
-            )
-          }
-        ]
-      },
-      {
-        title: t('table.balance'),
-        fields: [
-          { label: t('table.youOwe'), value: formatPkr(row.payable) },
-          {
-            label: t('table.col.status'),
-            value: (
-              <StatusBadge
-                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-                label={row.is_active ? t('status.active') : t('status.inactive')}
-              />
-            )
-          },
-          ...(row.is_system
-            ? [{ label: t('table.col.type'), value: t('status.serialized') as ReactNode }]
-            : [])
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('dukaan.party.name'),
+      fields: [
+        { label: t('table.col.name'), value: row.name },
+        {
+          label: t('table.col.phone'),
+          value: (
+            <a
+              className='text-primary underline-offset-2 hover:underline'
+              href={`tel:${row.phone}`}
+            >
+              {row.phone}
+            </a>
+          )
+        }
+      ]
+    },
+    {
+      title: t('table.balance'),
+      fields: [
+        { label: t('table.youOwe'), value: formatPkr(row.payable) },
+        {
+          label: t('table.col.status'),
+          value: (
+            <StatusBadge
+              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+              label={row.is_active ? t('status.active') : t('status.inactive')}
+            />
+          )
+        },
+        ...(row.is_system
+          ? [{ label: t('table.col.type'), value: t('status.serialized') as ReactNode }]
+          : [])
+      ]
+    }
+  ]
 };
 
 export function SuppliersTable({ toolbarAction }: TableToolbarProps) {
@@ -353,17 +344,10 @@ const customerMobileItem: MobileItemConfig<CustomerRow> = {
   leading: 'avatar',
   title: (row) => row.name,
   subtitle: (row) => row.phone,
-  badge: (row) => {
-    const t = useT();
-    return row.udhar > 0
-      ? { label: t('table.col.owing'), status: 'OVERDUE', tone: 'danger' }
-      : null;
-  },
+  badge: (row) =>
+    row.udhar > 0 ? { label: t('table.col.owing'), status: 'OVERDUE', tone: 'danger' } : null,
   value: (row) => formatPkr(row.udhar),
-  valueLabel: () => {
-    const t = useT();
-    return t('table.udhar');
-  },
+  valueLabel: () => t('table.udhar'),
   valueClassName: (row) =>
     cn(row.udhar > 0 ? 'text-[var(--status-warning)]' : 'text-muted-foreground'),
   ariaLabel: (row) => `${row.name}, ${row.phone}, ${formatPkr(row.udhar)}`
@@ -373,39 +357,32 @@ const customerDetail: DetailConfig<CustomerRow> = {
   mode: 'page',
   href: (row) => `/dashboard/customers/${row.id}`,
   title: (row) => row.name,
-  badge: (row) => {
-    const t = useT();
-    return row.udhar > 0
-      ? { label: t('table.col.owing'), status: 'OVERDUE', tone: 'danger' }
-      : null;
-  },
+  badge: (row) =>
+    row.udhar > 0 ? { label: t('table.col.owing'), status: 'OVERDUE', tone: 'danger' } : null,
   value: (row) => formatPkr(row.udhar),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('dukaan.party.name'),
-        fields: [
-          { label: t('table.col.name'), value: row.name },
-          {
-            label: t('table.col.phone'),
-            value: (
-              <a
-                className='text-primary underline-offset-2 hover:underline'
-                href={`tel:${row.phone}`}
-              >
-                {row.phone}
-              </a>
-            )
-          }
-        ]
-      },
-      {
-        title: t('table.balance'),
-        fields: [{ label: t('table.udhar'), value: formatPkr(row.udhar) }]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('dukaan.party.name'),
+      fields: [
+        { label: t('table.col.name'), value: row.name },
+        {
+          label: t('table.col.phone'),
+          value: (
+            <a
+              className='text-primary underline-offset-2 hover:underline'
+              href={`tel:${row.phone}`}
+            >
+              {row.phone}
+            </a>
+          )
+        }
+      ]
+    },
+    {
+      title: t('table.balance'),
+      fields: [{ label: t('table.udhar'), value: formatPkr(row.udhar) }]
+    }
+  ]
 };
 
 export function CustomersTable({ toolbarAction }: TableToolbarProps) {
@@ -614,30 +591,27 @@ const purchaseDetail: DetailConfig<PurchaseRow> = {
   title: (row) => row.purchase_no,
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.total_amount),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('nav.purchases'),
-        fields: [
-          { label: t('table.col.no'), value: row.purchase_no },
-          { label: t('table.col.date'), value: row.purchase_date },
-          { label: t('table.col.supplier'), value: row.supplier_name ?? '—' },
-          { label: t('table.col.supplierInvoice'), value: row.supplier_invoice_ref ?? '—' },
-          { label: t('table.col.total'), value: formatPkr(row.total_amount) },
-          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> },
-          ...(row.is_opening_stock
-            ? [
-                {
-                  label: t('table.col.type'),
-                  value: t('dukaan.purchase.openingStockLabel') as ReactNode
-                }
-              ]
-            : [])
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('nav.purchases'),
+      fields: [
+        { label: t('table.col.no'), value: row.purchase_no },
+        { label: t('table.col.date'), value: row.purchase_date },
+        { label: t('table.col.supplier'), value: row.supplier_name ?? '—' },
+        { label: t('table.col.supplierInvoice'), value: row.supplier_invoice_ref ?? '—' },
+        { label: t('table.col.total'), value: formatPkr(row.total_amount) },
+        { label: t('table.col.status'), value: <StatusBadge status={row.status} /> },
+        ...(row.is_opening_stock
+          ? [
+              {
+                label: t('table.col.type'),
+                value: t('dukaan.purchase.openingStockLabel') as ReactNode
+              }
+            ]
+          : [])
+      ]
+    }
+  ]
 };
 
 export function PurchasesTable({ toolbarAction }: TableToolbarProps) {
@@ -824,17 +798,12 @@ const saleMobileItem: MobileItemConfig<SaleRow> = {
   leading: 'icon',
   leadingIcon: Icons.receipt,
   title: (row) => row.sale_no,
-  subtitle: (row) => {
-    const t = useT();
-    return row.customer_name ?? t('dukaan.sale.walkIn');
-  },
+  subtitle: (row) => row.customer_name ?? t('dukaan.sale.walkIn'),
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.total_amount),
   meta: [(row) => row.sale_date],
-  ariaLabel: (row) => {
-    const t = useT();
-    return `${row.sale_no}, ${row.customer_name ?? t('dukaan.sale.walkIn')}, ${formatPkr(row.total_amount)}`;
-  }
+  ariaLabel: (row) =>
+    `${row.sale_no}, ${row.customer_name ?? t('dukaan.sale.walkIn')}, ${formatPkr(row.total_amount)}`
 };
 
 const saleDetail: DetailConfig<SaleRow> = {
@@ -843,22 +812,19 @@ const saleDetail: DetailConfig<SaleRow> = {
   title: (row) => row.sale_no,
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.total_amount),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('nav.sales'),
-        fields: [
-          { label: t('table.col.no'), value: row.sale_no },
-          { label: t('table.col.date'), value: row.sale_date },
-          { label: t('table.col.customer'), value: row.customer_name ?? t('dukaan.sale.walkIn') },
-          { label: t('table.col.total'), value: formatPkr(row.total_amount) },
-          { label: t('table.col.outstanding'), value: formatPkr(row.outstanding) },
-          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('nav.sales'),
+      fields: [
+        { label: t('table.col.no'), value: row.sale_no },
+        { label: t('table.col.date'), value: row.sale_date },
+        { label: t('table.col.customer'), value: row.customer_name ?? t('dukaan.sale.walkIn') },
+        { label: t('table.col.total'), value: formatPkr(row.total_amount) },
+        { label: t('table.col.outstanding'), value: formatPkr(row.outstanding) },
+        { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
+      ]
+    }
+  ]
 };
 
 export function SalesTable({ toolbarAction }: TableToolbarProps) {
@@ -1035,27 +1001,21 @@ const expenseMobileItem: MobileItemConfig<ExpenseRow> = {
 
 const expenseDetail: DetailConfig<ExpenseRow> = {
   mode: 'sheet',
-  title: (row) => {
-    const t = useT();
-    return row.category_name ?? t('nav.expenses');
-  },
+  title: (row) => row.category_name ?? t('nav.expenses'),
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.amount),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('nav.expenses'),
-        fields: [
-          { label: t('table.col.date'), value: row.expense_date },
-          { label: t('table.col.category'), value: row.category_name ?? '—' },
-          { label: t('table.col.amount'), value: formatPkr(row.amount) },
-          { label: t('table.col.description'), value: row.description ?? '—' },
-          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('nav.expenses'),
+      fields: [
+        { label: t('table.col.date'), value: row.expense_date },
+        { label: t('table.col.category'), value: row.category_name ?? '—' },
+        { label: t('table.col.amount'), value: formatPkr(row.amount) },
+        { label: t('table.col.description'), value: row.description ?? '—' },
+        { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
+      ]
+    }
+  ]
 };
 
 export function ExpensesTable({ toolbarAction }: TableToolbarProps) {
@@ -1148,46 +1108,34 @@ const expenseCategoryColumns: ColumnDef<ExpenseCategoryRow>[] = [
 
 const expenseCategoryMobileItem: MobileItemConfig<ExpenseCategoryRow> = {
   title: (row) => row.name,
-  subtitle: (row) => {
-    const t = useT();
-    return row.is_active ? t('status.active') : t('status.inactive');
-  },
-  ariaLabel: (row) => {
-    const t = useT();
-    return `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`;
-  }
+  subtitle: (row) => (row.is_active ? t('status.active') : t('status.inactive')),
+  ariaLabel: (row) => `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`
 };
 
 const expenseCategoryDetail: DetailConfig<ExpenseCategoryRow> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => {
-    const t = useT();
-    return {
-      label: row.is_active ? t('status.active') : t('status.inactive'),
-      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-    };
-  },
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('table.col.category'),
-        fields: [
-          { label: t('table.col.name'), value: row.name },
-          {
-            label: t('table.col.status'),
-            value: (
-              <StatusBadge
-                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-                label={row.is_active ? t('status.active') : t('status.inactive')}
-              />
-            )
-          }
-        ]
-      }
-    ];
-  }
+  badge: (row) => ({
+    label: row.is_active ? t('status.active') : t('status.inactive'),
+    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+  }),
+  sections: (row) => [
+    {
+      title: t('table.col.category'),
+      fields: [
+        { label: t('table.col.name'), value: row.name },
+        {
+          label: t('table.col.status'),
+          value: (
+            <StatusBadge
+              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+              label={row.is_active ? t('status.active') : t('status.inactive')}
+            />
+          )
+        }
+      ]
+    }
+  ]
 };
 
 export function ExpenseCategoriesTable({ toolbarAction }: TableToolbarProps) {
@@ -1346,31 +1294,26 @@ const cashMobileItem: MobileItemConfig<CashRow> = {
 const cashDetail: DetailConfig<CashRow> = {
   mode: 'sheet',
   title: (row) => formatLabel(row.type),
-  badge: (row) => {
-    const t = useT();
-    return row.is_overdraft
+  badge: (row) =>
+    row.is_overdraft
       ? { label: t('status.lowStock'), status: 'OVERDUE', tone: 'danger' }
-      : { label: formatLabel(row.direction), status: row.direction };
-  },
+      : { label: formatLabel(row.direction), status: row.direction },
   value: (row) => formatPkr(row.amount),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('nav.cashLedger'),
-        fields: [
-          { label: t('table.col.when'), value: formatDateTime(row.created_at) },
-          { label: t('table.col.type'), value: formatLabel(row.type) },
-          { label: t('table.col.direction'), value: formatLabel(row.direction) },
-          { label: t('table.col.amount'), value: formatPkr(row.amount) },
-          { label: t('table.col.note'), value: row.note ?? '—' },
-          ...(row.reverses_movement_id
-            ? [{ label: t('table.reverses'), value: row.reverses_movement_id }]
-            : [])
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('nav.cashLedger'),
+      fields: [
+        { label: t('table.col.when'), value: formatDateTime(row.created_at) },
+        { label: t('table.col.type'), value: formatLabel(row.type) },
+        { label: t('table.col.direction'), value: formatLabel(row.direction) },
+        { label: t('table.col.amount'), value: formatPkr(row.amount) },
+        { label: t('table.col.note'), value: row.note ?? '—' },
+        ...(row.reverses_movement_id
+          ? [{ label: t('table.reverses'), value: row.reverses_movement_id }]
+          : [])
+      ]
+    }
+  ]
 };
 
 export function CashTable() {
@@ -1490,52 +1433,39 @@ const stockColumns: ColumnDef<StockRow>[] = [
 const stockMobileItem: MobileItemConfig<StockRow> = {
   title: (row) => row.product_name,
   subtitle: (row) => formatLabel(row.tracking_type),
-  badge: (row) => {
-    const t = useT();
-    return row.low_stock
-      ? { label: t('status.lowStock'), status: 'OVERDUE', tone: 'danger' }
-      : null;
-  },
+  badge: (row) =>
+    row.low_stock ? { label: t('status.lowStock'), status: 'OVERDUE', tone: 'danger' } : null,
   value: (row) => String(row.quantity),
   meta: [(row) => formatPkr(row.avg_unit_cost)],
-  ariaLabel: (row) => {
-    const t = useT();
-    return `${row.product_name}, ${t('table.col.qty')} ${row.quantity}, ${formatPkr(row.avg_unit_cost)}`;
-  }
+  ariaLabel: (row) =>
+    `${row.product_name}, ${t('table.col.qty')} ${row.quantity}, ${formatPkr(row.avg_unit_cost)}`
 };
 
 const stockDetail: DetailConfig<StockRow> = {
   mode: 'sheet',
   title: (row) => row.product_name,
-  badge: (row) => {
-    const t = useT();
-    return row.low_stock
-      ? { label: t('status.lowStock'), status: 'OVERDUE', tone: 'danger' }
-      : null;
-  },
+  badge: (row) =>
+    row.low_stock ? { label: t('status.lowStock'), status: 'OVERDUE', tone: 'danger' } : null,
   value: (row) => String(row.quantity),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('nav.inventory'),
-        fields: [
-          { label: t('table.col.product'), value: row.product_name },
-          { label: t('table.col.tracking'), value: formatLabel(row.tracking_type) },
-          { label: t('table.col.qty'), value: row.quantity },
-          { label: t('table.col.cost'), value: formatPkr(row.avg_unit_cost) },
-          {
-            label: t('status.lowStock'),
-            value: row.low_stock ? (
-              <StatusBadge status='OVERDUE' label={t('status.lowStock')} tone='danger' />
-            ) : (
-              <StatusBadge status='ACTIVE' label={t('status.stockOk')} tone='success' />
-            )
-          }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('nav.inventory'),
+      fields: [
+        { label: t('table.col.product'), value: row.product_name },
+        { label: t('table.col.tracking'), value: formatLabel(row.tracking_type) },
+        { label: t('table.col.qty'), value: row.quantity },
+        { label: t('table.col.cost'), value: formatPkr(row.avg_unit_cost) },
+        {
+          label: t('status.lowStock'),
+          value: row.low_stock ? (
+            <StatusBadge status='OVERDUE' label={t('status.lowStock')} tone='danger' />
+          ) : (
+            <StatusBadge status='ACTIVE' label={t('status.stockOk')} tone='success' />
+          )
+        }
+      ]
+    }
+  ]
 };
 
 export function InventoryTable() {
@@ -1682,27 +1612,21 @@ const supplierPaymentMobileItem: MobileItemConfig<SupplierPaymentRow> = {
 
 const supplierPaymentDetail: DetailConfig<SupplierPaymentRow> = {
   mode: 'sheet',
-  title: (row) => {
-    const t = useT();
-    return row.supplier_name ?? t('nav.payments');
-  },
+  title: (row) => row.supplier_name ?? t('nav.payments'),
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.amount),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('nav.payments'),
-        fields: [
-          { label: t('table.col.date'), value: row.payment_date },
-          { label: t('table.col.supplier'), value: row.supplier_name ?? '—' },
-          { label: t('table.col.amount'), value: formatPkr(row.amount) },
-          { label: t('table.col.note'), value: row.notes ?? '—' },
-          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('nav.payments'),
+      fields: [
+        { label: t('table.col.date'), value: row.payment_date },
+        { label: t('table.col.supplier'), value: row.supplier_name ?? '—' },
+        { label: t('table.col.amount'), value: formatPkr(row.amount) },
+        { label: t('table.col.note'), value: row.notes ?? '—' },
+        { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
+      ]
+    }
+  ]
 };
 
 export function SupplierPaymentsTable({ toolbarAction }: TableToolbarProps) {
@@ -1857,31 +1781,25 @@ const movementMobileItem: MobileItemConfig<MovementRow> = {
 
 const movementDetail: DetailConfig<MovementRow> = {
   mode: 'sheet',
-  title: (row) => {
-    const t = useT();
-    return row.product_name ?? t('nav.movements');
-  },
+  title: (row) => row.product_name ?? t('nav.movements'),
   value: (row) => {
     const q = row.quantity_change;
     const prefix = q > 0 ? '+' : '';
     return `${prefix}${q}`;
   },
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('nav.movements'),
-        fields: [
-          { label: t('table.col.when'), value: formatDateTime(row.created_at) },
-          { label: t('table.col.type'), value: formatLabel(row.type) },
-          { label: t('table.col.product'), value: row.product_name ?? '—' },
-          { label: 'IMEI1', value: row.imei1 ?? '—' },
-          { label: `${t('table.col.qty')} Δ`, value: row.quantity_change },
-          { label: t('table.col.description'), value: row.reason ?? '—' }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('nav.movements'),
+      fields: [
+        { label: t('table.col.when'), value: formatDateTime(row.created_at) },
+        { label: t('table.col.type'), value: formatLabel(row.type) },
+        { label: t('table.col.product'), value: row.product_name ?? '—' },
+        { label: 'IMEI1', value: row.imei1 ?? '—' },
+        { label: `${t('table.col.qty')} Δ`, value: row.quantity_change },
+        { label: t('table.col.description'), value: row.reason ?? '—' }
+      ]
+    }
+  ]
 };
 
 export function MovementsTable() {
@@ -2040,47 +1958,36 @@ const paymentColumns: ColumnDef<PaymentRow>[] = [
 ];
 
 const paymentMobileItem: MobileItemConfig<PaymentRow> = {
-  title: (row) => {
-    const t = useT();
-    return row.customer_name ?? t('dukaan.sale.walkIn');
-  },
+  title: (row) => row.customer_name ?? t('dukaan.sale.walkIn'),
   subtitle: (row) => formatLabel(row.method),
   value: (row) => formatPkr(row.amount),
   valueClassName: () => 'text-[var(--status-success)]',
   meta: [(row) => formatDateTime(row.created_at)],
-  ariaLabel: (row) => {
-    const t = useT();
-    return `${row.customer_name ?? t('dukaan.sale.walkIn')}, ${formatLabel(row.method)}, ${formatPkr(row.amount)}`;
-  }
+  ariaLabel: (row) =>
+    `${row.customer_name ?? t('dukaan.sale.walkIn')}, ${formatLabel(row.method)}, ${formatPkr(row.amount)}`
 };
 
 const paymentDetail: DetailConfig<PaymentRow> = {
   mode: 'sheet',
-  title: (row) => {
-    const t = useT();
-    return row.customer_name ?? t('dukaan.sale.walkIn');
-  },
+  title: (row) => row.customer_name ?? t('dukaan.sale.walkIn'),
   value: (row) => <span className='text-[var(--status-success)]'>{formatPkr(row.amount)}</span>,
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('nav.payments'),
-        fields: [
-          { label: t('table.col.when'), value: formatDateTime(row.created_at) },
-          { label: t('table.col.customer'), value: row.customer_name ?? t('dukaan.sale.walkIn') },
-          { label: t('nav.sales'), value: row.sale_no ?? '—' },
-          { label: t('table.col.amount'), value: formatPkr(row.amount) },
-          { label: t('table.col.method'), value: formatLabel(row.method) },
-          {
-            label: `${t('table.col.receipt')} group`,
-            value: <span className='font-mono text-xs'>{row.receipt_group_id.slice(0, 12)}…</span>
-          },
-          { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('nav.payments'),
+      fields: [
+        { label: t('table.col.when'), value: formatDateTime(row.created_at) },
+        { label: t('table.col.customer'), value: row.customer_name ?? t('dukaan.sale.walkIn') },
+        { label: t('nav.sales'), value: row.sale_no ?? '—' },
+        { label: t('table.col.amount'), value: formatPkr(row.amount) },
+        { label: t('table.col.method'), value: formatLabel(row.method) },
+        {
+          label: `${t('table.col.receipt')} group`,
+          value: <span className='font-mono text-xs'>{row.receipt_group_id.slice(0, 12)}…</span>
+        },
+        { label: t('table.col.status'), value: <StatusBadge status={row.status} /> }
+      ]
+    }
+  ]
 };
 
 export function PaymentsTable() {

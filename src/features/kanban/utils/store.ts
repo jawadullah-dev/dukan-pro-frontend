@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { v4 as uuid } from 'uuid';
-// import { persist } from 'zustand/middleware';
 
 export type Priority = 'low' | 'medium' | 'high';
 
@@ -98,33 +97,26 @@ const initialColumns: Record<string, Task[]> = {
   ]
 };
 
-export const useTaskStore = create<KanbanState>()(
-  // To enable persistence across refreshes, uncomment the persist wrapper below:
-  // persist(
-  (set) => ({
-    columns: initialColumns,
+export const useTaskStore = create<KanbanState>()((set) => ({
+  columns: initialColumns,
 
-    setColumns: (columns) => set({ columns }),
+  setColumns: (columns) => set({ columns }),
 
-    addTask: (title, description) =>
-      set((state) => ({
-        columns: {
-          ...state.columns,
-          backlog: [
-            {
-              id: uuid(),
-              title,
-              description,
-              priority: 'medium' as Priority,
-              assignee: undefined,
-              dueDate: undefined
-            },
-            ...(state.columns.backlog ?? [])
-          ]
-        }
-      }))
-  })
-  //   ,
-  //   { name: 'kanban-store' }
-  // )
-);
+  addTask: (title, description) =>
+    set((state) => ({
+      columns: {
+        ...state.columns,
+        backlog: [
+          {
+            id: uuid(),
+            title,
+            description,
+            priority: 'medium' as Priority,
+            assignee: undefined,
+            dueDate: undefined
+          },
+          ...(state.columns.backlog ?? [])
+        ]
+      }
+    }))
+}));

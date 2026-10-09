@@ -26,7 +26,11 @@ const STATUS_CONFIG: Record<
   }
 };
 
-export function ShopStatusBadge({ status }: { status: PlatformShopStatus }) {
+interface ShopStatusBadgeProps {
+  status: PlatformShopStatus;
+}
+
+export function ShopStatusBadge({ status }: ShopStatusBadgeProps) {
   const t = useT();
   const config = STATUS_CONFIG[status];
   const Icon = Icons[config.icon];

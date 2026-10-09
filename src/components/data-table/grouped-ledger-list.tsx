@@ -9,7 +9,7 @@ import type { DetailConfig, MobileItemConfig } from './types';
 
 interface GroupedLedgerListProps<TData> {
   table: Table<TData>;
-  /** ISO date or display date string used for grouping. */
+
   getDateKey: (row: TData) => string;
   mobileItem: MobileItemConfig<TData>;
   detail: DetailConfig<TData>;
@@ -21,7 +21,6 @@ function dateHeading(key: string): string {
   return key;
 }
 
-/** Banking-style list: sticky date headers + signed amount rows. */
 export function GroupedLedgerList<TData>({
   table,
   getDateKey,

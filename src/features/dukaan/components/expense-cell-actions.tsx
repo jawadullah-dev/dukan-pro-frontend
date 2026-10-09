@@ -30,7 +30,11 @@ interface ExpenseActionRow {
   status: string;
 }
 
-export function ExpenseCellAction({ data }: { data: ExpenseActionRow }) {
+interface ExpenseCellActionProps {
+  data: ExpenseActionRow;
+}
+
+export function ExpenseCellAction({ data }: ExpenseCellActionProps) {
   const qc = useQueryClient();
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -66,15 +70,13 @@ export function ExpenseCellAction({ data }: { data: ExpenseActionRow }) {
   );
 }
 
-function ExpenseCancelBody({
-  data,
-  onClose,
-  onSuccess
-}: {
+interface ExpenseCancelBodyProps {
   data: ExpenseActionRow;
   onClose: () => void;
   onSuccess: () => void;
-}) {
+}
+
+function ExpenseCancelBody({ data, onClose, onSuccess }: ExpenseCancelBodyProps) {
   const t = useT();
   const cancel = useMutation({
     mutationFn: (reason: string) => dukaan.cancelExpense(data.id, reason),

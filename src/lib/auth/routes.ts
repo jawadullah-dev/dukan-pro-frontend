@@ -1,7 +1,6 @@
 import type { AuthAccountRole } from '@/lib/auth/accounts';
 import { defaultLocale, locales, isLocale, type AppLocale } from '@/i18n/request';
 
-// Re-export locale config so middleware only needs one import source
 export { defaultLocale, locales, isLocale, type AppLocale };
 
 export const SHOP_HOME = '/dashboard/overview';
@@ -9,11 +8,6 @@ export const PLATFORM_HOME = '/dashboard/platform';
 const SETTINGS_PREFIX = '/dashboard/settings';
 const PLATFORM_PREFIX = '/dashboard/platform';
 
-/**
- * Prepend a locale segment to an absolute path (starting with `/`).
- * - If locale === defaultLocale AND you set "as-needed", next-intl middleware normalizes;
- *   we still always include it so SSR can detect it reliably.
- */
 export function localize(path: string, locale: AppLocale | string): string {
   if (!path.startsWith('/')) return path;
   const safeLocale = isLocale(locale) ? locale : defaultLocale;
@@ -22,7 +16,6 @@ export function localize(path: string, locale: AppLocale | string): string {
   return `/${safeLocale}${path === '/' ? '' : path}`;
 }
 
-/** Strip the `/en`/`/ur`/`/ps` prefix if present, so internal helpers act on pure routes. */
 export function delocalize(pathname: string): string {
   let path = pathname;
   let strippedLocale = false;
@@ -38,7 +31,6 @@ export function delocalize(pathname: string): string {
   return strippedLocale ? path : pathname;
 }
 
-/** Extract locale from pathname or return default. */
 export function extractLocale(pathname: string): AppLocale {
   for (const l of locales) {
     const prefix = `/${l}`;
@@ -55,7 +47,6 @@ export function homePathForRole(
   return localize(base, locale);
 }
 
-/** PWA shortcut targets (`/?to=sales`). Platform admins always go home. */
 export function shortcutPathForRole(
   to: string | null | undefined,
   role: AuthAccountRole | string | undefined,
@@ -88,7 +79,6 @@ export function isSettingsRoute(pathname: string): boolean {
   return p === SETTINGS_PREFIX || p.startsWith(`${SETTINGS_PREFIX}/`);
 }
 
-/** Shop operational routes — hidden from platform super admin. */
 export function isShopOnlyRoute(pathname: string): boolean {
   const p = delocalize(pathname);
   if (!p.startsWith('/dashboard')) return false;
@@ -109,10 +99,6 @@ export function canAccessPath(
   return !isPlatformRoute(p);
 }
 
-/**
- * Role-based redirects. Only act when role is known —
- * never treat a missing role as shop admin.
- */
 export function redirectForRole(
   pathname: string,
   role: AuthAccountRole | string | undefined

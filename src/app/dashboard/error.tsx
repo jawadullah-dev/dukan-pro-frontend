@@ -13,13 +13,12 @@ function isChunkLoadError(error: Error): boolean {
   );
 }
 
-export default function DashboardError({
-  error,
-  reset
-}: {
+interface DashboardErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}
+
+export default function DashboardError({ error, reset }: DashboardErrorProps) {
   const t = useTranslations();
 
   useEffect(() => {
@@ -30,31 +29,28 @@ export default function DashboardError({
         if (!sessionStorage.getItem(key)) {
           sessionStorage.setItem(key, '1');
           window.location.reload();
+          return;
         }
-      } catch {
-        window.location.reload();
-      }
+      } catch {}
     }
   }, [error]);
 
   return (
-    <main className='flex min-h-[50vh] flex-col items-center justify-center gap-4 px-6 text-center'>
-      <h1 className='text-lg font-semibold'>{t('errors.screenLoadTitle')}</h1>
-      <p className='text-muted-foreground max-w-sm text-sm'>{t('errors.screenLoadDescription')}</p>
-      <Button
-        type='button'
-        onClick={() => {
-          try {
-            sessionStorage.removeItem('pwa-chunk-reload');
-          } catch {
-            // ignore
-          }
-          reset();
-          window.location.reload();
-        }}
-      >
-        {t('errors.reload')}
-      </Button>
-    </main>
+    <div className='flex h-[calc(100vh-4rem)] flex-col items-center justify-center gap-4 text-center'>
+      <div className='space-y-2'>
+        <h1 className='text-2xl font-bold tracking-tight'>{t('common.somethingWentWrong')}</h1>
+        <p className='text-muted-foreground text-sm max-w-md'>
+          {error.message || t('common.unexpectedError')}
+        </p>
+      </div>
+      <div className='flex gap-2'>
+        <Button onClick={reset} variant='default'>
+          {t('common.tryAgain')}
+        </Button>
+        <Button onClick={() => window.location.reload()} variant='outline'>
+          {t('common.reloadPage')}
+        </Button>
+      </div>
+    </div>
   );
 }

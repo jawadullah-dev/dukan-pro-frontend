@@ -12,13 +12,12 @@ interface MobileListProps<TData> {
   table: Table<TData>;
   mobileItem: MobileItemConfig<TData>;
   detail: DetailConfig<TData>;
-  /** When detail.mode is page, open sheet preview instead of navigating if false. */
+
   preferNavigate?: boolean;
   isLoading?: boolean;
   onNavigate?: (href: string) => void;
 }
 
-/** Divided list container for phone mode — not heavy cards. */
 export function MobileList<TData>({
   table,
   mobileItem,

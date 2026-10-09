@@ -1,5 +1,13 @@
 'use client';
 
+interface SupplierMutationValue {
+  name: string;
+  phone: string;
+  address: string;
+  notes: string;
+  opening_balance: number;
+}
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -38,18 +46,16 @@ function SupplierDialog({ open, onOpenChange }: SupplierDialogProps) {
   );
 }
 
-function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) => void }) {
+interface SupplierDialogBodyProps {
+  onOpenChange: (open: boolean) => void;
+}
+
+function SupplierDialogBody({ onOpenChange }: SupplierDialogBodyProps) {
   const qc = useQueryClient();
   const t = useT();
 
   const create = useMutation({
-    mutationFn: (value: {
-      name: string;
-      phone: string;
-      address: string;
-      notes: string;
-      opening_balance: number;
-    }) =>
+    mutationFn: (value: SupplierMutationValue) =>
       dukaan.createSupplier({
         name: value.name.trim(),
         phone: value.phone.trim(),
@@ -138,7 +144,11 @@ function SupplierDialogBody({ onOpenChange }: { onOpenChange: (open: boolean) =>
   );
 }
 
-export function SuppliersHeaderAction({ onAdd }: { onAdd?: () => void }) {
+interface SuppliersHeaderActionProps {
+  onAdd?: () => void;
+}
+
+export function SuppliersHeaderAction({ onAdd }: SuppliersHeaderActionProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {

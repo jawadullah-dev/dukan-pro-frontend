@@ -9,6 +9,7 @@ import {
   buildCustomerLedger
 } from './ledger';
 import { formatPurchaseNo, formatSaleNo, newId, nowIso, todayIsoDate } from './numbers';
+import { ValidationError } from '@/lib/errors';
 import { assertShopActive, canCancelRecords, getSession, setRuntimeSession } from './session';
 import { toDukaanSession } from '@/lib/auth/session-map';
 import { getStore, runTransaction } from './store';
@@ -30,8 +31,97 @@ import type {
   Sale,
   SoftCashWarning,
   Supplier,
-  SupplierPayment
+  SupplierPayment,
+  TrackingType
 } from './types';
+
+interface CreateProductInput {
+  category_id: string;
+  brand_id: string;
+  name: string;
+  model?: string;
+  color?: string;
+  ram?: string;
+  storage?: string;
+  sku?: string;
+  barcode?: string;
+  description?: string;
+  tracking_type: TrackingType;
+  default_purchase_price: number;
+  default_selling_price: number;
+  low_stock_threshold: number;
+}
+
+interface CreateSupplierInput {
+  name: string;
+  phone: string;
+  address?: string;
+  notes?: string;
+  opening_balance?: number;
+}
+
+interface CreateCustomerInput {
+  name: string;
+  phone: string;
+  address?: string;
+  notes?: string;
+  opening_balance?: number;
+}
+
+interface CreatePurchaseInput {
+  supplier_id: string;
+  supplier_invoice_ref?: string;
+  purchase_date?: string;
+  paid_now: number;
+  is_opening_stock?: boolean;
+  confirm_overdraft?: boolean;
+  client_request_id: string;
+  lines: PurchaseLineInput[];
+}
+
+interface CreateSupplierPaymentInput {
+  supplier_id: string;
+  purchase_id?: string;
+  amount: number;
+  payment_date?: string;
+  notes?: string;
+  confirm_overdraft?: boolean;
+  client_request_id: string;
+}
+
+interface AdjustStockInput {
+  product_id: string;
+  inventory_unit_id?: string;
+  type: 'ADJUSTMENT' | 'DAMAGED' | 'LOST';
+  counted_quantity?: number;
+  reason: string;
+}
+
+interface CreateSaleInput {
+  customer_id?: string;
+  discount?: number;
+  paid_now: number;
+  method?: PaymentMethod;
+  due_date?: string;
+  client_request_id: string;
+  lines: SaleLineInput[];
+}
+
+interface ReceiveCustomerPaymentInput {
+  customer_id: string;
+  amount: number;
+  method?: PaymentMethod;
+  sale_id?: string;
+  client_request_id: string;
+}
+
+interface CreateExpenseInput {
+  category_id: string;
+  amount: number;
+  expense_date?: string;
+  description?: string;
+  confirm_overdraft?: boolean;
+}
 
 function delay(ms = 80): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
@@ -72,7 +162,6 @@ function paginate<T>(items: T[], filters: ListFilters): Paginated<T> {
   };
 }
 
-/** Match item value against comma-separated faceted filter values. */
 function matchesFacet(filterCsv: string | undefined, value: string | boolean): boolean {
   if (!filterCsv) return true;
   const allowed = filterCsv.split(',').filter(Boolean);
@@ -100,8 +189,6 @@ function findIdempotent<T>(
 function rememberRequest(clientRequestId: string, type: string, id: string): void {
   getStore().request_index[clientRequestId] = { type, id };
 }
-
-// ─── Dashboard ───────────────────────────────────────────────
 
 export async function getDashboardKpis(): Promise<DashboardKpis> {
   await delay();
@@ -151,8 +238,6 @@ export async function getDashboardKpis(): Promise<DashboardKpis> {
   };
 }
 
-// ─── Categories / Brands / Products ──────────────────────────
-
 export async function listCategories(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
@@ -171,7 +256,7 @@ export async function createCategory(name: string): Promise<Category> {
     if (
       store.categories.some((c) => c.shop_id === sid && c.name.toLowerCase() === name.toLowerCase())
     ) {
-      throw new Error('Category name already exists');
+      throw new ValidationError('Category name already exists');
     }
     const row: Category = { id: newId('cat'), shop_id: sid, name, is_active: true };
     store.categories.push(row);
@@ -179,11 +264,11 @@ export async function createCategory(name: string): Promise<Category> {
   });
 }
 
-export async function getCategory(id: string): Promise<Category> {
+async function getCategory(id: string): Promise<Category> {
   await delay();
   const sid = shopId();
   const row = getStore().categories.find((c) => c.id === id && c.shop_id === sid);
-  if (!row) throw new Error('Category not found');
+  if (!row) throw new ValidationError('Category not found');
   return row;
 }
 
@@ -195,7 +280,7 @@ export async function updateCategory(
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.categories.find((c) => c.id === id && c.shop_id === sid);
-    if (!row) throw new Error('Category not found');
+    if (!row) throw new ValidationError('Category not found');
     Object.assign(row, data);
     return row;
   });
@@ -206,7 +291,7 @@ export async function deleteCategory(id: string): Promise<Category> {
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.categories.find((c) => c.id === id && c.shop_id === sid);
-    if (!row) throw new Error('Category not found');
+    if (!row) throw new ValidationError('Category not found');
     const inUse = store.products.some((p) => p.category_id === id && p.shop_id === sid);
     if (inUse) {
       row.is_active = false;
@@ -235,7 +320,7 @@ export async function createBrand(name: string): Promise<Brand> {
     if (
       store.brands.some((b) => b.shop_id === sid && b.name.toLowerCase() === name.toLowerCase())
     ) {
-      throw new Error('Brand name already exists');
+      throw new ValidationError('Brand name already exists');
     }
     const row: Brand = { id: newId('brand'), shop_id: sid, name, is_active: true };
     store.brands.push(row);
@@ -243,11 +328,11 @@ export async function createBrand(name: string): Promise<Brand> {
   });
 }
 
-export async function getBrand(id: string): Promise<Brand> {
+async function getBrand(id: string): Promise<Brand> {
   await delay();
   const sid = shopId();
   const row = getStore().brands.find((b) => b.id === id && b.shop_id === sid);
-  if (!row) throw new Error('Brand not found');
+  if (!row) throw new ValidationError('Brand not found');
   return row;
 }
 
@@ -256,7 +341,7 @@ export async function updateBrand(id: string, data: Partial<Pick<Brand, 'name' |
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.brands.find((b) => b.id === id && b.shop_id === sid);
-    if (!row) throw new Error('Brand not found');
+    if (!row) throw new ValidationError('Brand not found');
     Object.assign(row, data);
     return row;
   });
@@ -267,7 +352,7 @@ export async function deleteBrand(id: string): Promise<Brand> {
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.brands.find((b) => b.id === id && b.shop_id === sid);
-    if (!row) throw new Error('Brand not found');
+    if (!row) throw new ValidationError('Brand not found');
     const inUse = store.products.some((p) => p.brand_id === id && p.shop_id === sid);
     if (inUse) {
       row.is_active = false;
@@ -301,30 +386,15 @@ export async function listProducts(filters: ListFilters & { tracking_type?: stri
   return paginate(items, filters);
 }
 
-export async function getProduct(id: string) {
+async function getProduct(id: string) {
   await delay();
   const sid = shopId();
   const product = getStore().products.find((p) => p.id === id && p.shop_id === sid);
-  if (!product) throw new Error('Product not found');
+  if (!product) throw new ValidationError('Product not found');
   return product;
 }
 
-export async function createProduct(input: {
-  category_id: string;
-  brand_id: string;
-  name: string;
-  model?: string;
-  color?: string;
-  ram?: string;
-  storage?: string;
-  sku?: string;
-  barcode?: string;
-  description?: string;
-  tracking_type: 'SERIALIZED' | 'QUANTITY';
-  default_purchase_price: number;
-  default_selling_price: number;
-  low_stock_threshold: number;
-}): Promise<Product> {
+export async function createProduct(input: CreateProductInput): Promise<Product> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -333,7 +403,7 @@ export async function createProduct(input: {
         (p) => p.shop_id === sid && p.name.toLowerCase() === input.name.toLowerCase()
       )
     ) {
-      throw new Error('Product name already exists');
+      throw new ValidationError('Product name already exists');
     }
     const product: Product = {
       id: newId('prod'),
@@ -366,7 +436,7 @@ export async function updateProduct(
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.products.find((p) => p.id === id && p.shop_id === sid);
-    if (!row) throw new Error('Product not found');
+    if (!row) throw new ValidationError('Product not found');
     Object.assign(row, data);
     return row;
   });
@@ -377,7 +447,7 @@ export async function deleteProduct(id: string): Promise<Product> {
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.products.find((p) => p.id === id && p.shop_id === sid);
-    if (!row) throw new Error('Product not found');
+    if (!row) throw new ValidationError('Product not found');
     const used =
       store.purchase_items.some((i) => i.product_id === id) ||
       store.sale_items.some((i) => i.product_id === id) ||
@@ -392,8 +462,6 @@ export async function deleteProduct(id: string): Promise<Product> {
     return row;
   });
 }
-
-// ─── Suppliers / Customers ───────────────────────────────────
 
 export async function listSuppliers(filters: ListFilters = {}) {
   await delay();
@@ -412,13 +480,7 @@ export async function listSuppliers(filters: ListFilters = {}) {
   return paginate(withPayable, filters);
 }
 
-export async function createSupplier(input: {
-  name: string;
-  phone: string;
-  address?: string;
-  notes?: string;
-  opening_balance?: number;
-}): Promise<Supplier> {
+export async function createSupplier(input: CreateSupplierInput): Promise<Supplier> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -439,7 +501,7 @@ export async function createSupplier(input: {
   });
 }
 
-export async function updateSupplier(
+async function updateSupplier(
   id: string,
   data: Partial<Pick<Supplier, 'name' | 'phone' | 'address' | 'notes' | 'is_active'>>
 ) {
@@ -447,13 +509,13 @@ export async function updateSupplier(
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.suppliers.find((s) => s.id === id && s.shop_id === sid);
-    if (!row) throw new Error('Supplier not found');
+    if (!row) throw new ValidationError('Supplier not found');
     if (row.is_system) {
       if (data.is_active === false) {
-        throw new Error('Walk-in seller cannot be deactivated');
+        throw new ValidationError('Walk-in seller cannot be deactivated');
       }
       if (data.name != null && data.name !== row.name) {
-        throw new Error('Walk-in seller cannot be renamed');
+        throw new ValidationError('Walk-in seller cannot be renamed');
       }
     }
     Object.assign(row, data);
@@ -488,7 +550,7 @@ export async function getCustomer(id: string) {
   await delay();
   const sid = shopId();
   const customer = getStore().customers.find((c) => c.id === id && c.shop_id === sid);
-  if (!customer) throw new Error('Customer not found');
+  if (!customer) throw new ValidationError('Customer not found');
   return {
     ...customer,
     udhar: getCustomerUdhar(sid, id),
@@ -496,13 +558,7 @@ export async function getCustomer(id: string) {
   };
 }
 
-export async function createCustomer(input: {
-  name: string;
-  phone: string;
-  address?: string;
-  notes?: string;
-  opening_balance?: number;
-}): Promise<Customer> {
+export async function createCustomer(input: CreateCustomerInput): Promise<Customer> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -522,7 +578,7 @@ export async function createCustomer(input: {
   });
 }
 
-export async function updateCustomer(
+async function updateCustomer(
   id: string,
   data: Partial<Pick<Customer, 'name' | 'phone' | 'address' | 'notes' | 'is_active'>>
 ) {
@@ -530,21 +586,17 @@ export async function updateCustomer(
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.customers.find((c) => c.id === id && c.shop_id === sid);
-    if (!row) throw new Error('Customer not found');
+    if (!row) throw new ValidationError('Customer not found');
     Object.assign(row, data);
     return row;
   });
 }
 
-// ─── Purchases ───────────────────────────────────────────────
-
-export type PurchaseLineInput = {
+type PurchaseLineInput = {
   product_id: string;
   quantity: number;
   unit_cost: number;
-  /** Primary IMEIs — one per unit for SERIALIZED products */
   imei1?: string[];
-  /** Optional secondary IMEIs aligned by index with imei1 */
   imei2?: string[];
   condition?: InventoryCondition;
 };
@@ -559,16 +611,24 @@ function imeiAlreadyExists(
   );
 }
 
+function mapWithSupplierName<T extends { shop_id: string; supplier_id: string }>(
+  records: T[],
+  currentShopId: string,
+  suppliers: Supplier[]
+) {
+  return records
+    .filter((p) => p.shop_id === currentShopId)
+    .map((p) => ({
+      ...p,
+      supplier_name: suppliers.find((s) => s.id === p.supplier_id)?.name ?? '—'
+    }));
+}
+
 export async function listPurchases(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();
-  let items = store.purchases
-    .filter((p) => p.shop_id === sid)
-    .map((p) => ({
-      ...p,
-      supplier_name: store.suppliers.find((s) => s.id === p.supplier_id)?.name ?? '—'
-    }));
+  let items = mapWithSupplierName(store.purchases, sid, store.suppliers);
   if (filters.search) {
     const q = filters.search.toLowerCase();
     items = items.filter(
@@ -590,7 +650,7 @@ export async function getPurchase(id: string) {
   const sid = shopId();
   const store = getStore();
   const purchase = store.purchases.find((p) => p.id === id && p.shop_id === sid);
-  if (!purchase) throw new Error('Purchase not found');
+  if (!purchase) throw new ValidationError('Purchase not found');
   const items = store.purchase_items.filter((i) => i.purchase_id === id);
   const payments = store.supplier_payments.filter((p) => p.purchase_id === id);
   return {
@@ -602,16 +662,9 @@ export async function getPurchase(id: string) {
   };
 }
 
-export async function createPurchase(input: {
-  supplier_id: string;
-  supplier_invoice_ref?: string;
-  purchase_date?: string;
-  paid_now: number;
-  is_opening_stock?: boolean;
-  confirm_overdraft?: boolean;
-  client_request_id: string;
-  lines: PurchaseLineInput[];
-}): Promise<{ purchase?: Purchase; cash_warning?: SoftCashWarning }> {
+export async function createPurchase(
+  input: CreatePurchaseInput
+): Promise<{ purchase?: Purchase; cash_warning?: SoftCashWarning }> {
   await delay();
   const sid = shopId();
 
@@ -620,7 +673,7 @@ export async function createPurchase(input: {
   );
   if (existing) return { purchase: existing };
 
-  if (!input.lines.length) throw new Error('Add at least one item');
+  if (!input.lines.length) throw new ValidationError('Add at least one item');
 
   const isOpening = Boolean(input.is_opening_stock);
   const paidNow = isOpening ? 0 : input.paid_now;
@@ -632,37 +685,39 @@ export async function createPurchase(input: {
 
   const purchase = runTransaction((store) => {
     for (const line of input.lines) {
-      if (line.quantity <= 0) throw new Error('Quantity must be more than 0');
+      if (line.quantity <= 0) throw new ValidationError('Quantity must be more than 0');
       const product = store.products.find((p) => p.id === line.product_id && p.shop_id === sid);
-      if (!product) throw new Error('Product not found');
+      if (!product) throw new ValidationError('Product not found');
       if (product.tracking_type === 'SERIALIZED') {
         const imei1List = line.imei1 ?? [];
         if (imei1List.length !== line.quantity) {
-          throw new Error(`IMEI count must equal quantity for ${product.name}`);
+          throw new ValidationError(`IMEI count must equal quantity for ${product.name}`);
         }
         const imei2List = line.imei2 ?? [];
         if (imei2List.length > 0 && imei2List.length !== line.quantity) {
-          throw new Error(`IMEI2 count must equal quantity for ${product.name}`);
+          throw new ValidationError(`IMEI2 count must equal quantity for ${product.name}`);
         }
         for (let i = 0; i < imei1List.length; i++) {
-          const imei1 = imei1List[i]!;
+          const imei1 = imei1List[i];
+          if (!imei1) continue;
           if (imeiAlreadyExists(store, sid, imei1)) {
-            throw new Error(`IMEI already exists: ${imei1}`);
+            throw new ValidationError(`IMEI already exists: ${imei1}`);
           }
           const imei2 = imei2List[i];
           if (imei2) {
             if (imei2 === imei1) {
-              throw new Error(`IMEI1 and IMEI2 cannot be the same: ${imei1}`);
+              throw new ValidationError(`IMEI1 and IMEI2 cannot be the same: ${imei1}`);
             }
             if (imeiAlreadyExists(store, sid, imei2)) {
-              throw new Error(`IMEI already exists: ${imei2}`);
+              throw new ValidationError(`IMEI already exists: ${imei2}`);
             }
           }
         }
       }
     }
 
-    const shop = store.shops.find((s) => s.id === sid)!;
+    const shop = store.shops.find((s) => s.id === sid);
+    if (!shop) throw new ValidationError('Shop not found');
     const purchaseNo = formatPurchaseNo(shop.next_purchase_no);
     shop.next_purchase_no += 1;
 
@@ -683,7 +738,8 @@ export async function createPurchase(input: {
     store.purchases.push(purchaseRow);
 
     for (const line of input.lines) {
-      const product = store.products.find((p) => p.id === line.product_id)!;
+      const product = store.products.find((p) => p.id === line.product_id);
+      if (!product) continue;
       const piId = newId('pi');
       store.purchase_items.push({
         id: piId,
@@ -705,7 +761,7 @@ export async function createPurchase(input: {
             shop_id: sid,
             product_id: line.product_id,
             purchase_item_id: piId,
-            imei1: imei1List[i]!,
+            imei1: imei1List[i] ?? '',
             imei2: imei2List[i] || undefined,
             condition: line.condition ?? 'NEW',
             unit_cost: line.unit_cost,
@@ -725,7 +781,8 @@ export async function createPurchase(input: {
           });
         }
       } else {
-        const sl = store.stock_levels.find((s) => s.product_id === line.product_id)!;
+        const sl = store.stock_levels.find((s) => s.product_id === line.product_id);
+        if (!sl) continue;
         const prevQty = sl.quantity_on_hand;
         const prevCost = sl.avg_unit_cost;
         const newQty = prevQty + line.quantity;
@@ -780,17 +837,9 @@ export async function createPurchase(input: {
   return { purchase };
 }
 
-// ─── Supplier payments ───────────────────────────────────────
-
-export async function createSupplierPayment(input: {
-  supplier_id: string;
-  purchase_id?: string;
-  amount: number;
-  payment_date?: string;
-  notes?: string;
-  confirm_overdraft?: boolean;
-  client_request_id: string;
-}): Promise<{ payment?: SupplierPayment; cash_warning?: SoftCashWarning }> {
+export async function createSupplierPayment(
+  input: CreateSupplierPaymentInput
+): Promise<{ payment?: SupplierPayment; cash_warning?: SoftCashWarning }> {
   await delay();
   const sid = shopId();
 
@@ -799,15 +848,15 @@ export async function createSupplierPayment(input: {
   );
   if (existing) return { payment: existing };
 
-  if (input.amount <= 0) throw new Error('Amount must be more than 0');
+  if (input.amount <= 0) throw new ValidationError('Amount must be more than 0');
 
   if (input.purchase_id) {
     const left = getPurchaseOutstanding(input.purchase_id);
-    if (input.amount > left) throw new Error('Payment cannot exceed outstanding');
+    if (input.amount > left) throw new ValidationError('Payment cannot exceed outstanding');
   } else {
     const left = getSupplierPayable(sid, input.supplier_id);
-    // paying opening — allow up to total payable including opening portion
-    if (input.amount > left) throw new Error('Payment cannot exceed payable');
+
+    if (input.amount > left) throw new ValidationError('Payment cannot exceed payable');
   }
 
   const warning = checkSoftCashWarning(sid, input.amount);
@@ -851,12 +900,7 @@ export async function listSupplierPayments(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();
-  let items = store.supplier_payments
-    .filter((p) => p.shop_id === sid)
-    .map((p) => ({
-      ...p,
-      supplier_name: store.suppliers.find((s) => s.id === p.supplier_id)?.name ?? '—'
-    }));
+  let items = mapWithSupplierName(store.supplier_payments, sid, store.suppliers);
   if (filters.search) {
     const q = filters.search.toLowerCase();
     items = items.filter(
@@ -876,8 +920,6 @@ export async function listSupplierPayments(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-// ─── Stock ───────────────────────────────────────────────────
-
 export async function listStock(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
@@ -885,15 +927,15 @@ export async function listStock(filters: ListFilters = {}) {
   const qtyRows = store.stock_levels
     .filter((sl) => sl.shop_id === sid)
     .map((sl) => {
-      const product = store.products.find((p) => p.id === sl.product_id)!;
+      const product = store.products.find((p) => p.id === sl.product_id);
       return {
         id: sl.id,
         product_id: sl.product_id,
-        product_name: product.name,
+        product_name: product?.name ?? '—',
         tracking_type: 'QUANTITY' as const,
         quantity: sl.quantity_on_hand,
         avg_unit_cost: sl.avg_unit_cost,
-        low_stock: sl.quantity_on_hand <= product.low_stock_threshold
+        low_stock: sl.quantity_on_hand <= (product?.low_stock_threshold ?? 0)
       };
     });
 
@@ -941,27 +983,21 @@ export async function listInStockUnits(productId?: string) {
   );
 }
 
-export async function adjustStock(input: {
-  product_id: string;
-  inventory_unit_id?: string;
-  type: 'ADJUSTMENT' | 'DAMAGED' | 'LOST';
-  counted_quantity?: number;
-  reason: string;
-}) {
+export async function adjustStock(input: AdjustStockInput) {
   await delay();
   const sid = shopId();
-  if (!input.reason.trim()) throw new Error('Reason is required');
+  if (!input.reason.trim()) throw new ValidationError('Reason is required');
 
   return runTransaction((store) => {
     const product = store.products.find((p) => p.id === input.product_id && p.shop_id === sid);
-    if (!product) throw new Error('Product not found');
+    if (!product) throw new ValidationError('Product not found');
 
     if (product.tracking_type === 'SERIALIZED') {
       const unit = store.inventory_units.find(
         (u) => u.id === input.inventory_unit_id && u.shop_id === sid
       );
       if (!unit || unit.status !== 'IN_STOCK') {
-        throw new Error('Only IN_STOCK phones can be adjusted');
+        throw new ValidationError('Only IN_STOCK phones can be adjusted');
       }
       unit.status = input.type === 'ADJUSTMENT' ? 'LOST' : input.type;
       store.inventory_movements.push({
@@ -978,10 +1014,11 @@ export async function adjustStock(input: {
     }
 
     const sl = store.stock_levels.find((s) => s.product_id === product.id);
-    if (!sl) throw new Error('Stock level not found');
-    if (input.counted_quantity === undefined) throw new Error('Counted quantity required');
+    if (!sl) throw new ValidationError('Stock level not found');
+    if (input.counted_quantity === undefined)
+      throw new ValidationError('Counted quantity required');
     const diff = input.counted_quantity - sl.quantity_on_hand;
-    if (input.counted_quantity < 0) throw new Error('Stock cannot be negative');
+    if (input.counted_quantity < 0) throw new ValidationError('Stock cannot be negative');
     sl.quantity_on_hand = input.counted_quantity;
     store.inventory_movements.push({
       id: newId('im'),
@@ -995,8 +1032,6 @@ export async function adjustStock(input: {
     return { ok: true, quantity_change: diff };
   });
 }
-
-// ─── Sales ───────────────────────────────────────────────────
 
 export type SaleLineInput = {
   product_id: string;
@@ -1039,7 +1074,7 @@ export async function getSale(id: string) {
   const sid = shopId();
   const store = getStore();
   const sale = store.sales.find((s) => s.id === id && s.shop_id === sid);
-  if (!sale) throw new Error('Sale not found');
+  if (!sale) throw new ValidationError('Sale not found');
   const items = store.sale_items
     .filter((i) => i.sale_id === id)
     .map((item) => {
@@ -1063,15 +1098,9 @@ export async function getSale(id: string) {
   };
 }
 
-export async function createSale(input: {
-  customer_id?: string;
-  discount?: number;
-  paid_now: number;
-  method?: PaymentMethod;
-  due_date?: string;
-  client_request_id: string;
-  lines: SaleLineInput[];
-}): Promise<{ sale: Sale; below_cost_warning?: boolean }> {
+export async function createSale(
+  input: CreateSaleInput
+): Promise<{ sale: Sale; below_cost_warning?: boolean }> {
   await delay();
   const sid = shopId();
 
@@ -1080,7 +1109,7 @@ export async function createSale(input: {
   );
   if (existing) return { sale: existing };
 
-  if (!input.lines.length) throw new Error('Add at least one item');
+  if (!input.lines.length) throw new ValidationError('Add at least one item');
 
   const sale = runTransaction((store) => {
     let hasPhone = false;
@@ -1089,7 +1118,7 @@ export async function createSale(input: {
 
     for (const line of input.lines) {
       const product = store.products.find((p) => p.id === line.product_id && p.shop_id === sid);
-      if (!product) throw new Error('Product not found');
+      if (!product) throw new ValidationError('Product not found');
 
       if (product.tracking_type === 'SERIALIZED') {
         hasPhone = true;
@@ -1097,14 +1126,14 @@ export async function createSale(input: {
           (u) => u.id === line.inventory_unit_id && u.shop_id === sid
         );
         if (!unit || unit.status !== 'IN_STOCK') {
-          throw new Error(`IMEI not available for ${product.name}`);
+          throw new ValidationError(`IMEI not available for ${product.name}`);
         }
         if (line.unit_price < unit.unit_cost) belowCost = true;
         resolved.push({ ...line, quantity: 1, unit_cost: unit.unit_cost });
       } else {
         const sl = store.stock_levels.find((s) => s.product_id === product.id);
         if (!sl || sl.quantity_on_hand < line.quantity) {
-          throw new Error(`Not enough stock for ${product.name}`);
+          throw new ValidationError(`Not enough stock for ${product.name}`);
         }
         if (line.unit_price < sl.avg_unit_cost) belowCost = true;
         resolved.push({ ...line, unit_cost: sl.avg_unit_cost });
@@ -1112,7 +1141,7 @@ export async function createSale(input: {
     }
 
     if (hasPhone && !input.customer_id) {
-      throw new Error('Phone sale requires a customer');
+      throw new ValidationError('Phone sale requires a customer');
     }
 
     const subtotal = resolved.reduce((sum, l) => sum + l.quantity * l.unit_price, 0);
@@ -1121,13 +1150,14 @@ export async function createSale(input: {
     const outstanding = totalAmount - input.paid_now;
 
     if (outstanding > 0 && !input.customer_id) {
-      throw new Error('Udhar requires a customer');
+      throw new ValidationError('Udhar requires a customer');
     }
     if (input.paid_now < 0 || input.paid_now > totalAmount) {
-      throw new Error('Paid amount is invalid');
+      throw new ValidationError('Paid amount is invalid');
     }
 
-    const shop = store.shops.find((s) => s.id === sid)!;
+    const shop = store.shops.find((s) => s.id === sid);
+    if (!shop) throw new ValidationError('Shop not found');
     const saleNo = formatSaleNo(shop.next_sale_no);
     shop.next_sale_no += 1;
 
@@ -1148,7 +1178,8 @@ export async function createSale(input: {
     store.sales.push(saleRow);
 
     for (const line of resolved) {
-      const product = store.products.find((p) => p.id === line.product_id)!;
+      const product = store.products.find((p) => p.id === line.product_id);
+      if (!product) continue;
       const siId = newId('si');
       store.sale_items.push({
         id: siId,
@@ -1163,7 +1194,8 @@ export async function createSale(input: {
       });
 
       if (product.tracking_type === 'SERIALIZED') {
-        const unit = store.inventory_units.find((u) => u.id === line.inventory_unit_id)!;
+        const unit = store.inventory_units.find((u) => u.id === line.inventory_unit_id);
+        if (!unit) continue;
         unit.status = 'SOLD';
         store.inventory_movements.push({
           id: newId('im'),
@@ -1177,7 +1209,8 @@ export async function createSale(input: {
           created_at: nowIso()
         });
       } else {
-        const sl = store.stock_levels.find((s) => s.product_id === product.id)!;
+        const sl = store.stock_levels.find((s) => s.product_id === product.id);
+        if (!sl) continue;
         sl.quantity_on_hand -= line.quantity;
         store.inventory_movements.push({
           id: newId('im'),
@@ -1227,15 +1260,9 @@ export async function createSale(input: {
   return { sale: sale.saleRow, below_cost_warning: sale.belowCost };
 }
 
-// ─── Customer Udhar payment ──────────────────────────────────
-
-export async function receiveCustomerPayment(input: {
-  customer_id: string;
-  amount: number;
-  method?: PaymentMethod;
-  sale_id?: string;
-  client_request_id: string;
-}): Promise<{ payments: Payment[] }> {
+export async function receiveCustomerPayment(
+  input: ReceiveCustomerPaymentInput
+): Promise<{ payments: Payment[] }> {
   await delay();
   const sid = shopId();
 
@@ -1245,10 +1272,10 @@ export async function receiveCustomerPayment(input: {
   });
   if (existing) return { payments: existing };
 
-  if (input.amount <= 0) throw new Error('Amount must be more than 0');
+  if (input.amount <= 0) throw new ValidationError('Amount must be more than 0');
   const totalUdhar = getCustomerUdhar(sid, input.customer_id);
   if (input.amount > totalUdhar) {
-    throw new Error('Payment cannot exceed total Udhar');
+    throw new ValidationError('Payment cannot exceed total Udhar');
   }
 
   const payments = runTransaction((store) => {
@@ -1261,7 +1288,8 @@ export async function receiveCustomerPayment(input: {
     if (input.sale_id) {
       targets.push({ sale_id: input.sale_id, outstanding: getSaleOutstanding(input.sale_id) });
     } else {
-      const customer = store.customers.find((c) => c.id === input.customer_id)!;
+      const customer = store.customers.find((c) => c.id === input.customer_id);
+      if (!customer) throw new ValidationError('Customer not found');
       const openingPaid = store.payments
         .filter((p) => p.customer_id === input.customer_id && !p.sale_id && p.status === 'ACTIVE')
         .reduce((s, p) => s + p.amount, 0);
@@ -1326,8 +1354,6 @@ export async function receiveCustomerPayment(input: {
   return { payments };
 }
 
-// ─── Expenses ────────────────────────────────────────────────
-
 export async function listExpenseCategories(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
@@ -1348,7 +1374,7 @@ export async function createExpenseCategory(name: string): Promise<ExpenseCatego
         (c) => c.shop_id === sid && c.name.toLowerCase() === name.toLowerCase()
       )
     ) {
-      throw new Error('Expense category name already exists');
+      throw new ValidationError('Expense category name already exists');
     }
     const row: ExpenseCategory = {
       id: newId('ec'),
@@ -1369,7 +1395,7 @@ export async function updateExpenseCategory(
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.expense_categories.find((c) => c.id === id && c.shop_id === sid);
-    if (!row) throw new Error('Expense category not found');
+    if (!row) throw new ValidationError('Expense category not found');
     if (data.name) {
       const trimmed = data.name.trim();
       if (
@@ -1377,7 +1403,7 @@ export async function updateExpenseCategory(
           (c) => c.shop_id === sid && c.id !== id && c.name.toLowerCase() === trimmed.toLowerCase()
         )
       ) {
-        throw new Error('Expense category name already exists');
+        throw new ValidationError('Expense category name already exists');
       }
       row.name = trimmed;
     }
@@ -1391,7 +1417,7 @@ export async function deleteExpenseCategory(id: string): Promise<ExpenseCategory
   const sid = shopId();
   return runTransaction((store) => {
     const row = store.expense_categories.find((c) => c.id === id && c.shop_id === sid);
-    if (!row) throw new Error('Expense category not found');
+    if (!row) throw new ValidationError('Expense category not found');
     const inUse = store.expenses.some((e) => e.category_id === id && e.shop_id === sid);
     if (inUse) {
       row.is_active = false;
@@ -1430,16 +1456,12 @@ export async function listExpenses(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-export async function createExpense(input: {
-  category_id: string;
-  amount: number;
-  expense_date?: string;
-  description?: string;
-  confirm_overdraft?: boolean;
-}): Promise<{ expense?: Expense; cash_warning?: SoftCashWarning }> {
+export async function createExpense(
+  input: CreateExpenseInput
+): Promise<{ expense?: Expense; cash_warning?: SoftCashWarning }> {
   await delay();
   const sid = shopId();
-  if (input.amount <= 0) throw new Error('Amount must be more than 0');
+  if (input.amount <= 0) throw new ValidationError('Amount must be more than 0');
 
   const warning = checkSoftCashWarning(sid, input.amount);
   if (warning.needs_confirm && !input.confirm_overdraft) {
@@ -1478,11 +1500,11 @@ export async function createExpense(input: {
 export async function cancelExpense(id: string, reason: string) {
   await delay();
   const sid = shopId();
-  if (!reason.trim()) throw new Error('Reason is required');
+  if (!reason.trim()) throw new ValidationError('Reason is required');
   return runTransaction((store) => {
     const row = store.expenses.find((e) => e.id === id && e.shop_id === sid);
     if (!row || row.status === 'CANCELLED')
-      throw new Error('Expense not found or already cancelled');
+      throw new ValidationError('Expense not found or already cancelled');
     row.status = 'CANCELLED';
     row.cancelled_at = nowIso();
     row.cancel_reason = reason;
@@ -1505,8 +1527,6 @@ export async function cancelExpense(id: string, reason: string) {
     return row;
   });
 }
-
-// ─── Cancel sale / purchase / payment ────────────────────────
 
 export async function previewCancelSale(id: string) {
   await delay();
@@ -1531,8 +1551,8 @@ export async function cancelSale(
   await delay();
   const sid = shopId();
   const session = getSession();
-  if (!canCancelRecords(session.role)) throw new Error('Only owner can cancel');
-  if (!reason.trim()) throw new Error('Reason is required');
+  if (!canCancelRecords(session.role)) throw new ValidationError('Only owner can cancel');
+  if (!reason.trim()) throw new ValidationError('Reason is required');
 
   const cashOut = (await previewCancelSale(id)).cash_out;
   const warning = checkSoftCashWarning(sid, cashOut);
@@ -1543,16 +1563,18 @@ export async function cancelSale(
   runTransaction((store) => {
     const sale = store.sales.find((s) => s.id === id && s.shop_id === sid);
     if (!sale || sale.status === 'CANCELLED')
-      throw new Error('Sale not found or already cancelled');
+      throw new ValidationError('Sale not found or already cancelled');
     sale.status = 'CANCELLED';
     sale.cancelled_at = nowIso();
     sale.cancel_reason = reason;
 
     const items = store.sale_items.filter((i) => i.sale_id === id);
     for (const item of items) {
-      const product = store.products.find((p) => p.id === item.product_id)!;
+      const product = store.products.find((p) => p.id === item.product_id);
+      if (!product) continue;
       if (product.tracking_type === 'SERIALIZED' && item.inventory_unit_id) {
-        const unit = store.inventory_units.find((u) => u.id === item.inventory_unit_id)!;
+        const unit = store.inventory_units.find((u) => u.id === item.inventory_unit_id);
+        if (!unit) continue;
         unit.status = 'IN_STOCK';
         store.inventory_movements.push({
           id: newId('im'),
@@ -1567,7 +1589,8 @@ export async function cancelSale(
           created_at: nowIso()
         });
       } else {
-        const sl = store.stock_levels.find((s) => s.product_id === product.id)!;
+        const sl = store.stock_levels.find((s) => s.product_id === product.id);
+        if (!sl) continue;
         sl.quantity_on_hand += item.quantity;
         store.inventory_movements.push({
           id: newId('im'),
@@ -1606,7 +1629,6 @@ export async function cancelSale(
       });
     }
 
-    // walk-in cash on sale
     const walkinCash = store.cash_movements.filter(
       (m) => m.reference_type === 'sale' && m.reference_id === id && m.type === 'CUSTOMER_PAYMENT'
     );
@@ -1637,38 +1659,39 @@ export async function cancelPurchase(
 ): Promise<{ ok: boolean; cash_warning?: SoftCashWarning }> {
   await delay();
   const sid = shopId();
-  if (!canCancelRecords()) throw new Error('Only owner can cancel');
-  if (!reason.trim()) throw new Error('Reason is required');
+  if (!canCancelRecords()) throw new ValidationError('Only owner can cancel');
+  if (!reason.trim()) throw new ValidationError('Reason is required');
 
   const storePeek = getStore();
   const payments = storePeek.supplier_payments.filter(
     (p) => p.purchase_id === id && p.status === 'ACTIVE'
   );
   const cashIn = payments.reduce((s, p) => s + p.amount, 0);
-  // reversal is IN for supplier payment cancel — no soft cash warning on IN
+
   void cashIn;
   void confirm_overdraft;
 
   runTransaction((store) => {
     const purchase = store.purchases.find((p) => p.id === id && p.shop_id === sid);
     if (!purchase || purchase.status === 'CANCELLED') {
-      throw new Error('Purchase not found or already cancelled');
+      throw new ValidationError('Purchase not found or already cancelled');
     }
 
     const items = store.purchase_items.filter((i) => i.purchase_id === id);
     for (const item of items) {
-      const product = store.products.find((p) => p.id === item.product_id)!;
+      const product = store.products.find((p) => p.id === item.product_id);
+      if (!product) continue;
       if (product.tracking_type === 'SERIALIZED') {
         const units = store.inventory_units.filter((u) => u.purchase_item_id === item.id);
         for (const unit of units) {
           if (unit.status !== 'IN_STOCK') {
-            throw new Error(`Cannot cancel: phone ${unit.imei1} is not IN_STOCK`);
+            throw new ValidationError(`Cannot cancel: phone ${unit.imei1} is not IN_STOCK`);
           }
         }
       } else {
-        const sl = store.stock_levels.find((s) => s.product_id === product.id)!;
-        if (sl.quantity_on_hand < item.quantity) {
-          throw new Error('Cannot cancel: accessory stock would go negative');
+        const sl = store.stock_levels.find((s) => s.product_id === product.id);
+        if (!sl || sl.quantity_on_hand < item.quantity) {
+          throw new ValidationError('Cannot cancel: accessory stock would go negative');
         }
       }
     }
@@ -1678,7 +1701,8 @@ export async function cancelPurchase(
     purchase.cancel_reason = reason;
 
     for (const item of items) {
-      const product = store.products.find((p) => p.id === item.product_id)!;
+      const product = store.products.find((p) => p.id === item.product_id);
+      if (!product) continue;
       if (product.tracking_type === 'SERIALIZED') {
         const units = store.inventory_units.filter((u) => u.purchase_item_id === item.id);
         for (const unit of units) {
@@ -1697,8 +1721,8 @@ export async function cancelPurchase(
           });
         }
       } else {
-        const sl = store.stock_levels.find((s) => s.product_id === product.id)!;
-        sl.quantity_on_hand -= item.quantity;
+        const sl = store.stock_levels.find((s) => s.product_id === product.id);
+        if (sl) sl.quantity_on_hand -= item.quantity;
         store.inventory_movements.push({
           id: newId('im'),
           shop_id: sid,
@@ -1749,18 +1773,19 @@ export async function cancelPayment(
 ): Promise<{ ok: boolean; cash_warning?: SoftCashWarning }> {
   await delay();
   const sid = shopId();
-  if (!canCancelRecords()) throw new Error('Only owner can cancel');
-  if (!reason.trim()) throw new Error('Reason is required');
+  if (!canCancelRecords()) throw new ValidationError('Only owner can cancel');
+  if (!reason.trim()) throw new ValidationError('Reason is required');
 
   if (kind === 'customer') {
     const payment = getStore().payments.find((p) => p.id === id && p.shop_id === sid);
-    if (!payment || payment.status === 'CANCELLED') throw new Error('Payment not found');
+    if (!payment || payment.status === 'CANCELLED') throw new ValidationError('Payment not found');
     const warning = checkSoftCashWarning(sid, payment.amount);
     if (warning.needs_confirm && !confirm_overdraft) {
       return { ok: false, cash_warning: warning };
     }
     runTransaction((store) => {
-      const row = store.payments.find((p) => p.id === id)!;
+      const row = store.payments.find((p) => p.id === id);
+      if (!row) return;
       row.status = 'CANCELLED';
       row.cancelled_at = nowIso();
       row.cancel_reason = reason;
@@ -1786,7 +1811,7 @@ export async function cancelPayment(
 
   runTransaction((store) => {
     const row = store.supplier_payments.find((p) => p.id === id && p.shop_id === sid);
-    if (!row || row.status === 'CANCELLED') throw new Error('Payment not found');
+    if (!row || row.status === 'CANCELLED') throw new ValidationError('Payment not found');
     row.status = 'CANCELLED';
     row.cancelled_at = nowIso();
     row.cancel_reason = reason;
@@ -1809,8 +1834,6 @@ export async function cancelPayment(
   });
   return { ok: true };
 }
-
-// ─── Cash movements (read) ───────────────────────────────────
 
 export async function listCashMovements(filters: ListFilters = {}) {
   await delay();
@@ -1914,7 +1937,7 @@ export async function getSessionInfo() {
   if (typeof window === 'undefined') {
     const { auth } = await import('@/auth');
     const session = await auth();
-    if (!session?.user) throw new Error('Unauthorized');
+    if (!session?.user) throw new ValidationError('Unauthorized');
     const mapped = toDukaanSession(session);
     setRuntimeSession(mapped);
     return mapped;
@@ -1922,7 +1945,7 @@ export async function getSessionInfo() {
 
   const { getSession: getAuthSession } = await import('next-auth/react');
   const session = await getAuthSession();
-  if (!session?.user) throw new Error('Unauthorized');
+  if (!session?.user) throw new ValidationError('Unauthorized');
   const mapped = toDukaanSession(session);
   setRuntimeSession(mapped);
   return mapped;

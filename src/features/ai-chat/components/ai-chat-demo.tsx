@@ -29,7 +29,11 @@ type ToolPart = {
   errorText?: string;
 };
 
-function ToolMarker({ part }: { part: ToolPart }) {
+interface ToolMarkerProps {
+  part: ToolPart;
+}
+
+function ToolMarker({ part }: ToolMarkerProps) {
   const t = useT();
   const name = part.toolName ?? part.type.replace(/^tool-/, '');
   const running = part.state === 'input-streaming' || part.state === 'input-available';
@@ -151,7 +155,7 @@ export function AiChatDemo() {
                                 );
                               }
                               if (part.type === 'dynamic-tool' || part.type.startsWith('tool-')) {
-                                return <ToolMarker key={key} part={part as unknown as ToolPart} />;
+                                return <ToolMarker key={key} part={part as ToolPart} />;
                               }
                               return null;
                             })}

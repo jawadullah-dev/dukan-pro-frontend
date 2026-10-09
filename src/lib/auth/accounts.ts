@@ -1,27 +1,13 @@
-/**
- * Demo login accounts (Auth.js Credentials).
- *
- * Mirrors ERD:
- * - platform_admins → SaaS super admin (creates / manages shops)
- * - users (shop OWNER) → dukan shop admin
- *
- * Login is by Pakistani mobile number (most shopkeepers do not use email).
- * Passwords are bcrypt hashes of `admin@123`.
- */
-
 import { normalizePhone } from '@/lib/auth/phone';
 
 export type AuthAccountRole = 'SUPER_ADMIN' | 'OWNER' | 'ADMIN';
 
 export interface AuthAccount {
   id: string;
-  /** Pakistani mobile `03XXXXXXXXX` — primary login identifier */
   phone: string;
   name: string;
-  /** bcrypt hash of admin@123 */
   passwordHash: string;
   role: AuthAccountRole;
-  /** null for platform super admin */
   shopId: string | null;
   shopName: string | null;
 }
@@ -32,9 +18,7 @@ export const DEMO_SHOP_ID = 'shop_khalid';
 export const DEMO_SHOP_NAME = 'Zeb Mobile Center';
 export const DEMO_OWNER_ID = 'user_khalid';
 
-/** Demo super-admin mobile */
 export const DEMO_SUPER_ADMIN_PHONE = '03001234567';
-/** Demo shop-owner mobile */
 export const DEMO_OWNER_PHONE = '03119876543';
 
 export const AUTH_ACCOUNTS: AuthAccount[] = [

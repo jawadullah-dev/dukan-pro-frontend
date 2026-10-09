@@ -26,3 +26,8 @@ export type UserMutationPayload = {
   role: string;
   status: string;
 };
+
+export interface UpdateUserVariables {
+  id: number;
+  values: UserMutationPayload;
+}

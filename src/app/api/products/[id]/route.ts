@@ -1,9 +1,3 @@
-// ============================================================
-// Route Handler — Single Product (get + update)
-// ============================================================
-// See src/app/api/products/route.ts for pattern documentation.
-// ============================================================
-
 import { fakeProducts } from '@/constants/mock-api';
 import { NextRequest, NextResponse } from 'next/server';
 

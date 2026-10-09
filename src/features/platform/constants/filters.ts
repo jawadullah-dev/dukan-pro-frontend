@@ -1,7 +1,6 @@
 import type { PlatformShopStatus, SubscriptionPlan } from '../api/types';
 import { t } from '@/i18n';
 
-/** Live-translated options — read `.label` at render time. */
 export const PLATFORM_STATUS_OPTIONS: { label: string; value: PlatformShopStatus }[] = [
   {
     get label() {

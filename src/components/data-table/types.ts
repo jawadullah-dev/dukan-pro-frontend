@@ -5,11 +5,10 @@ import type { Icon } from '@/components/icons';
 export interface MobileBadge {
   label: string;
   tone?: StatusTone;
-  /** Passed to StatusBadge when tone omitted. */
+
   status?: string;
 }
 
-/** Phone list slots — max 4 main points + 2 meta. */
 export interface MobileItemConfig<TData> {
   leading?: 'avatar' | 'icon' | 'thumbnail';
   leadingIcon?: Icon;
@@ -23,9 +22,9 @@ export interface MobileItemConfig<TData> {
   ariaLabel?: (row: TData) => string;
 }
 
-export interface DetailField {
-  label: string | ((row: any) => string);
-  value: React.ReactNode | ((row: any) => React.ReactNode);
+export interface DetailField<TData = unknown> {
+  label: string | ((row: TData) => string);
+  value: React.ReactNode | ((row: TData) => React.ReactNode);
 }
 
 export interface DetailSection {
@@ -39,10 +38,6 @@ export interface DetailAction {
   variant?: 'default' | 'destructive' | 'outline';
 }
 
-/**
- * Detail presentation: `page` navigates to a full route; `sheet` uses
- * RecordDetail (bottom sheet on phones, end-side panel on tablet/desktop).
- */
 export interface DetailConfig<TData> {
   mode: 'sheet' | 'page';
   href?: (row: TData) => string;
@@ -56,7 +51,7 @@ export interface DetailConfig<TData> {
 export interface QuickFilterChip {
   id: string;
   label: string;
-  /** Applied to the named column filter when selected (`all` clears). */
+
   value?: string | string[] | null;
   columnId?: string;
 }

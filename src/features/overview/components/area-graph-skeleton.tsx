@@ -14,8 +14,8 @@ export function AreaGraphSkeleton() {
       <CardContent>
         <div className='relative aspect-auto h-[280px] w-full'>
           <div className='from-primary/5 to-primary/20 absolute inset-0 rounded-lg bg-linear-to-t' />
-          <Skeleton className='absolute right-0 bottom-0 left-0 h-[1px]' />
-          <Skeleton className='absolute top-0 bottom-0 left-0 w-[1px]' />
+          <Skeleton className='absolute inset-x-0 bottom-0 h-[1px]' />
+          <Skeleton className='absolute inset-y-0 start-0 w-[1px]' />
         </div>
       </CardContent>
     </Card>

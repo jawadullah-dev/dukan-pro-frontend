@@ -16,11 +16,12 @@ interface MobileListItemProps<TData> {
 function initials(text: string): string {
   const parts = text.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '?';
-  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
-  return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase();
+  const first = parts[0] ?? '';
+  if (parts.length === 1) return first.slice(0, 2).toUpperCase();
+  const second = parts[1] ?? '';
+  return `${first[0] ?? ''}${second[0] ?? ''}`.toUpperCase();
 }
 
-/** Two-line list row with fixed slots (title / subtitle / badge / value). */
 export function MobileListItem<TData>({
   row,
   config,

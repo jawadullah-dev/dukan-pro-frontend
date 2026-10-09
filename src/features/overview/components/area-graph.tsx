@@ -94,7 +94,11 @@ export function AreaGraph() {
   );
 }
 
-const DottedBackgroundPattern = ({ config }: { config: ChartConfig }) => {
+interface DottedBackgroundPatternProps {
+  config: ChartConfig;
+}
+
+const DottedBackgroundPattern = ({ config }: DottedBackgroundPatternProps) => {
   const items = Object.fromEntries(
     Object.entries(config).map(([key, value]) => [key, value.color])
   );

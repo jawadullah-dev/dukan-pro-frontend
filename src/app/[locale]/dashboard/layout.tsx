@@ -26,7 +26,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+}
+
+export default async function DashboardLayout({ children }: DashboardLayoutProps) {
   const session = await auth();
   const locale = await getLocale();
   const t = await getTranslations();
@@ -56,8 +60,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <Header />
           <InfobarProvider
             defaultOpen={false}
-            // Row layout: page + info sidebar. min-h-0 lets the page scroll pane size correctly.
-            // Avoid overflow-hidden here — it clips card rings/borders at the edges.
+
             className='min-h-0 flex-1'
           >
             {children}

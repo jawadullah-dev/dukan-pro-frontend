@@ -15,7 +15,6 @@ import {
   useInfobar
 } from '@/components/ui/infobar';
 
-// Default/fallback data when no content is set
 const defaultData = {
   title: 'info.documentation',
   sections: [

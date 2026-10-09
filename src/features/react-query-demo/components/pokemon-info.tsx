@@ -27,7 +27,6 @@ export function PokemonInfo() {
 
   return (
     <div className='space-y-6'>
-      {/* Pokemon selector */}
       <Card>
         <CardHeader>
           <CardTitle>{t('reactQueryDemo.pickPokemon')}</CardTitle>
@@ -49,7 +48,6 @@ export function PokemonInfo() {
         </CardContent>
       </Card>
 
-      {/* Pokemon card */}
       <Card>
         <CardHeader>
           <div className='flex items-center gap-3'>
@@ -66,7 +64,6 @@ export function PokemonInfo() {
         </CardHeader>
         <CardContent>
           <div className='flex flex-col items-center gap-6 sm:flex-row'>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={data.sprites.front_shiny}
               alt={data.name}

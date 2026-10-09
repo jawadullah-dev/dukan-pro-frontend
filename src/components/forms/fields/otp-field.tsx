@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/input-otp';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
 
-/** 6-digit one-time-code input (3 + 3 with a separator). */
 export function OtpField({ label, description, required }: BaseFieldProps) {
   const field = useFieldContext<string>();
   const isInvalid = useFieldInvalid();

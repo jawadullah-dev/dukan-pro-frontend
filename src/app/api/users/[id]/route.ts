@@ -1,9 +1,3 @@
-// ============================================================
-// Route Handler — Single User (update + delete)
-// ============================================================
-// See src/app/api/users/route.ts for pattern documentation.
-// ============================================================
-
 import { fakeUsers } from '@/constants/mock-api-users';
 import { NextRequest, NextResponse } from 'next/server';
 

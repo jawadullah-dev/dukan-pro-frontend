@@ -41,8 +41,11 @@ function isActivePath(pathname: string, url: string): boolean {
   return false;
 }
 
-/** Phone-only bottom bar: 4 primary destinations + More sheet. */
-export function MobileBottomNav({ role }: { role: SessionRole }) {
+interface MobileBottomNavProps {
+  role: SessionRole;
+}
+
+export function MobileBottomNav({ role }: MobileBottomNavProps) {
   const t = useT();
   const isPhone = useIsPhone();
   const pathname = usePathname();

@@ -13,9 +13,7 @@ export function getColumns(): ColumnDef<User>[] {
     {
       id: 'name',
       accessorFn: (row) => `${row.first_name} ${row.last_name}`,
-      header: ({ column }: { column: Column<User, unknown> }) => (
-        <NameColumnHeader column={column} />
-      ),
+      header: ({ column }: UserColumnProps) => <NameColumnHeader column={column} />,
       cell: ({ row }) => (
         <div className='flex flex-col'>
           <span className='font-medium'>
@@ -38,18 +36,14 @@ export function getColumns(): ColumnDef<User>[] {
     {
       id: 'phone',
       accessorKey: 'phone',
-      header: ({ column }: { column: Column<User, unknown> }) => (
-        <PhoneColumnHeader column={column} />
-      ),
+      header: ({ column }: UserColumnProps) => <PhoneColumnHeader column={column} />,
       meta: { label: 'users.phone', type: 'phone', priority: 2 }
     },
     {
       id: 'role',
       accessorKey: 'role',
       enableSorting: false,
-      header: ({ column }: { column: Column<User, unknown> }) => (
-        <RoleColumnHeader column={column} />
-      ),
+      header: ({ column }: UserColumnProps) => <RoleColumnHeader column={column} />,
       cell: ({ cell }) => {
         return (
           <Badge variant='outline' className='capitalize'>
@@ -69,9 +63,7 @@ export function getColumns(): ColumnDef<User>[] {
     {
       id: 'status',
       accessorKey: 'status',
-      header: ({ column }: { column: Column<User, unknown> }) => (
-        <StatusColumnHeader column={column} />
-      ),
+      header: ({ column }: UserColumnProps) => <StatusColumnHeader column={column} />,
       cell: ({ cell }) => {
         const status = cell.getValue<User['status']>();
         const variant =
@@ -88,22 +80,26 @@ export function getColumns(): ColumnDef<User>[] {
   ];
 }
 
-function NameColumnHeader({ column }: { column: Column<User, unknown> }) {
+interface UserColumnProps {
+  column: Column<User, unknown>;
+}
+
+function NameColumnHeader({ column }: UserColumnProps) {
   const t = useT();
   return <DataTableColumnHeader column={column} title={t('users.firstName')} />;
 }
 
-function PhoneColumnHeader({ column }: { column: Column<User, unknown> }) {
+function PhoneColumnHeader({ column }: UserColumnProps) {
   const t = useT();
   return <DataTableColumnHeader column={column} title={t('users.phone')} />;
 }
 
-function RoleColumnHeader({ column }: { column: Column<User, unknown> }) {
+function RoleColumnHeader({ column }: UserColumnProps) {
   const t = useT();
   return <DataTableColumnHeader column={column} title={t('users.role')} />;
 }
 
-function StatusColumnHeader({ column }: { column: Column<User, unknown> }) {
+function StatusColumnHeader({ column }: UserColumnProps) {
   const t = useT();
   return <DataTableColumnHeader column={column} title={t('users.status')} />;
 }

@@ -23,7 +23,11 @@ import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { clearPwaCaches } from '@/lib/pwa';
 import { useT } from '@/i18n/use-t';
 
-function ProfileAvatar({ className }: { className?: string }) {
+interface ProfileAvatarProps {
+  className?: string;
+}
+
+function ProfileAvatar({ className }: ProfileAvatarProps) {
   return (
     <Avatar className={className}>
       <AvatarFallback className='bg-muted'>
@@ -33,7 +37,12 @@ function ProfileAvatar({ className }: { className?: string }) {
   );
 }
 
-function AccountMenuItems({ userName, shopName }: { userName: string; shopName: string }) {
+interface AccountMenuItemsProps {
+  userName: string;
+  shopName: string;
+}
+
+function AccountMenuItems({ userName, shopName }: AccountMenuItemsProps) {
   const t = useT();
   const [signingOut, setSigningOut] = React.useState(false);
 
@@ -77,7 +86,6 @@ function AccountMenuItems({ userName, shopName }: { userName: string; shopName: 
   );
 }
 
-/** Compact profile avatar for the top header (next to notifications). */
 export function UserNav() {
   const t = useT();
   const { data, isPending } = useQuery(sessionQueryOptions());
@@ -103,55 +111,6 @@ export function UserNav() {
         <ProfileAvatar className='h-8 w-8' />
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56' align='end' sideOffset={8}>
-        <AccountMenuItems userName={data.user_name} shopName={data.shop_name} />
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-}
-
-/** Sidebar footer account row — same session + logout for both roles. */
-export function SidebarUserMenu() {
-  const t = useT();
-  const { data, isPending } = useQuery(sessionQueryOptions());
-
-  if (isPending) {
-    return (
-      <div className='flex items-center gap-2 p-2'>
-        <Skeleton className='h-8 w-8 rounded-full' />
-        <div className='grid flex-1 gap-1'>
-          <Skeleton className='h-3 w-24' />
-          <Skeleton className='h-3 w-16' />
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) return null;
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <SidebarMenuButton
-            size='lg'
-            className='data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground'
-            aria-label={t('nav.accountMenu')}
-          />
-        }
-      >
-        <ProfileAvatar className='h-8 w-8 shrink-0' />
-        <div className='grid min-w-0 flex-1 text-start text-sm leading-tight'>
-          <span className='truncate font-medium'>{data.user_name}</span>
-          <span className='text-muted-foreground truncate text-xs'>{data.shop_name}</span>
-        </div>
-        <Icons.chevronsUpDown className='ms-auto size-4 shrink-0' />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        className='w-(--anchor-width) min-w-56 rounded-lg'
-        side='top'
-        align='end'
-        sideOffset={4}
-      >
         <AccountMenuItems userName={data.user_name} shopName={data.shop_name} />
       </DropdownMenuContent>
     </DropdownMenu>

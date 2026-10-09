@@ -19,7 +19,6 @@ const PURCHASE_1 = 'pur_001';
 const SALE_1 = 'sale_001';
 const SALE_2 = 'sale_002';
 
-/** Days ago as ISO date (local calendar day). */
 function daysAgoIso(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() - days);
@@ -475,7 +474,6 @@ function seedStore(): DukaanStore {
     }
   };
 
-  // Fix cover stock after seed sale of 1 cover
   const coverSl = store.stock_levels.find((s) => s.product_id === PROD_COVER);
   if (coverSl) coverSl.quantity_on_hand = 19;
 
@@ -483,10 +481,9 @@ function seedStore(): DukaanStore {
   return store;
 }
 
-/** Pad list entities to 100 rows with Timergara / Lower Dir Pathan shop flavor. */
 function padListDemoData(store: DukaanStore, created: string, today: string): void {
   const TARGET = 100;
-  const pick = <T>(arr: readonly T[], n: number): T => arr[n % arr.length]!;
+  const pick = <T>(arr: readonly T[], n: number): T => (arr[n % arr.length] ?? arr[0]) as T;
   const pkPhone = (n: number, prefix: string) =>
     `${prefix}${String(10000000 + ((n * 137) % 90000000)).slice(0, 7)}`;
 
@@ -759,7 +756,7 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
         id,
         shop_id: SHOP_ID,
         category_id: CAT_PHONES,
-        brand_id: store.brands[n % Math.min(12, store.brands.length)]!.id,
+        brand_id: store.brands[n % Math.min(12, store.brands.length)]?.id ?? 'b1',
         name: n > PHONE_MODELS.length ? `${name} #${n}` : name,
         model,
         color: pick(['Black', 'Blue', 'Gold', 'Green', 'Silver'] as const, n),
@@ -778,7 +775,7 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
         id,
         shop_id: SHOP_ID,
         category_id: store.categories[(n % 6) + 1]?.id ?? CAT_CHARGERS,
-        brand_id: store.brands[n % store.brands.length]!.id,
+        brand_id: store.brands[n % store.brands.length]?.id ?? 'b1',
         name: n > ACCESSORY_NAMES.length ? `${name} pack ${n}` : name,
         tracking_type: 'QUANTITY',
         default_purchase_price: buyRs * 100,
@@ -837,7 +834,7 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
     store.purchases.push({
       id,
       shop_id: SHOP_ID,
-      supplier_id: store.suppliers[n % store.suppliers.length]!.id,
+      supplier_id: store.suppliers[n % store.suppliers.length]?.id ?? 'sup-1',
       purchase_no: formatPurchaseNo(n),
       supplier_invoice_ref: `DIR-${1000 + n}`,
       purchase_date: date,
@@ -858,7 +855,7 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
     store.sales.push({
       id,
       shop_id: SHOP_ID,
-      customer_id: n % 3 === 0 ? store.customers[n % store.customers.length]!.id : undefined,
+      customer_id: n % 3 === 0 ? store.customers[n % store.customers.length]?.id : undefined,
       sale_no: formatSaleNo(n),
       sale_date: date,
       subtotal: total,
@@ -877,7 +874,7 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
     store.expenses.push({
       id: `exp_demo_${n}`,
       shop_id: SHOP_ID,
-      category_id: cats[n % cats.length]!.id,
+      category_id: cats[n % cats.length]?.id ?? 'cat-1',
       amount: (500 + n * 55) * 100,
       expense_date: daysAgoIso(n % 45),
       description: pick(EXPENSE_NOTES, n),
@@ -892,7 +889,7 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
     store.supplier_payments.push({
       id,
       shop_id: SHOP_ID,
-      supplier_id: store.suppliers[n % store.suppliers.length]!.id,
+      supplier_id: store.suppliers[n % store.suppliers.length]?.id ?? 'sup-1',
       amount: (2000 + n * 120) * 100,
       payment_date: daysAgoIso(n % 40),
       notes: n % 4 === 0 ? 'Partial udhar clearance' : 'Cash paid at shop',
@@ -906,8 +903,10 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
   while (store.payments.length < TARGET) {
     const n = store.payments.length + 1;
     const id = `pay_demo_${n}`;
-    const cust = store.customers[n % store.customers.length]!;
-    const sale = store.sales[n % store.sales.length]!;
+    const cust = store.customers[n % store.customers.length];
+    if (!cust) continue;
+    const sale = store.sales[n % store.sales.length];
+    if (!sale) continue;
     store.payments.push({
       id,
       shop_id: SHOP_ID,
@@ -952,7 +951,8 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
 
   while (store.inventory_movements.length < TARGET) {
     const n = store.inventory_movements.length + 1;
-    const product = store.products[n % store.products.length]!;
+    const product = store.products[n % store.products.length];
+    if (!product) continue;
     const isIn = n % 3 !== 0;
     store.inventory_movements.push({
       id: `im_demo_${n}`,
@@ -965,20 +965,21 @@ function padListDemoData(store: DukaanStore, created: string, today: string): vo
         : pick(['Sold at counter', 'Stock count adjust', 'Screen damage write-off'] as const, n),
       reference_type: isIn ? 'purchase' : 'sale',
       reference_id: isIn
-        ? store.purchases[n % store.purchases.length]!.id
-        : store.sales[n % store.sales.length]!.id,
+        ? (store.purchases[n % store.purchases.length]?.id ?? '')
+        : (store.sales[n % store.sales.length]?.id ?? ''),
       created_at: `${daysAgoIso(n % 70)}T09:${String(n % 60).padStart(2, '0')}:00.000Z`
     });
   }
 
-  const shop = store.shops[0]!;
+  const shop = store.shops[0];
+  if (!shop) return;
   shop.next_purchase_no = store.purchases.length + 1;
   shop.next_sale_no = store.sales.length + 1;
 }
 
 const SEED_VERSION = 5;
 
-const globalForDukaan = globalThis as unknown as {
+const globalForDukaan = globalThis as typeof globalThis & {
   __dukaanStore?: DukaanStore;
   __dukaanSeedVersion?: number;
 };
@@ -991,7 +992,7 @@ export function getStore(): DukaanStore {
   return globalForDukaan.__dukaanStore;
 }
 
-export function resetStore(): DukaanStore {
+function resetStore(): DukaanStore {
   globalForDukaan.__dukaanStore = seedStore();
   globalForDukaan.__dukaanSeedVersion = SEED_VERSION;
   return globalForDukaan.__dukaanStore;
@@ -1005,7 +1006,6 @@ export function replaceStore(next: DukaanStore): void {
   globalForDukaan.__dukaanStore = next;
 }
 
-/** Run mutations; on throw, restore previous snapshot. */
 export function runTransaction<T>(fn: (store: DukaanStore) => T): T {
   const snapshot = cloneStore(getStore());
   try {

@@ -9,10 +9,6 @@ import { Icons } from '@/components/icons';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
 import { useT } from '@/i18n/use-t';
 
-/**
- * Free-text tag list over a `string[]` value. Use with `mode='array'` on the
- * `<form.AppField>` — Enter or the Add button pushes, badges remove.
- */
 export function TagsField({
   label,
   description,

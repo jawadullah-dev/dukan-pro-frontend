@@ -1,3 +1,5 @@
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
 import { useT } from '@/i18n/use-t';

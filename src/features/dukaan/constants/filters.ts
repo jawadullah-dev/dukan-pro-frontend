@@ -5,42 +5,41 @@ function optionsFrom(values: readonly string[]) {
   return values.map((value) => ({ label: formatLabel(value), value }));
 }
 
-export function getRecordStatusOptions() {
+function getRecordStatusOptions() {
   return [
     { label: t('status.active'), value: 'ACTIVE' },
     { label: t('status.cancelled'), value: 'CANCELLED' }
   ];
 }
 
-export function getTrackingTypeOptions() {
+function getTrackingTypeOptions() {
   return [
     { label: t('status.serialized'), value: 'SERIALIZED' },
     { label: t('status.quantity'), value: 'QUANTITY' }
   ];
 }
 
-export function getActiveStatusOptions() {
+function getActiveStatusOptions() {
   return [
     { label: t('status.active'), value: 'true' },
     { label: t('status.inactive'), value: 'false' }
   ];
 }
 
-export function getLowStockOptions() {
+function getLowStockOptions() {
   return [
     { label: t('status.lowStock'), value: 'true' },
     { label: t('status.stockOk'), value: 'false' }
   ];
 }
 
-export function getCashDirectionOptions() {
+function getCashDirectionOptions() {
   return [
     { label: t('status.cashIn'), value: 'IN' },
     { label: t('status.cashOut'), value: 'OUT' }
   ];
 }
 
-/** Live-translated options — read `.label` at render time. */
 export const RECORD_STATUS_OPTIONS = [
   {
     get label() {

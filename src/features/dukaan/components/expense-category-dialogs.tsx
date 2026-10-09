@@ -43,13 +43,12 @@ export function ExpenseCategoryDialog({
   );
 }
 
-function ExpenseCategoryDialogBody({
-  category,
-  onOpenChange
-}: {
+interface ExpenseCategoryDialogBodyProps {
   category?: ExpenseCategory | null;
   onOpenChange: (open: boolean) => void;
-}) {
+}
+
+function ExpenseCategoryDialogBody({ category, onOpenChange }: ExpenseCategoryDialogBodyProps) {
   const qc = useQueryClient();
   const isEdit = Boolean(category);
   const t = useT();

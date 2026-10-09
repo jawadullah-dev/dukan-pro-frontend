@@ -13,15 +13,6 @@ import {
 import { cn } from '@/lib/utils';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
 
-/**
- * Multi-select checkbox group over a `string[]` value. Use with
- * `mode='array'` on the `<form.AppField>`:
- *
- * ```tsx
- * <form.AppField name='interests' mode='array'
- *   children={(field) => <field.CheckboxGroupField label='Interests' options={…} />} />
- * ```
- */
 export function CheckboxGroupField({
   label,
   description,
@@ -30,7 +21,7 @@ export function CheckboxGroupField({
   className
 }: BaseFieldProps & {
   options: { value: string; label: string; disabled?: boolean }[];
-  /** Layout for the option grid, e.g. 'grid grid-cols-2 gap-3'. */
+
   className?: string;
 }) {
   const field = useFieldContext<string[]>();

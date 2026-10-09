@@ -15,7 +15,6 @@ import { Icons } from '@/components/icons';
 import { translateMaybe, useT } from '@/i18n/use-t';
 import { toast } from 'sonner';
 
-// Schema — validated on submit, errors display next to each field
 const demoFormSchema = (t: (key: string) => string) =>
   z.object({
     name: z.string().min(2, t('demoFormZod.nameMin2')),
@@ -76,7 +75,11 @@ const genderOptionKeys = [
   { value: 'prefer-not-to-say', labelKey: 'formOptions.genders.preferNotToSay' }
 ];
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
+interface SectionTitleProps {
+  children: React.ReactNode;
+}
+
+function SectionTitle({ children }: SectionTitleProps) {
   return (
     <div className='space-y-1'>
       <Separator />
@@ -86,8 +89,6 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
-
-// ─── Form ───
 
 type DemoFormValues = {
   name: string;
@@ -182,7 +183,6 @@ export default function DemoForm() {
               form.handleSubmit();
             }}
           >
-            {/* ─── TEXT INPUTS ─── */}
             <SectionTitle>{t('demoForm.sectionText')}</SectionTitle>
 
             <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -193,7 +193,6 @@ export default function DemoForm() {
                 )}
               />
 
-              {/* Async validation: simulated server-side email check */}
               <form.AppField
                 name='email'
                 asyncDebounceMs={500}
@@ -267,7 +266,6 @@ export default function DemoForm() {
               />
             </FieldGroup>
 
-            {/* ─── TEXTAREA ─── */}
             <form.AppField
               name='bio'
               children={(field) => (
@@ -282,7 +280,6 @@ export default function DemoForm() {
               )}
             />
 
-            {/* ─── SELECT & COMBOBOX ─── */}
             <SectionTitle>{t('demoForm.sectionSelect')}</SectionTitle>
 
             <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -312,7 +309,6 @@ export default function DemoForm() {
               />
             </FieldGroup>
 
-            {/* ─── CHECKBOX & RADIO ─── */}
             <SectionTitle>{t('demoForm.sectionCheckbox')}</SectionTitle>
 
             <form.AppField
@@ -349,7 +345,6 @@ export default function DemoForm() {
               )}
             />
 
-            {/* ─── TOGGLE & SWITCH ─── */}
             <SectionTitle>{t('demoForm.sectionToggle')}</SectionTitle>
 
             <form.AppField
@@ -388,7 +383,6 @@ export default function DemoForm() {
               children={(field) => <field.CheckboxField label={t('demoForm.terms')} required />}
             />
 
-            {/* ─── SLIDER ─── */}
             <SectionTitle>{t('demoForm.sectionSlider')}</SectionTitle>
 
             <form.AppField
@@ -404,7 +398,6 @@ export default function DemoForm() {
               )}
             />
 
-            {/* ─── DATE & TIME ─── */}
             <SectionTitle>{t('demoForm.sectionDate')}</SectionTitle>
 
             <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -431,7 +424,6 @@ export default function DemoForm() {
               children={(field) => <field.DateRangeField label={t('demoForm.dateRange')} />}
             />
 
-            {/* ─── SPECIAL INPUTS ─── */}
             <SectionTitle>{t('demoForm.sectionSpecial')}</SectionTitle>
 
             <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -469,7 +461,6 @@ export default function DemoForm() {
               )}
             />
 
-            {/* ─── FILE UPLOAD ─── */}
             <SectionTitle>{t('demoForm.sectionFile')}</SectionTitle>
 
             <form.AppField
@@ -484,7 +475,6 @@ export default function DemoForm() {
               )}
             />
 
-            {/* ─── SUBMIT ─── */}
             <Separator />
             <div className='flex gap-4 pt-2'>
               <Button
@@ -503,7 +493,6 @@ export default function DemoForm() {
         </CardContent>
       </Card>
 
-      {/* Form Data Preview - sticky sidebar */}
       <div className='xl:sticky xl:top-16 xl:self-start'>
         <Card>
           <CardHeader>

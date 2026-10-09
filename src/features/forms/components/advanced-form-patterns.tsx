@@ -14,10 +14,6 @@ import { toast } from 'sonner';
 import { useAppForm } from '@/lib/form';
 import { translateMaybe, useT } from '@/i18n/use-t';
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
 type AdvancedFormValues = {
   username: string;
   email: string;
@@ -31,10 +27,6 @@ type AdvancedFormValues = {
   country: string;
   state: string;
 };
-
-// ---------------------------------------------------------------------------
-// Country / State data
-// ---------------------------------------------------------------------------
 
 const countryStateMap: Record<string, { value: string; labelKey: string }[]> = {
   us: [
@@ -59,14 +51,6 @@ const countryOptionKeys = [
   { value: 'uk', labelKey: 'formOptions.countries.uk' },
   { value: 'au', labelKey: 'formOptions.countries.au' }
 ];
-
-// ---------------------------------------------------------------------------
-// Form-level Zod schema (cross-field validation on submit)
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
 
 export default function AdvancedFormPatterns() {
   const t = useT();
@@ -121,7 +105,6 @@ export default function AdvancedFormPatterns() {
     }
   });
 
-  // Read current country reactively for dependent state field
   const selectedCountry = useStore(form.store, (s) => s.values.country);
   const stateOptions = (countryStateMap[selectedCountry] ?? []).map(({ value, labelKey }) => ({
     value,
@@ -142,14 +125,12 @@ export default function AdvancedFormPatterns() {
             form.handleSubmit();
           }}
         >
-          {/* ─── Section 1: Account ─── */}
           <div className='space-y-1'>
             <h3 className='text-lg font-semibold'>{t('advancedForm.sectionAccount')}</h3>
             <p className='text-muted-foreground text-sm'>{t('advancedForm.sectionAccountDesc')}</p>
           </div>
 
           <FieldGroup className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            {/* Username — async validation (spinner built into TextField) */}
             <form.AppField
               name='username'
               asyncDebounceMs={500}
@@ -196,7 +177,6 @@ export default function AdvancedFormPatterns() {
               )}
             />
 
-            {/* Confirm Password — linked validation via onChangeListenTo */}
             <form.AppField
               name='confirmPassword'
               validators={{
@@ -222,7 +202,6 @@ export default function AdvancedFormPatterns() {
 
           <Separator />
 
-          {/* ─── Section 2: Team Info (nested objects) ─── */}
           <div className='space-y-1'>
             <h3 className='text-lg font-semibold'>{t('advancedForm.sectionTeam')}</h3>
             <p className='text-muted-foreground text-sm'>{t('advancedForm.sectionTeamDesc')}</p>
@@ -256,7 +235,6 @@ export default function AdvancedFormPatterns() {
 
           <Separator />
 
-          {/* ─── Section 3: Members (dynamic array rows — raw form.Field) ─── */}
           <div className='space-y-1'>
             <h3 className='text-lg font-semibold'>{t('advancedForm.sectionMembers')}</h3>
             <p className='text-muted-foreground text-sm'>{t('advancedForm.sectionMembersDesc')}</p>
@@ -362,7 +340,6 @@ export default function AdvancedFormPatterns() {
 
           <Separator />
 
-          {/* ─── Section 4: Preferences (listeners / side effects) ─── */}
           <div className='space-y-1'>
             <h3 className='text-lg font-semibold'>{t('advancedForm.sectionPreferences')}</h3>
             <p className='text-muted-foreground text-sm'>
@@ -406,7 +383,6 @@ export default function AdvancedFormPatterns() {
 
           <Separator />
 
-          {/* ─── Submit ─── */}
           <div className='flex gap-4 pt-2'>
             <Button type='button' variant='outline' onClick={() => form.reset()} className='flex-1'>
               {t('advancedForm.reset')}

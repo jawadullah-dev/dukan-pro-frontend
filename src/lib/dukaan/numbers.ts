@@ -6,7 +6,6 @@ export function formatPurchaseNo(n: number): string {
   return `P-${String(n).padStart(4, '0')}`;
 }
 
-/** UI label for enum-like values: SERIALIZED → serialized, ACTIVE → active */
 export function formatLabel(value: string): string {
   return value.replaceAll('_', ' ').toLowerCase();
 }
@@ -31,7 +30,6 @@ export function nowIso(): string {
   return new Date().toISOString();
 }
 
-/** Display date + time with AM/PM, e.g. 2026-10-05 07:19:00 AM */
 export function formatDateTime(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;

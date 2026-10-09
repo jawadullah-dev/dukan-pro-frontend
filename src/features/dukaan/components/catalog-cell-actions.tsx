@@ -58,7 +58,11 @@ function ActionMenu({ onEdit, onDelete }: ActionMenuProps) {
   );
 }
 
-export function CategoryCellAction({ data }: { data: Category }) {
+interface CategoryCellActionProps {
+  data: Category;
+}
+
+export function CategoryCellAction({ data }: CategoryCellActionProps) {
   const t = useT();
   const qc = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
@@ -91,7 +95,11 @@ export function CategoryCellAction({ data }: { data: Category }) {
   );
 }
 
-export function BrandCellAction({ data }: { data: Brand }) {
+interface BrandCellActionProps {
+  data: Brand;
+}
+
+export function BrandCellAction({ data }: BrandCellActionProps) {
   const t = useT();
   const qc = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
@@ -124,7 +132,11 @@ export function BrandCellAction({ data }: { data: Brand }) {
   );
 }
 
-export function ProductCellAction({ data }: { data: Product }) {
+interface ProductCellActionProps {
+  data: Product;
+}
+
+export function ProductCellAction({ data }: ProductCellActionProps) {
   const t = useT();
   const qc = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);

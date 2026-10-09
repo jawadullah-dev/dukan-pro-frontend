@@ -1,9 +1,3 @@
-/**
- * React Query options for dukaan Release 1.
- * Data access lives in `@/lib/dukaan` (operations). When wiring a real API,
- * introduce `service.ts` here and point queryFns at it — UI stays unchanged.
- * Field names match ERD v2 / future Postgres columns; money amounts are paisa.
- */
 import { queryOptions } from '@tanstack/react-query';
 import { dukaan } from '@/lib/dukaan';
 import type { ListFilters } from '@/lib/dukaan';

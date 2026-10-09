@@ -17,10 +17,11 @@ import {
 } from '@/config/site';
 import { isRtlLocale, locales } from '@/i18n/request';
 import { cn } from '@/lib/utils';
+import { env } from '@/config/env';
 import '../styles/globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const metadataBase = new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000');
+  const metadataBase = new URL(env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000');
 
   const defaultMetadata = {
     metadataBase,
@@ -74,9 +75,7 @@ export async function generateMetadata(): Promise<Metadata> {
     try {
       const t = await getTranslations('Metadata');
       defaultTitle = t('title', { appName: APP_NAME });
-    } catch {
-      // Fallback if Metadata namespace does not exist
-    }
+    } catch {}
 
     const alternates: Metadata['alternates'] = {
       canonical: `/${locale}`,
@@ -84,7 +83,9 @@ export async function generateMetadata(): Promise<Metadata> {
     };
 
     for (const l of locales) {
-      alternates.languages![l] = `/${l}`;
+      if (alternates.languages) {
+        alternates.languages[l] = `/${l}`;
+      }
     }
 
     return {
@@ -110,7 +111,11 @@ export const viewport: Viewport = {
   viewportFit: 'cover'
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+export default async function RootLayout({ children }: RootLayoutProps) {
   const requestedLocale = await getLocale();
   const locale = isLocale(requestedLocale) ? requestedLocale : 'en';
   setRequestLocale(locale);
@@ -118,7 +123,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const cookieStore = await cookies();
   const activeThemeValue = cookieStore.get('active_theme')?.value;
   const isValidTheme = THEMES.some((t) => t.value === activeThemeValue);
-  const themeToApply = isValidTheme ? activeThemeValue! : DEFAULT_THEME;
+  const themeToApply = isValidTheme && activeThemeValue ? activeThemeValue : DEFAULT_THEME;
 
   const dir = isRtlLocale(locale) ? 'rtl' : 'ltr';
 

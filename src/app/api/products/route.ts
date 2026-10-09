@@ -1,20 +1,3 @@
-// ============================================================
-// Route Handler — Products (list + create)
-// ============================================================
-// Used with Pattern 2 (Route Handlers + ORM) or Pattern 3 (BFF).
-//
-// Fullstack (ORM): Replace fakeProducts calls with your ORM
-//   const products = await db.query.products.findMany({ ... })
-//
-// BFF (proxy): Replace with fetch to your external backend
-//   const res = await fetch(`${BACKEND_URL}/products?${searchParams}`, {
-//     headers: { Authorization: `Bearer ${token}` }
-//   })
-//   return NextResponse.json(await res.json())
-//
-// Current: Mock (in-memory fake data for demo/prototyping)
-// ============================================================
-
 import { fakeProducts } from '@/constants/mock-api';
 import { NextRequest, NextResponse } from 'next/server';
 

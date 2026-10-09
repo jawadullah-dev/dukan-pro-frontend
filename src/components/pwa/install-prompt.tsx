@@ -67,9 +67,7 @@ function takeAutoPromptFlag(): boolean {
 function setAutoPromptFlag(): void {
   try {
     sessionStorage.setItem(AUTO_PROMPT_KEY, '1');
-  } catch {
-    // ignore
-  }
+  } catch {}
 }
 
 interface InstallPromptProps {
@@ -77,11 +75,6 @@ interface InstallPromptProps {
   className?: string;
 }
 
-/**
- * Simple install UX:
- * 1) If Chrome can install → open native dialog (creates desktop / home icon).
- * 2) If not → show remove-old-app steps, then reload and auto-open install dialog.
- */
 export function InstallPrompt({ variant = 'both', className }: InstallPromptProps) {
   const t = useTranslations();
   const [standalone, setStandalone] = React.useState(false);
@@ -124,7 +117,6 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
     });
   }, []);
 
-  // After "I removed it" we reload — then open Chrome’s install dialog for the user.
   React.useEffect(() => {
     if (standalone || surface === 'ios' || autoPromptTried.current) return;
     if (!takeAutoPromptFlag()) return;
@@ -164,9 +156,7 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
   const dismissBanner = () => {
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    } catch {
-      // ignore
-    }
+    } catch {}
     setShowBanner(false);
     setEligible(false);
   };
@@ -225,7 +215,6 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
     }
   };
 
-  /** Reload page and auto-open the real Chrome install dialog. */
   const onRemovedAndInstall = () => {
     if (surface === 'ios') {
       openHelp(false);

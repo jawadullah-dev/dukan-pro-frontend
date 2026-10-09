@@ -10,7 +10,6 @@ interface DialogCancelButtonProps {
   disabled?: boolean;
 }
 
-/** Outline dismiss control — Cancel text + close icon. */
 export function DialogCancelButton({ onClick, disabled }: DialogCancelButtonProps) {
   const t = useT();
   return (
@@ -26,7 +25,7 @@ type DialogPrimaryMode = 'add' | 'edit' | 'save';
 interface DialogPrimaryButtonProps {
   mode: DialogPrimaryMode;
   disabled?: boolean;
-  /** Shows the shared button spinner while a mutation runs. */
+
   loading?: boolean;
   type?: 'submit' | 'button';
   onClick?: () => void;
@@ -39,7 +38,6 @@ const PRIMARY_ICON = {
   save: Icons.check
 } as const;
 
-/** Primary dialog action — Add / Edit / Save with matching icon. */
 export function DialogPrimaryButton({
   mode,
   disabled,
@@ -66,7 +64,6 @@ interface DialogConfirmButtonProps {
   label?: string;
 }
 
-/** Destructive confirm (cancel payment / expense / etc.). */
 export function DialogConfirmButton({
   disabled,
   loading = false,

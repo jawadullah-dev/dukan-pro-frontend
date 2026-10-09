@@ -1,6 +1,5 @@
 import * as React from 'react';
 
-/** Matches plan: off-canvas shell below 1024px (sidebar + bottom nav phones). */
 export const MOBILE_BREAKPOINT = 1024;
 
 function subscribeMaxWidth(maxPx: number, onStoreChange: () => void) {
@@ -21,7 +20,6 @@ export function useIsMobile() {
   );
 }
 
-/** True below 640px — phone bottom nav / hide breadcrumbs. */
 export function useIsPhone() {
   return React.useSyncExternalStore(
     (onStoreChange) => subscribeMaxWidth(639, onStoreChange),

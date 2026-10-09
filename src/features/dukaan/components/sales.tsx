@@ -1,5 +1,26 @@
 'use client';
 
+interface SaleLineItem {
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  inventory_unit_id?: string;
+  tracking_type?: Product['tracking_type'];
+}
+
+interface SaleFormValues {
+  customer_id: string;
+  discount: number;
+  paid_now: number;
+  method: 'CASH' | 'BANK' | 'MOBILE_WALLET';
+  lines: SaleLineItem[];
+}
+
+interface CancelSaleVariables {
+  reason: string;
+  confirm?: boolean;
+}
+
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -45,15 +66,13 @@ import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { FormEntitySelect } from './form-entity-select';
 import { SalesTable } from './tables/commerce-tables';
 
-function SaleCreateDialog({
-  open,
-  onOpenChange,
-  clearDefaultQuery
-}: {
+interface SaleCreateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   clearDefaultQuery?: boolean;
-}) {
+}
+
+function SaleCreateDialog({ open, onOpenChange, clearDefaultQuery }: SaleCreateDialogProps) {
   const router = useRouter();
   const t = useT();
 
@@ -82,7 +101,12 @@ function SaleCreateDialog({
   );
 }
 
-export function SalesHeaderAction({ className, onAdd }: { className?: string; onAdd: () => void }) {
+interface SalesHeaderActionProps {
+  className?: string;
+  onAdd: () => void;
+}
+
+export function SalesHeaderAction({ className, onAdd }: SalesHeaderActionProps) {
   const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
@@ -92,7 +116,11 @@ export function SalesHeaderAction({ className, onAdd }: { className?: string; on
   );
 }
 
-export function SalesListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) {
+interface SalesListClientProps {
+  defaultOpenAdd?: boolean;
+}
+
+export function SalesListClient({ defaultOpenAdd = false }: SalesListClientProps) {
   const t = useT();
   const [open, setOpen] = useState(defaultOpenAdd);
 
@@ -124,26 +152,18 @@ const emptySaleLine: {
   inventory_unit_id: ''
 };
 
-export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
+interface SaleCreateFormProps {
+  onDone?: () => void;
+}
+
+export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
   const qc = useQueryClient();
   const t = useT();
   const { data: units } = useSuspenseQuery(unitsQueryOptions());
   const [clientRequestId] = useState(() => createClientRequestId());
 
   const save = useMutation({
-    mutationFn: (value: {
-      customer_id: string;
-      discount: number;
-      paid_now: number;
-      method: 'CASH' | 'BANK' | 'MOBILE_WALLET';
-      lines: Array<{
-        product_id: string;
-        quantity: number;
-        unit_price: number;
-        inventory_unit_id?: string;
-        tracking_type?: Product['tracking_type'];
-      }>;
-    }) =>
+    mutationFn: (value: SaleFormValues) =>
       dukaan.createSale({
         customer_id: value.customer_id === '__walkin__' ? undefined : value.customer_id,
         discount: toPaisa(value.discount),
@@ -422,14 +442,18 @@ export function SaleCreateForm({ onDone }: { onDone?: () => void }) {
   );
 }
 
-export function SaleDetailClient({ id }: { id: string }) {
+interface SaleDetailClientProps {
+  id: string;
+}
+
+export function SaleDetailClient({ id }: SaleDetailClientProps) {
   const qc = useQueryClient();
   const { data } = useSuspenseQuery(saleQueryOptions(id));
   const [warning, setWarning] = useState<SoftCashWarning | null>(null);
   const t = useT();
 
   const cancel = useMutation({
-    mutationFn: ({ reason, confirm }: { reason: string; confirm?: boolean }) =>
+    mutationFn: ({ reason, confirm }: CancelSaleVariables) =>
       dukaan.cancelSale(id, reason, confirm),
     onSuccess: (res) => {
       if (res.cash_warning) {
@@ -578,7 +602,11 @@ export function SaleDetailClient({ id }: { id: string }) {
   );
 }
 
-export function SaleReceiptClient({ id }: { id: string }) {
+interface SaleReceiptClientProps {
+  id: string;
+}
+
+export function SaleReceiptClient({ id }: SaleReceiptClientProps) {
   const t = useT();
   const { data } = useSuspenseQuery(saleQueryOptions(id));
   const receiptGroup = data.payments.find((p) => p.status === 'ACTIVE')?.receipt_group_id;

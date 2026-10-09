@@ -10,10 +10,6 @@ interface FloatingActionButtonProps {
   className?: string;
 }
 
-/**
- * Phone FAB above bottom nav + safe area. Hidden from `sm` up
- * (toolbar button used instead).
- */
 export function FloatingActionButton({ label, onClick, className }: FloatingActionButtonProps) {
   return (
     <Button

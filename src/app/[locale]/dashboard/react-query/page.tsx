@@ -14,7 +14,6 @@ export const metadata = {
 export default function ReactQueryPage() {
   const queryClient = getQueryClient();
 
-  // Prefetch on the server — data is ready before client JS loads
   void queryClient.prefetchQuery(pokemonOptions(25));
 
   return (

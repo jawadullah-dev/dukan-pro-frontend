@@ -10,6 +10,7 @@ import {
   type ColumnSemanticType
 } from './resolve-mobile-item';
 import type { DetailConfig, DetailSection, MobileItemConfig } from './types';
+import { env } from '@/config/env';
 
 function metaOf<TData>(col: Column<TData, unknown>): ColumnLayoutMeta {
   const m = col.columnDef.meta ?? {};
@@ -63,7 +64,6 @@ function columnById<TData>(table: Table<TData>, id: string | null): Column<TData
   return table.getColumn(id) ?? null;
 }
 
-/** Build MobileItemConfig from TanStack columns (auto-layout). */
 export function buildMobileItemFromTable<TData>(
   table: Table<TData>,
   t?: TranslateFn
@@ -71,8 +71,7 @@ export function buildMobileItemFromTable<TData>(
   const layouts = table.getAllColumns().map(metaOf);
   const slots = resolveMobileSlots(layouts);
 
-  if (process.env.NODE_ENV !== 'production' && !slots.titleColumnId) {
-    // eslint-disable-next-line no-console -- intentional dev guard
+  if (env.NODE_ENV !== 'production' && !slots.titleColumnId) {
     console.warn(
       '[ResponsiveDataTable] No resolvable title column. Mark a column with meta.primary or type text/id.'
     );
@@ -142,7 +141,6 @@ export function buildMobileItemFromTable<TData>(
   };
 }
 
-/** Auto detail sections from all non-action columns. */
 export function buildDetailFromTable<TData>(
   table: Table<TData>,
   overrides?: Partial<DetailConfig<TData>>,

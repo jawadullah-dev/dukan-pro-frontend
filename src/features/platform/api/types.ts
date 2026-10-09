@@ -38,7 +38,6 @@ export interface PlatformShopFilters {
   limit?: number;
   search?: string;
   city?: string;
-  /** Single status or comma-separated list */
   status?: PlatformShopStatus | string;
 }
 

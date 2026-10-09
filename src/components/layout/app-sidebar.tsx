@@ -59,7 +59,11 @@ function translateMaybe(key: string, t: ReturnType<typeof useTranslations>): str
   return translated.startsWith('MISSING_MESSAGE') ? key : translated;
 }
 
-export default function AppSidebar({ role }: { role: SessionRole }) {
+export interface AppSidebarProps {
+  role: SessionRole;
+}
+
+export default function AppSidebar({ role }: AppSidebarProps) {
   const t = useTranslations();
   const locale = useLocale() as AppLocale;
   const isRtl = isRtlLocale(locale);
@@ -134,7 +138,7 @@ export default function AppSidebar({ role }: { role: SessionRole }) {
                         <SidebarMenuButton
                           tooltip={title}
                           isActive={isActive}
-                          className='group/collapsible rtl:text-right'
+                          className='group/collapsible text-start'
                         />
                       }
                     >
@@ -157,7 +161,7 @@ export default function AppSidebar({ role }: { role: SessionRole }) {
                                   />
                                 }
                                 isActive={pathname === subItem.url}
-                                className='rtl:text-right'
+                                className='text-start'
                               >
                                 <span>{subTitle}</span>
                               </SidebarMenuSubButton>
@@ -173,7 +177,7 @@ export default function AppSidebar({ role }: { role: SessionRole }) {
                       render={<Link href={item.url} aria-label={title} onClick={closeMobileNav} />}
                       tooltip={title}
                       isActive={isActive}
-                      className='rtl:text-right'
+                      className='text-start'
                     >
                       <Icon />
                       <span>{title}</span>

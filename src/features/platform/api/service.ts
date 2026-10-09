@@ -170,13 +170,13 @@ function buildShops(count: number): PlatformShop[] {
   const shops: PlatformShop[] = [];
 
   for (let i = 1; i <= count; i++) {
-    const city = CITIES[(i - 1) % CITIES.length]!;
-    const prefix = SHOP_PREFIXES[(i - 1) % SHOP_PREFIXES.length]!;
-    const suffix = SHOP_SUFFIXES[(i * 3) % SHOP_SUFFIXES.length]!;
-    const first = FIRST_NAMES[(i - 1) % FIRST_NAMES.length]!;
-    const last = LAST_NAMES[(i * 7) % LAST_NAMES.length]!;
-    const street = STREETS[(i * 5) % STREETS.length]!;
-    const status = STATUSES[(i - 1) % STATUSES.length]!;
+    const city = CITIES[(i - 1) % CITIES.length] ?? 'Karachi';
+    const prefix = SHOP_PREFIXES[(i - 1) % SHOP_PREFIXES.length] ?? 'Al-Madina';
+    const suffix = SHOP_SUFFIXES[(i * 3) % SHOP_SUFFIXES.length] ?? 'Store';
+    const first = FIRST_NAMES[(i - 1) % FIRST_NAMES.length] ?? 'Ali';
+    const last = LAST_NAMES[(i * 7) % LAST_NAMES.length] ?? 'Khan';
+    const street = STREETS[(i * 5) % STREETS.length] ?? 'Main Bazaar';
+    const status = STATUSES[(i - 1) % STATUSES.length] ?? 'ACTIVE';
     const block = ((i * 3) % 24) + 1;
     const phoneTail = String(10000000 + i * 137).slice(-8);
 
@@ -205,7 +205,6 @@ function buildShops(count: number): PlatformShop[] {
   return shops;
 }
 
-/** Plan prices in paisa. */
 const MONTHLY_AMOUNT_PAISA = 1000_00;
 const YEARLY_AMOUNT_PAISA = 12000_00;
 
@@ -244,6 +243,14 @@ function paginate<T>(items: T[], page: number, limit: number): Paginated<T> {
   };
 }
 
+function parseCsvFilter(value?: string | string[]): string[] {
+  if (!value) return [];
+  return String(value)
+    .split(',')
+    .map((c) => c.trim())
+    .filter(Boolean);
+}
+
 function filterShops(filters: PlatformShopFilters): PlatformShop[] {
   let rows = [...SHOPS];
   const q = filters.search?.trim().toLowerCase();
@@ -257,19 +264,13 @@ function filterShops(filters: PlatformShopFilters): PlatformShop[] {
     );
   }
   if (filters.city && filters.city !== 'all') {
-    const cities = filters.city
-      .split(',')
-      .map((c) => c.trim())
-      .filter(Boolean);
+    const cities = parseCsvFilter(filters.city);
     if (cities.length) {
       rows = rows.filter((s) => cities.includes(s.city));
     }
   }
   if (filters.status) {
-    const statuses = String(filters.status)
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const statuses = parseCsvFilter(filters.status);
     if (statuses.length) {
       rows = rows.filter((s) => statuses.includes(s.status));
     }
@@ -314,10 +315,7 @@ export async function listPlatformSubscriptions(
     rows = rows.filter((s) => s.shop_name.toLowerCase().includes(q));
   }
   if (filters.status) {
-    const statuses = String(filters.status)
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const statuses = parseCsvFilter(filters.status);
     if (statuses.length) {
       rows = rows.filter((s) => statuses.includes(s.status));
     }

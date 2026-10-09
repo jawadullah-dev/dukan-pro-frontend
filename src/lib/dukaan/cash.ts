@@ -19,7 +19,7 @@ export function checkSoftCashWarning(shopId: string, outflow: number): SoftCashW
   };
 }
 
-export function sumCashMovements(movements: CashMovement[]): number {
+function sumCashMovements(movements: CashMovement[]): number {
   return movements.reduce((sum, m) => {
     return m.direction === 'IN' ? sum + m.amount : sum - m.amount;
   }, 0);

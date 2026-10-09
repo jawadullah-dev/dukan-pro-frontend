@@ -23,17 +23,19 @@ function DashboardSkeleton() {
   );
 }
 
+interface OverViewLayoutProps {
+  sales: React.ReactNode;
+  pie_stats: React.ReactNode;
+  bar_stats: React.ReactNode;
+  area_stats: React.ReactNode;
+}
+
 export default async function OverViewLayout({
   sales: _sales,
   pie_stats: _pie,
   bar_stats: _bar,
   area_stats: _area
-}: {
-  sales: React.ReactNode;
-  pie_stats: React.ReactNode;
-  bar_stats: React.ReactNode;
-  area_stats: React.ReactNode;
-}) {
+}: OverViewLayoutProps) {
   const session = await auth();
   if (session?.user?.role === 'SUPER_ADMIN') {
     redirect(PLATFORM_HOME);

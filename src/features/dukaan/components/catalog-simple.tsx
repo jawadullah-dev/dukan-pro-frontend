@@ -9,7 +9,11 @@ import { useT } from '@/i18n/use-t';
 import { BrandDialog, CategoryDialog } from './catalog-dialogs';
 import { BrandsTable, CategoriesTable } from './tables/catalog-tables';
 
-export function CategoriesHeaderAction({ onAdd }: { onAdd?: () => void }) {
+interface CategoriesHeaderActionProps {
+  onAdd?: () => void;
+}
+
+export function CategoriesHeaderAction({ onAdd }: CategoriesHeaderActionProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {
@@ -39,7 +43,11 @@ export function CategoriesPageClient() {
   );
 }
 
-export function BrandsHeaderAction({ onAdd }: { onAdd?: () => void }) {
+interface BrandsHeaderActionProps {
+  onAdd?: () => void;
+}
+
+export function BrandsHeaderAction({ onAdd }: BrandsHeaderActionProps) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const handleOpen = () => {

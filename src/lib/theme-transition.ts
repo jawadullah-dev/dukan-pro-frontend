@@ -1,13 +1,9 @@
-/**
- * Animate a theme (mode or palette) change with a circular reveal from the
- * pointer position, using the View Transitions API. Falls back to an instant
- * change where the API is unavailable or no origin is given. The reveal
- * keyframes live in `src/styles/globals.css`.
- */
-export function startThemeTransition(
-  apply: () => void,
-  origin?: { clientX: number; clientY: number }
-) {
+export interface ThemeTransitionOrigin {
+  clientX: number;
+  clientY: number;
+}
+
+export function startThemeTransition(apply: () => void, origin?: ThemeTransitionOrigin) {
   const root = document.documentElement;
 
   if (!document.startViewTransition) {

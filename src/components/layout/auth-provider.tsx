@@ -5,7 +5,11 @@ import { useEffect } from 'react';
 import { setRuntimeSession } from '@/lib/dukaan/session';
 import { toDukaanSession } from '@/lib/auth/session-map';
 
-function AuthSessionBridge({ children }: { children: React.ReactNode }) {
+interface AuthSessionBridgeProps {
+  children: React.ReactNode;
+}
+
+function AuthSessionBridge({ children }: AuthSessionBridgeProps) {
   const { data } = useSession();
 
   useEffect(() => {
@@ -19,7 +23,11 @@ function AuthSessionBridge({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
   return (
     <SessionProvider>
       <AuthSessionBridge>{children}</AuthSessionBridge>

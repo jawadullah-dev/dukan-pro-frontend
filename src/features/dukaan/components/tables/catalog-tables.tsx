@@ -14,6 +14,7 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
+import { t } from '@/i18n';
 import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type { Brand, Category, Product } from '@/lib/dukaan/types';
 import {
@@ -103,46 +104,34 @@ const categoryMobileItem: MobileItemConfig<Category> = {
   leading: 'icon',
   leadingIcon: Icons.folder,
   title: (row) => row.name,
-  subtitle: (row) => {
-    const t = useT();
-    return row.is_active ? t('status.active') : t('status.inactive');
-  },
-  ariaLabel: (row) => {
-    const t = useT();
-    return `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`;
-  }
+  subtitle: (row) => (row.is_active ? t('status.active') : t('status.inactive')),
+  ariaLabel: (row) => `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`
 };
 
 const categoryDetail: DetailConfig<Category> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => {
-    const t = useT();
-    return {
-      label: row.is_active ? t('status.active') : t('status.inactive'),
-      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-    };
-  },
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('table.col.category'),
-        fields: [
-          { label: t('table.col.name'), value: row.name },
-          {
-            label: t('table.col.status'),
-            value: (
-              <StatusBadge
-                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-                label={row.is_active ? t('status.active') : t('status.inactive')}
-              />
-            )
-          }
-        ]
-      }
-    ];
-  }
+  badge: (row) => ({
+    label: row.is_active ? t('status.active') : t('status.inactive'),
+    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+  }),
+  sections: (row) => [
+    {
+      title: t('table.col.category'),
+      fields: [
+        { label: t('table.col.name'), value: row.name },
+        {
+          label: t('table.col.status'),
+          value: (
+            <StatusBadge
+              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+              label={row.is_active ? t('status.active') : t('status.inactive')}
+            />
+          )
+        }
+      ]
+    }
+  ]
 };
 
 export function CategoriesTable({ toolbarAction }: TableToolbarProps) {
@@ -215,46 +204,34 @@ const brandMobileItem: MobileItemConfig<Brand> = {
   leading: 'icon',
   leadingIcon: Icons.tag,
   title: (row) => row.name,
-  subtitle: (row) => {
-    const t = useT();
-    return row.is_active ? t('status.active') : t('status.inactive');
-  },
-  ariaLabel: (row) => {
-    const t = useT();
-    return `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`;
-  }
+  subtitle: (row) => (row.is_active ? t('status.active') : t('status.inactive')),
+  ariaLabel: (row) => `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`
 };
 
 const brandDetail: DetailConfig<Brand> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => {
-    const t = useT();
-    return {
-      label: row.is_active ? t('status.active') : t('status.inactive'),
-      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-    };
-  },
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('table.col.brand'),
-        fields: [
-          { label: t('table.col.name'), value: row.name },
-          {
-            label: t('table.col.status'),
-            value: (
-              <StatusBadge
-                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-                label={row.is_active ? t('status.active') : t('status.inactive')}
-              />
-            )
-          }
-        ]
-      }
-    ];
-  }
+  badge: (row) => ({
+    label: row.is_active ? t('status.active') : t('status.inactive'),
+    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+  }),
+  sections: (row) => [
+    {
+      title: t('table.col.brand'),
+      fields: [
+        { label: t('table.col.name'), value: row.name },
+        {
+          label: t('table.col.status'),
+          value: (
+            <StatusBadge
+              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+              label={row.is_active ? t('status.active') : t('status.inactive')}
+            />
+          )
+        }
+      ]
+    }
+  ]
 };
 
 export function BrandsTable({ toolbarAction }: TableToolbarProps) {
@@ -368,13 +345,10 @@ const productMobileItem: MobileItemConfig<Product> = {
   leadingIcon: Icons.box,
   title: (row) => row.name,
   subtitle: (row) => formatLabel(row.tracking_type),
-  badge: (row) => {
-    const t = useT();
-    return {
-      label: row.is_active ? t('status.active') : t('status.inactive'),
-      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-    };
-  },
+  badge: (row) => ({
+    label: row.is_active ? t('status.active') : t('status.inactive'),
+    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+  }),
   value: (row) => formatPkr(row.default_selling_price),
   ariaLabel: (row) =>
     `${row.name}, ${formatLabel(row.tracking_type)}, ${formatPkr(row.default_selling_price)}`
@@ -383,36 +357,30 @@ const productMobileItem: MobileItemConfig<Product> = {
 const productDetail: DetailConfig<Product> = {
   mode: 'sheet',
   title: (row) => row.name,
-  badge: (row) => {
-    const t = useT();
-    return {
-      label: row.is_active ? t('status.active') : t('status.inactive'),
-      status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-    };
-  },
+  badge: (row) => ({
+    label: row.is_active ? t('status.active') : t('status.inactive'),
+    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+  }),
   value: (row) => formatPkr(row.default_selling_price),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('table.col.product'),
-        fields: [
-          { label: t('table.col.name'), value: row.name },
-          { label: t('dukaan.product.trackingType'), value: formatLabel(row.tracking_type) },
-          { label: t('table.col.sellPrice'), value: formatPkr(row.default_selling_price) },
-          {
-            label: t('table.col.status'),
-            value: (
-              <StatusBadge
-                status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-                label={row.is_active ? t('status.active') : t('status.inactive')}
-              />
-            )
-          }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: t('table.col.product'),
+      fields: [
+        { label: t('table.col.name'), value: row.name },
+        { label: t('dukaan.product.trackingType'), value: formatLabel(row.tracking_type) },
+        { label: t('table.col.sellPrice'), value: formatPkr(row.default_selling_price) },
+        {
+          label: t('table.col.status'),
+          value: (
+            <StatusBadge
+              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
+              label={row.is_active ? t('status.active') : t('status.inactive')}
+            />
+          )
+        }
+      ]
+    }
+  ]
 };
 
 export function ProductsTable({ toolbarAction }: TableToolbarProps) {

@@ -1,5 +1,28 @@
 'use client';
 
+interface PurchaseLineItem {
+  product_id: string;
+  quantity: number;
+  unit_cost: number;
+  imeis_text: string;
+  imei2_text: string;
+  condition: 'NEW' | 'USED';
+  tracking_type?: Product['tracking_type'];
+}
+
+interface PurchaseFormValues {
+  supplier_id: string;
+  supplier_invoice_ref: string;
+  is_opening_stock: boolean;
+  paid_now: number;
+  lines: PurchaseLineItem[];
+}
+
+interface PurchaseSaveVariables {
+  value: PurchaseFormValues;
+  confirm_overdraft?: boolean;
+}
+
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -38,15 +61,17 @@ import { DialogCancelButton, DialogPrimaryButton } from './dialog-actions';
 import { FormEntitySelect } from './form-entity-select';
 import { PurchasesTable } from './tables/commerce-tables';
 
+interface PurchaseCreateDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  clearDefaultQuery?: boolean;
+}
+
 function PurchaseCreateDialog({
   open,
   onOpenChange,
   clearDefaultQuery
-}: {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  clearDefaultQuery?: boolean;
-}) {
+}: PurchaseCreateDialogProps) {
   const router = useRouter();
   const t = useT();
 
@@ -71,13 +96,12 @@ function PurchaseCreateDialog({
   );
 }
 
-export function PurchasesHeaderAction({
-  className,
-  onAdd
-}: {
+interface PurchasesHeaderActionProps {
   className?: string;
   onAdd: () => void;
-}) {
+}
+
+export function PurchasesHeaderAction({ className, onAdd }: PurchasesHeaderActionProps) {
   const t = useT();
   return (
     <Button type='button' className={className ?? 'h-8'} onClick={onAdd}>
@@ -87,7 +111,11 @@ export function PurchasesHeaderAction({
   );
 }
 
-export function PurchasesListClient({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) {
+interface PurchasesListClientProps {
+  defaultOpenAdd?: boolean;
+}
+
+export function PurchasesListClient({ defaultOpenAdd = false }: PurchasesListClientProps) {
   const t = useT();
   const [open, setOpen] = useState(defaultOpenAdd);
 
@@ -129,34 +157,18 @@ const emptyLine = (): PurchaseLineDraft => ({
   tracking_type: undefined
 });
 
-export function PurchaseCreateForm({ onDone }: { onDone?: () => void }) {
+interface PurchaseCreateFormProps {
+  onDone?: () => void;
+}
+
+export function PurchaseCreateForm({ onDone }: PurchaseCreateFormProps) {
   const qc = useQueryClient();
   const t = useT();
   const [clientRequestId] = useState(() => createClientRequestId());
   const [warning, setWarning] = useState<SoftCashWarning | null>(null);
 
   const save = useMutation({
-    mutationFn: ({
-      value,
-      confirm_overdraft
-    }: {
-      value: {
-        supplier_id: string;
-        supplier_invoice_ref: string;
-        is_opening_stock: boolean;
-        paid_now: number;
-        lines: Array<{
-          product_id: string;
-          quantity: number;
-          unit_cost: number;
-          imeis_text: string;
-          imei2_text: string;
-          condition: 'NEW' | 'USED';
-          tracking_type?: Product['tracking_type'];
-        }>;
-      };
-      confirm_overdraft?: boolean;
-    }) =>
+    mutationFn: ({ value, confirm_overdraft }: PurchaseSaveVariables) =>
       dukaan.createPurchase({
         supplier_id: value.supplier_id,
         supplier_invoice_ref: value.supplier_invoice_ref || undefined,
@@ -183,9 +195,9 @@ export function PurchaseCreateForm({ onDone }: { onDone?: () => void }) {
         toast.warning(t('dukaan.actions.cashBelowZeroWarning'));
         return;
       }
-      toast.success(t('dukaan.purchase.saved', { purchaseNo: res.purchase!.purchase_no }));
+      toast.success(t('dukaan.purchase.saved', { purchaseNo: res.purchase?.purchase_no ?? '' }));
       void qc.invalidateQueries({ queryKey: dukaanKeys.all });
-      window.location.href = `/dashboard/purchases/${res.purchase!.id}`;
+      window.location.href = `/dashboard/purchases/${res.purchase?.id}`;
     },
     onError: (e: Error) => toast.error(e.message)
   });
@@ -450,7 +462,11 @@ export function PurchaseCreateForm({ onDone }: { onDone?: () => void }) {
   );
 }
 
-export function PurchaseDetailClient({ id }: { id: string }) {
+interface PurchaseDetailClientProps {
+  id: string;
+}
+
+export function PurchaseDetailClient({ id }: PurchaseDetailClientProps) {
   const qc = useQueryClient();
   const { data } = useSuspenseQuery(purchaseQueryOptions(id));
   const t = useT();

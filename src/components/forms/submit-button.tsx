@@ -4,7 +4,6 @@ import * as React from 'react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { useFormContext } from '@/lib/form-context';
 
-/** Submit button that shows a no-layout-shift spinner while the form submits. */
 export function SubmitButton({
   children,
   disabled,

@@ -1,6 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
-import { PurchasesListClient } from '@/features/dukaan/components/purchases';
-import { purchasesQueryOptions } from '@/features/dukaan/api/queries';
+import { PurchasesListClient } from '@/features/purchases';
+import { purchasesQueryOptions } from '@/features/purchases';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

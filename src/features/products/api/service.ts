@@ -1,27 +1,18 @@
-import { fakeProducts } from '@/constants/mock-api';
-import type {
-  ProductFilters,
-  ProductsResponse,
-  ProductByIdResponse,
-  ProductMutationPayload
-} from './types';
+import { dukaan } from '@/lib/dukaan';
+import type { ListFilters, Product } from '@/lib/dukaan';
 
-export async function getProducts(filters: ProductFilters): Promise<ProductsResponse> {
-  return fakeProducts.getProducts(filters);
+export async function listProducts(filters: ListFilters = {}) {
+  return dukaan.listProducts(filters);
 }
 
-export async function getProductById(id: number): Promise<ProductByIdResponse> {
-  return fakeProducts.getProductById(id) as Promise<ProductByIdResponse>;
+export async function createProduct(input: Parameters<typeof dukaan.createProduct>[0]) {
+  return dukaan.createProduct(input);
 }
 
-export async function createProduct(data: ProductMutationPayload) {
-  return fakeProducts.createProduct(data);
+export async function updateProduct(id: string, input: Parameters<typeof dukaan.updateProduct>[1]) {
+  return dukaan.updateProduct(id, input);
 }
 
-export async function updateProduct(id: number, data: ProductMutationPayload) {
-  return fakeProducts.updateProduct(id, data);
-}
-
-export async function deleteProduct(id: number) {
-  return fakeProducts.deleteProduct(id);
+export async function deleteProduct(id: string) {
+  return dukaan.deleteProduct(id);
 }

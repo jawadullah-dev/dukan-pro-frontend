@@ -1,6 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
-import { ExpenseCategoriesClient } from '@/features/dukaan/components/money-stock';
-import { expenseCategoriesQueryOptions } from '@/features/dukaan/api/queries';
+import { ExpenseCategoriesClient } from '@/features/expenses';
+import { expenseCategoriesQueryOptions } from '@/features/expenses';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

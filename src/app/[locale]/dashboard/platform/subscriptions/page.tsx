@@ -1,7 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { TablePageBody } from '@/components/layout/table-page-body';
-import { PlatformSubscriptionsTable } from '@/features/platform/components/subscriptions-table';
-import { platformSubscriptionsQueryOptions } from '@/features/platform/api/queries';
+import { PlatformSubscriptionsTable } from '@/features/platform-admin/components/subscriptions-table';
+import { platformSubscriptionsQueryOptions } from '@/features/platform-admin/api/queries';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

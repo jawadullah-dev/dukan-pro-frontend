@@ -1,10 +1,8 @@
 import PageContainer from '@/components/layout/page-container';
-import { SupplierPaymentsClient } from '@/features/dukaan/components/money-stock';
-import {
-  purchasesQueryOptions,
-  supplierPaymentsQueryOptions,
-  suppliersQueryOptions
-} from '@/features/dukaan/api/queries';
+import { SupplierPaymentsClient } from '@/features/cash';
+import { supplierPaymentsQueryOptions } from '@/features/dukaan/api/queries';
+import { suppliersQueryOptions } from '@/features/suppliers';
+import { purchasesQueryOptions } from '@/features/purchases';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

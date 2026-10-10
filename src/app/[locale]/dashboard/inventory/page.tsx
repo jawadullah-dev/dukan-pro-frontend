@@ -1,6 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
-import { InventoryListClient } from '@/features/dukaan/components/money-stock';
-import { stockQueryOptions } from '@/features/dukaan/api/queries';
+import { InventoryListClient } from '@/features/inventory';
+import { stockQueryOptions } from '@/features/inventory';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

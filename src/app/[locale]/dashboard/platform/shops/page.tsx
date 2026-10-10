@@ -2,8 +2,8 @@ import PageContainer from '@/components/layout/page-container';
 import {
   CreateShopHeaderAction,
   PlatformShopsListClient
-} from '@/features/platform/components/shops-page-client';
-import { platformShopsQueryOptions } from '@/features/platform/api/queries';
+} from '@/features/platform-admin/components/shops-page-client';
+import { platformShopsQueryOptions } from '@/features/platform-admin/api/queries';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

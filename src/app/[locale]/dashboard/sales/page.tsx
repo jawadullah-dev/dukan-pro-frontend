@@ -1,6 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
-import { SalesListClient } from '@/features/dukaan/components/sales';
-import { salesQueryOptions } from '@/features/dukaan/api/queries';
+import { SalesListClient } from '@/features/sales';
+import { salesQueryOptions } from '@/features/sales';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

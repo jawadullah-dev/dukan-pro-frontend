@@ -1,6 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
-import { PaymentsClient } from '@/features/dukaan/components/payments';
-import { paymentsQueryOptions } from '@/features/dukaan/api/queries';
+import { PaymentsClient } from '@/features/cash';
+import { paymentsQueryOptions } from '@/features/cash';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

@@ -1,6 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
-import { CashLedgerClient } from '@/features/dukaan/components/money-stock';
-import { cashQueryOptions } from '@/features/dukaan/api/queries';
+import { CashLedgerClient } from '@/features/cash';
+import { cashQueryOptions } from '@/features/cash';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

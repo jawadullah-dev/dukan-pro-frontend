@@ -1,6 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
-import { PlatformDashboard } from '@/features/platform/components/platform-dashboard';
-import { platformOverviewQueryOptions } from '@/features/platform/api/queries';
+import { PlatformDashboard } from '@/features/platform-admin/components/platform-dashboard';
+import { platformOverviewQueryOptions } from '@/features/platform-admin/api/queries';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

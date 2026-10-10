@@ -1,6 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
-import { StockAdjustForm } from '@/features/dukaan/components/money-stock';
-import { productsQueryOptions, unitsQueryOptions } from '@/features/dukaan/api/queries';
+import { StockAdjustForm } from '@/features/inventory';
+import { productsQueryOptions } from '@/features/products';
+import { unitsQueryOptions } from '@/features/dukaan/api/queries';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';

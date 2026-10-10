@@ -5,6 +5,7 @@ import { authConfig } from '@/auth.config';
 import {
   homePathForRole,
   loginPath,
+  platformAdminLoginPath,
   redirectForRole,
   shortcutPathForRole,
   extractLocale
@@ -17,10 +18,10 @@ const { auth } = NextAuth(authConfig);
 
 function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string } } | null) {
   const { pathname } = req.nextUrl;
-  const repeatedLocalePrefix = pathname.match(/^\/(en|ur|ps)(?:\/(?:en|ur|ps))+(?=\/|$)/);
+  const repeatedLocalePrefix = pathname.match(/^\/(?:en|ur|ps)(?:\/(?:en|ur|ps))+(?=\/|$)/);
   if (repeatedLocalePrefix) {
     const url = req.nextUrl.clone();
-    url.pathname = `/${repeatedLocalePrefix[1]}${pathname.slice(repeatedLocalePrefix[0].length)}`;
+    url.pathname = `/${repeatedLocalePrefix[0].split('/')[1]}${pathname.slice(repeatedLocalePrefix[0].length)}`;
     return NextResponse.redirect(url);
   }
 
@@ -28,7 +29,10 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
   const isLoggedIn = !!session?.user;
   const role = session?.user?.role;
 
-  const isLoginPage = pathname.endsWith('/login') || /\/[a-z]{2}\/login(\/|$)/.test(pathname);
+  // Both login pages — owner and platform admin.
+  const isOwnerLoginPage = pathname.endsWith('/login') && !pathname.includes('/platform-admin');
+  const isPlatformAdminLoginPage = /\/platform-admin\/login(\/|$)/.test(pathname);
+  const isAnyLoginPage = isOwnerLoginPage || isPlatformAdminLoginPage;
 
   const startsWithDashboard = /^\/(en|ur|ps)\/dashboard(\/|$)/.test(pathname);
   const isAuthApi = pathname.startsWith('/api/auth');
@@ -48,6 +52,7 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     return handleI18nRouting(req);
   }
 
+  // Protect dashboard routes — unauthenticated users go to /login.
   if (startsWithDashboard && !isLoggedIn) {
     const url = req.nextUrl.clone();
     url.pathname = loginPath(locale);
@@ -55,6 +60,12 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     return NextResponse.redirect(url);
   }
 
+  // Redirect logged-in users away from login pages to their home dashboard.
+  if (isAnyLoginPage && isLoggedIn) {
+    return NextResponse.redirect(new URL(homePathForRole(role, locale), req.nextUrl));
+  }
+
+  // Role-based redirect inside the dashboard (e.g. owner hitting /platform).
   if (isLoggedIn && role) {
     const roleRedirect = redirectForRole(pathname, role);
     if (roleRedirect) {
@@ -62,20 +73,17 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     }
   }
 
-  if (isLoginPage && isLoggedIn) {
-    return NextResponse.redirect(new URL(homePathForRole(role, locale), req.nextUrl));
-  }
-
-  if ((pathname === '/' || /^\/(en|ur|ps)\/?$/.test(pathname)) && isLoggedIn) {
-    const to = req.nextUrl.searchParams.get('to');
-    const shortcut = shortcutPathForRole(to, role, locale);
-    return NextResponse.redirect(new URL(shortcut ?? homePathForRole(role, locale), req.nextUrl));
-  }
-
-  if ((pathname === '/' || /^\/(en|ur|ps)\/?$/.test(pathname)) && !isLoggedIn) {
+  // Redirect root to home dashboard when logged in, or to /login when not.
+  if (pathname === '/' || /^\/(en|ur|ps)\/?$/.test(pathname)) {
+    if (isLoggedIn) {
+      const to = req.nextUrl.searchParams.get('to');
+      const shortcut = shortcutPathForRole(to, role, locale);
+      return NextResponse.redirect(new URL(shortcut ?? homePathForRole(role, locale), req.nextUrl));
+    }
     return NextResponse.redirect(new URL(loginPath(locale), req.nextUrl));
   }
 
+  // /dashboard (bare) → role home.
   if (/^\/(en|ur|ps)\/dashboard\/?$/.test(pathname) && isLoggedIn) {
     return NextResponse.redirect(new URL(homePathForRole(role, locale), req.nextUrl));
   }

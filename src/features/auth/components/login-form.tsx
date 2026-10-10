@@ -9,8 +9,7 @@ import { signIn, getSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Icons } from '@/components/icons';
-import { homePathForRole, canAccessPath } from '@/lib/auth/routes';
-import { DEMO_OWNER_PHONE, DEMO_SUPER_ADMIN_PHONE } from '@/lib/auth/accounts';
+import { homePathForRole, canAccessPath, platformAdminLoginPath } from '@/lib/auth/routes';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
 import { useTranslations, useLocale } from 'next-intl';
 
@@ -125,10 +124,13 @@ export function LoginForm() {
           </form.AppForm>
 
           <p className='text-muted-foreground text-center text-xs leading-relaxed'>
-            {t('auth.demoLabel')}: <span className='text-foreground'>{DEMO_SUPER_ADMIN_PHONE}</span>{' '}
-            {t('auth.orConjunction')} <span className='text-foreground'>{DEMO_OWNER_PHONE}</span>
-            <br />
-            {t('auth.passwordLabel')}: <span className='text-foreground'>admin@123</span>
+            Platform admin?{' '}
+            <a
+              href={platformAdminLoginPath(locale)}
+              className='text-foreground underline-offset-4 hover:underline'
+            >
+              Sign in here
+            </a>
           </p>
         </form>
       </CardContent>

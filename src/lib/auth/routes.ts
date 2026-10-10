@@ -69,6 +69,10 @@ export function loginPath(locale: AppLocale | string = defaultLocale): string {
   return localize('/login', locale);
 }
 
+export function platformAdminLoginPath(locale: AppLocale | string = defaultLocale): string {
+  return localize('/platform-admin/login', locale);
+}
+
 export function isPlatformRoute(pathname: string): boolean {
   const p = delocalize(pathname);
   return p === PLATFORM_PREFIX || p.startsWith(`${PLATFORM_PREFIX}/`);

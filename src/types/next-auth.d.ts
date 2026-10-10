@@ -6,9 +6,15 @@ declare module 'next-auth' {
     role: AuthAccountRole;
     shopId: string | null;
     shopName: string | null;
+    /** Backend-issued Bearer token. Forwarded on every API request. */
+    accessToken: string;
+    /** ISO date when the shop subscription expires. null for platform admins. */
+    subscriptionEndsAt: string | null;
   }
 
   interface Session {
+    /** Backend-issued Bearer token. Use on every apiRequest call. */
+    accessToken: string;
     user: {
       id: string;
       role: AuthAccountRole;
@@ -23,5 +29,7 @@ declare module 'next-auth/jwt' {
     role: AuthAccountRole;
     shopId: string | null;
     shopName: string | null;
+    accessToken: string;
+    subscriptionEndsAt: string | null;
   }
 }

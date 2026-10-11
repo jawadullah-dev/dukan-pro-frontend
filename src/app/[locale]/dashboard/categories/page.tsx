@@ -4,6 +4,7 @@ import { categoriesQueryOptions } from '@/features/categories';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
+import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { getTranslations } from 'next-intl/server';
 
 export async function generateMetadata() {
@@ -23,7 +24,7 @@ export default function Page() {
       pageDescription='pages.categories.description'
     >
       <HydrationBoundary state={dehydrate(qc)}>
-        <Suspense>
+        <Suspense fallback={<DataTableSkeleton rowCount={8} columnCount={3} />}>
           <CategoriesPageClient />
         </Suspense>
       </HydrationBoundary>

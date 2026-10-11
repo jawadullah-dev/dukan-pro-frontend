@@ -41,7 +41,7 @@ export function ExpenseCategoryCellAction({ data }: ExpenseCategoryCellActionPro
   });
 
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <AlertModal
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}
@@ -63,7 +63,8 @@ export function ExpenseCategoryCellAction({ data }: ExpenseCategoryCellActionPro
           </DropdownMenuGroup>
           <DropdownMenuGroup>
             <DropdownMenuItem
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 requestAnimationFrame(() => setEditOpen(true));
               }}
             >
@@ -71,7 +72,8 @@ export function ExpenseCategoryCellAction({ data }: ExpenseCategoryCellActionPro
             </DropdownMenuItem>
             <DropdownMenuItem
               variant='destructive'
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 requestAnimationFrame(() => setDeleteOpen(true));
               }}
             >
@@ -80,6 +82,6 @@ export function ExpenseCategoryCellAction({ data }: ExpenseCategoryCellActionPro
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    </div>
   );
 }

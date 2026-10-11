@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -41,6 +42,8 @@ interface ResponsiveDataTableProps<TData> {
 
   ledger?: LedgerListConfig<TData>;
   className?: string;
+  isLoading?: boolean;
+  rowCount?: number;
 }
 
 export function ResponsiveDataTable<TData>({
@@ -50,7 +53,9 @@ export function ResponsiveDataTable<TData>({
   detail: detailProp,
   quickFilters,
   ledger,
-  className
+  className,
+  isLoading = false,
+  rowCount
 }: ResponsiveDataTableProps<TData>) {
   const t = useTranslations();
   const router = useRouter();
@@ -77,18 +82,22 @@ export function ResponsiveDataTable<TData>({
     return buildDetailFromTable(table, detailProp, (key) => (t as (k: string) => string)(key));
   }, [detailProp, table.options.columns, table.options.data, t]);
 
+  const skeletonRowCount =
+    rowCount ??
+    (table.getState().pagination?.pageSize ? Math.min(table.getState().pagination.pageSize, 8) : 8);
+
   return (
     <div
       ref={ref}
       data-slot='responsive-data-table'
       className={cn('flex min-h-0 w-full min-w-0 flex-1 flex-col gap-3 overflow-hidden', className)}
     >
-      {!measured ? (
-        <div className='flex flex-col gap-2' aria-busy='true'>
-          <Skeleton className='h-11 w-full' />
-          <Skeleton className='h-40 w-full rounded-[var(--radius)]' />
-          <Skeleton className='h-10 w-full' />
-        </div>
+      {!measured || isLoading ? (
+        <DataTableSkeleton
+          rowCount={skeletonRowCount}
+          columnCount={table.getAllColumns().length || 4}
+          mode={measured ? mode : 'auto'}
+        />
       ) : (
         <>
           <DataTableToolbar table={table} mode={isList ? 'list' : mode}>
@@ -101,41 +110,41 @@ export function ResponsiveDataTable<TData>({
             </div>
           ) : null}
 
-          <div className='min-h-0 flex-1 overflow-y-auto overscroll-y-contain'>
-            <div className='p-px'>
-              {isList ? (
-                <>
-                  {ledger ? (
-                    <GroupedLedgerList
-                      table={table}
-                      getDateKey={ledger.getDateKey}
-                      mobileItem={mobileItem}
-                      detail={detail}
-                      onNavigate={(href) => router.push(href)}
-                    />
-                  ) : (
-                    <MobileList
-                      table={table}
-                      mobileItem={mobileItem}
-                      detail={detail}
-                      onNavigate={(href) => router.push(href)}
-                    />
-                  )}
-                  <LoadMore table={table} />
-                </>
-              ) : (
-                <>
-                  <CompactOrFullTable
+          {isList ? (
+            <div className='min-h-0 flex-1 overflow-y-auto overscroll-y-contain'>
+              <div className='p-px'>
+                {ledger ? (
+                  <GroupedLedgerList
                     table={table}
-                    mode={mode === 'full' ? 'full' : 'compact'}
-                    wideCompact={wideCompact}
-                    onRowClick={(row) => setSideRow(row)}
+                    getDateKey={ledger.getDateKey}
+                    mobileItem={mobileItem}
+                    detail={detail}
+                    onNavigate={(href) => router.push(href)}
                   />
-                  <DataTablePagination table={table} variant='full' />
-                </>
-              )}
+                ) : (
+                  <MobileList
+                    table={table}
+                    mobileItem={mobileItem}
+                    detail={detail}
+                    onNavigate={(href) => router.push(href)}
+                  />
+                )}
+                <LoadMore table={table} />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className='flex min-h-0 flex-1 flex-col gap-3 overflow-hidden'>
+              <CompactOrFullTable
+                table={table}
+                mode={mode === 'full' ? 'full' : 'compact'}
+                wideCompact={wideCompact}
+                onRowClick={(row) => setSideRow(row)}
+              />
+              <div className='shrink-0'>
+                <DataTablePagination table={table} variant='full' />
+              </div>
+            </div>
+          )}
 
           <RecordDetail
             open={sideRow != null}
@@ -186,9 +195,12 @@ function CompactOrFullTable<TData>({
   const stickyFirst = mode === 'compact';
 
   return (
-    <div className='relative min-w-0 overflow-x-auto rounded-lg border border-border'>
-      <Table className='min-w-full'>
-        <TableHeader className='bg-background sticky top-0 z-10'>
+    <div className='relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card'>
+      <Table
+        className='min-w-full'
+        containerClassName='min-h-0 flex-1 overflow-auto overscroll-contain'
+      >
+        <TableHeader className='bg-background sticky top-0 z-20 shadow-[0_1px_0_0_var(--border)]'>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className='hover:bg-transparent'>
               {headerGroup.headers.map((header, index) => {
@@ -201,9 +213,9 @@ function CompactOrFullTable<TData>({
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'bg-background',
+                      'bg-background sticky top-0 z-20 shadow-[0_1px_0_0_var(--border)]',
                       isActions && 'w-12 text-end',
-                      isSticky && 'sticky start-0 z-20 shadow-[1px_0_0_0_var(--border)]'
+                      isSticky && 'sticky start-0 z-30 shadow-[1px_1px_0_0_var(--border)]'
                     )}
                   >
                     {header.isPlaceholder
@@ -225,7 +237,11 @@ function CompactOrFullTable<TData>({
                   onRowClick
                     ? (e) => {
                         const target = e.target as HTMLElement;
-                        if (target.closest('[data-slot="dropdown-menu-trigger"],button,a')) {
+                        if (
+                          target.closest(
+                            '[data-slot="dropdown-menu-trigger"], [data-slot="dropdown-menu-content"], [data-slot="dropdown-menu-item"], [data-slot="action-cell"], [role="menuitem"], [role="menu"], button, a'
+                          )
+                        ) {
                           return;
                         }
                         onRowClick(row);
@@ -242,6 +258,8 @@ function CompactOrFullTable<TData>({
                   return (
                     <TableCell
                       key={cell.id}
+                      data-slot={isActions ? 'action-cell' : undefined}
+                      onClick={isActions ? (e) => e.stopPropagation() : undefined}
                       className={cn(
                         isActions && 'w-12 text-end',
                         isSticky &&

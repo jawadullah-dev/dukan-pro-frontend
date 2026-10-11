@@ -39,14 +39,16 @@ function ActionMenu({ onEdit, onDelete }: ActionMenuProps) {
         </DropdownMenuGroup>
         <DropdownMenuGroup>
           <DropdownMenuItem
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               requestAnimationFrame(onEdit);
             }}
           >
             <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation();
               requestAnimationFrame(onDelete);
             }}
           >
@@ -79,7 +81,7 @@ export function CategoryCellAction({ data }: CategoryCellActionProps) {
   });
 
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <AlertModal
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}
@@ -91,7 +93,7 @@ export function CategoryCellAction({ data }: CategoryCellActionProps) {
       />
       <CategoryDialog open={editOpen} onOpenChange={setEditOpen} category={data} />
       <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
-    </>
+    </div>
   );
 }
 
@@ -116,7 +118,7 @@ export function BrandCellAction({ data }: BrandCellActionProps) {
   });
 
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <AlertModal
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}
@@ -128,7 +130,7 @@ export function BrandCellAction({ data }: BrandCellActionProps) {
       />
       <BrandDialog open={editOpen} onOpenChange={setEditOpen} brand={data} />
       <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
-    </>
+    </div>
   );
 }
 
@@ -153,7 +155,7 @@ export function ProductCellAction({ data }: ProductCellActionProps) {
   });
 
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <AlertModal
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}
@@ -165,6 +167,6 @@ export function ProductCellAction({ data }: ProductCellActionProps) {
       />
       <ProductDialog open={editOpen} onOpenChange={setEditOpen} product={data} />
       <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
-    </>
+    </div>
   );
 }

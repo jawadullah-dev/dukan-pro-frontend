@@ -1,15 +1,16 @@
 import { ApiError, type ApiErrorBody, type ApiSuccessResponse } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
+const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000').replace(
+  /\/+$/,
+  ''
+);
 
 export async function apiRequest<T>(
   path: string,
   options?: RequestInit,
   token?: string
 ): Promise<T> {
-  const url = path.startsWith('http')
-    ? path
-    : `${API_BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+  const url = path.startsWith('http') ? path : `${API_BASE_URL}/${path.replace(/^\/+/, '')}`;
   const headers = new Headers(options?.headers);
 
   if (!headers.has('Content-Type') && !(options?.body instanceof FormData)) {

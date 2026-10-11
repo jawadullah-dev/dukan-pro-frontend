@@ -77,9 +77,6 @@ function BrandCellAction({ data }: BrandCellActionProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
           <DropdownMenuGroup>
-            <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
-          </DropdownMenuGroup>
-          <DropdownMenuGroup>
             <DropdownMenuItem onClick={() => requestAnimationFrame(() => setEditOpen(true))}>
               <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
             </DropdownMenuItem>

@@ -10,9 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Command,
-  CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator
@@ -75,7 +73,9 @@ export function DataTableFacetedFilter<TData, TValue>({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger render={<Button variant='outline' size='sm' className='border-dashed' />}>
+      <PopoverTrigger
+        render={<Button variant='outline' size='sm' className='h-8 gap-1.5 border-dashed' />}
+      >
         {selectedValues?.size > 0 ? (
           <DataTableFilterClear title={title} onReset={onReset} />
         ) : (
@@ -110,17 +110,19 @@ export function DataTableFacetedFilter<TData, TValue>({
           </>
         )}
       </PopoverTrigger>
-      <PopoverContent className='w-[12.5rem] p-0' align='start'>
+      <PopoverContent className='w-48 p-1.5' align='start' sideOffset={6}>
         <Command>
-          <CommandInput placeholder={title} />
           <CommandList className='max-h-full'>
-            <CommandEmpty>{t('table.noResults')}</CommandEmpty>
-            <CommandGroup className='max-h-[18.75rem] overflow-x-hidden overflow-y-auto'>
+            <CommandGroup className='max-h-[18.75rem] overflow-x-hidden overflow-y-auto p-0.5 [&_[cmdk-group-items]]:space-y-1'>
               {options.map((option) => {
                 const isSelected = selectedValues.has(option.value);
 
                 return (
-                  <CommandItem key={option.value} onSelect={() => onItemSelect(option, isSelected)}>
+                  <CommandItem
+                    key={option.value}
+                    onSelect={() => onItemSelect(option, isSelected)}
+                    className='my-0.5 flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors'
+                  >
                     <div
                       className={cn(
                         'border-primary flex size-4 items-center justify-center rounded-sm border',
@@ -140,9 +142,12 @@ export function DataTableFacetedFilter<TData, TValue>({
             </CommandGroup>
             {selectedValues.size > 0 && (
               <>
-                <CommandSeparator />
-                <CommandGroup>
-                  <CommandItem onSelect={() => onReset()} className='justify-center text-center'>
+                <CommandSeparator className='my-1' />
+                <CommandGroup className='p-0.5'>
+                  <CommandItem
+                    onSelect={() => onReset()}
+                    className='justify-center rounded-md py-1.5 text-center'
+                  >
                     {t('table.resetFilters')}
                   </CommandItem>
                 </CommandGroup>

@@ -122,7 +122,15 @@ export function ResponsiveDataTable<TData>({
     }
   }, [pathname, currentRowsCount]);
 
-  const cachedRowsCount = pathname ? getCachedTableRows(pathname) : null;
+  const [cachedRowsCount, setCachedRowsCount] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    if (pathname) {
+      const cached = getCachedTableRows(pathname);
+      if (cached) setCachedRowsCount(cached);
+    }
+  }, [pathname]);
+
   const skeletonRowCount =
     (currentRowsCount && currentRowsCount > 0 ? currentRowsCount : null) ??
     (rowCount && rowCount > 0 ? rowCount : null) ??
@@ -253,20 +261,27 @@ function CompactOrFullTable<TData>({
                 }
                 const isActions = header.column.id === 'actions';
                 const isSticky = stickyFirst && index === 0 && !isActions;
-                const colSize = header.column.columnDef.size;
+                const colSize = isActions
+                  ? Math.max(header.column.columnDef.size ?? 0, 72)
+                  : header.column.columnDef.size;
                 return (
                   <TableHead
                     key={header.id}
                     style={colSize ? { width: `${colSize}px` } : undefined}
                     className={cn(
                       'bg-background sticky top-0 z-20 shadow-[0_1px_0_0_var(--border)]',
-                      isActions && 'w-12 text-end',
+                      isActions && 'w-20 text-end pe-3',
                       isSticky && 'sticky start-0 z-30 shadow-[1px_1px_0_0_var(--border)]'
                     )}
                   >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(header.column.columnDef.header, header.getContext()) ||
+                        (isActions ? (
+                          <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
+                            {t('table.actions')}
+                          </span>
+                        ) : null)}
                   </TableHead>
                 );
               })}
@@ -283,13 +298,15 @@ function CompactOrFullTable<TData>({
                   }
                   const isActions = header.column.id === 'actions';
                   const isSticky = stickyFirst && index === 0 && !isActions;
-                  const colSize = header.column.columnDef.size;
+                  const colSize = isActions
+                    ? Math.max(header.column.columnDef.size ?? 0, 72)
+                    : header.column.columnDef.size;
                   return (
                     <TableCell
                       key={header.id}
                       style={colSize ? { width: `${colSize}px` } : undefined}
                       className={cn(
-                        isActions && 'w-12 text-end',
+                        isActions && 'w-20 text-end pe-3',
                         isSticky &&
                           'bg-background sticky start-0 z-10 shadow-[1px_0_0_0_var(--border)]'
                       )}
@@ -331,7 +348,9 @@ function CompactOrFullTable<TData>({
                   }
                   const isActions = cell.column.id === 'actions';
                   const isSticky = stickyFirst && index === 0 && !isActions;
-                  const colSize = cell.column.columnDef.size;
+                  const colSize = isActions
+                    ? Math.max(cell.column.columnDef.size ?? 0, 72)
+                    : cell.column.columnDef.size;
                   return (
                     <TableCell
                       key={cell.id}
@@ -339,7 +358,7 @@ function CompactOrFullTable<TData>({
                       data-slot={isActions ? 'action-cell' : undefined}
                       onClick={isActions ? (e) => e.stopPropagation() : undefined}
                       className={cn(
-                        isActions && 'w-12 text-end',
+                        isActions && 'w-20 text-end pe-3',
                         isSticky &&
                           'bg-background sticky start-0 z-10 shadow-[1px_0_0_0_var(--border)]'
                       )}

@@ -1,12 +1,12 @@
 import type { AppearanceState } from './store';
 
-const RADIUS_REM: Record<AppearanceState['radius'], string> = {
+export const RADIUS_REM: Record<AppearanceState['radius'], string> = {
   sharp: '0.25rem',
   medium: '0.5rem',
   round: '0.75rem'
 };
 
-const ACCENT_OKLCH: Record<AppearanceState['accent'], string> = {
+export const ACCENT_OKLCH: Record<AppearanceState['accent'], string> = {
   blue: 'oklch(0.55 0.18 250)',
   green: 'oklch(0.58 0.16 145)',
   purple: 'oklch(0.55 0.2 300)',
@@ -15,6 +15,12 @@ const ACCENT_OKLCH: Record<AppearanceState['accent'], string> = {
   teal: 'oklch(0.58 0.12 195)'
 };
 
+function setAppearanceCookie(name: string, value: string) {
+  if (typeof document === 'undefined') return;
+  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  document.cookie = `${name}=${value}; path=/; max-age=31536000; SameSite=Lax; ${isHttps ? 'Secure;' : ''}`;
+}
+
 export function applyAppearancePrefs(
   prefs: Pick<AppearanceState, 'density' | 'radius' | 'accent' | 'digits'>
 ): void {
@@ -22,9 +28,21 @@ export function applyAppearancePrefs(
 
   const root = document.documentElement;
   root.style.removeProperty('font-size');
-  root.style.setProperty('--radius', RADIUS_REM[prefs.radius]);
-  root.style.setProperty('--primary', ACCENT_OKLCH[prefs.accent]);
-  root.dataset.appearanceDensity = prefs.density;
-  root.dataset.appearanceDigits = prefs.digits;
+  if (prefs.radius && RADIUS_REM[prefs.radius]) {
+    root.style.setProperty('--radius', RADIUS_REM[prefs.radius]);
+    setAppearanceCookie('dukaan_radius', prefs.radius);
+  }
+  if (prefs.accent && ACCENT_OKLCH[prefs.accent]) {
+    root.style.setProperty('--primary', ACCENT_OKLCH[prefs.accent]);
+    setAppearanceCookie('dukaan_accent', prefs.accent);
+  }
+  if (prefs.density) {
+    root.dataset.appearanceDensity = prefs.density;
+    setAppearanceCookie('dukaan_density', prefs.density);
+  }
+  if (prefs.digits) {
+    root.dataset.appearanceDigits = prefs.digits;
+    setAppearanceCookie('dukaan_digits', prefs.digits);
+  }
   delete root.dataset.appearanceFont;
 }

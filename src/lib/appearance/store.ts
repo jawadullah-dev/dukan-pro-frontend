@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { applyAppearancePrefs } from './apply';
 
 export type AppearanceDensity = 'comfortable' | 'compact';
 export type AppearanceRadius = 'sharp' | 'medium' | 'round';
@@ -46,13 +47,28 @@ function getInitialAppearance() {
 
 export const useAppearanceStore = create<AppearanceState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...getInitialAppearance(),
-      setDensity: (density) => set({ density }),
-      setRadius: (radius) => set({ radius }),
-      setAccent: (accent) => set({ accent }),
-      setDigits: (digits) => set({ digits }),
-      resetAll: () => set({ ...DEFAULT_APPEARANCE })
+      setDensity: (density) => {
+        applyAppearancePrefs({ ...get(), density });
+        set({ density });
+      },
+      setRadius: (radius) => {
+        applyAppearancePrefs({ ...get(), radius });
+        set({ radius });
+      },
+      setAccent: (accent) => {
+        applyAppearancePrefs({ ...get(), accent });
+        set({ accent });
+      },
+      setDigits: (digits) => {
+        applyAppearancePrefs({ ...get(), digits });
+        set({ digits });
+      },
+      resetAll: () => {
+        applyAppearancePrefs(DEFAULT_APPEARANCE);
+        set({ ...DEFAULT_APPEARANCE });
+      }
     }),
     {
       name: 'dukaan-appearance:v2'

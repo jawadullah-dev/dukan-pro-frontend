@@ -93,9 +93,6 @@ function CustomerCellAction({ data }: CustomerCellActionProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-40'>
           <DropdownMenuGroup>
-            <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
-          </DropdownMenuGroup>
-          <DropdownMenuGroup>
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
@@ -264,7 +261,15 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
   },
   {
     id: 'actions',
-    size: 48,
+    size: 72,
+    header: () => {
+      const t = useT();
+      return (
+        <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
+          {t('table.actions')}
+        </span>
+      );
+    },
     enableSorting: false,
     enableHiding: false,
     meta: { mobile: 'hidden' },

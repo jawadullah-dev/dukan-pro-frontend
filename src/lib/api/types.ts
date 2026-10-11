@@ -24,6 +24,20 @@ export interface BrandDTO {
   updatedAt: string;
 }
 
+/** Matches the ResponseCustomerDto from the NestJS customers controller. */
+export interface CustomerDTO {
+  id: string;
+  shopId: string;
+  name: string;
+  phone: string | null;
+  address: string | null;
+  notes: string | null;
+  openingBalance: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ApiErrorBody {
   statusCode: number;
   message: string | string[];

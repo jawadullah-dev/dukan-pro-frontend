@@ -6,13 +6,16 @@ type Translator = ReturnType<typeof useTranslations>;
 export const createPartyFormSchema = (t: Translator) =>
   z.object({
     name: z.string().trim().min(1, t('validation.nameRequired')),
-    phone: z.string().trim().min(1, t('validation.phoneRequired')),
+    phone: z.string().trim(),
     address: z.string(),
     notes: z.string(),
     opening_balance: z
       .number({ error: t('validation.openingBalanceRequired') })
-      .min(0, t('validation.valueNonNegative'))
+      .min(0, t('validation.valueNonNegative')),
+    isActive: z.boolean().optional()
   });
+
+export const createCustomerFormSchema = createPartyFormSchema;
 
 export const createReceivePaymentSchema = (t: Translator) =>
   z.object({

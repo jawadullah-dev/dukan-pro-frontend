@@ -21,6 +21,7 @@ interface AlertModalProps {
   description?: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  closeOnOutsideClick?: boolean;
 }
 
 export function AlertModal({
@@ -31,13 +32,20 @@ export function AlertModal({
   title,
   description,
   confirmLabel,
-  cancelLabel
+  cancelLabel,
+  closeOnOutsideClick = true
 }: AlertModalProps) {
   const t = useT();
   const resolvedTitle = title ?? t('common.areYouSure');
   const resolvedDescription = description ?? t('common.cannotUndo');
   const resolvedConfirm = confirmLabel ?? t('common.continue');
   const resolvedCancel = cancelLabel ?? t('common.cancel');
+
+  const handleOutsideClick = () => {
+    if (closeOnOutsideClick && !loading) {
+      onClose();
+    }
+  };
 
   return (
     <AlertDialog
@@ -46,7 +54,7 @@ export function AlertModal({
         if (!open && !loading) onClose();
       }}
     >
-      <AlertDialogContent size='default'>
+      <AlertDialogContent size='default' onOverlayClick={handleOutsideClick}>
         <AlertDialogHeader>
           <AlertDialogTitle>{resolvedTitle}</AlertDialogTitle>
           <AlertDialogDescription>{resolvedDescription}</AlertDialogDescription>

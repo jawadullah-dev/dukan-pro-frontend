@@ -128,7 +128,15 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const dir = isRtlLocale(locale) ? 'rtl' : 'ltr';
 
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning data-theme={themeToApply}>
+    <html
+      lang={locale}
+      dir={dir}
+      suppressHydrationWarning
+      data-theme={themeToApply}
+      style={{
+        ['--primary' as string]: 'oklch(0.58 0.22 25)'
+      }}
+    >
       <head>
         <Script
           id='theme-and-extension-attribute-bootstrap'
@@ -136,6 +144,32 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           dangerouslySetInnerHTML={{
             __html: `
               try {
+                var ACCENTS = {
+                  blue: 'oklch(0.55 0.18 250)',
+                  green: 'oklch(0.58 0.16 145)',
+                  purple: 'oklch(0.55 0.2 300)',
+                  orange: 'oklch(0.68 0.18 55)',
+                  red: 'oklch(0.58 0.22 25)',
+                  teal: 'oklch(0.58 0.12 195)'
+                };
+                var RADIUS = {
+                  sharp: '0.25rem',
+                  medium: '0.5rem',
+                  round: '0.75rem'
+                };
+                var rawApp = localStorage.getItem('dukaan-appearance:v2');
+                var parsedApp = rawApp ? JSON.parse(rawApp) : null;
+                var appState = (parsedApp && parsedApp.state) ? parsedApp.state : null;
+                var accent = (appState && appState.accent) || 'red';
+                var radius = (appState && appState.radius) || 'medium';
+                var density = (appState && appState.density) || 'comfortable';
+                var digits = (appState && appState.digits) || 'western';
+                var docEl = document.documentElement;
+                if (ACCENTS[accent]) docEl.style.setProperty('--primary', ACCENTS[accent]);
+                if (RADIUS[radius]) docEl.style.setProperty('--radius', RADIUS[radius]);
+                docEl.dataset.appearanceDensity = density;
+                docEl.dataset.appearanceDigits = digits;
+
                 if (localStorage.theme === 'dark' || ((!('theme' in localStorage) || localStorage.theme === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '${PWA_THEME_COLOR_DARK}')
                 }

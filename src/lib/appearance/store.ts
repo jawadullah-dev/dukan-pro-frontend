@@ -27,10 +27,27 @@ export const DEFAULT_APPEARANCE = {
   digits: 'western' as AppearanceDigits
 };
 
+function getInitialAppearance() {
+  if (typeof window === 'undefined') return DEFAULT_APPEARANCE;
+  try {
+    const raw = localStorage.getItem('dukaan-appearance:v2');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.state) {
+        return {
+          ...DEFAULT_APPEARANCE,
+          ...parsed.state
+        };
+      }
+    }
+  } catch {}
+  return DEFAULT_APPEARANCE;
+}
+
 export const useAppearanceStore = create<AppearanceState>()(
   persist(
     (set) => ({
-      ...DEFAULT_APPEARANCE,
+      ...getInitialAppearance(),
       setDensity: (density) => set({ density }),
       setRadius: (radius) => set({ radius }),
       setAccent: (accent) => set({ accent }),
@@ -38,8 +55,7 @@ export const useAppearanceStore = create<AppearanceState>()(
       resetAll: () => set({ ...DEFAULT_APPEARANCE })
     }),
     {
-      name: 'dukaan-appearance:v2',
-      skipHydration: true
+      name: 'dukaan-appearance:v2'
     }
   )
 );

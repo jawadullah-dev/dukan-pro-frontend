@@ -10,6 +10,20 @@ export interface PaginatedResponse<T> {
   pageSize: number;
 }
 
+// ---------------------------------------------------------------------------
+// Domain DTOs — shapes returned by the NestJS backend (camelCase)
+// ---------------------------------------------------------------------------
+
+/** Matches the BrandResponseDto from the NestJS brands controller. */
+export interface BrandDTO {
+  id: string;
+  shopId: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ApiErrorBody {
   statusCode: number;
   message: string | string[];

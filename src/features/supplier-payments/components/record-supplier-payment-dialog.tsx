@@ -399,7 +399,7 @@ export function RecordSupplierPaymentDialog({
               value={paymentDate}
               onChange={(e) => setPaymentDate(e.target.value)}
               disabled={recordMutation.isPending}
-              className='h-10 text-sm font-normal text-foreground'
+              className='h-10 text-sm font-normal text-foreground cursor-pointer'
               required
             />
           </div>

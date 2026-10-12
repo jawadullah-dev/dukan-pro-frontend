@@ -276,3 +276,5 @@ export interface CancelPaymentInput {
 }
 
 export * from '@/types/supplier-payment';
+export * from '@/types/expense';
+export * from '@/types/cash';

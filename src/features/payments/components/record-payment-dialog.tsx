@@ -182,7 +182,7 @@ export function RecordPaymentDialog({
               value={paymentDate}
               onChange={(e) => setPaymentDate(e.target.value)}
               required
-              className='text-sm font-normal text-foreground'
+              className='text-sm font-normal text-foreground cursor-pointer'
             />
           </div>
 

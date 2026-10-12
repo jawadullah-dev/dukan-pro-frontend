@@ -14,6 +14,7 @@ export interface PageContainerProps {
 
 import React from 'react';
 import { Heading } from '../ui/heading';
+import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import type { InfobarContent } from '@/components/ui/infobar';
 import { cn } from '@/lib/utils';
 import { useT, translateMaybe } from '@/i18n/use-t';
@@ -24,16 +25,9 @@ function PageSkeleton() {
     <div
       role='status'
       aria-label={t('common.loadingPage')}
-      className='flex flex-1 animate-pulse flex-col gap-4'
+      className='flex min-h-0 flex-1 flex-col'
     >
-      <div className='flex items-center justify-between'>
-        <div>
-          <div className='bg-muted mb-2 h-8 w-48 rounded' />
-          <div className='bg-muted h-4 w-96 rounded' />
-        </div>
-      </div>
-      <div className='bg-muted mt-6 h-40 w-full rounded-lg' />
-      <div className='bg-muted h-40 w-full rounded-lg' />
+      <DataTableSkeleton rowCount={8} />
     </div>
   );
 }

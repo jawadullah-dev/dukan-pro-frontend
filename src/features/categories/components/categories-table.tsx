@@ -2,7 +2,10 @@
 
 import type { ColumnDef } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -14,47 +17,78 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
-import { t } from '@/i18n';
-import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
-import type { Brand, Category, Product } from '@/lib/dukaan/types';
+import { AlertModal } from '@/components/modal/alert-modal';
+import { Button } from '@/components/ui/button';
 import {
-  brandsQueryOptions,
-  categoriesQueryOptions,
-  productsQueryOptions
-} from '@/features/dukaan/api/queries';
-import { ACTIVE_STATUS_OPTIONS, TRACKING_TYPE_OPTIONS } from '@/features/dukaan/constants/filters';
-import {
-  BrandCellAction,
-  CategoryCellAction,
-  ProductCellAction
-} from '@/features/dukaan/components/catalog-cell-actions';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { categoriesQueryOptions, categoryKeys } from '../api/queries';
+import { deleteCategory } from '../api/service';
+import type { CategoryDTO } from '@/lib/api/types';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
+import { CategoryDialog } from './category-dialog';
 
-function useDukaanTable<TData>(
-  data: TData[],
-  columns: ColumnDef<TData>[],
-  total: number,
-  perPage: number
-) {
-  const pageCount = Math.max(1, Math.ceil(total / perPage));
-  return useDataTable({
-    data,
-    columns,
-    pageCount,
-    rowCount: total,
-    shallow: true,
-    debounceMs: 400,
-    initialState: {
-      pagination: { pageIndex: 0, pageSize: DUKAAN_DEFAULT_PAGE_SIZE }
-    }
+interface CategoryCellActionProps {
+  data: CategoryDTO;
+}
+
+function CategoryCellAction({ data }: CategoryCellActionProps) {
+  const t = useT();
+  const qc = useQueryClient();
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const remove = useMutation({
+    mutationFn: () => deleteCategory(data.id),
+    onSuccess: () => {
+      toast.success(t('dukaan.category.deleted'));
+      setDeleteOpen(false);
+      void qc.invalidateQueries({ queryKey: categoryKeys.all });
+    },
+    onError: (e: Error) => toast.error(e.message)
   });
+
+  return (
+    <>
+      <AlertModal
+        isOpen={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={() => remove.mutate()}
+        loading={remove.isPending}
+        title={t('dukaan.category.deleteTitle')}
+        description={t('dukaan.category.deleteDescription')}
+        confirmLabel={t('common.delete')}
+      />
+      <CategoryDialog open={editOpen} onOpenChange={setEditOpen} category={data} />
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
+          <span className='sr-only'>{t('common.openMenu')}</span>
+          <Icons.ellipsis className='h-4 w-4' />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end'>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
+          </DropdownMenuGroup>
+          <DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => requestAnimationFrame(() => setEditOpen(true))}>
+              <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => requestAnimationFrame(() => setDeleteOpen(true))}>
+              <Icons.trash className='me-2 h-4 w-4' /> {t('common.delete')}
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
 }
 
-interface TableToolbarProps {
-  toolbarAction?: ReactNode;
-}
-
-const categoryColumns: ColumnDef<Category>[] = [
+const categoryColumns: ColumnDef<CategoryDTO>[] = [
   {
     id: 'name',
     accessorKey: 'name',
@@ -74,8 +108,8 @@ const categoryColumns: ColumnDef<Category>[] = [
     enableColumnFilter: true
   },
   {
-    id: 'is_active',
-    accessorKey: 'is_active',
+    id: 'isActive',
+    accessorKey: 'isActive',
     header: ({ column }) => {
       const t = useT();
       return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
@@ -84,8 +118,8 @@ const categoryColumns: ColumnDef<Category>[] = [
     cell: ({ row }) => {
       const t = useT();
       return (
-        <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-          {row.original.is_active ? t('status.active') : t('status.inactive')}
+        <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
+          {row.original.isActive ? t('status.active') : t('status.inactive')}
         </Badge>
       );
     }
@@ -104,32 +138,32 @@ const categoryColumns: ColumnDef<Category>[] = [
   }
 ];
 
-const categoryMobileItem: MobileItemConfig<Category> = {
+const categoryMobileItem: MobileItemConfig<CategoryDTO> = {
   leading: 'icon',
   leadingIcon: Icons.folder,
   title: (row) => row.name,
-  subtitle: (row) => (row.is_active ? t('status.active') : t('status.inactive')),
-  ariaLabel: (row) => `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`
+  subtitle: (row) => (row.isActive ? 'Active' : 'Inactive'),
+  ariaLabel: (row) => `${row.name}, ${row.isActive ? 'Active' : 'Inactive'}`
 };
 
-const categoryDetail: DetailConfig<Category> = {
+const categoryDetail: DetailConfig<CategoryDTO> = {
   mode: 'sheet',
   title: (row) => row.name,
   badge: (row) => ({
-    label: row.is_active ? t('status.active') : t('status.inactive'),
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
+    label: row.isActive ? 'Active' : 'Inactive',
+    status: row.isActive ? 'ACTIVE' : 'INACTIVE'
   }),
   sections: (row) => [
     {
-      title: t('table.col.category'),
+      title: 'Category',
       fields: [
-        { label: t('table.col.name'), value: row.name },
+        { label: 'Name', value: row.name },
         {
-          label: t('table.col.status'),
+          label: 'Status',
           value: (
             <StatusBadge
-              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-              label={row.is_active ? t('status.active') : t('status.inactive')}
+              status={row.isActive ? 'ACTIVE' : 'INACTIVE'}
+              label={row.isActive ? 'Active' : 'Inactive'}
             />
           )
         }
@@ -138,11 +172,28 @@ const categoryDetail: DetailConfig<Category> = {
   ]
 };
 
-export function CategoriesTable({ toolbarAction }: TableToolbarProps) {
-  const columnIds = ['name', 'is_active'];
+interface CategoriesTableProps {
+  toolbarAction?: ReactNode;
+}
+
+export function CategoriesTable({ toolbarAction }: CategoriesTableProps) {
+  const columnIds = ['name', 'isActive'];
   const { params, filters } = useDukaanListParams(columnIds);
-  const { data } = useSuspenseQuery(categoriesQueryOptions(filters));
-  const { table } = useDukaanTable(data.items, categoryColumns, data.total, params.perPage);
+  const { data } = useSuspenseQuery(
+    categoriesQueryOptions({ page: params.page, pageSize: params.perPage, search: filters.search })
+  );
+  const pageCount = Math.max(1, Math.ceil(data.total / params.perPage));
+  const { table } = useDataTable({
+    data: data.items,
+    columns: categoryColumns,
+    pageCount,
+    rowCount: data.total,
+    shallow: true,
+    debounceMs: 400,
+    initialState: {
+      pagination: { pageIndex: 0, pageSize: DUKAAN_DEFAULT_PAGE_SIZE }
+    }
+  });
 
   return (
     <ResponsiveDataTable
@@ -150,258 +201,6 @@ export function CategoriesTable({ toolbarAction }: TableToolbarProps) {
       toolbarAction={toolbarAction}
       mobileItem={categoryMobileItem}
       detail={categoryDetail}
-    />
-  );
-}
-
-const brandColumns: ColumnDef<Brand>[] = [
-  {
-    id: 'name',
-    accessorKey: 'name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
-    },
-    meta: {
-      label: 'table.col.name',
-      placeholderKey: 'search.brands' as const,
-      variant: 'text',
-      icon: Icons.search,
-      type: 'text',
-      primary: true,
-      priority: 1
-    },
-    enableColumnFilter: true
-  },
-  {
-    id: 'is_active',
-    accessorKey: 'is_active',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
-    },
-    meta: { label: 'table.col.status', type: 'boolean', priority: 2 },
-    cell: ({ row }) => {
-      const t = useT();
-      return (
-        <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-          {row.original.is_active ? t('status.active') : t('status.inactive')}
-        </Badge>
-      );
-    }
-  },
-  {
-    id: 'actions',
-    size: 48,
-    enableSorting: false,
-    enableHiding: false,
-    meta: { mobile: 'hidden' },
-    cell: ({ row }) => (
-      <div className='flex justify-end'>
-        <BrandCellAction data={row.original} />
-      </div>
-    )
-  }
-];
-
-const brandMobileItem: MobileItemConfig<Brand> = {
-  leading: 'icon',
-  leadingIcon: Icons.tag,
-  title: (row) => row.name,
-  subtitle: (row) => (row.is_active ? t('status.active') : t('status.inactive')),
-  ariaLabel: (row) => `${row.name}, ${row.is_active ? t('status.active') : t('status.inactive')}`
-};
-
-const brandDetail: DetailConfig<Brand> = {
-  mode: 'sheet',
-  title: (row) => row.name,
-  badge: (row) => ({
-    label: row.is_active ? t('status.active') : t('status.inactive'),
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
-  sections: (row) => [
-    {
-      title: t('table.col.brand'),
-      fields: [
-        { label: t('table.col.name'), value: row.name },
-        {
-          label: t('table.col.status'),
-          value: (
-            <StatusBadge
-              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-              label={row.is_active ? t('status.active') : t('status.inactive')}
-            />
-          )
-        }
-      ]
-    }
-  ]
-};
-
-export function BrandsTable({ toolbarAction }: TableToolbarProps) {
-  const columnIds = ['name', 'is_active'];
-  const { params, filters } = useDukaanListParams(columnIds);
-  const { data } = useSuspenseQuery(brandsQueryOptions(filters));
-  const { table } = useDukaanTable(data.items, brandColumns, data.total, params.perPage);
-
-  return (
-    <ResponsiveDataTable
-      table={table}
-      toolbarAction={toolbarAction}
-      mobileItem={brandMobileItem}
-      detail={brandDetail}
-    />
-  );
-}
-
-const productColumns: ColumnDef<Product>[] = [
-  {
-    id: 'name',
-    accessorKey: 'name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
-    },
-    meta: {
-      label: 'table.col.name',
-      placeholderKey: 'search.products' as const,
-      variant: 'text',
-      icon: Icons.search,
-      type: 'text',
-      primary: true,
-      priority: 1
-    },
-    enableColumnFilter: true
-  },
-  {
-    id: 'tracking_type',
-    accessorKey: 'tracking_type',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('dukaan.product.trackingType')} />;
-    },
-    meta: {
-      label: 'dukaan.product.trackingType',
-      variant: 'multiSelect',
-      options: [...TRACKING_TYPE_OPTIONS],
-      type: 'text',
-      priority: 2
-    },
-    enableColumnFilter: true,
-    cell: ({ row }) => <Badge variant='outline'>{formatLabel(row.original.tracking_type)}</Badge>
-  },
-  {
-    id: 'default_selling_price',
-    accessorKey: 'default_selling_price',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.sellPrice')} />;
-    },
-    meta: {
-      label: 'table.col.sellPrice',
-      type: 'money',
-      highlight: true,
-      priority: 1
-    },
-    cell: ({ row }) => formatPkr(row.original.default_selling_price)
-  },
-  {
-    id: 'is_active',
-    accessorKey: 'is_active',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
-    },
-    meta: {
-      label: 'table.col.status',
-      variant: 'multiSelect',
-      options: [...ACTIVE_STATUS_OPTIONS],
-      type: 'status',
-      priority: 1
-    },
-    enableColumnFilter: true,
-    cell: ({ row }) => {
-      const t = useT();
-      return (
-        <StatusBadge
-          status={row.original.is_active ? 'ACTIVE' : 'INACTIVE'}
-          label={row.original.is_active ? t('status.active') : t('status.inactive')}
-        />
-      );
-    }
-  },
-  {
-    id: 'actions',
-    size: 48,
-    enableSorting: false,
-    enableHiding: false,
-    meta: { mobile: 'hidden' },
-    cell: ({ row }) => (
-      <div className='flex justify-end'>
-        <ProductCellAction data={row.original} />
-      </div>
-    )
-  }
-];
-
-const productMobileItem: MobileItemConfig<Product> = {
-  leading: 'icon',
-  leadingIcon: Icons.box,
-  title: (row) => row.name,
-  subtitle: (row) => formatLabel(row.tracking_type),
-  badge: (row) => ({
-    label: row.is_active ? t('status.active') : t('status.inactive'),
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
-  value: (row) => formatPkr(row.default_selling_price),
-  ariaLabel: (row) =>
-    `${row.name}, ${formatLabel(row.tracking_type)}, ${formatPkr(row.default_selling_price)}`
-};
-
-const productDetail: DetailConfig<Product> = {
-  mode: 'sheet',
-  title: (row) => row.name,
-  badge: (row) => ({
-    label: row.is_active ? t('status.active') : t('status.inactive'),
-    status: row.is_active ? 'ACTIVE' : 'INACTIVE'
-  }),
-  value: (row) => formatPkr(row.default_selling_price),
-  sections: (row) => [
-    {
-      title: t('table.col.product'),
-      fields: [
-        { label: t('table.col.name'), value: row.name },
-        { label: t('dukaan.product.trackingType'), value: formatLabel(row.tracking_type) },
-        { label: t('table.col.sellPrice'), value: formatPkr(row.default_selling_price) },
-        {
-          label: t('table.col.status'),
-          value: (
-            <StatusBadge
-              status={row.is_active ? 'ACTIVE' : 'INACTIVE'}
-              label={row.is_active ? t('status.active') : t('status.inactive')}
-            />
-          )
-        }
-      ]
-    }
-  ]
-};
-
-export function ProductsTable({ toolbarAction }: TableToolbarProps) {
-  const columnIds = ['name', 'tracking_type', 'default_selling_price', 'is_active'];
-  const { params, filters } = useDukaanListParams(columnIds, 'name', [
-    'tracking_type',
-    'is_active'
-  ]);
-  const { data } = useSuspenseQuery(productsQueryOptions(filters));
-  const { table } = useDukaanTable(data.items, productColumns, data.total, params.perPage);
-
-  return (
-    <ResponsiveDataTable
-      table={table}
-      toolbarAction={toolbarAction}
-      mobileItem={productMobileItem}
-      detail={productDetail}
     />
   );
 }

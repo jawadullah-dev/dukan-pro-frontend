@@ -1,11 +1,11 @@
 import PageContainer from '@/components/layout/page-container';
-import { CategoriesPageClient } from '@/features/categories';
-import { categoriesQueryOptions } from '@/features/categories';
+import { CategoriesPageClient, categoriesQueryOptions } from '@/features/categories';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { getTranslations } from 'next-intl/server';
+import { auth } from '@/auth';
 
 export async function generateMetadata() {
   const t = await getTranslations('metadata');
@@ -14,9 +14,14 @@ export async function generateMetadata() {
   };
 }
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
   const qc = getQueryClient();
-  void qc.prefetchQuery(categoriesQueryOptions({ page: 1, limit: 20 }));
+
+  if (session?.accessToken) {
+    await qc.prefetchQuery(categoriesQueryOptions({ page: 1, pageSize: 20 }, session.accessToken));
+  }
+
   return (
     <PageContainer
       fill

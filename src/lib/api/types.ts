@@ -226,3 +226,13 @@ export class ApiError extends Error {
     this.name = 'ApiError';
   }
 }
+
+/** Matches the CategoryResponseDto from the NestJS categories controller. */
+export interface CategoryDTO {
+  id: string;
+  shopId: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

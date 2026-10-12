@@ -34,13 +34,26 @@ function AlertDialogOverlay({ className, ...props }: AlertDialogPrimitive.Backdr
 function AlertDialogContent({
   className,
   size = 'default',
+  onOverlayClick,
   ...props
 }: AlertDialogPrimitive.Popup.Props & {
   size?: 'default' | 'sm';
+  onOverlayClick?: (event?: React.MouseEvent<HTMLDivElement>) => void;
 }) {
   return (
     <AlertDialogPortal>
-      <AlertDialogOverlay />
+      <AlertDialogOverlay
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onOverlayClick?.(e);
+          }
+        }}
+        onPointerDown={(e) => {
+          if (e.target === e.currentTarget) {
+            onOverlayClick?.(e as unknown as React.MouseEvent<HTMLDivElement>);
+          }
+        }}
+      />
       <AlertDialogPrimitive.Popup
         data-slot='alert-dialog-content'
         data-size={size}

@@ -15,6 +15,7 @@ interface MobileListProps<TData> {
 
   preferNavigate?: boolean;
   isLoading?: boolean;
+  skeletonRowCount?: number;
   onNavigate?: (href: string) => void;
 }
 
@@ -24,6 +25,7 @@ export function MobileList<TData>({
   detail,
   preferNavigate = true,
   isLoading,
+  skeletonRowCount,
   onNavigate
 }: MobileListProps<TData>) {
   const t = useTranslations();
@@ -39,9 +41,15 @@ export function MobileList<TData>({
   };
 
   if (isLoading) {
+    const count =
+      (rows.length > 0 ? rows.length : null) ??
+      (table.options.data?.length > 0 ? table.options.data.length : null) ??
+      skeletonRowCount ??
+      3;
+
     return (
       <div className='overflow-hidden rounded-[var(--radius)] border border-border' aria-busy>
-        {Array.from({ length: 6 }).map((_, i) => (
+        {Array.from({ length: count }).map((_, i) => (
           <div key={i} className='border-b border-border px-3 py-3 last:border-b-0'>
             <Skeleton className='h-12 w-full' />
           </div>

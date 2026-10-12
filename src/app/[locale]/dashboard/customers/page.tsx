@@ -1,10 +1,10 @@
 import PageContainer from '@/components/layout/page-container';
-import { CustomersListClient } from '@/features/customers';
-import { customersQueryOptions } from '@/features/customers';
+import { CustomersListClient, customersQueryOptions } from '@/features/customers';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
+import { auth } from '@/auth';
 
 export async function generateMetadata() {
   const t = await getTranslations('metadata');
@@ -13,9 +13,19 @@ export async function generateMetadata() {
   };
 }
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
   const qc = getQueryClient();
-  void qc.prefetchQuery(customersQueryOptions({ limit: 100 }));
+
+  if (session?.accessToken) {
+    await qc.prefetchQuery(
+      customersQueryOptions(
+        { page: 1, pageSize: 20, sortBy: 'createdAt', sortOrder: 'desc' },
+        session.accessToken
+      )
+    );
+  }
+
   return (
     <PageContainer
       fill

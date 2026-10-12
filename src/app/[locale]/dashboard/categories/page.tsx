@@ -24,7 +24,7 @@ export default function Page() {
       pageDescription='pages.categories.description'
     >
       <HydrationBoundary state={dehydrate(qc)}>
-        <Suspense fallback={<DataTableSkeleton rowCount={8} columnCount={3} />}>
+        <Suspense fallback={<DataTableSkeleton rowCount={3} columnCount={3} />}>
           <CategoriesPageClient />
         </Suspense>
       </HydrationBoundary>

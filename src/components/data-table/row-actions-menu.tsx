@@ -47,9 +47,6 @@ export function RowActionsMenu({ actions }: RowActionsMenuProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-40'>
           <DropdownMenuGroup>
-            <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
-          </DropdownMenuGroup>
-          <DropdownMenuGroup>
             {actions.map((action) => {
               const Icon = action.icon ?? Icons.chevronRight;
               return (

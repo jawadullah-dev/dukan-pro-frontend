@@ -2,6 +2,7 @@ import {
   IconAdjustmentsHorizontal,
   IconAlertCircle,
   IconAlertTriangle,
+  IconArchive,
   IconArrowRight,
   IconBell,
   IconBan,
@@ -199,6 +200,7 @@ export const Icons = {
   cash: IconCash,
   building: IconBuildingStore,
   ban: IconBan,
+  archive: IconArchive,
   folder: IconFolder,
   tag: IconTag,
 

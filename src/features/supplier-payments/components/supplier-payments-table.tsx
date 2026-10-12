@@ -51,7 +51,7 @@ function SupplierPaymentRowActions({ payment, onCancel }: SupplierPaymentRowActi
           <span className='sr-only'>Open menu</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-36'>
+        <DropdownMenuContent align='end' className='w-32'>
           <DropdownMenuGroup>
             <DropdownMenuItem
               className='text-destructive focus:text-destructive cursor-pointer'
@@ -61,7 +61,7 @@ function SupplierPaymentRowActions({ payment, onCancel }: SupplierPaymentRowActi
               }}
             >
               <Icons.close className='me-2 h-4 w-4' />
-              Cancel Payment
+              Cancel
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

@@ -1,18 +1,60 @@
 import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
+import type {
+  CreateExpenseInput,
+  CancelExpenseInput,
+  CreateExpenseCategoryInput,
+  UpdateExpenseCategoryInput
+} from '@/types/expense';
 import { expenseKeys } from './queries';
-import { createExpense, createExpenseCategory } from './service';
+import {
+  cancelExpense,
+  createExpense,
+  createExpenseCategory,
+  updateExpenseCategory,
+  deleteExpenseCategory
+} from './service';
 
 export const createExpenseMutation = mutationOptions({
-  mutationFn: (payload: Parameters<typeof createExpense>[0]) => createExpense(payload),
+  mutationFn: (input: CreateExpenseInput) => createExpense(input),
   onSuccess: () => {
-    getQueryClient().invalidateQueries({ queryKey: expenseKeys.all });
+    const qc = getQueryClient();
+    qc.invalidateQueries({ queryKey: expenseKeys.all });
+    qc.invalidateQueries({ queryKey: ['cash'] });
+  }
+});
+
+export const cancelExpenseMutation = mutationOptions({
+  mutationFn: ({ id, input }: { id: string; input: CancelExpenseInput }) =>
+    cancelExpense(id, input),
+  onSuccess: () => {
+    const qc = getQueryClient();
+    qc.invalidateQueries({ queryKey: expenseKeys.all });
+    qc.invalidateQueries({ queryKey: ['cash'] });
   }
 });
 
 export const createExpenseCategoryMutation = mutationOptions({
-  mutationFn: (name: string) => createExpenseCategory(name),
+  mutationFn: (input: CreateExpenseCategoryInput) => createExpenseCategory(input),
   onSuccess: () => {
-    getQueryClient().invalidateQueries({ queryKey: expenseKeys.all });
+    const qc = getQueryClient();
+    qc.invalidateQueries({ queryKey: expenseKeys.all });
+  }
+});
+
+export const updateExpenseCategoryMutation = mutationOptions({
+  mutationFn: ({ id, input }: { id: string; input: UpdateExpenseCategoryInput }) =>
+    updateExpenseCategory(id, input),
+  onSuccess: () => {
+    const qc = getQueryClient();
+    qc.invalidateQueries({ queryKey: expenseKeys.all });
+  }
+});
+
+export const deleteExpenseCategoryMutation = mutationOptions({
+  mutationFn: (id: string) => deleteExpenseCategory(id),
+  onSuccess: () => {
+    const qc = getQueryClient();
+    qc.invalidateQueries({ queryKey: expenseKeys.all });
   }
 });

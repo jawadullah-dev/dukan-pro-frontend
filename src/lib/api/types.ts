@@ -236,3 +236,45 @@ export interface CategoryDTO {
   createdAt: string;
   updatedAt: string;
 }
+
+/** Matches ResponsePaymentDto from the NestJS payments controller. */
+export interface PaymentDTO {
+  id: string;
+  shopId: string;
+  customerId?: string | null;
+  customerName?: string | null;
+  saleId?: string | null;
+  saleNo?: string | null;
+  receiptGroupId?: string | null;
+  amount: number; // in PAISA
+  paymentDate: string;
+  method: 'CASH' | string;
+  status: 'ACTIVE' | 'CANCELLED';
+  cancelledAt?: string | null;
+  cancelReason?: string | null;
+  cancelledById?: string | null;
+  clientRequestId: string;
+  notes?: string | null;
+  createdById: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreatePaymentInput {
+  clientRequestId: string;
+  customerId: string;
+  amount: number; // in PAISA
+  paymentDate: string;
+  salesIds?: string[];
+  method?: 'CASH' | 'JAZZCASH' | 'EASYPAISA' | 'BANK' | string;
+  notes?: string;
+}
+
+export interface CancelPaymentInput {
+  cancelReason: string;
+  confirmOverdraft?: boolean;
+}
+
+export * from '@/types/supplier-payment';
+export * from '@/types/expense';
+export * from '@/types/cash';

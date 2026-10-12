@@ -5,14 +5,7 @@ import { Icons } from '@/components/icons';
 import { useT, translateMaybe } from '@/i18n/use-t';
 
 import { Button } from '@/components/ui/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
-} from '@/components/ui/command';
+import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 import * as React from 'react';
@@ -47,25 +40,24 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
         {t('table.view')}
         <Icons.chevronsUpDown className='ms-auto opacity-50' />
       </PopoverTrigger>
-      <PopoverContent align='end' className='w-44 p-0'>
+      <PopoverContent align='end' className='w-48 p-1.5' sideOffset={6}>
         <Command>
-          <CommandInput placeholder={t('table.searchColumns')} />
           <CommandList>
-            <CommandEmpty>{t('table.noColumnsFound')}</CommandEmpty>
-            <CommandGroup>
+            <CommandGroup className='p-0.5 [&_[cmdk-group-items]]:space-y-1'>
               {columns.map((column) => (
                 <CommandItem
                   key={column.id}
                   onSelect={() => column.toggleVisibility(!column.getIsVisible())}
+                  className='my-0.5 flex cursor-pointer items-center justify-between gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors'
                 >
-                  <span className='truncate'>
+                  <span className='min-w-0 flex-1 truncate'>
                     {column.columnDef.meta?.label
                       ? translateMaybe(column.columnDef.meta.label, t)
                       : column.id.replaceAll('_', ' ')}
                   </span>
                   <Icons.check
                     className={cn(
-                      'ms-auto size-4 shrink-0',
+                      'size-4 shrink-0',
                       column.getIsVisible() ? 'opacity-100' : 'opacity-0'
                     )}
                   />

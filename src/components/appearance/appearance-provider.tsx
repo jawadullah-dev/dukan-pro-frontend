@@ -1,8 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { applyAppearancePrefs } from '@/lib/appearance/apply';
 import { useAppearanceStore } from '@/lib/appearance/store';
+
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 interface AppearanceProviderProps {
   children: React.ReactNode;
@@ -14,11 +16,7 @@ export function AppearanceProvider({ children }: AppearanceProviderProps) {
   const accent = useAppearanceStore((s) => s.accent);
   const digits = useAppearanceStore((s) => s.digits);
 
-  useEffect(() => {
-    void useAppearanceStore.persist.rehydrate();
-  }, []);
-
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     applyAppearancePrefs({ density, radius, accent, digits });
   }, [density, radius, accent, digits]);
 

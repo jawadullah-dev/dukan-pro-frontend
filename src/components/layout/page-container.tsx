@@ -27,7 +27,7 @@ function PageSkeleton() {
       aria-label={t('common.loadingPage')}
       className='flex min-h-0 flex-1 flex-col'
     >
-      <DataTableSkeleton rowCount={8} />
+      <DataTableSkeleton rowCount={3} />
     </div>
   );
 }

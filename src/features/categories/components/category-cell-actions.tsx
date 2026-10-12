@@ -39,9 +39,6 @@ function ActionMenu({ onEdit, onDelete }: ActionMenuProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuGroup>
-          <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
-        </DropdownMenuGroup>
-        <DropdownMenuGroup>
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation();

@@ -59,9 +59,6 @@ export function ExpenseCategoryCellAction({ data }: ExpenseCategoryCellActionPro
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-40'>
           <DropdownMenuGroup>
-            <DropdownMenuLabel>{t('common.actions')}</DropdownMenuLabel>
-          </DropdownMenuGroup>
-          <DropdownMenuGroup>
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();

@@ -1,13 +1,5 @@
 'use client';
 
-interface CustomerMutationValue {
-  name: string;
-  phone: string;
-  address: string;
-  notes: string;
-  opening_balance: number;
-}
-
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -15,15 +7,6 @@ import { FloatingActionButton } from '@/components/common/floating-action-button
 import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
-import { FieldGroup } from '@/components/ui/field';
 import {
   Table,
   TableBody,
@@ -37,120 +20,9 @@ import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { createClientRequestId, formatPkr, toPaisa } from '@/lib/dukaan/numbers';
 import { customerQueryOptions, dukaanKeys } from '@/features/dukaan/api/queries';
-import { createPartyFormSchema, createReceivePaymentSchema } from '@/features/dukaan/schemas/forms';
-import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
-import { CustomersTable } from '@/features/dukaan/components/tables/commerce-tables';
-
-interface CustomerDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-function CustomerDialog({ open, onOpenChange }: CustomerDialogProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {open ? <CustomerDialogBody key='new' onOpenChange={onOpenChange} /> : null}
-    </Dialog>
-  );
-}
-
-interface CustomerDialogBodyProps {
-  onOpenChange: (open: boolean) => void;
-}
-
-function CustomerDialogBody({ onOpenChange }: CustomerDialogBodyProps) {
-  const qc = useQueryClient();
-  const t = useT();
-
-  const create = useMutation({
-    mutationFn: (value: CustomerMutationValue) =>
-      dukaan.createCustomer({
-        name: value.name.trim(),
-        phone: value.phone.trim(),
-        address: value.address || undefined,
-        notes: value.notes || undefined,
-        opening_balance: toPaisa(value.opening_balance)
-      }),
-    onSuccess: () => {
-      toast.success(t('dukaan.party.customerAdded'));
-      void qc.invalidateQueries({ queryKey: dukaanKeys.all });
-      onOpenChange(false);
-    },
-    onError: (e: Error) => toast.error(e.message)
-  });
-
-  const form = useAppForm({
-    defaultValues: {
-      name: '',
-      phone: '',
-      address: '',
-      notes: '',
-      opening_balance: 0
-    },
-    validators: { onSubmit: createPartyFormSchema(t) },
-    onSubmit: ({ value }) => {
-      create.mutate(value);
-    }
-  });
-
-  return (
-    <DialogContent className='flex max-h-[85vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-lg'>
-      <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
-        <DialogTitle>{t('dukaan.party.customerAddTitle')}</DialogTitle>
-        <DialogDescription>{t('dukaan.party.customerAddDescription')}</DialogDescription>
-      </DialogHeader>
-      <form
-        className='flex min-h-0 flex-1 flex-col'
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
-        <div className='no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4'>
-          <FieldGroup className='gap-4'>
-            <form.AppField
-              name='name'
-              children={(field) => (
-                <field.TextField label={t('dukaan.party.name')} required autoFocus />
-              )}
-            />
-            <form.AppField
-              name='phone'
-              children={(field) => (
-                <field.TextField
-                  label={t('dukaan.party.phone')}
-                  type='tel'
-                  inputMode='numeric'
-                  placeholder={t('users.phonePlaceholder')}
-                  startIcon={Icons.phone}
-                  required
-                />
-              )}
-            />
-            <form.AppField
-              name='address'
-              children={(field) => <field.TextField label={t('dukaan.party.address')} />}
-            />
-            <form.AppField
-              name='opening_balance'
-              children={(field) => (
-                <field.TextField label={t('dukaan.party.customerOpeningBalance')} type='number' />
-              )}
-            />
-            <form.AppField
-              name='notes'
-              children={(field) => <field.TextareaField label={t('dukaan.party.notes')} />}
-            />
-          </FieldGroup>
-        </div>
-        <DialogFooter className='mx-0 mb-0 shrink-0'>
-          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={create.isPending} />
-          <DialogPrimaryButton mode='add' loading={create.isPending} />
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  );
-}
+import { createReceivePaymentSchema } from '@/features/dukaan/schemas/forms';
+import { CustomerDialog } from './customer-dialog';
+import { CustomersTable } from './customers-table';
 
 interface CustomersHeaderActionProps {
   onAdd?: () => void;

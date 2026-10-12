@@ -111,7 +111,7 @@ export function DataTableFacetedFilter<TData, TValue>({
         )}
       </PopoverTrigger>
       <PopoverContent className='w-48 p-1.5' align='start' sideOffset={6}>
-        <Command>
+        <Command shouldFilter={false}>
           <CommandList className='max-h-full'>
             <CommandGroup className='max-h-[18.75rem] overflow-x-hidden overflow-y-auto p-0.5 [&_[cmdk-group-items]]:space-y-1'>
               {options.map((option) => {
@@ -120,6 +120,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                 return (
                   <CommandItem
                     key={option.value}
+                    value={option.value}
                     onSelect={() => onItemSelect(option, isSelected)}
                     className='my-0.5 flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors'
                   >

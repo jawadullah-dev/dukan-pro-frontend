@@ -6,6 +6,7 @@ import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
+import { auth } from '@/auth';
 
 export async function generateMetadata() {
   const t = await getTranslations('metadata');
@@ -14,9 +15,13 @@ export async function generateMetadata() {
   };
 }
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
+  const token = session?.accessToken;
   const qc = getQueryClient();
-  void qc.prefetchQuery(purchasesQueryOptions({ limit: 100 }));
+  if (token) {
+    await qc.prefetchQuery(purchasesQueryOptions({ limit: 100 }, token));
+  }
   void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
   void qc.prefetchQuery(productsQueryOptions({ limit: 100 }));
   return (

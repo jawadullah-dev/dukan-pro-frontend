@@ -70,16 +70,25 @@ import {
   CashTable,
   ExpenseCategoriesTable,
   ExpensesTable,
-  InventoryTable,
   MovementsTable,
   SupplierPaymentsTable
 } from '@/features/dukaan/components/tables/commerce-tables';
 import { ExpenseCategoryDialog } from '@/features/dukaan/components/expense-category-dialogs';
+import { InventoryTable } from './inventory-table';
+import { AdjustmentsTable } from './adjustments-table';
 
 export function InventoryListClient() {
   return (
     <TablePageBody>
       <InventoryTable />
+    </TablePageBody>
+  );
+}
+
+export function StockAdjustmentsClient() {
+  return (
+    <TablePageBody>
+      <AdjustmentsTable />
     </TablePageBody>
   );
 }

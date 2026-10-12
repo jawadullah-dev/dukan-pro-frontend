@@ -1,7 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
-import { StockAdjustForm } from '@/features/inventory';
-import { productsQueryOptions } from '@/features/products';
-import { unitsQueryOptions } from '@/features/dukaan/api/queries';
+import { StockAdjustmentsClient, inventoryAdjustmentsQueryOptions } from '@/features/inventory';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
@@ -16,16 +14,16 @@ export async function generateMetadata() {
 
 export default function Page() {
   const qc = getQueryClient();
-  void qc.prefetchQuery(productsQueryOptions({ limit: 100 }));
-  void qc.prefetchQuery(unitsQueryOptions());
+  void qc.prefetchQuery(inventoryAdjustmentsQueryOptions({ limit: 100 }));
   return (
     <PageContainer
+      fill
       pageTitle='pages.adjustments.title'
       pageDescription='pages.adjustments.description'
     >
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
-          <StockAdjustForm />
+          <StockAdjustmentsClient />
         </Suspense>
       </HydrationBoundary>
     </PageContainer>

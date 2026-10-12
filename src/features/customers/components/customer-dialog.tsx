@@ -151,9 +151,9 @@ function CustomerDialogBody({ customer, onOpenChange }: CustomerDialogBodyProps)
             />
           </FieldGroup>
         </div>
-        <DialogFooter className='mx-0 mb-0 shrink-0'>
+        <DialogFooter className='mx-0 mb-0 shrink-0 gap-2 sm:gap-2.5'>
           <DialogCancelButton onClick={() => onOpenChange(false)} disabled={save.isPending} />
-          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} loading={save.isPending} />
+          <DialogPrimaryButton mode='save' loading={save.isPending} />
         </DialogFooter>
       </form>
     </DialogContent>

@@ -440,7 +440,7 @@ export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
         />
       </div>
 
-      <DialogFooter className='mx-0 mb-0 px-0'>
+      <DialogFooter className='mx-0 mb-0 px-0 gap-2 sm:gap-2.5'>
         {onDone ? <DialogCancelButton onClick={onDone} disabled={save.isPending} /> : null}
         <DialogPrimaryButton mode='save' loading={save.isPending} />
       </DialogFooter>

@@ -1,8 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
-import { SupplierPaymentsClient } from '@/features/cash';
-import { supplierPaymentsQueryOptions } from '@/features/dukaan/api/queries';
-import { suppliersQueryOptions } from '@/features/suppliers';
-import { purchasesQueryOptions } from '@/features/purchases';
+import { SupplierPaymentsClient, supplierPaymentsQueryOptions } from '@/features/supplier-payments';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
@@ -17,9 +14,8 @@ export async function generateMetadata() {
 
 export default function Page() {
   const qc = getQueryClient();
-  void qc.prefetchQuery(supplierPaymentsQueryOptions({ limit: 100 }));
-  void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
-  void qc.prefetchQuery(purchasesQueryOptions({ limit: 100 }));
+  void qc.prefetchQuery(supplierPaymentsQueryOptions({ pageSize: 20 }));
+
   return (
     <PageContainer
       fill

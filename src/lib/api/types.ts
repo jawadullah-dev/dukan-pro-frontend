@@ -274,3 +274,5 @@ export interface CancelPaymentInput {
   cancelReason: string;
   confirmOverdraft?: boolean;
 }
+
+export * from '@/types/supplier-payment';

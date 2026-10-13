@@ -32,8 +32,14 @@ export interface InventoryAdjustmentsFilters {
   sortOrder?: 'asc' | 'desc';
 }
 
+const APP_URL =
+  typeof window !== 'undefined'
+    ? ''
+    : (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3006').replace(/\/+$/, '');
+
 async function inventoryFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, { ...init, cache: 'no-store' });
+  const url = path.startsWith('http') ? path : `${APP_URL}${path}`;
+  const res = await fetch(url, { ...init, cache: 'no-store' });
   const body = (await res.json()) as T & { error?: string; message?: string | string[] };
 
   if (!res.ok) {

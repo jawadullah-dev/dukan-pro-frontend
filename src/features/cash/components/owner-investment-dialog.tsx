@@ -19,12 +19,15 @@ import { toPaisa } from '@/lib/dukaan/numbers';
 import { createOwnerInvestmentMutation } from '../api/mutations';
 import { cashKeys } from '../api/queries';
 
+import { useT } from '@/i18n/use-t';
+
 export interface OwnerInvestmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDialogProps) {
+  const t = useT();
   const qc = useQueryClient();
   const [amountStr, setAmountStr] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -33,7 +36,7 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
   const createMutation = useMutation({
     ...createOwnerInvestmentMutation,
     onSuccess: async () => {
-      toast.success('Owner investment recorded successfully');
+      toast.success(t('dukaan.cash.investmentSuccess') || 'Owner investment recorded successfully');
       await qc.invalidateQueries({ queryKey: cashKeys.all });
       await qc.invalidateQueries({ queryKey: ['dashboard'] });
       setAmountStr('');
@@ -73,9 +76,12 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
     >
       <DialogContent className='w-full sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Record Owner Investment</DialogTitle>
+          <DialogTitle>
+            {t('dukaan.cash.recordInvestmentTitle') || 'Record Owner Investment'}
+          </DialogTitle>
           <DialogDescription>
-            Record cash the owner puts into the shop drawer. This is not counted as shop revenue.
+            {t('dukaan.cash.recordInvestmentDesc') ||
+              'Record cash the owner puts into the shop drawer. This is not counted as shop revenue.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -83,7 +89,8 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
           {/* Amount */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-amount' className='text-sm font-normal text-foreground'>
-              Investment Amount (PKR) <span className='text-destructive'>*</span>
+              {t('dukaan.cash.investmentAmount') || 'Investment Amount (PKR)'}{' '}
+              <span className='text-destructive'>*</span>
             </Label>
             <div className='relative w-full'>
               <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
@@ -108,7 +115,7 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
           {/* Date */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-date' className='text-sm font-normal text-foreground'>
-              Date <span className='text-destructive'>*</span>
+              {t('dukaan.cash.date') || 'Date'} <span className='text-destructive'>*</span>
             </Label>
             <Input
               id='investment-date'
@@ -124,7 +131,10 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
           {/* Notes */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-notes' className='text-sm font-normal text-foreground'>
-              Notes <span className='text-xs text-muted-foreground'>(Optional)</span>
+              {t('dukaan.cash.notes') || 'Notes'}{' '}
+              <span className='text-xs text-muted-foreground'>
+                ({t('common.optional') || 'Optional'})
+              </span>
             </Label>
             <Textarea
               id='investment-notes'

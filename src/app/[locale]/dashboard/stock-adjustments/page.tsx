@@ -12,9 +12,20 @@ export async function generateMetadata() {
   };
 }
 
-export default function Page() {
+import { auth } from '@/auth';
+
+export default async function Page() {
+  const session = await auth();
+  const token = session?.accessToken;
   const qc = getQueryClient();
-  void qc.prefetchQuery(inventoryAdjustmentsQueryOptions({ limit: 100 }));
+  if (token) {
+    await qc.prefetchQuery(
+      inventoryAdjustmentsQueryOptions(
+        { page: 1, pageSize: 20, sortBy: 'createdAt', sortOrder: 'desc' },
+        token
+      )
+    );
+  }
   return (
     <PageContainer
       fill

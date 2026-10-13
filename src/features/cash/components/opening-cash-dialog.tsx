@@ -19,12 +19,15 @@ import { toPaisa } from '@/lib/dukaan/numbers';
 import { createOpeningCashMutation } from '../api/mutations';
 import { cashKeys } from '../api/queries';
 
+import { useT } from '@/i18n/use-t';
+
 export interface OpeningCashDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps) {
+  const t = useT();
   const qc = useQueryClient();
   const [amountStr, setAmountStr] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -33,7 +36,7 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
   const createMutation = useMutation({
     ...createOpeningCashMutation,
     onSuccess: async () => {
-      toast.success('Opening cash recorded successfully');
+      toast.success(t('dukaan.cash.openingSuccess') || 'Opening cash recorded successfully');
       await qc.invalidateQueries({ queryKey: cashKeys.all });
       await qc.invalidateQueries({ queryKey: ['dashboard'] });
       setAmountStr('');
@@ -73,9 +76,10 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
     >
       <DialogContent className='w-full sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Record Opening Cash</DialogTitle>
+          <DialogTitle>{t('dukaan.cash.recordOpeningTitle') || 'Record Opening Cash'}</DialogTitle>
           <DialogDescription>
-            Day-0 cash balance in the register drawer. Can only be set once per shop.
+            {t('dukaan.cash.recordOpeningDesc') ||
+              'Day-0 cash balance in the register drawer. Can only be set once per shop.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -83,7 +87,8 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
           {/* Amount */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-amount' className='text-sm font-normal text-foreground'>
-              Opening Amount (PKR) <span className='text-destructive'>*</span>
+              {t('dukaan.cash.openingAmount') || 'Opening Amount (PKR)'}{' '}
+              <span className='text-destructive'>*</span>
             </Label>
             <div className='relative w-full'>
               <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
@@ -108,7 +113,8 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
           {/* Date */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-date' className='text-sm font-normal text-foreground'>
-              Start Date <span className='text-destructive'>*</span>
+              {t('dukaan.cash.startDate') || 'Start Date'}{' '}
+              <span className='text-destructive'>*</span>
             </Label>
             <Input
               id='opening-date'
@@ -124,7 +130,10 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
           {/* Notes */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-notes' className='text-sm font-normal text-foreground'>
-              Notes <span className='text-xs text-muted-foreground'>(Optional)</span>
+              {t('dukaan.cash.notes') || 'Notes'}{' '}
+              <span className='text-xs text-muted-foreground'>
+                ({t('common.optional') || 'Optional'})
+              </span>
             </Label>
             <Textarea
               id='opening-notes'

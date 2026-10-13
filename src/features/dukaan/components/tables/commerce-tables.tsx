@@ -1726,7 +1726,7 @@ const movementColumns: ColumnDef<MovementRow>[] = [
       return <DataTableColumnHeader column={column} title={`${t('table.col.qty')} Δ`} />;
     },
     meta: {
-      label: 'table.col.qty Δ',
+      label: 'table.col.qtyDelta',
       type: 'number',
       highlight: true,
       priority: 1,

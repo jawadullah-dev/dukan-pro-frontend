@@ -110,7 +110,13 @@
       "outstanding": "باقی",
       "description": "تفصیل",
       "when": "جب",
-      "dir": "سمت"
+      "dir": "سمت",
+      "qtyDelta": "مقدار میں تبدیلی",
+      "createdAt": "تخلیق کی تاریخ",
+      "updatedAt": "اپ ڈیٹ کی تاریخ",
+      "reason": "وجہ",
+      "target": "ہدف",
+      "notes": "نوٹس"
     }
   },
   "nav": {
@@ -185,12 +191,7 @@
     "delete": "حذف کریں",
     "archive": "آرکائیو کریں",
     "activate": "فعال کریں",
-    "archiveCustomer": "آرکائیو کریں",
-    "activateCustomer": "فعال کریں",
     "deactivate": "غیر فعال کریں",
-    "reactivate": "فعال کریں",
-    "deactivateCustomer": "گاہک کو غیر فعال کریں",
-    "reactivateCustomer": "گاہک کو فعال کریں",
     "loading": "لوڈ ہو رہا ہے...",
     "areYouSure": "کیا آپ کو یقین ہے؟",
     "cannotUndo": "یہ عمل واپس نہیں کیا جا سکتا۔",
@@ -205,12 +206,7 @@
     "addBrand": "برانڈ شامل",
     "addPayment": "ادائیگی شامل",
     "createProduct": "پروڈکٹ بنائیں",
-    "editProduct": "پروڈکٹ میں ترمیم کریں",
-    "addNew": "نیا شامل کریں",
     "browse": "براؤز کریں",
-    "updateProduct": "پروڈکٹ اپ ڈیٹ کریں",
-    "productImage": "پروڈکٹ کی تصویر",
-    "uploadProductImage": "اپنی پروڈکٹ کی تصویر اپ لوڈ کریں",
     "productName": "پروڈکٹ کا نام",
     "category": "قسم",
     "price": "قیمت",
@@ -219,24 +215,17 @@
     "selectCategory": "قسم منتخب کریں",
     "enterPrice": "قیمت درج کریں",
     "enterProductDescription": "پروڈکٹ کی تفصیل درج کریں",
-    "productCreated": "پروڈکٹ کامیابی سے شامل ہو گئی",
-    "productUpdated": "پروڈکٹ کامیابی سے اپ ڈیٹ ہو گئی",
-    "productCreateFailed": "پروڈکٹ شامل کرنے میں ناکامی",
-    "productUpdateFailed": "پروڈکٹ اپ ڈیٹ کرنے میں ناکامی",
     "showPassword": "پاس ورڈ دکھائیں",
     "hidePassword": "پاس ورڈ چھپائیں",
     "select": "منتخب کریں...",
     "selected": "منتخب شدہ",
     "loadingPage": "صفحہ لوڈ ہو رہا ہے...",
     "back": "واپس",
-    "confirmCancel": "منسوخی کی تصدیق",
-    "pdfPrintReceipt": "پی ڈی ایف / پرنٹ رسید",
     "payments": "ادائیگیاں",
     "receipt": "رسید",
     "subtotal": "ذیلی کل",
     "discount": "رعایت",
     "total": "کل",
-    "cancelledInfo": "منسوخ: {reason} ({date})",
     "openMenu": "مینو کھولیں",
     "actions": "اعمال",
     "pickDate": "تاریخ منتخب کریں",
@@ -253,9 +242,11 @@
     "create": "شامل کریں",
     "update": "اپ ڈیٹ کریں",
     "name": "نام",
-    "productDeleteFailed": "پروڈکٹ حذف کرنے میں ناکامی",
-    "demoPrefix": "ڈیمو:",
-    "passwordValue": "پاس ورڈ: {password}"
+    "investCash": "کیش شامل کریں",
+    "withdraw": "کیش نکالیں",
+    "openingBalance": "ابتدائی بیلنس",
+    "adjustStock": "اسٹاک ایڈجسٹ کریں",
+    "optional": "اختیاری"
   },
   "status": {
     "active": "فعال",
@@ -358,7 +349,12 @@
       "qtyHeader": "مقدار",
       "unitCostHeader": "فی یونٹ لاگت",
       "lineHeader": "لائن",
-      "outstanding": "باقی"
+      "outstanding": "باقی",
+      "conditionNew": "نیا",
+      "conditionUsed": "استعمال شدہ",
+      "addLine": "لائن شامل کریں",
+      "imei1List": "IMEI نمبرز (ہر لائن پر ایک)",
+      "imeiHelp": "IMEI نمبرز درج کریں"
     },
     "sale": {
       "newTitle": "نئی فروخت",
@@ -512,6 +508,25 @@
       "confirmCancel": "منسوخی کی تصدیق",
       "softOverdraft": "عارضی اوور ڈرافٹ",
       "cashArrow": "نقد {current} ← {projected}"
+    },
+    "cash": {
+      "recordInvestmentTitle": "مالک کی سرمایہ کاری درج کریں",
+      "recordInvestmentDesc": "وہ نقد رقم درج کریں جو مالک دکان کے دراز میں ڈالتا ہے۔ یہ آمدنی میں شمار نہیں ہوتا۔",
+      "recordWithdrawalTitle": "مالک کی رقم نکلوانا درج کریں",
+      "recordWithdrawalDesc": "وہ نقد رقم درج کریں جو مالک دکان سے نکالتا ہے۔ یہ کاروباری اخراجات میں شمار نہیں ہوتا۔",
+      "recordOpeningTitle": "ابتدائی کیش بیلنس درج کریں",
+      "recordOpeningDesc": "رجسٹر دراز میں پہلے دن کا نقد بیلنس۔ یہ فی دکان صرف ایک بار سیٹ کیا جا سکتا ہے۔",
+      "investmentAmount": "سرمایہ کاری کی رقم (روپے)",
+      "withdrawalAmount": "نکلوائی گئی رقم (روپے)",
+      "openingAmount": "ابتدائی رقم (روپے)",
+      "date": "تاریخ",
+      "startDate": "آغاز کی تاریخ",
+      "notes": "نوٹس",
+      "shortfallWarningTitle": "کیش کی کمی کی وارننگ",
+      "confirmOverdraftLabel": "کیش کی کمی کے باوجود رقم نکلوانے کی تصدیق کریں",
+      "investmentSuccess": "مالک کی سرمایہ کاری کامیابی سے درج ہوگئی",
+      "withdrawalSuccess": "مالک کی رقم نکلوانا کامیابی سے درج ہوگیا",
+      "openingSuccess": "ابتدائی کیش کامیابی سے درج ہوگیا"
     }
   },
   "validation": {
@@ -558,7 +573,8 @@
     "selectCountry": "براہ کرم ملک منتخب کریں",
     "selectState": "براہ کرم صوبہ منتخب کریں",
     "usernameTaken": "صارف نام پہلے سے استعمال ہو رہا ہے",
-    "passwordsDoNotMatch": "پاس ورڈ مماثل نہیں ہیں"
+    "passwordsDoNotMatch": "پاس ورڈ مماثل نہیں ہیں",
+    "lineItemsMinOne": "کم از کم ایک آئٹم درکار ہے"
   },
   "pages": {
     "dashboard": {
@@ -962,7 +978,9 @@
     "payments": "ادائیگیاں تلاش کریں...",
     "movements": "مومنٹس تلاش کریں...",
     "option": "تلاش کریں...",
-    "noResults": "کوئی نتیجہ نہیں ملا۔"
+    "noResults": "کوئی نتیجہ نہیں ملا۔",
+    "adjustments": "ایڈجسٹمنٹ تلاش کریں...",
+    "supplierPayments": "سپلائر ادائیگیاں تلاش کریں..."
   },
   "select": {
     "option": "ایک آپشن منتخب کریں",

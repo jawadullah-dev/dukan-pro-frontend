@@ -6,6 +6,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { parseAsString, useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 import { useT } from '@/i18n/use-t';
+import { t } from '@/i18n';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -84,7 +85,7 @@ function ExpenseCategoryCellAction({
                 }}
               >
                 <Icons.close className='me-2 h-4 w-4' />
-                Deactivate
+                {t('common.deactivate')}
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem
@@ -113,7 +114,7 @@ function ExpenseCategoryCellAction({
 const categoryMobileItem: MobileItemConfig<ExpenseCategoryDTO> = {
   title: (row: ExpenseCategoryDTO) => row.name,
   badge: (row: ExpenseCategoryDTO) => ({
-    label: row.isActive ? 'Active' : 'Inactive',
+    label: row.isActive ? t('status.active') : t('status.inactive'),
     status: row.isActive ? 'ACTIVE' : 'INACTIVE'
   }),
   meta: [(row: ExpenseCategoryDTO) => (row.createdAt ? formatDate(row.createdAt) : '—')]
@@ -123,17 +124,20 @@ const categoryDetail: DetailConfig<ExpenseCategoryDTO> = {
   mode: 'sheet',
   title: (row: ExpenseCategoryDTO) => row.name,
   badge: (row: ExpenseCategoryDTO) => ({
-    label: row.isActive ? 'Active' : 'Inactive',
+    label: row.isActive ? t('status.active') : t('status.inactive'),
     status: row.isActive ? 'ACTIVE' : 'INACTIVE'
   }),
   sections: (row: ExpenseCategoryDTO) => [
     {
-      title: 'Category Details',
+      title: t('table.col.category'),
       fields: [
-        { label: 'Category Name', value: row.name },
-        { label: 'Status', value: row.isActive ? 'Active' : 'Inactive' },
-        { label: 'Created At', value: row.createdAt ? formatDate(row.createdAt) : '—' },
-        { label: 'Updated At', value: row.updatedAt ? formatDate(row.updatedAt) : '—' }
+        { label: t('table.col.name'), value: row.name },
+        {
+          label: t('table.col.status'),
+          value: row.isActive ? t('status.active') : t('status.inactive')
+        },
+        { label: t('table.col.createdAt'), value: row.createdAt ? formatDate(row.createdAt) : '—' },
+        { label: t('table.col.updatedAt'), value: row.updatedAt ? formatDate(row.updatedAt) : '—' }
       ]
     }
   ]
@@ -349,9 +353,9 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
           onClose={() => setDeactivateTarget(null)}
           onConfirm={() => deactivateMutation.mutate(deactivateTarget.id)}
           loading={deactivateMutation.isPending}
-          title='Deactivate Expense Category'
+          title={t('common.deactivate')}
           description={`Are you sure you want to deactivate "${deactivateTarget.name}"? Historical expenses will keep this category, but it will be hidden from new expense entries.`}
-          confirmLabel='Deactivate'
+          confirmLabel={t('common.deactivate')}
         />
       )}
 

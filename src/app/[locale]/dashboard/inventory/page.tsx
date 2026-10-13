@@ -13,9 +13,17 @@ export async function generateMetadata() {
   };
 }
 
-export default function Page() {
+import { auth } from '@/auth';
+
+export default async function Page() {
+  const session = await auth();
+  const token = session?.accessToken;
   const qc = getQueryClient();
-  void qc.prefetchQuery(stockQueryOptions({ limit: 100 }));
+  if (token) {
+    await qc.prefetchQuery(
+      stockQueryOptions({ page: 1, pageSize: 20, sortBy: 'name', sortOrder: 'asc' }, token)
+    );
+  }
   return (
     <PageContainer
       fill

@@ -395,7 +395,7 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
               }}
             >
               <IconPlus className='mr-1.5 h-4 w-4' />
-              New adjustment
+              {t('common.adjustStock')}
             </Button>
           )
         }

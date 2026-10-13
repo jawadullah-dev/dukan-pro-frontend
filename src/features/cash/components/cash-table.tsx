@@ -321,7 +321,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
       {toolbarAction}
       <Button size='sm' className='h-8 gap-1.5' onClick={() => setInvestmentOpen(true)}>
         <Icons.add className='h-3.5 w-3.5' />
-        <span>Invest cash</span>
+        <span>{t('common.investCash')}</span>
       </Button>
       <Button
         size='sm'
@@ -330,7 +330,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
         onClick={() => setWithdrawalOpen(true)}
       >
         <Icons.minus className='h-3.5 w-3.5' />
-        <span>Withdraw</span>
+        <span>{t('common.withdraw')}</span>
       </Button>
       <Button
         size='sm'
@@ -339,7 +339,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
         onClick={() => setOpeningCashOpen(true)}
       >
         <Icons.wallet className='h-3.5 w-3.5' />
-        <span>Opening balance</span>
+        <span>{t('common.openingBalance')}</span>
       </Button>
     </div>
   );

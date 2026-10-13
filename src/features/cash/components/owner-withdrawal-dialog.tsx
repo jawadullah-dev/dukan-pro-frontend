@@ -97,13 +97,12 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-          {/* Amount */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='withdrawal-amount' className='text-sm font-normal text-foreground'>
               Withdrawal Amount (PKR) <span className='text-destructive'>*</span>
             </Label>
             <div className='relative w-full'>
-              <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
+              <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
                 Rs
               </span>
               <Input
@@ -119,14 +118,13 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
                   setConfirmOverdraft(false);
                 }}
                 disabled={withdrawalMutation.isPending}
-                className='h-10 pl-9 text-sm font-normal text-foreground w-full'
+                className='h-10 ps-9 text-sm font-normal text-foreground w-full'
                 autoFocus
                 required
               />
             </div>
           </div>
 
-          {/* Date */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='withdrawal-date' className='text-sm font-normal text-foreground'>
               Date <span className='text-destructive'>*</span>
@@ -142,7 +140,6 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
             />
           </div>
 
-          {/* Notes */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='withdrawal-notes' className='text-sm font-normal text-foreground'>
               Notes <span className='text-xs text-muted-foreground'>(Optional)</span>
@@ -158,7 +155,6 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
             />
           </div>
 
-          {/* Overdraft Warning Banner */}
           {overdraftPrompt && (
             <div className='rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 space-y-2.5 text-xs text-amber-900 dark:text-amber-200'>
               <div className='flex items-start gap-2'>

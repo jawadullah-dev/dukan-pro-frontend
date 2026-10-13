@@ -3,8 +3,8 @@ export interface ExpenseDTO {
   shopId: string;
   categoryId: string;
   categoryName: string;
-  amount: number; // in PAISA
-  expenseDate: string; // YYYY-MM-DD
+  amount: number;
+  expenseDate: string;
   description: string | null;
   status: 'ACTIVE' | 'CANCELLED';
   cancelledAt: string | null;
@@ -26,8 +26,8 @@ export interface ExpenseCategoryDTO {
 
 export interface CreateExpenseInput {
   categoryId: string;
-  amount: number; // in PAISA
-  expenseDate: string; // YYYY-MM-DD
+  amount: number;
+  expenseDate: string;
   description?: string;
   confirmOverdraft?: boolean;
 }

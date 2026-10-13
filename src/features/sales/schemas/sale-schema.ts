@@ -21,9 +21,4 @@ export const createSaleFormSchema = (t: Translator) =>
       .min(1, t('validation.lineItemsMinOne'))
   });
 
-export const createReasonSchema = (t: Translator) =>
-  z.object({
-    reason: z.string().trim().min(1, t('validation.reasonRequired'))
-  });
-
-export type SaleFormValues = z.infer<ReturnType<typeof createSaleFormSchema>>;
+type SaleFormValues = z.infer<ReturnType<typeof createSaleFormSchema>>;

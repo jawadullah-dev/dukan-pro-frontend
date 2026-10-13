@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { ProductImageDTO } from '@/lib/api/types';
+import { AppError } from '@/lib/errors';
 
 import {
   useDeleteProductImage,
@@ -40,7 +41,6 @@ export function ProductPhotoManager({ productId, images, onChange }: ProductPhot
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Resize to max 1600px
     try {
       setIsIconUploading(true);
       const resizedBlob = await resizeImage(file, 1600);
@@ -93,9 +93,9 @@ export function ProductPhotoManager({ productId, images, onChange }: ProductPhot
           disabled={isIconUploading || uploadMutation.isPending}
         >
           {isIconUploading || uploadMutation.isPending ? (
-            <IconLoader2 className='mr-2 h-4 w-4 animate-spin' />
+            <IconLoader2 className='me-2 h-4 w-4 animate-spin' />
           ) : (
-            <IconPlus className='mr-2 h-4 w-4' />
+            <IconPlus className='me-2 h-4 w-4' />
           )}
           {isIconUploading || uploadMutation.isPending ? t('uploading') : t('uploadImage')}
         </Button>
@@ -155,7 +155,7 @@ export function ProductPhotoManager({ productId, images, onChange }: ProductPhot
                 </Button>
               </div>
               {index === 0 && (
-                <div className='absolute left-1 top-1 rounded bg-primary px-1.5 py-0.5 text-xs text-primary-foreground'>
+                <div className='absolute start-1 top-1 rounded bg-primary px-1.5 py-0.5 text-xs text-primary-foreground'>
                   {t('cover')}
                 </div>
               )}
@@ -174,13 +174,13 @@ async function resizeImage(file: File, maxSize: number): Promise<Blob> {
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas context not available');
+  if (!ctx) throw new AppError('Canvas context not available');
   ctx.drawImage(img, 0, 0, width, height);
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => {
         if (blob) resolve(blob);
-        else reject(new Error('Failed to resize image'));
+        else reject(new AppError('Failed to resize image'));
       },
       'image/jpeg',
       0.85

@@ -53,7 +53,6 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);
   const [previewData, setPreviewData] = useState<ReturnPreviewDTO | null>(null);
 
-  // Initialize return state for each item
   const [itemStates, setItemStates] = useState<Record<string, ItemReturnState>>(() => {
     const initial: Record<string, ItemReturnState> = {};
     for (const item of sale.items) {

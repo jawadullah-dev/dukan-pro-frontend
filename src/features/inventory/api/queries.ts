@@ -1,21 +1,31 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { ListFilters } from '@/lib/dukaan';
-import { listInventoryMovements, listStock } from './service';
+import {
+  listInventoryAdjustments,
+  listInventoryStock,
+  type InventoryAdjustmentsFilters,
+  type InventoryStockFilters
+} from './service';
 
 export const inventoryKeys = {
   all: ['inventory'] as const,
-  stock: (filters?: ListFilters) => [...inventoryKeys.all, 'stock', filters] as const,
-  movements: (filters?: ListFilters) => [...inventoryKeys.all, 'movements', filters] as const
+  stock: (filters?: InventoryStockFilters) => [...inventoryKeys.all, 'stock', filters] as const,
+  adjustments: (filters?: InventoryAdjustmentsFilters) =>
+    [...inventoryKeys.all, 'adjustments', filters] as const,
+  movements: (filters?: InventoryAdjustmentsFilters) =>
+    [...inventoryKeys.all, 'movements', filters] as const
 };
 
-export const stockQueryOptions = (filters: ListFilters = {}) =>
+export const inventoryStockQueryOptions = (filters: InventoryStockFilters = {}, token?: string) =>
   queryOptions({
     queryKey: inventoryKeys.stock(filters),
-    queryFn: () => listStock(filters)
+    queryFn: () => listInventoryStock(filters, token)
   });
 
-export const inventoryMovementsQueryOptions = (filters: ListFilters = {}) =>
+export const inventoryAdjustmentsQueryOptions = (
+  filters: InventoryAdjustmentsFilters = {},
+  token?: string
+) =>
   queryOptions({
-    queryKey: inventoryKeys.movements(filters),
-    queryFn: () => listInventoryMovements(filters)
+    queryKey: inventoryKeys.adjustments(filters),
+    queryFn: () => listInventoryAdjustments(filters, token)
   });

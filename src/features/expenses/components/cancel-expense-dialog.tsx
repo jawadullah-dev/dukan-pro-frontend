@@ -83,7 +83,6 @@ export function CancelExpenseDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-          {/* Summary Box */}
           <div className='rounded-xl border border-border/70 bg-muted/30 p-3 text-xs space-y-1.5'>
             <div className='flex items-center justify-between text-muted-foreground'>
               <span>Category:</span>
@@ -115,13 +114,11 @@ export function CancelExpenseDialog({
             </div>
           </div>
 
-          {/* Cancellation Reason */}
           <div className='space-y-2'>
             <Label htmlFor='expense-cancel-reason' className='text-sm font-normal text-foreground'>
               Cancellation Reason <span className='text-destructive'>*</span>
             </Label>
 
-            {/* Preset Reason Chips */}
             <div className='flex flex-wrap gap-1.5'>
               {PRESET_REASONS.map((preset) => (
                 <button
@@ -147,7 +144,6 @@ export function CancelExpenseDialog({
             />
           </div>
 
-          {/* Footer buttons: Keep and Confirm with icons and gap */}
           <DialogFooter className='gap-2 sm:gap-2.5 pt-2'>
             <Button
               type='button'

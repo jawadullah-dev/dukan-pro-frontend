@@ -18,4 +18,4 @@ export const createSupplierFormSchema = (t: Translator) =>
       .min(0, t('validation.valueNonNegative'))
   });
 
-export type SupplierFormValues = z.infer<ReturnType<typeof createSupplierFormSchema>>;
+type SupplierFormValues = z.infer<ReturnType<typeof createSupplierFormSchema>>;

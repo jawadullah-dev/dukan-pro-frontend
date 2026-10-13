@@ -6,7 +6,6 @@ import type {
   CancelPaymentInput,
   CancelImpactDTO
 } from '@/lib/api/types';
-import { ApiError } from '@/lib/api/types';
 
 export interface PaymentsListFilters {
   page?: number;
@@ -23,21 +22,7 @@ export interface PaymentsListFilters {
   sortOrder?: 'asc' | 'desc';
 }
 
-async function paymentsFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, { ...init, cache: 'no-store' });
-  const body = (await res.json()) as T & { error?: string; message?: string | string[] };
-
-  if (!res.ok) {
-    const rawMessage =
-      (body as { message?: string | string[] }).message ?? (body as { error?: string }).error;
-    const message = Array.isArray(rawMessage)
-      ? rawMessage.join(', ')
-      : (rawMessage ?? 'An error occurred');
-    throw new ApiError(res.status, message);
-  }
-
-  return body;
-}
+import { appFetch } from '@/lib/api/app-fetch';
 
 export async function listPayments(
   filters: PaymentsListFilters = {},
@@ -59,24 +44,22 @@ export async function listPayments(
 
   const qs = params.toString() ? `?${params.toString()}` : '';
 
-  // Server-side prefetch with token: direct call to NestJS backend
   if (token) {
     return apiRequest<PaginatedResponse<PaymentDTO>>(`/payments${qs}`, undefined, token);
   }
 
-  // Client-side call via Next.js proxy route
-  return paymentsFetch<PaginatedResponse<PaymentDTO>>(`/api/payments${qs}`);
+  return appFetch<PaginatedResponse<PaymentDTO>>(`/api/payments${qs}`);
 }
 
 export async function getPayment(id: string, token?: string): Promise<PaymentDTO> {
   if (token) {
     return apiRequest<PaymentDTO>(`/payments/${id}`, undefined, token);
   }
-  return paymentsFetch<PaymentDTO>(`/api/payments/${id}`);
+  return appFetch<PaymentDTO>(`/api/payments/${id}`);
 }
 
-export async function createPayment(input: CreatePaymentInput): Promise<any> {
-  return paymentsFetch<any>('/api/payments', {
+export async function createPayment(input: CreatePaymentInput): Promise<PaymentDTO> {
+  return appFetch<PaymentDTO>('/api/payments', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -87,14 +70,14 @@ export async function getPaymentCancelImpact(id: string, token?: string): Promis
   if (token) {
     return apiRequest<CancelImpactDTO>(`/payments/${id}/cancel-impact`, undefined, token);
   }
-  return paymentsFetch<CancelImpactDTO>(`/api/payments/${id}/cancel-impact`);
+  return appFetch<CancelImpactDTO>(`/api/payments/${id}/cancel-impact`);
 }
 
 export async function cancelPayment(
   id: string,
   input: CancelPaymentInput
 ): Promise<{ success: boolean; confirmOverdraft?: boolean; shortfall?: number; message?: string }> {
-  return paymentsFetch<{
+  return appFetch<{
     success: boolean;
     confirmOverdraft?: boolean;
     shortfall?: number;

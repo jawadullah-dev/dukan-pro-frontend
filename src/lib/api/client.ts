@@ -1,9 +1,5 @@
 import { ApiError, type ApiErrorBody, type ApiSuccessResponse } from './types';
-
-const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000').replace(
-  /\/+$/,
-  ''
-);
+import { API_BASE_URL } from '@/constants/api';
 
 export async function apiRequest<T>(
   path: string,
@@ -40,12 +36,11 @@ export async function apiRequest<T>(
     throw new ApiError(response.status, message, body ?? undefined);
   }
 
-  // Backend wraps response in ApiSuccessResponseDTO { message, data }
   if (body && typeof body === 'object' && 'data' in body) {
     return body.data as T;
   }
 
-  return body as unknown as T;
+  return (body as T) ?? ({} as T);
 }
 
 export * from './types';

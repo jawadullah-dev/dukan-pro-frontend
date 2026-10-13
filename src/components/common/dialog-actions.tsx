@@ -55,33 +55,3 @@ export function DialogPrimaryButton({
     </Button>
   );
 }
-
-interface DialogConfirmButtonProps {
-  disabled?: boolean;
-  loading?: boolean;
-  type?: 'submit' | 'button';
-  onClick?: () => void;
-  label?: string;
-}
-
-export function DialogConfirmButton({
-  disabled,
-  loading = false,
-  type = 'submit',
-  onClick,
-  label
-}: DialogConfirmButtonProps) {
-  const t = useT();
-  return (
-    <Button
-      type={type}
-      variant='destructive'
-      disabled={disabled}
-      isLoading={loading}
-      onClick={onClick}
-    >
-      <Icons.trash className='me-2 h-4 w-4' />
-      {label ?? t('common.confirm')}
-    </Button>
-  );
-}

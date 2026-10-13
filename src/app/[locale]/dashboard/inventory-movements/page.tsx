@@ -1,6 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
-import { InventoryMovementsClient } from '@/features/inventory';
-import { inventoryMovementsQueryOptions } from '@/features/inventory';
+import { InventoryMovementsClient, inventoryAdjustmentsQueryOptions } from '@/features/inventory';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
@@ -15,7 +14,7 @@ export async function generateMetadata() {
 
 export default function Page() {
   const qc = getQueryClient();
-  void qc.prefetchQuery(inventoryMovementsQueryOptions({ limit: 100 }));
+  void qc.prefetchQuery(inventoryAdjustmentsQueryOptions({ pageSize: 100 }));
   return (
     <PageContainer
       fill

@@ -5,25 +5,29 @@ import { paymentKeys } from './queries';
 import { cancelPayment, createPayment } from './service';
 import { customerKeys } from '@/features/customers/api/queries';
 
+function invalidatePaymentDependencies() {
+  const qc = getQueryClient();
+  qc.invalidateQueries({ queryKey: paymentKeys.all });
+  qc.invalidateQueries({ queryKey: customerKeys.all });
+  qc.invalidateQueries({ queryKey: ['cash'] });
+  qc.invalidateQueries({ queryKey: ['sales'] });
+}
+
 export const createPaymentMutation = mutationOptions({
   mutationFn: (input: CreatePaymentInput) => createPayment(input),
   onSuccess: () => {
-    const qc = getQueryClient();
-    qc.invalidateQueries({ queryKey: paymentKeys.all });
-    qc.invalidateQueries({ queryKey: customerKeys.all });
-    qc.invalidateQueries({ queryKey: ['cash'] });
-    qc.invalidateQueries({ queryKey: ['sales'] });
+    invalidatePaymentDependencies();
   }
 });
 
+export interface CancelPaymentMutationVariables {
+  id: string;
+  input: CancelPaymentInput;
+}
+
 export const cancelPaymentMutation = mutationOptions({
-  mutationFn: ({ id, input }: { id: string; input: CancelPaymentInput }) =>
-    cancelPayment(id, input),
+  mutationFn: ({ id, input }: CancelPaymentMutationVariables) => cancelPayment(id, input),
   onSuccess: () => {
-    const qc = getQueryClient();
-    qc.invalidateQueries({ queryKey: paymentKeys.all });
-    qc.invalidateQueries({ queryKey: customerKeys.all });
-    qc.invalidateQueries({ queryKey: ['cash'] });
-    qc.invalidateQueries({ queryKey: ['sales'] });
+    invalidatePaymentDependencies();
   }
 });

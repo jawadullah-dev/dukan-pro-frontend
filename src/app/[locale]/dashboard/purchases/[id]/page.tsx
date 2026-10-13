@@ -5,6 +5,7 @@ import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
+import { auth } from '@/auth';
 
 export async function generateMetadata() {
   const t = await getTranslations('metadata');
@@ -19,8 +20,13 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
+  const session = await auth();
+  const token = session?.accessToken;
   const qc = getQueryClient();
-  void qc.prefetchQuery(purchaseQueryOptions(id));
+  if (token) {
+    await qc.prefetchQuery(purchaseQueryOptions(id, token));
+  }
+
   return (
     <PageContainer
       pageTitle='pages.purchaseDetail.title'

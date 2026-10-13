@@ -23,9 +23,4 @@ export const createPurchaseFormSchema = (t: Translator) =>
       .min(1, t('validation.lineItemsMinOne'))
   });
 
-export const createReasonSchema = (t: Translator) =>
-  z.object({
-    reason: z.string().trim().min(1, t('validation.reasonRequired'))
-  });
-
-export type PurchaseFormValues = z.infer<ReturnType<typeof createPurchaseFormSchema>>;
+type PurchaseFormValues = z.infer<ReturnType<typeof createPurchaseFormSchema>>;

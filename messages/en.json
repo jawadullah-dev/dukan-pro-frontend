@@ -197,6 +197,7 @@
     "noAccess": "You do not have access to this page.",
     "addCustomer": "Add customer",
     "newPurchase": "New purchase",
+    "adjustStock": "Adjust Stock",
     "addSupplier": "Add supplier",
     "newSale": "New sale",
     "addExpense": "Add expense",
@@ -1011,6 +1012,8 @@
     "inventory": "Search inventory...",
     "payments": "Search payments...",
     "movements": "Search movements...",
+    "adjustments": "Search adjustments...",
+    "supplierPayments": "Search supplier payments...",
     "option": "Search...",
     "noResults": "No results found."
   },

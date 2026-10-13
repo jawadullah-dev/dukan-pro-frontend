@@ -1,6 +1,5 @@
 import { apiRequest } from '@/lib/api/client';
 import type { PaginatedResponse, CancelImpactDTO } from '@/lib/api/types';
-import { ApiError } from '@/lib/api/types';
 import type {
   SupplierPaymentDTO,
   SupplierPayableDTO,
@@ -11,20 +10,7 @@ import type {
   SupplierPaymentQueryFilter
 } from '@/types/supplier-payment';
 
-async function supplierPaymentsFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, { ...init, cache: 'no-store' });
-  const body = (await res.json()) as T & { error?: string; message?: string | string[] };
-
-  if (!res.ok) {
-    const rawMessage = body.message ?? body.error;
-    const message = Array.isArray(rawMessage)
-      ? rawMessage.join(', ')
-      : (rawMessage ?? 'An error occurred');
-    throw new ApiError(res.status, message);
-  }
-
-  return body;
-}
+import { appFetch } from '@/lib/api/app-fetch';
 
 export async function listSupplierPayments(
   filters: SupplierPaymentQueryFilter = {},
@@ -53,9 +39,7 @@ export async function listSupplierPayments(
     );
   }
 
-  return supplierPaymentsFetch<PaginatedResponse<SupplierPaymentDTO>>(
-    `/api/supplier-payments${qs}`
-  );
+  return appFetch<PaginatedResponse<SupplierPaymentDTO>>(`/api/supplier-payments${qs}`);
 }
 
 export async function getSupplierPayable(
@@ -69,13 +53,13 @@ export async function getSupplierPayable(
       token
     );
   }
-  return supplierPaymentsFetch<SupplierPayableDTO>(`/api/supplier-payments/payable/${supplierId}`);
+  return appFetch<SupplierPayableDTO>(`/api/supplier-payments/payable/${supplierId}`);
 }
 
 export async function createSupplierPayment(
   input: CreateSupplierPaymentInput
 ): Promise<CreateSupplierPaymentResult> {
-  return supplierPaymentsFetch<CreateSupplierPaymentResult>('/api/supplier-payments', {
+  return appFetch<CreateSupplierPaymentResult>('/api/supplier-payments', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -89,14 +73,14 @@ export async function getSupplierPaymentCancelImpact(
   if (token) {
     return apiRequest<CancelImpactDTO>(`/supplier-payments/${id}/cancel-impact`, undefined, token);
   }
-  return supplierPaymentsFetch<CancelImpactDTO>(`/api/supplier-payments/${id}/cancel-impact`);
+  return appFetch<CancelImpactDTO>(`/api/supplier-payments/${id}/cancel-impact`);
 }
 
 export async function cancelSupplierPayment(
   id: string,
   input: CancelSupplierPaymentInput
 ): Promise<CancelSupplierPaymentResult> {
-  return supplierPaymentsFetch<CancelSupplierPaymentResult>(`/api/supplier-payments/${id}/cancel`, {
+  return appFetch<CancelSupplierPaymentResult>(`/api/supplier-payments/${id}/cancel`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)

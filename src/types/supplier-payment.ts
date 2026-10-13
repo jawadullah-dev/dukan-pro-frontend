@@ -5,8 +5,8 @@ export interface SupplierPaymentDTO {
   supplierName?: string;
   purchaseId?: string | null;
   purchaseNo?: string | null;
-  amount: number; // in PAISA
-  paymentDate: string; // YYYY-MM-DD
+  amount: number;
+  paymentDate: string;
   status: 'ACTIVE' | 'CANCELLED';
   cancelledAt?: string | null;
   cancelReason?: string | null;
@@ -24,7 +24,7 @@ export interface SupplierDTO {
   phone?: string | null;
   address?: string | null;
   notes?: string | null;
-  openingBalance: number; // in PAISA
+  openingBalance: number;
   isSystem: boolean;
   isActive: boolean;
   createdAt: string;
@@ -35,28 +35,28 @@ export interface UnpaidPurchaseDTO {
   id: string;
   purchaseNo: string;
   supplierInvoiceRef?: string | null;
-  purchaseDate: string; // YYYY-MM-DD
-  totalAmount: number; // in PAISA
-  paidAmount: number; // in PAISA
-  remaining: number; // in PAISA
+  purchaseDate: string;
+  totalAmount: number;
+  paidAmount: number;
+  remaining: number;
 }
 
 export interface SupplierPayableDTO {
   supplierId: string;
   supplierName: string;
-  openingBalance: number; // in PAISA
-  openingRemaining: number; // in PAISA
-  totalPurchases: number; // in PAISA
-  totalPaid: number; // in PAISA
-  payable: number; // in PAISA
+  openingBalance: number;
+  openingRemaining: number;
+  totalPurchases: number;
+  totalPaid: number;
+  payable: number;
   unpaidPurchases: UnpaidPurchaseDTO[];
 }
 
 export interface CreateSupplierPaymentInput {
   supplierId: string;
   purchaseId?: string | null;
-  amount: number; // in PAISA
-  paymentDate: string; // YYYY-MM-DD
+  amount: number;
+  paymentDate: string;
   confirmOverdraft?: boolean;
   notes?: string;
 }

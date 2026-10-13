@@ -112,7 +112,6 @@ export function CancelSupplierPaymentDialog({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-            {/* Impact Preview */}
             <div className='rounded-xl border border-border/70 bg-muted/30 p-3 text-xs space-y-2'>
               <div className='flex items-center justify-between text-muted-foreground'>
                 <span>Supplier:</span>
@@ -160,7 +159,6 @@ export function CancelSupplierPaymentDialog({
               ) : null}
             </div>
 
-            {/* Cancellation Reason */}
             <div className='space-y-2'>
               <div className='flex items-center justify-between'>
                 <Label
@@ -171,7 +169,6 @@ export function CancelSupplierPaymentDialog({
                 </Label>
               </div>
 
-              {/* Preset Reason Chips */}
               <div className='flex flex-wrap gap-1.5'>
                 {PRESET_REASONS.map((preset) => (
                   <button
@@ -197,7 +194,6 @@ export function CancelSupplierPaymentDialog({
               />
             </div>
 
-            {/* Footer buttons: Keep and Confirm with icons and gap */}
             <DialogFooter className='gap-2 sm:gap-2.5 pt-2'>
               <Button
                 type='button'

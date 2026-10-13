@@ -32,10 +32,6 @@ import { expenseCategoriesQueryOptions, expenseKeys } from '../api/queries';
 import { deleteExpenseCategoryMutation, updateExpenseCategoryMutation } from '../api/mutations';
 import { ExpenseCategoryDialog } from './expense-category-dialog';
 
-// ---------------------------------------------------------------------------
-// Row Actions
-// ---------------------------------------------------------------------------
-
 interface ExpenseCategoryCellActionProps {
   category: ExpenseCategoryDTO;
   onEdit: (category: ExpenseCategoryDTO) => void;
@@ -106,10 +102,6 @@ function ExpenseCategoryCellAction({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Mobile & Detail Configurations
-// ---------------------------------------------------------------------------
-
 const categoryMobileItem: MobileItemConfig<ExpenseCategoryDTO> = {
   title: (row: ExpenseCategoryDTO) => row.name,
   badge: (row: ExpenseCategoryDTO) => ({
@@ -138,10 +130,6 @@ const categoryDetail: DetailConfig<ExpenseCategoryDTO> = {
     }
   ]
 };
-
-// ---------------------------------------------------------------------------
-// Main ExpenseCategoriesTable Component
-// ---------------------------------------------------------------------------
 
 interface ExpenseCategoriesTableProps {
   toolbarAction?: ReactNode;

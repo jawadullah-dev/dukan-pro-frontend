@@ -46,7 +46,7 @@ import { useRender } from '@base-ui/react/use-render';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { useComposedRefs } from '@/lib/compose-refs';
+import { useComposedRefs } from '@radix-ui/react-compose-refs';
 import { cn } from '@/lib/utils';
 
 const directions: string[] = [
@@ -704,7 +704,7 @@ function KanbanColumn(props: KanbanColumnProps) {
     animateLayoutChanges
   });
 
-  const composedRef = useComposedRefs(ref, (node) => {
+  const composedRef = useComposedRefs(ref, (node: any) => {
     if (disabled) return;
     setNodeRef(node);
   });
@@ -794,7 +794,7 @@ function KanbanColumnHandle(props: KanbanColumnHandleProps) {
 
   const isDisabled = disabled ?? columnContext.disabled;
 
-  const composedRef = useComposedRefs(ref, (node) => {
+  const composedRef = useComposedRefs(ref, (node: any) => {
     if (isDisabled) return;
     columnContext.setActivatorNodeRef(node);
   });
@@ -877,7 +877,7 @@ function KanbanItem(props: KanbanItemProps) {
     throw new Error(`\`${ITEM_NAME}\` value cannot be an empty string`);
   }
 
-  const composedRef = useComposedRefs(ref, (node) => {
+  const composedRef = useComposedRefs(ref, (node: any) => {
     if (disabled) return;
     setNodeRef(node);
   });
@@ -948,7 +948,7 @@ function KanbanItemHandle(props: KanbanItemHandleProps) {
 
   const isDisabled = disabled ?? itemContext.disabled;
 
-  const composedRef = useComposedRefs(ref, (node) => {
+  const composedRef = useComposedRefs(ref, (node: any) => {
     if (isDisabled) return;
     itemContext.setActivatorNodeRef(node);
   });

@@ -48,10 +48,6 @@ import { saleKeys, saleQueryOptions } from '../api/queries';
 import { createSaleMutation } from '../api/mutations';
 import type { CreateSaleInput, CreateSaleItemInput, SaleDTO } from '@/lib/api/types';
 
-// ---------------------------------------------------------------------------
-// Dialog wrapper for creating a sale
-// ---------------------------------------------------------------------------
-
 interface SaleCreateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -93,10 +89,6 @@ export function SaleCreateDialog({ open, onOpenChange, clearDefaultQuery }: Sale
   );
 }
 
-// ---------------------------------------------------------------------------
-// Header Action
-// ---------------------------------------------------------------------------
-
 interface SalesHeaderActionProps {
   className?: string;
   onAdd: () => void;
@@ -111,10 +103,6 @@ export function SalesHeaderAction({ className, onAdd }: SalesHeaderActionProps) 
     </Button>
   );
 }
-
-// ---------------------------------------------------------------------------
-// SalesListClient
-// ---------------------------------------------------------------------------
 
 interface SalesListClientProps {
   defaultOpenAdd?: boolean;
@@ -138,10 +126,6 @@ export function SalesListClient({ defaultOpenAdd = false }: SalesListClientProps
   );
 }
 
-// ---------------------------------------------------------------------------
-// Create Form
-// ---------------------------------------------------------------------------
-
 interface SaleLineItem {
   product_id: string;
   quantity: number;
@@ -156,6 +140,10 @@ interface SaleFormValues {
   paid_now: number;
   lines: SaleLineItem[];
   notes?: string;
+}
+
+interface SaleFormSubmitContext {
+  value: SaleFormValues;
 }
 
 const emptySaleLine: SaleLineItem = {
@@ -195,7 +183,7 @@ export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
       notes: '',
       lines: [{ ...emptySaleLine }]
     },
-    onSubmit: ({ value }: { value: SaleFormValues }) => {
+    onSubmit: ({ value }: SaleFormSubmitContext) => {
       const items: CreateSaleItemInput[] = value.lines
         .filter((l) => l.product_id)
         .map((l) => ({
@@ -448,10 +436,6 @@ export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// SaleDetailClient
-// ---------------------------------------------------------------------------
-
 interface SaleDetailClientProps {
   id: string;
 }
@@ -478,7 +462,6 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
         <ReturnSaleDialog sale={data} open={returnOpen} onOpenChange={setReturnOpen} />
       )}
 
-      {/* Header */}
       <div className='flex flex-wrap items-start justify-between gap-3'>
         <div>
           <div className='flex items-center gap-2'>
@@ -542,7 +525,6 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
         </div>
       </div>
 
-      {/* Cancelled Banner */}
       {isCancelled && (
         <div className='rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive'>
           <p className='font-semibold'>This sale has been cancelled.</p>
@@ -555,7 +537,6 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
         </div>
       )}
 
-      {/* Items Table */}
       <div className='rounded-lg border'>
         <Table>
           <TableHeader>
@@ -581,9 +562,7 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
         </Table>
       </div>
 
-      {/* Payments and Returns cards */}
       <div className='grid gap-4 md:grid-cols-2'>
-        {/* Payments */}
         <div className='rounded-lg border p-4 space-y-3'>
           <h4 className='font-semibold text-sm'>Payments Recorded</h4>
           {(data.payments ?? []).length === 0 ? (
@@ -613,7 +592,6 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
           )}
         </div>
 
-        {/* Financial Summary */}
         <div className='rounded-lg border p-4 space-y-2 text-sm'>
           <h4 className='font-semibold'>Sale Summary</h4>
           <div className='flex justify-between text-muted-foreground'>
@@ -641,7 +619,6 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
         </div>
       </div>
 
-      {/* Returns History */}
       {(data.returns ?? []).length > 0 && (
         <div className='rounded-lg border p-4 space-y-3'>
           <h4 className='font-semibold text-sm'>Returns History</h4>
@@ -677,10 +654,6 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// SaleReceiptClient
-// ---------------------------------------------------------------------------
 
 interface SaleReceiptClientProps {
   id: string;

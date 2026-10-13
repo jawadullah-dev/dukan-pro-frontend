@@ -22,14 +22,6 @@ export function productsQueryOptions(filters: ProductListFilters = {}, token?: s
   });
 }
 
-export function productQueryOptions(id: string, token?: string) {
-  return queryOptions({
-    queryKey: productsQueryKeys.detail(id),
-    queryFn: () => getProduct(id, token),
-    enabled: !!id
-  });
-}
-
 export function productImagesQueryOptions(productId: string, token?: string) {
   return queryOptions({
     queryKey: productsQueryKeys.imageList(productId),
@@ -38,10 +30,14 @@ export function productImagesQueryOptions(productId: string, token?: string) {
   });
 }
 
+export interface ProductImageQueryExtraOptions {
+  enabled?: boolean;
+}
+
 export function useProductImagesQuery(
   productId: string,
   token?: string,
-  options?: { enabled?: boolean }
+  options?: ProductImageQueryExtraOptions
 ) {
   return useQuery({
     ...productImagesQueryOptions(productId, token),

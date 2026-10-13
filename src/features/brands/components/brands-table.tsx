@@ -34,10 +34,6 @@ import type { BrandDTO } from '@/lib/api/types';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { BrandDialog } from './brand-dialog';
 
-// ---------------------------------------------------------------------------
-// Cell action
-// ---------------------------------------------------------------------------
-
 interface BrandCellActionProps {
   data: BrandDTO;
 }
@@ -89,10 +85,6 @@ function BrandCellAction({ data }: BrandCellActionProps) {
     </>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Table
-// ---------------------------------------------------------------------------
 
 const brandColumns: ColumnDef<BrandDTO>[] = [
   {

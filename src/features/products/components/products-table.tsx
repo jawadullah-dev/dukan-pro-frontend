@@ -35,10 +35,6 @@ import { formatPkr } from '@/lib/dukaan/numbers';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { ProductDialog } from './product-dialog';
 
-// ---------------------------------------------------------------------------
-// Cell Action
-// ---------------------------------------------------------------------------
-
 interface ProductCellActionProps {
   data: ProductDTO;
 }
@@ -93,10 +89,6 @@ function ProductCellAction({ data }: ProductCellActionProps) {
     </>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Table Columns
-// ---------------------------------------------------------------------------
 
 const productColumns: ColumnDef<ProductDTO>[] = [
   {
@@ -246,10 +238,6 @@ const productDetail: DetailConfig<ProductDTO> = {
     }
   ]
 };
-
-// ---------------------------------------------------------------------------
-// Table Component
-// ---------------------------------------------------------------------------
 
 interface ProductsTableProps {
   toolbarAction?: ReactNode;

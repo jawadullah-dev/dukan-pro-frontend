@@ -157,22 +157,21 @@ export function CategorySelectCombobox({
         align='start'
         className='z-50 w-[var(--radix-popover-trigger-width)] min-w-[320px] p-0 shadow-lg'
       >
-        {/* Search Input Header */}
         <div className='p-2 pb-1.5'>
           <div className='relative flex items-center'>
-            <Icons.search className='pointer-events-none absolute left-2.5 size-4 text-muted-foreground' />
+            <Icons.search className='pointer-events-none absolute start-2.5 size-4 text-muted-foreground' />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder='Search category...'
-              className='h-9 pl-8 pr-8 text-sm font-normal text-foreground w-full'
+              className='h-9 ps-8 pe-8 text-sm font-normal text-foreground w-full'
               autoFocus
             />
             {search && (
               <button
                 type='button'
                 onClick={() => setSearch('')}
-                className='absolute right-2.5 text-muted-foreground hover:text-foreground'
+                className='absolute end-2.5 text-muted-foreground hover:text-foreground'
               >
                 <Icons.close className='size-3.5' />
               </button>
@@ -180,7 +179,6 @@ export function CategorySelectCombobox({
           </div>
         </div>
 
-        {/* Scrollable list with auto-pagination */}
         <div
           onScroll={handleScroll}
           className='max-h-56 overflow-y-auto p-1 text-sm divide-y divide-border/20'
@@ -223,7 +221,6 @@ export function CategorySelectCombobox({
           )}
         </div>
 
-        {/* Add New Category button footer */}
         {onAddNewCategoryClick && (
           <div className='border-t border-border/60 p-1.5 bg-muted/20'>
             <Button

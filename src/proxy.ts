@@ -29,7 +29,6 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
   const isLoggedIn = !!session?.user;
   const role = session?.user?.role;
 
-  // Both login pages — owner and platform admin.
   const isOwnerLoginPage = pathname.endsWith('/login') && !pathname.includes('/platform-admin');
   const isPlatformAdminLoginPage = /\/platform-admin\/login(\/|$)/.test(pathname);
   const isAnyLoginPage = isOwnerLoginPage || isPlatformAdminLoginPage;
@@ -52,7 +51,6 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     return handleI18nRouting(req);
   }
 
-  // Protect dashboard routes — unauthenticated users go to /login.
   if (startsWithDashboard && !isLoggedIn) {
     const url = req.nextUrl.clone();
     url.pathname = loginPath(locale);
@@ -60,12 +58,10 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     return NextResponse.redirect(url);
   }
 
-  // Redirect logged-in users away from login pages to their home dashboard.
   if (isAnyLoginPage && isLoggedIn) {
     return NextResponse.redirect(new URL(homePathForRole(role, locale), req.nextUrl));
   }
 
-  // Role-based redirect inside the dashboard (e.g. owner hitting /platform).
   if (isLoggedIn && role) {
     const roleRedirect = redirectForRole(pathname, role);
     if (roleRedirect) {
@@ -73,7 +69,6 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     }
   }
 
-  // Redirect root to home dashboard when logged in, or to /login when not.
   if (pathname === '/' || /^\/(en|ur|ps)\/?$/.test(pathname)) {
     if (isLoggedIn) {
       const to = req.nextUrl.searchParams.get('to');
@@ -83,7 +78,6 @@ function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string
     return NextResponse.redirect(new URL(loginPath(locale), req.nextUrl));
   }
 
-  // /dashboard (bare) → role home.
   if (/^\/(en|ur|ps)\/dashboard\/?$/.test(pathname) && isLoggedIn) {
     return NextResponse.redirect(new URL(homePathForRole(role, locale), req.nextUrl));
   }

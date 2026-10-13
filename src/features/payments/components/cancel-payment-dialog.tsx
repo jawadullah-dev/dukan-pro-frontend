@@ -127,7 +127,6 @@ export function CancelPaymentDialog({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className='space-y-4'>
-            {/* Impact preview */}
             {impact && (
               <div className='rounded-lg border bg-muted/40 p-3 text-xs space-y-2'>
                 <p className='font-semibold text-foreground text-sm'>Drawer Impact Preview</p>
@@ -174,7 +173,6 @@ export function CancelPaymentDialog({
               </div>
             )}
 
-            {/* Reason field */}
             <div className='space-y-1.5'>
               <Label htmlFor='cancel-reason' className='text-xs font-medium text-foreground'>
                 Reason for Cancellation <span className='text-destructive'>*</span>
@@ -202,7 +200,6 @@ export function CancelPaymentDialog({
               </div>
             </div>
 
-            {/* Overdraft confirmation checkbox */}
             {(impact?.willCauseOverdraft || overdraftPrompt) && (
               <div
                 onClick={() => setConfirmOverdraft((prev) => !prev)}

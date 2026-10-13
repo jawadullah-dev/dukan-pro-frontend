@@ -20,7 +20,7 @@ import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
 import { createClientRequestId, formatPkr, toPaisa } from '@/lib/dukaan/numbers';
 import { customerQueryOptions, dukaanKeys } from '@/features/dukaan/api/queries';
-import { createReceivePaymentSchema } from '@/features/dukaan/schemas/forms';
+import { createReceivePaymentSchema } from '../schemas/customer-schema';
 import { CustomerDialog } from './customer-dialog';
 import { CustomersTable } from './customers-table';
 

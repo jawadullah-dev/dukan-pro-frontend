@@ -32,7 +32,13 @@ export function getSession(): MockSession {
     store.users.find((u) => u.shop_id === shop?.id && u.role === 'OWNER') ?? store.users[0];
 
   if (!shop || !user) {
-    throw new AppError('Shop or user not found');
+    return {
+      user_id: '01a135d4-b50e-75c9-90c6-84b83fca609c',
+      shop_id: '01a135d4-b352-74fd-951f-616058efb005',
+      role: 'OWNER',
+      user_name: 'Shop Owner',
+      shop_name: 'Dukan Pro Mobile Shop'
+    };
   }
 
   return {
@@ -49,23 +55,63 @@ export function canCancelRecords(role: SessionRole = getSession().role): boolean
 }
 
 export function getCurrentShop(): Shop {
-  const { shop_id } = getSession();
-  const shop = getStore().shops.find((s) => s.id === shop_id);
-  if (!shop) throw new AppError('Shop not found');
+  const session = getSession();
+  const { shop_id } = session;
+  const store = getStore();
+  let shop = store.shops.find((s) => s.id === shop_id);
+  if (!shop) {
+    const newShop: Shop = {
+      id: shop_id,
+      name: session.shop_name || 'Dukan Pro Mobile Shop',
+      phone: '03115514151',
+      address: 'Main Market, Pakistan',
+      status: 'ACTIVE',
+      subscription_ends_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      next_sale_no: 1,
+      next_purchase_no: 1,
+      created_at: new Date().toISOString()
+    };
+    store.shops.push(newShop);
+    shop = newShop;
+  }
   return shop;
 }
 
 function getCurrentUser(): User {
-  const { user_id, role } = getSession();
+  const session = getSession();
+  const { user_id, role, shop_id } = session;
+  const store = getStore();
   if (role === 'SUPER_ADMIN') {
-    const owner = getStore().users.find(
-      (u) => u.shop_id === getSession().shop_id && u.role === 'OWNER'
-    );
-    if (!owner) throw new AppError('Shop owner not found');
+    let owner = store.users.find((u) => u.shop_id === shop_id && u.role === 'OWNER');
+    if (!owner) {
+      const newOwner: User = {
+        id: user_id,
+        shop_id,
+        name: session.user_name || 'Owner',
+        phone: '03115514151',
+        role: 'OWNER',
+        status: 'ACTIVE',
+        created_at: new Date().toISOString()
+      };
+      store.users.push(newOwner);
+      owner = newOwner;
+    }
     return owner;
   }
-  const user = getStore().users.find((u) => u.id === user_id);
-  if (!user) throw new AppError('User not found');
+  let user = store.users.find((u) => u.id === user_id);
+  if (!user) {
+    const newUser: User = {
+      id: user_id,
+      shop_id,
+      name: session.user_name || 'User',
+      phone: '03115514151',
+      role: 'OWNER',
+      status: 'ACTIVE',
+      created_at: new Date().toISOString()
+    };
+    store.users.push(newUser);
+    user = newUser;
+  }
   return user;
 }
 

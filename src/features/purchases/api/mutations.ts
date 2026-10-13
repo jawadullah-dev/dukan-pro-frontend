@@ -11,9 +11,13 @@ export const createPurchaseMutation = mutationOptions({
   }
 });
 
+export interface CancelPurchaseMutationVariables {
+  id: string;
+  input: CancelPurchaseInput;
+}
+
 export const cancelPurchaseMutation = mutationOptions({
-  mutationFn: ({ id, input }: { id: string; input: CancelPurchaseInput }) =>
-    cancelPurchase(id, input),
+  mutationFn: ({ id, input }: CancelPurchaseMutationVariables) => cancelPurchase(id, input),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: purchaseKeys.all });
   }

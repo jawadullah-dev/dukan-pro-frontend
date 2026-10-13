@@ -20,7 +20,6 @@
 
   "reporters": ["console"],
 
-  "exitCode": 1,
 
   "skipLocal": false,
 

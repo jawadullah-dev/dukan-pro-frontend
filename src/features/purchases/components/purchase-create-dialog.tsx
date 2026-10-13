@@ -44,7 +44,7 @@ import type {
 } from '@/lib/api/types';
 import { purchaseKeys } from '../api/queries';
 import { createPurchaseMutation } from '../api/mutations';
-import { createPurchaseFormSchema } from '@/features/dukaan/schemas/forms';
+import { createPurchaseFormSchema } from '../schemas/purchase-schema';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { FormEntitySelect } from '@/components/forms/form-entity-select';
 

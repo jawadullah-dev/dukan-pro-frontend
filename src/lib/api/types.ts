@@ -10,11 +10,6 @@ export interface PaginatedResponse<T> {
   pageSize: number;
 }
 
-// ---------------------------------------------------------------------------
-// Domain DTOs — shapes returned by the NestJS backend (camelCase)
-// ---------------------------------------------------------------------------
-
-/** Matches the BrandResponseDto from the NestJS brands controller. */
 export interface BrandDTO {
   id: string;
   shopId: string;
@@ -24,7 +19,6 @@ export interface BrandDTO {
   updatedAt: string;
 }
 
-/** Matches the ResponseCustomerDto from the NestJS customers controller. */
 export interface CustomerDTO {
   id: string;
   shopId: string;
@@ -38,7 +32,6 @@ export interface CustomerDTO {
   updatedAt: string;
 }
 
-/** Matches ResponseSaleItemDto from NestJS sales controller. */
 export interface SaleItemDTO {
   id: string;
   productId: string;
@@ -46,14 +39,14 @@ export interface SaleItemDTO {
   inventoryUnitId?: string | null;
   imei?: string | null;
   quantity: number;
-  unitPrice: number; // in PAISA
-  unitCost: number; // in PAISA
-  total: number; // in PAISA
+  unitPrice: number;
+  unitCost: number;
+  total: number;
 }
 
 export interface SalePaymentDTO {
   id: string;
-  amount: number; // in PAISA
+  amount: number;
   method: 'CASH' | 'BANK' | 'MOBILE_WALLET';
   status: 'ACTIVE' | 'CANCELLED';
   receiptGroupId?: string | null;
@@ -73,7 +66,7 @@ export interface ReturnItemDTO {
 
 export interface ReturnRefundDTO {
   id: string;
-  amount: number; // in PAISA
+  amount: number;
   method: string;
   createdAt: string;
 }
@@ -86,7 +79,7 @@ export interface SaleReturnDTO {
   customerName?: string | null;
   returnDate: string;
   reason: string;
-  returnAmount: number; // in PAISA
+  returnAmount: number;
   status: string;
   notes?: string | null;
   createdById: string;
@@ -96,7 +89,6 @@ export interface SaleReturnDTO {
   refunds: ReturnRefundDTO[];
 }
 
-/** Matches ResponseSaleDto from NestJS sales controller. */
 export interface SaleDTO {
   id: string;
   shopId: string;
@@ -104,9 +96,9 @@ export interface SaleDTO {
   customerName?: string | null;
   saleNo: string;
   saleDate: string;
-  subtotal: number; // in PAISA
-  discount: number; // in PAISA
-  totalAmount: number; // in PAISA
+  subtotal: number;
+  discount: number;
+  totalAmount: number;
   dueDate?: string | null;
   status: 'ACTIVE' | 'CANCELLED';
   cancelledAt?: string | null;
@@ -125,7 +117,7 @@ export interface SaleDTO {
 export interface CreateSaleItemInput {
   productId: string;
   quantity: number;
-  unitPrice: number; // in PAISA
+  unitPrice: number;
   inventoryUnitId?: string;
 }
 
@@ -134,8 +126,8 @@ export interface CreateSaleInput {
   saleDate: string;
   customerId?: string;
   items: CreateSaleItemInput[];
-  discount?: number; // in PAISA
-  paidNow?: number; // in PAISA
+  discount?: number;
+  paidNow?: number;
   dueDate?: string;
   notes?: string;
 }
@@ -155,13 +147,13 @@ export interface CancelImpactDTO {
   recordType: string;
   recordId: string;
   recordNo?: string | null;
-  currentCash: number; // in PAISA
-  cashReversedAmount: number; // in PAISA
+  currentCash: number;
+  cashReversedAmount: number;
   cashReversedDirection: 'OUT' | 'IN';
-  cashAfter: number; // in PAISA
+  cashAfter: number;
   willCauseOverdraft: boolean;
-  customerUdharAfter?: number | null; // in PAISA
-  supplierPayableAfter?: number | null; // in PAISA
+  customerUdharAfter?: number | null;
+  supplierPayableAfter?: number | null;
   stockItems: CancelImpactStockItemDTO[];
   blocked: boolean;
   blockedReason?: string | null;
@@ -175,7 +167,7 @@ export interface ReturnItemInput {
 
 export interface ReturnPreviewInput {
   items: ReturnItemInput[];
-  refundAmount?: number; // in PAISA
+  refundAmount?: number;
 }
 
 export interface ReturnPreviewLineDTO {
@@ -190,13 +182,13 @@ export interface ReturnPreviewDTO {
   saleId: string;
   saleNo: string;
   customerName?: string | null;
-  returnAmount: number; // in PAISA
-  outstandingBefore: number; // in PAISA
-  outstandingAfter: number; // in PAISA
-  refundable: number; // in PAISA
-  refundAmount: number; // in PAISA
-  currentCash: number; // in PAISA
-  cashAfter: number; // in PAISA
+  returnAmount: number;
+  outstandingBefore: number;
+  outstandingAfter: number;
+  refundable: number;
+  refundAmount: number;
+  currentCash: number;
+  cashAfter: number;
   willCauseOverdraft: boolean;
   items: ReturnPreviewLineDTO[];
 }
@@ -205,7 +197,7 @@ export interface CreateReturnInput {
   reason: string;
   returnDate: string;
   items: ReturnItemInput[];
-  refundAmount?: number; // in PAISA
+  refundAmount?: number;
   confirmOverdraft?: boolean;
   notes?: string;
 }
@@ -227,7 +219,6 @@ export class ApiError extends Error {
   }
 }
 
-/** Matches the CategoryResponseDto from the NestJS categories controller. */
 export interface CategoryDTO {
   id: string;
   shopId: string;
@@ -237,7 +228,6 @@ export interface CategoryDTO {
   updatedAt: string;
 }
 
-/** Matches ResponsePaymentDto from the NestJS payments controller. */
 export interface PaymentDTO {
   id: string;
   shopId: string;
@@ -246,7 +236,7 @@ export interface PaymentDTO {
   saleId?: string | null;
   saleNo?: string | null;
   receiptGroupId?: string | null;
-  amount: number; // in PAISA
+  amount: number;
   paymentDate: string;
   method: 'CASH' | string;
   status: 'ACTIVE' | 'CANCELLED';
@@ -263,7 +253,7 @@ export interface PaymentDTO {
 export interface CreatePaymentInput {
   clientRequestId: string;
   customerId: string;
-  amount: number; // in PAISA
+  amount: number;
   paymentDate: string;
   salesIds?: string[];
   method?: 'CASH' | 'JAZZCASH' | 'EASYPAISA' | 'BANK' | string;
@@ -275,18 +265,16 @@ export interface CancelPaymentInput {
   confirmOverdraft?: boolean;
 }
 
-/** Matches ResponsePurchaseItemDto from NestJS purchases controller. */
 export interface PurchaseItemDTO {
   id: string;
   productId: string;
   productName: string;
   quantity: number;
-  unitCost: number; // in PAISA
-  totalCost: number; // in PAISA
+  unitCost: number;
+  totalCost: number;
   imeis?: string[];
 }
 
-/** Matches ResponsePurchaseDto from NestJS purchases controller. */
 export interface PurchaseDTO {
   id: string;
   shopId: string;
@@ -295,7 +283,7 @@ export interface PurchaseDTO {
   purchaseNo: string;
   supplierInvoiceRef?: string | null;
   purchaseDate: string;
-  totalAmount: number; // in PAISA
+  totalAmount: number;
   isOpeningStock: boolean;
   status: 'ACTIVE' | 'CANCELLED';
   cancelledAt?: string | null;
@@ -312,7 +300,7 @@ export interface PurchaseDTO {
 export interface CreatePurchaseItemInput {
   productId: string;
   quantity: number;
-  unitCost: number; // in PAISA
+  unitCost: number;
   imeis?: string[];
   condition?: 'NEW' | 'USED';
 }
@@ -323,14 +311,16 @@ export interface CreatePurchaseInput {
   supplierInvoiceRef?: string;
   purchaseDate: string;
   items: CreatePurchaseItemInput[];
-  paidNow?: number; // in PAISA
+  paidNow?: number;
   isOpeningStock?: boolean;
   confirmOverdraft?: boolean;
   notes?: string;
 }
 
 export interface CancelPurchaseInput {
-  cancelReason: string;
+  reason?: string;
+  cancelReason?: string;
+  confirmOverdraft?: boolean;
 }
 
 export interface CreatePurchaseResult {
@@ -341,9 +331,8 @@ export interface CreatePurchaseResult {
   purchase?: PurchaseDTO;
 }
 
-/** Matches InventoryReportRowDTO from NestJS reports controller */
 export interface InventoryItemDTO {
-  id: string; // productId
+  id: string;
   name: string;
   sku?: string | null;
   barcode?: string | null;
@@ -351,29 +340,11 @@ export interface InventoryItemDTO {
   brandName?: string | null;
   trackingType: 'QUANTITY' | 'SERIALIZED';
   inStock: number;
-  stockValue: number; // in PAISA
+  stockValue: number;
   lowStock: boolean;
   imeis?: string[];
 }
 
-export interface InventoryReportSummary {
-  countProducts: number;
-  countLowStock: number;
-  countUnitsInStock: number;
-  stockValueTotal: number;
-}
-
-export interface InventoryReportResponse {
-  page: number;
-  pageSize: number;
-  total: number;
-  from?: string;
-  to?: string;
-  summary?: InventoryReportSummary;
-  items: InventoryItemDTO[];
-}
-
-/** Matches InventoryAdjustment row from NestJS inventory controller */
 export interface InventoryAdjustmentDTO {
   id: string;
   shopId: string;
@@ -404,7 +375,6 @@ export interface CreateInventoryAdjustmentResult {
   data?: unknown;
 }
 
-/** Matches ResponseSupplierDto from the NestJS suppliers controller. */
 export interface SupplierDTO {
   id: string;
   shopId: string;
@@ -412,7 +382,7 @@ export interface SupplierDTO {
   phone?: string | null;
   address?: string | null;
   notes?: string | null;
-  openingBalance: number; // in PAISA
+  openingBalance: number;
   isSystem: boolean;
   isActive: boolean;
   createdAt: string;
@@ -424,7 +394,7 @@ export interface CreateSupplierInput {
   phone?: string;
   address?: string;
   notes?: string;
-  openingBalance?: number; // in PAISA
+  openingBalance?: number;
   isActive?: boolean;
 }
 
@@ -433,7 +403,7 @@ export interface UpdateSupplierInput {
   phone?: string;
   address?: string;
   notes?: string;
-  openingBalance?: number; // in PAISA
+  openingBalance?: number;
   isActive?: boolean;
 }
 
@@ -447,7 +417,6 @@ export interface ProductImageDTO {
   sortOrder: number;
 }
 
-/** Matches ResponseProductDto from the NestJS products controller. */
 export interface ProductDTO {
   id: string;
   shopId: string;
@@ -465,8 +434,8 @@ export interface ProductDTO {
   barcode?: string | null;
   description?: string | null;
   imageUrl?: string | null;
-  defaultPurchasePrice: number; // in PAISA
-  defaultSellingPrice: number; // in PAISA
+  defaultPurchasePrice: number;
+  defaultSellingPrice: number;
   lowStockThreshold: number;
   isActive: boolean;
   isPublished: boolean;
@@ -491,8 +460,8 @@ export interface CreateProductInput {
   barcode?: string;
   description?: string;
   imageUrl?: string;
-  defaultPurchasePrice?: number; // in PAISA
-  defaultSellingPrice?: number; // in PAISA
+  defaultPurchasePrice?: number;
+  defaultSellingPrice?: number;
   lowStockThreshold?: number;
   isActive?: boolean;
 }
@@ -510,8 +479,8 @@ export interface UpdateProductInput {
   barcode?: string | null;
   description?: string | null;
   imageUrl?: string | null;
-  defaultPurchasePrice?: number; // in PAISA
-  defaultSellingPrice?: number; // in PAISA
+  defaultPurchasePrice?: number;
+  defaultSellingPrice?: number;
   lowStockThreshold?: number;
   isActive?: boolean;
   isPublished?: boolean;

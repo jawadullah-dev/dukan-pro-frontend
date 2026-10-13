@@ -9,6 +9,21 @@ import type {
 import { saleKeys } from './queries';
 import { cancelSale, createReturn, createSale, previewReturn } from './service';
 
+export interface CancelSaleMutationVariables {
+  id: string;
+  input: CancelSaleInput;
+}
+
+export interface PreviewReturnMutationVariables {
+  id: string;
+  input: ReturnPreviewInput;
+}
+
+export interface CreateReturnMutationVariables {
+  id: string;
+  input: CreateReturnInput;
+}
+
 export const createSaleMutation = mutationOptions({
   mutationFn: (input: CreateSaleInput) => createSale(input),
   onSuccess: () => {
@@ -17,18 +32,18 @@ export const createSaleMutation = mutationOptions({
 });
 
 export const cancelSaleMutation = mutationOptions({
-  mutationFn: ({ id, input }: { id: string; input: CancelSaleInput }) => cancelSale(id, input),
+  mutationFn: ({ id, input }: CancelSaleMutationVariables) => cancelSale(id, input),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: saleKeys.all });
   }
 });
 
 export const previewReturnMutation = mutationOptions({
-  mutationFn: ({ id, input }: { id: string; input: ReturnPreviewInput }) => previewReturn(id, input)
+  mutationFn: ({ id, input }: PreviewReturnMutationVariables) => previewReturn(id, input)
 });
 
 export const createReturnMutation = mutationOptions({
-  mutationFn: ({ id, input }: { id: string; input: CreateReturnInput }) => createReturn(id, input),
+  mutationFn: ({ id, input }: CreateReturnMutationVariables) => createReturn(id, input),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: saleKeys.all });
   }

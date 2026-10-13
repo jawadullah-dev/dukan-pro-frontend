@@ -24,11 +24,6 @@ const platformAdminLoginSchema = z.object({
 
 type PlatformAdminLoginValues = z.infer<typeof platformAdminLoginSchema>;
 
-/**
- * Login form exclusively for Dukaan Pro platform admins.
- * Sends { isPlatformAdmin: 'true' } so auth.ts skips the owner endpoint
- * and calls POST /auth/platform-admin/login directly.
- */
 export function PlatformAdminLoginForm() {
   const locale = useLocale();
   const router = useRouter();

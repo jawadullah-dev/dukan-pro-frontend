@@ -10,7 +10,6 @@ import type {
   CreateReturnInput,
   SaleReturnDTO
 } from '@/lib/api/types';
-import { ApiError } from '@/lib/api/types';
 
 export interface SalesListFilters {
   page?: number;
@@ -25,27 +24,7 @@ export interface SalesListFilters {
   sortOrder?: 'asc' | 'desc';
 }
 
-const APP_URL =
-  typeof window !== 'undefined'
-    ? ''
-    : (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3006').replace(/\/+$/, '');
-
-async function salesFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = path.startsWith('http') ? path : `${APP_URL}${path}`;
-  const res = await fetch(url, { ...init, cache: 'no-store' });
-  const body = (await res.json()) as T & { error?: string; message?: string | string[] };
-
-  if (!res.ok) {
-    const rawMessage =
-      (body as { message?: string | string[] }).message ?? (body as { error?: string }).error;
-    const message = Array.isArray(rawMessage)
-      ? rawMessage.join(', ')
-      : (rawMessage ?? 'An error occurred');
-    throw new ApiError(res.status, message);
-  }
-
-  return body;
-}
+import { appFetch } from '@/lib/api/app-fetch';
 
 export async function listSales(
   filters: SalesListFilters = {},
@@ -65,24 +44,22 @@ export async function listSales(
 
   const qs = params.toString() ? `?${params.toString()}` : '';
 
-  // Server-side prefetch with token: direct call to NestJS backend
   if (token) {
     return apiRequest<PaginatedResponse<SaleDTO>>(`/sales${qs}`, undefined, token);
   }
 
-  // Client-side call through Next.js Route Handler
-  return salesFetch<PaginatedResponse<SaleDTO>>(`/api/sales${qs}`);
+  return appFetch<PaginatedResponse<SaleDTO>>(`/api/sales${qs}`);
 }
 
 export async function getSale(id: string, token?: string): Promise<SaleDTO> {
   if (token) {
     return apiRequest<SaleDTO>(`/sales/${id}`, undefined, token);
   }
-  return salesFetch<SaleDTO>(`/api/sales/${id}`);
+  return appFetch<SaleDTO>(`/api/sales/${id}`);
 }
 
 export async function createSale(input: CreateSaleInput): Promise<SaleDTO> {
-  return salesFetch<SaleDTO>('/api/sales', {
+  return appFetch<SaleDTO>('/api/sales', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -93,14 +70,14 @@ export async function getCancelImpact(id: string, token?: string): Promise<Cance
   if (token) {
     return apiRequest<CancelImpactDTO>(`/sales/${id}/cancel-impact`, undefined, token);
   }
-  return salesFetch<CancelImpactDTO>(`/api/sales/${id}/cancel-impact`);
+  return appFetch<CancelImpactDTO>(`/api/sales/${id}/cancel-impact`);
 }
 
 export async function cancelSale(
   id: string,
   input: CancelSaleInput
 ): Promise<{ confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleDTO> {
-  return salesFetch<{ confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleDTO>(
+  return appFetch<{ confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleDTO>(
     `/api/sales/${id}/cancel`,
     {
       method: 'POST',
@@ -114,7 +91,7 @@ export async function previewReturn(
   id: string,
   input: ReturnPreviewInput
 ): Promise<ReturnPreviewDTO> {
-  return salesFetch<ReturnPreviewDTO>(`/api/sales/${id}/returns/preview`, {
+  return appFetch<ReturnPreviewDTO>(`/api/sales/${id}/returns/preview`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -125,7 +102,7 @@ export async function createReturn(
   id: string,
   input: CreateReturnInput
 ): Promise<{ confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleReturnDTO> {
-  return salesFetch<
+  return appFetch<
     { confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleReturnDTO
   >(`/api/sales/${id}/returns`, {
     method: 'POST',

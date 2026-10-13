@@ -36,10 +36,6 @@ import type { SalesListFilters } from '../api/service';
 import { CancelSaleDialog } from './cancel-sale-dialog';
 import { ReturnSaleDialog } from './return-sale-dialog';
 
-// ---------------------------------------------------------------------------
-// Action Menu for each sale row
-// ---------------------------------------------------------------------------
-
 interface SaleRowActionsProps {
   sale: SaleDTO;
 }
@@ -113,10 +109,6 @@ function SaleRowActions({ sale }: SaleRowActionsProps) {
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Table Columns Definition
-// ---------------------------------------------------------------------------
 
 const salesColumns: ColumnDef<SaleDTO>[] = [
   {
@@ -263,10 +255,6 @@ const salesColumns: ColumnDef<SaleDTO>[] = [
   }
 ];
 
-// ---------------------------------------------------------------------------
-// Mobile card configuration
-// ---------------------------------------------------------------------------
-
 const saleMobileItem: MobileItemConfig<SaleDTO> = {
   title: (row: SaleDTO) => row.saleNo,
   subtitle: (row: SaleDTO) => row.customerName || 'Walk-in',
@@ -277,10 +265,6 @@ const saleMobileItem: MobileItemConfig<SaleDTO> = {
   }),
   meta: [(row: SaleDTO) => (row.saleDate ? row.saleDate.split('T')[0] : '—')]
 };
-
-// ---------------------------------------------------------------------------
-// Drawer Detail configuration
-// ---------------------------------------------------------------------------
 
 const saleDetail: DetailConfig<SaleDTO> = {
   mode: 'sheet',
@@ -324,10 +308,6 @@ const saleDetail: DetailConfig<SaleDTO> = {
       : [])
   ]
 };
-
-// ---------------------------------------------------------------------------
-// SalesTable Component
-// ---------------------------------------------------------------------------
 
 interface SalesTableProps {
   toolbarAction?: ReactNode;

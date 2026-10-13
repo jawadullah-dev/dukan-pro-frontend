@@ -60,13 +60,21 @@ export function DataTableToolbar<TData>({
         <div className='flex items-center gap-2'>
           {textColumn ? (
             <Input
-              placeholder={
-                (textColumn.columnDef.meta?.placeholderKey
-                  ? (t as (k: string) => string)(textColumn.columnDef.meta.placeholderKey)
-                  : textColumn.columnDef.meta?.placeholder) ??
-                textColumn.columnDef.meta?.label ??
-                t('table.search')
-              }
+              placeholder={(() => {
+                const pk = textColumn.columnDef.meta?.placeholderKey;
+                if (pk) {
+                  try {
+                    return (t as (k: string) => string)(pk);
+                  } catch {
+                    return pk;
+                  }
+                }
+                return (
+                  textColumn.columnDef.meta?.placeholder ??
+                  textColumn.columnDef.meta?.label ??
+                  t('table.search')
+                );
+              })()}
               aria-label={textColumn.columnDef.meta?.label ?? t('table.search')}
               value={(textColumn.getFilterValue() as string) ?? ''}
               onChange={(event) => textColumn.setFilterValue(event.target.value)}
@@ -132,7 +140,13 @@ interface DataTableToolbarFilterProps<TData> {
 
 function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<TData>) {
   const t = useTranslations();
-  const translate = (k: string) => (t as (key: string) => string)(k);
+  const translate = (k: string) => {
+    try {
+      return (t as (key: string) => string)(k);
+    } catch {
+      return k;
+    }
+  };
   const columnMeta = column.columnDef.meta;
   if (!columnMeta?.variant) return null;
 

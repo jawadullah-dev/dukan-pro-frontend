@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const productSchema = z.object({
+export const productFormSchema = z.object({
   name: z.string().trim().min(1, 'Product name is required'),
   categoryId: z.string().min(1, 'Category is required'),
   brandId: z.string().min(1, 'Brand is required'),
@@ -23,6 +23,4 @@ export const productSchema = z.object({
   ptaStatus: z.enum(['PTA_APPROVED', 'NON_PTA']).optional().nullable()
 });
 
-export const productFormSchema = productSchema;
-
-export type ProductFormValues = z.infer<typeof productSchema>;
+export type ProductFormValues = z.infer<typeof productFormSchema>;

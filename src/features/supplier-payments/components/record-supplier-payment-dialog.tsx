@@ -52,7 +52,6 @@ export function RecordSupplierPaymentDialog({
     message: string;
   } | null>(null);
 
-  // Fetch what is owed to this supplier and unpaid bills
   const { data: payableData, isLoading: payableLoading } = useQuery({
     ...supplierPayableQueryOptions(supplierId),
     enabled: open && !!supplierId
@@ -62,12 +61,10 @@ export function RecordSupplierPaymentDialog({
   const openingRemaining = payableData?.openingRemaining ?? 0;
   const totalPayable = payableData?.payable ?? 0;
 
-  // Selected purchase details
   const activePurchase: UnpaidPurchaseDTO | undefined = unpaidPurchases.find(
     (p) => p.id === selectedPurchaseId
   );
 
-  // Determine current remaining limit based on target
   const maxRemainingPaisa =
     targetType === 'opening' ? openingRemaining : (activePurchase?.remaining ?? 0);
 
@@ -186,7 +183,6 @@ export function RecordSupplierPaymentDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-          {/* Supplier Selector */}
           <div className='space-y-1.5'>
             <Label className='text-sm font-normal text-foreground'>
               Supplier <span className='text-destructive'>*</span>
@@ -200,7 +196,6 @@ export function RecordSupplierPaymentDialog({
             />
           </div>
 
-          {/* Supplier Payable Overview */}
           {supplierId && (
             <div className='rounded-xl border border-border/70 bg-muted/40 p-3.5 text-sm'>
               {payableLoading ? (
@@ -231,7 +226,6 @@ export function RecordSupplierPaymentDialog({
             </div>
           )}
 
-          {/* Pay Against: Opening Balance vs Specific Purchase */}
           {supplierId && payableData && (
             <div className='space-y-2'>
               <Label className='text-sm font-normal text-foreground'>Payment Target</Label>
@@ -293,7 +287,6 @@ export function RecordSupplierPaymentDialog({
                 </div>
               </RadioGroup>
 
-              {/* Purchase Selection Dropdown when targetType === 'purchase' */}
               {targetType === 'purchase' && (
                 <div className='mt-2 space-y-1.5'>
                   <Label className='text-xs font-normal text-muted-foreground'>
@@ -324,7 +317,7 @@ export function RecordSupplierPaymentDialog({
                               <span className='font-medium text-foreground'>
                                 {purchase.purchaseNo}
                                 {purchase.supplierInvoiceRef && (
-                                  <span className='text-muted-foreground ml-1'>
+                                  <span className='text-muted-foreground ms-1'>
                                     (Inv: {purchase.supplierInvoiceRef})
                                   </span>
                                 )}
@@ -334,7 +327,7 @@ export function RecordSupplierPaymentDialog({
                                 {formatPkr(purchase.totalAmount)}
                               </span>
                             </div>
-                            <div className='text-right'>
+                            <div className='text-end'>
                               <span className='font-semibold text-foreground'>
                                 {formatPkr(purchase.remaining)}
                               </span>
@@ -350,7 +343,6 @@ export function RecordSupplierPaymentDialog({
             </div>
           )}
 
-          {/* Amount Input */}
           <div className='space-y-1.5'>
             <div className='flex items-center justify-between'>
               <Label
@@ -370,7 +362,7 @@ export function RecordSupplierPaymentDialog({
               )}
             </div>
             <div className='relative'>
-              <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
+              <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
                 Rs
               </span>
               <Input
@@ -382,13 +374,12 @@ export function RecordSupplierPaymentDialog({
                 value={amountStr}
                 onChange={(e) => setAmountStr(e.target.value)}
                 disabled={recordMutation.isPending}
-                className='h-10 pl-9 text-sm font-normal text-foreground'
+                className='h-10 ps-9 text-sm font-normal text-foreground'
                 required
               />
             </div>
           </div>
 
-          {/* Payment Date */}
           <div className='space-y-1.5'>
             <Label htmlFor='supplier-payment-date' className='text-sm font-normal text-foreground'>
               Payment Date <span className='text-destructive'>*</span>
@@ -404,7 +395,6 @@ export function RecordSupplierPaymentDialog({
             />
           </div>
 
-          {/* Notes */}
           <div className='space-y-1.5'>
             <Label htmlFor='supplier-payment-notes' className='text-sm font-normal text-foreground'>
               Notes <span className='text-xs text-muted-foreground'>(Optional)</span>
@@ -420,7 +410,6 @@ export function RecordSupplierPaymentDialog({
             />
           </div>
 
-          {/* Overdraft Warning Banner */}
           {overdraftPrompt && (
             <div className='rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 space-y-2.5 text-xs text-amber-900 dark:text-amber-200'>
               <div className='flex items-start gap-2'>
@@ -443,7 +432,6 @@ export function RecordSupplierPaymentDialog({
             </div>
           )}
 
-          {/* Footer Actions: Cancel and Save */}
           <DialogFooter className='gap-2 sm:gap-2.5 pt-2'>
             <DialogCancelButton
               onClick={() => onOpenChange(false)}

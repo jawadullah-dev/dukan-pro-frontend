@@ -27,6 +27,7 @@ import { Icons } from '@/components/icons';
 import { createInventoryAdjustment } from '../api/service';
 import { inventoryKeys, inventoryStockQueryOptions } from '../api/queries';
 import type { CreateInventoryAdjustmentInput, InventoryItemDTO } from '@/lib/api/types';
+import { ValidationError } from '@/lib/errors';
 
 interface StockAdjustDialogProps {
   open: boolean;
@@ -70,7 +71,6 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
       } else {
         setSelectedImei('');
       }
-      // If serialized product, ADJUSTMENT is not allowed by backend, switch to DAMAGED
       if (selectedProduct.trackingType === 'SERIALIZED' && type === 'ADJUSTMENT') {
         setType('DAMAGED');
       }
@@ -79,8 +79,8 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
 
   const mutation = useMutation({
     mutationFn: async () => {
-      if (!productId) throw new Error('Please select a product');
-      if (!reason.trim()) throw new Error('Reason is required for all stock changes');
+      if (!productId) throw new ValidationError('Please select a product');
+      if (!reason.trim()) throw new ValidationError('Reason is required for all stock changes');
 
       const payload: CreateInventoryAdjustmentInput = {
         productId,
@@ -90,14 +90,14 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
 
       if (type === 'ADJUSTMENT') {
         if (isSerialized) {
-          throw new Error('Count adjustments are only allowed for non-serialized products');
+          throw new ValidationError(
+            'Count adjustments are only allowed for non-serialized products'
+          );
         }
         payload.countedQuantity = Number(countedQuantity);
       } else {
-        // DAMAGED or LOST
         if (isSerialized) {
-          if (!selectedImei) throw new Error('Please select the unit IMEI to write off');
-          // Backend expects inventoryUnitId or IMEI reference
+          if (!selectedImei) throw new ValidationError('Please select the unit IMEI to write off');
           payload.inventoryUnitId = selectedImei;
         } else {
           payload.quantity = Math.max(1, Number(quantity));
@@ -134,7 +134,6 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
           </DialogHeader>
 
           <div className='grid gap-4 py-2'>
-            {/* Product selection */}
             <div className='space-y-1.5'>
               <Label htmlFor='adj-product'>Product</Label>
               <Select value={productId} onValueChange={(val) => setProductId(val ?? '')}>
@@ -155,7 +154,6 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
               </Select>
             </div>
 
-            {/* Adjustment Type */}
             <div className='space-y-1.5'>
               <Label htmlFor='adj-type'>Change Type</Label>
               <Select
@@ -179,7 +177,6 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
               </Select>
             </div>
 
-            {/* Type-specific inputs */}
             {type === 'ADJUSTMENT' ? (
               <div className='space-y-1.5'>
                 <div className='flex items-center justify-between'>
@@ -267,7 +264,6 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
               </div>
             )}
 
-            {/* Mandatory Reason */}
             <div className='space-y-1.5'>
               <Label htmlFor='adj-reason'>Reason (Mandatory)</Label>
               <Textarea
@@ -284,7 +280,7 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
           <DialogFooter className='gap-2 sm:gap-0'>
             <DialogCancelButton onClick={() => onOpenChange(false)} disabled={mutation.isPending} />
             <Button type='submit' disabled={mutation.isPending || !reason.trim()}>
-              {mutation.isPending && <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />}
+              {mutation.isPending && <Icons.spinner className='me-2 h-4 w-4 animate-spin' />}
               Record Change
             </Button>
           </DialogFooter>

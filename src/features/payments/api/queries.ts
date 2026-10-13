@@ -18,13 +18,6 @@ export const paymentsQueryOptions = (filters: PaymentsListFilters = {}, token?: 
     queryFn: () => listPayments(filters, token)
   });
 
-export const paymentQueryOptions = (id: string, token?: string) =>
-  queryOptions({
-    queryKey: paymentKeys.detail(id),
-    queryFn: () => getPayment(id, token),
-    enabled: !!id
-  });
-
 export const paymentCancelImpactQueryOptions = (id: string, token?: string) =>
   queryOptions({
     queryKey: paymentKeys.cancelImpact(id),

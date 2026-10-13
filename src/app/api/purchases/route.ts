@@ -1,134 +1,45 @@
-import { auth } from '@/auth';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
+import { proxyToBackend } from '@/lib/api/proxy';
+import type { PurchaseDTO } from '@/lib/api/types';
 
-const BACKEND = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000').replace(/\/+$/, '');
-
-/**
- * GET /api/purchases
- * Proxies to GET /purchases on the NestJS backend.
- */
-export async function GET(request: NextRequest) {
-  const session = await auth();
-  if (!session?.accessToken) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const { searchParams } = request.nextUrl;
-  const params = new URLSearchParams();
-
-  const page = searchParams.get('page');
-  if (page) params.set('page', page);
-
-  const pageSize = searchParams.get('pageSize') ?? searchParams.get('limit');
-  if (pageSize) params.set('pageSize', pageSize);
-
-  const search = searchParams.get('search');
-  if (search) params.set('search', search);
-
-  const supplierId = searchParams.get('supplierId');
-  if (supplierId) params.set('supplierId', supplierId);
-
-  const status = searchParams.get('status');
-  if (status) params.set('status', status);
-
-  const isOpeningStock = searchParams.get('isOpeningStock');
-  if (isOpeningStock !== null && isOpeningStock !== undefined && isOpeningStock !== '') {
-    params.set('isOpeningStock', isOpeningStock);
-  }
-
-  const from = searchParams.get('from');
-  if (from) params.set('from', from);
-
-  const to = searchParams.get('to');
-  if (to) params.set('to', to);
-
-  const sortBy = searchParams.get('sortBy');
-  const allowedBackendSorts = [
-    'purchaseDate',
-    'purchaseNo',
-    'totalAmount',
-    'createdAt',
-    'updatedAt'
-  ];
-  if (sortBy && allowedBackendSorts.includes(sortBy)) {
-    params.set('sortBy', sortBy);
-  }
-
-  const sortOrder = searchParams.get('sortOrder');
-  if (sortOrder === 'asc' || sortOrder === 'desc') {
-    params.set('sortOrder', sortOrder);
-  }
-
-  const qs = params.toString() ? `?${params.toString()}` : '';
-
-  try {
-    const upstream = await fetch(`${BACKEND}/purchases${qs}`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-      cache: 'no-store'
-    });
-
-    const body = await upstream.json();
-
-    if (!upstream.ok) {
-      return NextResponse.json(body, { status: upstream.status });
-    }
-
-    const payload = body.data !== undefined ? body.data : body;
-    let items = Array.isArray(payload?.items) ? [...payload.items] : [];
-
-    if (sortBy === 'status') {
-      items.sort((a, b) => {
-        const sA = (a.status || '').toLowerCase();
-        const sB = (b.status || '').toLowerCase();
-        return sortOrder === 'desc' ? sB.localeCompare(sA) : sA.localeCompare(sB);
-      });
-    }
-
-    return NextResponse.json({ ...payload, items }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fetch purchases' },
-      { status: 500 }
-    );
-  }
+interface PurchaseListPayload {
+  items?: PurchaseDTO[];
+  [key: string]: unknown;
 }
 
-/**
- * POST /api/purchases
- * Proxies to POST /purchases on the NestJS backend.
- */
-export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.accessToken) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+export async function GET(request: NextRequest) {
+  const sortBy = request.nextUrl.searchParams.get('sortBy');
+  const sortOrder = request.nextUrl.searchParams.get('sortOrder');
 
-  try {
-    const body = await request.json();
-
-    const upstream = await fetch(`${BACKEND}/purchases`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body),
-      cache: 'no-store'
-    });
-
-    const responseBody = await upstream.json();
-
-    if (!upstream.ok) {
-      return NextResponse.json(responseBody, { status: upstream.status });
+  return proxyToBackend(request, '/purchases', {
+    allowedParams: [
+      'page',
+      'pageSize',
+      'search',
+      'supplierId',
+      'status',
+      'isOpeningStock',
+      'from',
+      'to',
+      'sortBy',
+      'sortOrder'
+    ],
+    transformResponse: (payload: unknown) => {
+      const data = payload as PurchaseListPayload | null;
+      if (!data || !Array.isArray(data.items)) return payload;
+      let items = [...data.items];
+      if (sortBy === 'status') {
+        items.sort((a: PurchaseDTO, b: PurchaseDTO) => {
+          const sA = (a.status || '').toLowerCase();
+          const sB = (b.status || '').toLowerCase();
+          return sortOrder === 'desc' ? sB.localeCompare(sA) : sA.localeCompare(sB);
+        });
+      }
+      return { ...data, items };
     }
+  });
+}
 
-    return NextResponse.json(responseBody.data !== undefined ? responseBody.data : responseBody, {
-      status: upstream.status
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create purchase' },
-      { status: 500 }
-    );
-  }
+export async function POST(request: NextRequest) {
+  return proxyToBackend(request, '/purchases');
 }

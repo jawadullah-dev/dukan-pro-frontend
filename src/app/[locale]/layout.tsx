@@ -1,6 +1,5 @@
 import { isLocale, locales } from '@/i18n/request';
 import { notFound } from 'next/navigation';
-import { I18nProvider } from '@/components/i18n/i18n-provider';
 import { getMessages, getNow, getTimeZone, setRequestLocale } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import Providers from '@/components/layout/providers';
@@ -8,6 +7,7 @@ import { PwaShell } from '@/components/pwa/pwa-shell';
 import { Toaster } from '@/components/ui/sonner';
 import { DEFAULT_THEME, THEMES } from '@/components/themes/theme.config';
 import { LocaleDocumentAttributes } from '@/components/locale-document-attributes';
+import { I18nProvider } from '@/components/i18n/i18n-provider';
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));

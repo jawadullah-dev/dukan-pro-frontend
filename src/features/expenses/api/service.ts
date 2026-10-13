@@ -1,6 +1,5 @@
 import { apiRequest } from '@/lib/api/client';
 import type { PaginatedResponse } from '@/lib/api/types';
-import { ApiError } from '@/lib/api/types';
 import type {
   ExpenseDTO,
   ExpenseCategoryDTO,
@@ -15,26 +14,7 @@ import type {
   ExpenseCategoryStatusResult
 } from '@/types/expense';
 
-const APP_URL =
-  typeof window !== 'undefined'
-    ? ''
-    : (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3006').replace(/\/+$/, '');
-
-async function expensesFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = path.startsWith('http') ? path : `${APP_URL}${path}`;
-  const res = await fetch(url, { ...init, cache: 'no-store' });
-  const body = (await res.json()) as T & { error?: string; message?: string | string[] };
-
-  if (!res.ok) {
-    const rawMessage = body.message ?? body.error;
-    const message = Array.isArray(rawMessage)
-      ? rawMessage.join(', ')
-      : (rawMessage ?? 'An error occurred');
-    throw new ApiError(res.status, message);
-  }
-
-  return body;
-}
+import { appFetch } from '@/lib/api/app-fetch';
 
 export async function listExpenses(
   filters: ExpenseQueryFilter = {},
@@ -58,18 +38,18 @@ export async function listExpenses(
     return apiRequest<PaginatedResponse<ExpenseDTO>>(`/expenses${qs}`, undefined, token);
   }
 
-  return expensesFetch<PaginatedResponse<ExpenseDTO>>(`/api/expenses${qs}`);
+  return appFetch<PaginatedResponse<ExpenseDTO>>(`/api/expenses${qs}`);
 }
 
 export async function getExpense(id: string, token?: string): Promise<ExpenseDTO> {
   if (token) {
     return apiRequest<ExpenseDTO>(`/expenses/${id}`, undefined, token);
   }
-  return expensesFetch<ExpenseDTO>(`/api/expenses/${id}`);
+  return appFetch<ExpenseDTO>(`/api/expenses/${id}`);
 }
 
 export async function createExpense(input: CreateExpenseInput): Promise<CreateExpenseResult> {
-  return expensesFetch<CreateExpenseResult>('/api/expenses', {
+  return appFetch<CreateExpenseResult>('/api/expenses', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -80,7 +60,7 @@ export async function cancelExpense(
   id: string,
   input: CancelExpenseInput
 ): Promise<CancelExpenseResult> {
-  return expensesFetch<CancelExpenseResult>(`/api/expenses/${id}/cancel`, {
+  return appFetch<CancelExpenseResult>(`/api/expenses/${id}/cancel`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -110,13 +90,13 @@ export async function listExpenseCategories(
     );
   }
 
-  return expensesFetch<PaginatedResponse<ExpenseCategoryDTO>>(`/api/expense-categories${qs}`);
+  return appFetch<PaginatedResponse<ExpenseCategoryDTO>>(`/api/expense-categories${qs}`);
 }
 
 export async function createExpenseCategory(
   input: CreateExpenseCategoryInput
 ): Promise<ExpenseCategoryStatusResult> {
-  return expensesFetch<ExpenseCategoryStatusResult>('/api/expense-categories', {
+  return appFetch<ExpenseCategoryStatusResult>('/api/expense-categories', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -127,14 +107,14 @@ export async function getExpenseCategory(id: string, token?: string): Promise<Ex
   if (token) {
     return apiRequest<ExpenseCategoryDTO>(`/expense-categories/${id}`, undefined, token);
   }
-  return expensesFetch<ExpenseCategoryDTO>(`/api/expense-categories/${id}`);
+  return appFetch<ExpenseCategoryDTO>(`/api/expense-categories/${id}`);
 }
 
 export async function updateExpenseCategory(
   id: string,
   input: UpdateExpenseCategoryInput
 ): Promise<ExpenseCategoryStatusResult> {
-  return expensesFetch<ExpenseCategoryStatusResult>(`/api/expense-categories/${id}`, {
+  return appFetch<ExpenseCategoryStatusResult>(`/api/expense-categories/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -142,7 +122,7 @@ export async function updateExpenseCategory(
 }
 
 export async function deleteExpenseCategory(id: string): Promise<ExpenseCategoryStatusResult> {
-  return expensesFetch<ExpenseCategoryStatusResult>(`/api/expense-categories/${id}`, {
+  return appFetch<ExpenseCategoryStatusResult>(`/api/expense-categories/${id}`, {
     method: 'DELETE'
   });
 }

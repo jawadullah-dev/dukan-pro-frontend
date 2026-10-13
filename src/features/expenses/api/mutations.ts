@@ -24,9 +24,18 @@ export const createExpenseMutation = mutationOptions({
   }
 });
 
+export interface CancelExpenseMutationVariables {
+  id: string;
+  input: CancelExpenseInput;
+}
+
+export interface UpdateExpenseCategoryMutationVariables {
+  id: string;
+  input: UpdateExpenseCategoryInput;
+}
+
 export const cancelExpenseMutation = mutationOptions({
-  mutationFn: ({ id, input }: { id: string; input: CancelExpenseInput }) =>
-    cancelExpense(id, input),
+  mutationFn: ({ id, input }: CancelExpenseMutationVariables) => cancelExpense(id, input),
   onSuccess: () => {
     const qc = getQueryClient();
     qc.invalidateQueries({ queryKey: expenseKeys.all });
@@ -43,7 +52,7 @@ export const createExpenseCategoryMutation = mutationOptions({
 });
 
 export const updateExpenseCategoryMutation = mutationOptions({
-  mutationFn: ({ id, input }: { id: string; input: UpdateExpenseCategoryInput }) =>
+  mutationFn: ({ id, input }: UpdateExpenseCategoryMutationVariables) =>
     updateExpenseCategory(id, input),
   onSuccess: () => {
     const qc = getQueryClient();

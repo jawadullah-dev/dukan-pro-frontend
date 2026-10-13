@@ -86,14 +86,13 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-          {/* Amount */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-amount' className='text-sm font-normal text-foreground'>
               {t('dukaan.cash.investmentAmount') || 'Investment Amount (PKR)'}{' '}
               <span className='text-destructive'>*</span>
             </Label>
             <div className='relative w-full'>
-              <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
+              <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
                 Rs
               </span>
               <Input
@@ -105,14 +104,13 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
                 value={amountStr}
                 onChange={(e) => setAmountStr(e.target.value)}
                 disabled={createMutation.isPending}
-                className='h-10 pl-9 text-sm font-normal text-foreground w-full'
+                className='h-10 ps-9 text-sm font-normal text-foreground w-full'
                 autoFocus
                 required
               />
             </div>
           </div>
 
-          {/* Date */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-date' className='text-sm font-normal text-foreground'>
               {t('dukaan.cash.date') || 'Date'} <span className='text-destructive'>*</span>
@@ -128,7 +126,6 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
             />
           </div>
 
-          {/* Notes */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-notes' className='text-sm font-normal text-foreground'>
               {t('dukaan.cash.notes') || 'Notes'}{' '}

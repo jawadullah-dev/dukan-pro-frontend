@@ -238,7 +238,7 @@ export async function getDashboardKpis(): Promise<DashboardKpis> {
   };
 }
 
-export async function listCategories(filters: ListFilters = {}) {
+async function listCategories(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   let items = getStore().categories.filter((c) => c.shop_id === sid);
@@ -249,7 +249,7 @@ export async function listCategories(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-export async function createCategory(name: string): Promise<Category> {
+async function createCategory(name: string): Promise<Category> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -272,10 +272,7 @@ async function getCategory(id: string): Promise<Category> {
   return row;
 }
 
-export async function updateCategory(
-  id: string,
-  data: Partial<Pick<Category, 'name' | 'is_active'>>
-) {
+async function updateCategory(id: string, data: Partial<Pick<Category, 'name' | 'is_active'>>) {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -286,7 +283,7 @@ export async function updateCategory(
   });
 }
 
-export async function deleteCategory(id: string): Promise<Category> {
+async function deleteCategory(id: string): Promise<Category> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -302,7 +299,7 @@ export async function deleteCategory(id: string): Promise<Category> {
   });
 }
 
-export async function listBrands(filters: ListFilters = {}) {
+async function listBrands(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   let items = getStore().brands.filter((b) => b.shop_id === sid);
@@ -313,7 +310,7 @@ export async function listBrands(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-export async function createBrand(name: string): Promise<Brand> {
+async function createBrand(name: string): Promise<Brand> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -336,7 +333,7 @@ async function getBrand(id: string): Promise<Brand> {
   return row;
 }
 
-export async function updateBrand(id: string, data: Partial<Pick<Brand, 'name' | 'is_active'>>) {
+async function updateBrand(id: string, data: Partial<Pick<Brand, 'name' | 'is_active'>>) {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -347,7 +344,7 @@ export async function updateBrand(id: string, data: Partial<Pick<Brand, 'name' |
   });
 }
 
-export async function deleteBrand(id: string): Promise<Brand> {
+async function deleteBrand(id: string): Promise<Brand> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -394,7 +391,7 @@ async function getProduct(id: string) {
   return product;
 }
 
-export async function createProduct(input: CreateProductInput): Promise<Product> {
+async function createProduct(input: CreateProductInput): Promise<Product> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -426,7 +423,7 @@ export async function createProduct(input: CreateProductInput): Promise<Product>
   });
 }
 
-export async function updateProduct(
+async function updateProduct(
   id: string,
   data: Partial<Omit<Product, 'id' | 'shop_id' | 'tracking_type' | 'created_at'>> & {
     is_active?: boolean;
@@ -442,7 +439,7 @@ export async function updateProduct(
   });
 }
 
-export async function deleteProduct(id: string): Promise<Product> {
+async function deleteProduct(id: string): Promise<Product> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -480,7 +477,7 @@ export async function listSuppliers(filters: ListFilters = {}) {
   return paginate(withPayable, filters);
 }
 
-export async function createSupplier(input: CreateSupplierInput): Promise<Supplier> {
+async function createSupplier(input: CreateSupplierInput): Promise<Supplier> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -523,7 +520,7 @@ async function updateSupplier(
   });
 }
 
-export async function listCustomers(filters: ListFilters = {}) {
+async function listCustomers(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   let items = getStore().customers.filter((c) => c.shop_id === sid);
@@ -558,7 +555,7 @@ export async function getCustomer(id: string) {
   };
 }
 
-export async function createCustomer(input: CreateCustomerInput): Promise<Customer> {
+async function createCustomer(input: CreateCustomerInput): Promise<Customer> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -624,7 +621,7 @@ function mapWithSupplierName<T extends { shop_id: string; supplier_id: string }>
     }));
 }
 
-export async function listPurchases(filters: ListFilters = {}) {
+async function listPurchases(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();
@@ -645,7 +642,7 @@ export async function listPurchases(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-export async function getPurchase(id: string) {
+async function getPurchase(id: string) {
   await delay();
   const sid = shopId();
   const store = getStore();
@@ -662,7 +659,7 @@ export async function getPurchase(id: string) {
   };
 }
 
-export async function createPurchase(
+async function createPurchase(
   input: CreatePurchaseInput
 ): Promise<{ purchase?: Purchase; cash_warning?: SoftCashWarning }> {
   await delay();
@@ -837,7 +834,7 @@ export async function createPurchase(
   return { purchase };
 }
 
-export async function createSupplierPayment(
+async function createSupplierPayment(
   input: CreateSupplierPaymentInput
 ): Promise<{ payment?: SupplierPayment; cash_warning?: SoftCashWarning }> {
   await delay();
@@ -896,7 +893,7 @@ export async function createSupplierPayment(
   return { payment };
 }
 
-export async function listSupplierPayments(filters: ListFilters = {}) {
+async function listSupplierPayments(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();
@@ -920,7 +917,7 @@ export async function listSupplierPayments(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-export async function listStock(filters: ListFilters = {}) {
+async function listStock(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();
@@ -983,7 +980,7 @@ export async function listInStockUnits(productId?: string) {
   );
 }
 
-export async function adjustStock(input: AdjustStockInput) {
+async function adjustStock(input: AdjustStockInput) {
   await delay();
   const sid = shopId();
   if (!input.reason.trim()) throw new ValidationError('Reason is required');
@@ -1040,7 +1037,7 @@ export type SaleLineInput = {
   inventory_unit_id?: string;
 };
 
-export async function listSales(filters: ListFilters = {}) {
+async function listSales(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();
@@ -1098,7 +1095,7 @@ export async function getSale(id: string) {
   };
 }
 
-export async function createSale(
+async function createSale(
   input: CreateSaleInput
 ): Promise<{ sale: Sale; below_cost_warning?: boolean }> {
   await delay();
@@ -1354,7 +1351,7 @@ export async function receiveCustomerPayment(
   return { payments };
 }
 
-export async function listExpenseCategories(filters: ListFilters = {}) {
+async function listExpenseCategories(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   let items = getStore().expense_categories.filter((c) => c.shop_id === sid);
@@ -1365,7 +1362,7 @@ export async function listExpenseCategories(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-export async function createExpenseCategory(name: string): Promise<ExpenseCategory> {
+async function createExpenseCategory(name: string): Promise<ExpenseCategory> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -1387,7 +1384,7 @@ export async function createExpenseCategory(name: string): Promise<ExpenseCatego
   });
 }
 
-export async function updateExpenseCategory(
+async function updateExpenseCategory(
   id: string,
   data: Partial<Pick<ExpenseCategory, 'name' | 'is_active'>>
 ) {
@@ -1412,7 +1409,7 @@ export async function updateExpenseCategory(
   });
 }
 
-export async function deleteExpenseCategory(id: string): Promise<ExpenseCategory> {
+async function deleteExpenseCategory(id: string): Promise<ExpenseCategory> {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -1428,7 +1425,7 @@ export async function deleteExpenseCategory(id: string): Promise<ExpenseCategory
   });
 }
 
-export async function listExpenses(filters: ListFilters = {}) {
+async function listExpenses(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();
@@ -1456,7 +1453,7 @@ export async function listExpenses(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-export async function createExpense(
+async function createExpense(
   input: CreateExpenseInput
 ): Promise<{ expense?: Expense; cash_warning?: SoftCashWarning }> {
   await delay();
@@ -1497,7 +1494,7 @@ export async function createExpense(
   return { expense };
 }
 
-export async function cancelExpense(id: string, reason: string) {
+async function cancelExpense(id: string, reason: string) {
   await delay();
   const sid = shopId();
   if (!reason.trim()) throw new ValidationError('Reason is required');
@@ -1543,7 +1540,7 @@ export async function previewCancelSale(id: string) {
   };
 }
 
-export async function cancelSale(
+async function cancelSale(
   id: string,
   reason: string,
   confirm_overdraft?: boolean
@@ -1652,7 +1649,7 @@ export async function cancelSale(
   return { ok: true };
 }
 
-export async function cancelPurchase(
+async function cancelPurchase(
   id: string,
   reason: string,
   confirm_overdraft?: boolean
@@ -1765,7 +1762,7 @@ export async function cancelPurchase(
   return { ok: true };
 }
 
-export async function cancelPayment(
+async function cancelPayment(
   id: string,
   reason: string,
   kind: 'customer' | 'supplier',
@@ -1835,7 +1832,7 @@ export async function cancelPayment(
   return { ok: true };
 }
 
-export async function listCashMovements(filters: ListFilters = {}) {
+async function listCashMovements(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   let items = getStore().cash_movements.filter((m) => m.shop_id === sid);
@@ -1860,7 +1857,7 @@ export async function listCashMovements(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-export async function listInventoryMovements(filters: ListFilters = {}) {
+async function listInventoryMovements(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();
@@ -1892,7 +1889,7 @@ export async function listInventoryMovements(filters: ListFilters = {}) {
   return paginate(enriched, filters);
 }
 
-export async function listPayments(filters: ListFilters = {}) {
+async function listPayments(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
   const store = getStore();

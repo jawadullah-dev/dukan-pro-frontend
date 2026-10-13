@@ -16,8 +16,8 @@ export interface CashMovementDTO {
   shopId: string;
   type: CashMovementType;
   direction: CashDirection;
-  amount: number; // in PAISA
-  movementDate: string; // ISO string
+  amount: number;
+  movementDate: string;
   referenceType: string | null;
   referenceId: string | null;
   reversesMovementId: string | null;
@@ -36,27 +36,27 @@ export interface CashMovementQueryFilter {
   type?: CashMovementType;
   direction?: CashDirection;
   search?: string;
-  from?: string; // YYYY-MM-DD
-  to?: string; // YYYY-MM-DD
+  from?: string;
+  to?: string;
   sortBy?: CashMovementSortField;
   sortOrder?: 'asc' | 'desc';
 }
 
 export interface CreateOpeningCashInput {
-  amount: number; // in PAISA
-  date?: string; // YYYY-MM-DD
+  amount: number;
+  date?: string;
   notes?: string;
 }
 
 export interface CreateOwnerInvestmentInput {
-  amount: number; // in PAISA
-  date?: string; // YYYY-MM-DD
+  amount: number;
+  date?: string;
   notes?: string;
 }
 
 export interface CreateOwnerWithdrawalInput {
-  amount: number; // in PAISA
-  date?: string; // YYYY-MM-DD
+  amount: number;
+  date?: string;
   notes?: string;
   confirmOverdraft?: boolean;
 }

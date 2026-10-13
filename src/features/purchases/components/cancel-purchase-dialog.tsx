@@ -99,7 +99,6 @@ export function CancelPurchaseDialog({
           </div>
         ) : (
           <form onSubmit={handleSubmit} className='space-y-4 py-2'>
-            {/* Impact summary */}
             <div className='space-y-2 rounded-lg border bg-muted/40 p-3 text-sm'>
               <p className='font-semibold text-foreground'>Preview Impact:</p>
 

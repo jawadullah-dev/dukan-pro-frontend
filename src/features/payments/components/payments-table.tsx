@@ -30,10 +30,6 @@ import type { PaymentsListFilters } from '../api/service';
 import { CancelPaymentDialog } from './cancel-payment-dialog';
 import { RecordPaymentDialog } from './record-payment-dialog';
 
-// ---------------------------------------------------------------------------
-// Payment Row Actions
-// ---------------------------------------------------------------------------
-
 interface PaymentRowActionsProps {
   payment: PaymentDTO;
   onCancel: (payment: PaymentDTO) => void;
@@ -70,10 +66,6 @@ function PaymentRowActions({ payment, onCancel }: PaymentRowActionsProps) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Mobile card configuration
-// ---------------------------------------------------------------------------
-
 const paymentMobileItem: MobileItemConfig<PaymentDTO> = {
   title: (row: PaymentDTO) => row.customerName || 'Walk-in',
   subtitle: (row: PaymentDTO) => (row.saleNo ? `Sale #${row.saleNo}` : 'Old Udhar'),
@@ -98,10 +90,6 @@ export function formatPaymentMethod(method?: string | null, notes?: string | nul
   if (upper === 'BANK' || upper === 'BANK_TRANSFER') return 'Bank Transfer';
   return method.charAt(0).toUpperCase() + method.slice(1).toLowerCase();
 }
-
-// ---------------------------------------------------------------------------
-// Drawer Detail configuration
-// ---------------------------------------------------------------------------
 
 const paymentDetail: DetailConfig<PaymentDTO> = {
   mode: 'sheet',
@@ -138,10 +126,6 @@ const paymentDetail: DetailConfig<PaymentDTO> = {
     ];
   }
 };
-
-// ---------------------------------------------------------------------------
-// PaymentsTable Component
-// ---------------------------------------------------------------------------
 
 interface PaymentsTableProps {
   toolbarAction?: ReactNode;

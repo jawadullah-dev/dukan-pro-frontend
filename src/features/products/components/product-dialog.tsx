@@ -141,7 +141,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
       };
 
       if (product) {
-        // Edit mode: can update everything including online store
         updateProduct.mutate(
           {
             name: value.name.trim(),
@@ -175,7 +174,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
           }
         );
       } else {
-        // Add mode: only send the fields the backend allows for new products
         createProduct.mutate(
           {
             name: value.name.trim(),
@@ -224,7 +222,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
       >
         <div className='no-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-4'>
           <FieldGroup className='gap-4'>
-            {/* 1. Basic Info */}
             <form.AppField
               name='name'
               children={(field) => <field.TextField label={t('name')} required />}
@@ -292,7 +289,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
               />
             </div>
 
-            {/* Tracking type is chosen once on creation */}
             {!isEdit ? (
               <form.AppField
                 name='trackingType'
@@ -309,7 +305,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
               />
             ) : null}
 
-            {/* 2. Prices */}
             <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
               <form.AppField
                 name='defaultPurchasePrice'
@@ -325,7 +320,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
               />
             </div>
 
-            {/* 3. Specs - show phone specs when SERIALIZED */}
             <form.Subscribe
               selector={(state) => state.values.trackingType}
               children={(trackingType) => (
@@ -361,7 +355,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
                       />
                     </div>
                   )}
-                  {/* PTA status is only available when editing a serialized product */}
                   {isEdit && trackingType === 'SERIALIZED' && (
                     <form.AppField
                       name='ptaStatus'
@@ -401,7 +394,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
               children={(field) => <field.TextareaField label={t('description')} />}
             />
 
-            {/* 4. Online Store Section - ONLY shown when EDITING an existing product */}
             {isEdit && (
               <>
                 <div className='border-t pt-4'>
@@ -425,7 +417,6 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
             )}
           </FieldGroup>
 
-          {/* Photo manager only when editing an existing product */}
           {isEdit && product?.id ? (
             <div className='mt-6 border-t pt-4'>
               <h4 className='text-sm font-semibold mb-3'>{t('images')}</h4>

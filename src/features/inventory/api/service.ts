@@ -1,5 +1,5 @@
 import { apiRequest } from '@/lib/api/client';
-import { ApiError } from '@/lib/api/types';
+import { appFetch } from '@/lib/api/app-fetch';
 import type {
   CreateInventoryAdjustmentInput,
   CreateInventoryAdjustmentResult,
@@ -32,31 +32,6 @@ export interface InventoryAdjustmentsFilters {
   sortOrder?: 'asc' | 'desc';
 }
 
-const APP_URL =
-  typeof window !== 'undefined'
-    ? ''
-    : (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3006').replace(/\/+$/, '');
-
-async function inventoryFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = path.startsWith('http') ? path : `${APP_URL}${path}`;
-  const res = await fetch(url, { ...init, cache: 'no-store' });
-  const body = (await res.json()) as T & { error?: string; message?: string | string[] };
-
-  if (!res.ok) {
-    const rawMessage =
-      (body as { message?: string | string[] }).message ?? (body as { error?: string }).error;
-    const message = Array.isArray(rawMessage)
-      ? rawMessage.join(', ')
-      : (rawMessage ?? 'An error occurred');
-    throw new ApiError(res.status, message);
-  }
-
-  return body;
-}
-
-/**
- * Lists stock levels and items from /reports/inventory (point-in-time stock).
- */
 export async function listInventoryStock(
   filters: InventoryStockFilters = {},
   token?: string
@@ -81,12 +56,9 @@ export async function listInventoryStock(
     );
   }
 
-  return inventoryFetch<PaginatedResponse<InventoryItemDTO>>(`/api/inventory${qs}`);
+  return appFetch<PaginatedResponse<InventoryItemDTO>>(`/api/inventory${qs}`);
 }
 
-/**
- * Lists manual stock changes (ADJUSTMENT, DAMAGED, LOST).
- */
 export async function listInventoryAdjustments(
   filters: InventoryAdjustmentsFilters = {},
   token?: string
@@ -113,25 +85,15 @@ export async function listInventoryAdjustments(
     );
   }
 
-  return inventoryFetch<PaginatedResponse<InventoryAdjustmentDTO>>(
-    `/api/inventory/adjustments${qs}`
-  );
+  return appFetch<PaginatedResponse<InventoryAdjustmentDTO>>(`/api/inventory/adjustments${qs}`);
 }
 
-/**
- * Records a manual stock change (adjust count, damaged, lost).
- */
 export async function createInventoryAdjustment(
   input: CreateInventoryAdjustmentInput
 ): Promise<CreateInventoryAdjustmentResult> {
-  return inventoryFetch<CreateInventoryAdjustmentResult>('/api/inventory/adjustments', {
+  return appFetch<CreateInventoryAdjustmentResult>('/api/inventory/adjustments', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
   });
 }
-
-// Backward-compatible aliases
-export const listStock = listInventoryStock;
-export const adjustStock = createInventoryAdjustment;
-export const listInventoryMovements = listInventoryAdjustments;

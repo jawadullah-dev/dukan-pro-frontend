@@ -59,9 +59,7 @@ function ExpenseCategoryDialogBody({
           if (found) {
             onCategoryCreated(found);
           }
-        } catch {
-          // ignore fallback
-        }
+        } catch {}
       }
 
       onOpenChange(false);

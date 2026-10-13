@@ -33,112 +33,16 @@ export const dashboardQueryOptions = () =>
     queryFn: () => dukaan.getDashboardKpis()
   });
 
-export const categoriesQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.categories(filters),
-    queryFn: () => dukaan.listCategories(filters)
-  });
-
-export const brandsQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.brands(filters),
-    queryFn: () => dukaan.listBrands(filters)
-  });
-
-export const productsQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.products(filters),
-    queryFn: () => dukaan.listProducts(filters)
-  });
-
-export const suppliersQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.suppliers(filters),
-    queryFn: () => dukaan.listSuppliers(filters)
-  });
-
-export const customersQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.customers(filters),
-    queryFn: () => dukaan.listCustomers(filters)
-  });
-
 export const customerQueryOptions = (id: string) =>
   queryOptions({
     queryKey: dukaanKeys.customer(id),
     queryFn: () => dukaan.getCustomer(id)
   });
 
-export const purchasesQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.purchases(filters),
-    queryFn: () => dukaan.listPurchases(filters)
-  });
-
-export const purchaseQueryOptions = (id: string) =>
-  queryOptions({
-    queryKey: dukaanKeys.purchase(id),
-    queryFn: () => dukaan.getPurchase(id)
-  });
-
-export const stockQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.stock(filters),
-    queryFn: () => dukaan.listStock(filters)
-  });
-
 export const unitsQueryOptions = (productId?: string) =>
   queryOptions({
     queryKey: dukaanKeys.units(productId),
     queryFn: () => dukaan.listInStockUnits(productId)
-  });
-
-export const salesQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.sales(filters),
-    queryFn: () => dukaan.listSales(filters)
-  });
-
-export const saleQueryOptions = (id: string) =>
-  queryOptions({
-    queryKey: dukaanKeys.sale(id),
-    queryFn: () => dukaan.getSale(id)
-  });
-
-export const supplierPaymentsQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.supplierPayments(filters),
-    queryFn: () => dukaan.listSupplierPayments(filters)
-  });
-
-export const expensesQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.expenses(filters),
-    queryFn: () => dukaan.listExpenses(filters)
-  });
-
-export const expenseCategoriesQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.expenseCategories(filters),
-    queryFn: () => dukaan.listExpenseCategories(filters)
-  });
-
-export const cashQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.cash(filters),
-    queryFn: () => dukaan.listCashMovements(filters)
-  });
-
-export const inventoryMovementsQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.inventoryMovements(filters),
-    queryFn: () => dukaan.listInventoryMovements(filters)
-  });
-
-export const paymentsQueryOptions = (filters: ListFilters = {}) =>
-  queryOptions({
-    queryKey: dukaanKeys.payments(filters),
-    queryFn: () => dukaan.listPayments(filters)
   });
 
 export const sessionQueryOptions = () =>

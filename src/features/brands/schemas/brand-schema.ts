@@ -8,4 +8,4 @@ export const createBrandFormSchema = (t: Translator) =>
     name: z.string().trim().min(1, t('validation.nameRequired'))
   });
 
-export type BrandFormValues = z.infer<ReturnType<typeof createBrandFormSchema>>;
+type BrandFormValues = z.infer<ReturnType<typeof createBrandFormSchema>>;

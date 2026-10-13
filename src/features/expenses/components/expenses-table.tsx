@@ -30,10 +30,6 @@ import { CancelExpenseDialog } from './cancel-expense-dialog';
 import { RecordExpenseDialog } from './record-expense-dialog';
 import { ExpenseDetailSheet } from './expense-detail-sheet';
 
-// ---------------------------------------------------------------------------
-// Row Actions
-// ---------------------------------------------------------------------------
-
 interface ExpenseRowActionsProps {
   expense: ExpenseDTO;
   onCancel: (expense: ExpenseDTO) => void;
@@ -70,10 +66,6 @@ function ExpenseRowActions({ expense, onCancel }: ExpenseRowActionsProps) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Mobile Item Configuration
-// ---------------------------------------------------------------------------
-
 const expenseMobileItem: MobileItemConfig<ExpenseDTO> = {
   title: (row: ExpenseDTO) => row.categoryName,
   subtitle: (row: ExpenseDTO) => row.description || '—',
@@ -84,10 +76,6 @@ const expenseMobileItem: MobileItemConfig<ExpenseDTO> = {
   }),
   meta: [(row: ExpenseDTO) => (row.expenseDate ? row.expenseDate.split('T')[0] : '—')]
 };
-
-// ---------------------------------------------------------------------------
-// Detail Configuration
-// ---------------------------------------------------------------------------
 
 const expenseDetail: DetailConfig<ExpenseDTO> = {
   mode: 'sheet',
@@ -110,10 +98,6 @@ const expenseDetail: DetailConfig<ExpenseDTO> = {
     }
   ]
 };
-
-// ---------------------------------------------------------------------------
-// ExpensesTable Component
-// ---------------------------------------------------------------------------
 
 interface ExpensesTableProps {
   toolbarAction?: ReactNode;

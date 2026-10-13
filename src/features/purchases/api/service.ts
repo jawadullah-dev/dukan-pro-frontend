@@ -1,4 +1,5 @@
 import { apiRequest } from '@/lib/api/client';
+import { appFetch } from '@/lib/api/app-fetch';
 import type {
   CancelImpactDTO,
   CancelPurchaseInput,
@@ -7,7 +8,6 @@ import type {
   PaginatedResponse,
   PurchaseDTO
 } from '@/lib/api/types';
-import { ApiError } from '@/lib/api/types';
 
 export interface PurchasesListFilters {
   page?: number;
@@ -21,28 +21,6 @@ export interface PurchasesListFilters {
   to?: string;
   sortBy?: 'purchaseDate' | 'purchaseNo' | 'totalAmount' | 'status' | 'createdAt' | 'updatedAt';
   sortOrder?: 'asc' | 'desc';
-}
-
-const APP_URL =
-  typeof window !== 'undefined'
-    ? ''
-    : (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3006').replace(/\/+$/, '');
-
-async function purchasesFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = path.startsWith('http') ? path : `${APP_URL}${path}`;
-  const res = await fetch(url, { ...init, cache: 'no-store' });
-  const body = (await res.json()) as T & { error?: string; message?: string | string[] };
-
-  if (!res.ok) {
-    const rawMessage =
-      (body as { message?: string | string[] }).message ?? (body as { error?: string }).error;
-    const message = Array.isArray(rawMessage)
-      ? rawMessage.join(', ')
-      : (rawMessage ?? 'An error occurred');
-    throw new ApiError(res.status, message);
-  }
-
-  return body;
 }
 
 export async function listPurchases(
@@ -66,24 +44,22 @@ export async function listPurchases(
 
   const qs = params.toString() ? `?${params.toString()}` : '';
 
-  // Server-side prefetch with token: direct call to NestJS backend
   if (token) {
     return apiRequest<PaginatedResponse<PurchaseDTO>>(`/purchases${qs}`, undefined, token);
   }
 
-  // Client-side call through Next.js Route Handler
-  return purchasesFetch<PaginatedResponse<PurchaseDTO>>(`/api/purchases${qs}`);
+  return appFetch<PaginatedResponse<PurchaseDTO>>(`/api/purchases${qs}`);
 }
 
 export async function getPurchase(id: string, token?: string): Promise<PurchaseDTO> {
   if (token) {
     return apiRequest<PurchaseDTO>(`/purchases/${id}`, undefined, token);
   }
-  return purchasesFetch<PurchaseDTO>(`/api/purchases/${id}`);
+  return appFetch<PurchaseDTO>(`/api/purchases/${id}`);
 }
 
 export async function createPurchase(input: CreatePurchaseInput): Promise<CreatePurchaseResult> {
-  return purchasesFetch<CreatePurchaseResult>('/api/purchases', {
+  return appFetch<CreatePurchaseResult>('/api/purchases', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -94,14 +70,17 @@ export async function getCancelImpact(id: string, token?: string): Promise<Cance
   if (token) {
     return apiRequest<CancelImpactDTO>(`/purchases/${id}/cancel-impact`, undefined, token);
   }
-  return purchasesFetch<CancelImpactDTO>(`/api/purchases/${id}/cancel-impact`);
+  return appFetch<CancelImpactDTO>(`/api/purchases/${id}/cancel-impact`);
 }
 
 export async function cancelPurchase(
   id: string,
-  input: CancelPurchaseInput
+  inputOrReason: CancelPurchaseInput | string,
+  confirmOverdraft?: boolean
 ): Promise<{ success?: boolean; message?: string }> {
-  return purchasesFetch<{ success?: boolean; message?: string }>(`/api/purchases/${id}/cancel`, {
+  const input: CancelPurchaseInput =
+    typeof inputOrReason === 'string' ? { reason: inputOrReason, confirmOverdraft } : inputOrReason;
+  return appFetch<{ success?: boolean; message?: string }>(`/api/purchases/${id}/cancel`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)

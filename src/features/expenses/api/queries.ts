@@ -19,13 +19,6 @@ export const expensesQueryOptions = (filters: ExpenseQueryFilter = {}, token?: s
     queryFn: () => listExpenses(filters, token)
   });
 
-export const expenseQueryOptions = (id: string, token?: string) =>
-  queryOptions({
-    queryKey: expenseKeys.detail(id),
-    queryFn: () => getExpense(id, token),
-    enabled: !!id
-  });
-
 export const expenseCategoriesQueryOptions = (
   filters: ExpenseCategoryQueryFilter = {},
   token?: string
@@ -33,11 +26,4 @@ export const expenseCategoriesQueryOptions = (
   queryOptions({
     queryKey: expenseKeys.categories(filters),
     queryFn: () => listExpenseCategories(filters, token)
-  });
-
-export const expenseCategoryQueryOptions = (id: string, token?: string) =>
-  queryOptions({
-    queryKey: expenseKeys.category(id),
-    queryFn: () => getExpenseCategory(id, token),
-    enabled: !!id
   });

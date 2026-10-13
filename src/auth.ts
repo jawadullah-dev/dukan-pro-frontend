@@ -4,10 +4,8 @@ import { z } from 'zod';
 import { authConfig } from '@/auth.config';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
 import type { AuthAccountRole } from '@/lib/auth/accounts';
+import { API_BASE_URL } from '@/constants/api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000';
-
-/** Minimal shape we read from both login responses. */
 interface LoginResult {
   id: string;
   name: string;
@@ -19,9 +17,25 @@ interface LoginResult {
   subscriptionEndsAt: string | null;
 }
 
-async function tryOwnerLogin(phone: string, password: string): Promise<LoginResult | null> {
+interface AuthResponseData {
+  accessToken?: string;
+  user?: { id: string; name: string; phone: string };
+  admin?: { id: string; name: string; phone: string };
+  shopId?: string | null;
+  shop?: { name?: string | null; subscriptionEndsAt?: string | null } | null;
+}
+
+interface AuthResponseBody {
+  data?: AuthResponseData;
+}
+
+async function executeAuthPost(
+  endpoint: string,
+  phone: string,
+  password: string
+): Promise<AuthResponseData | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone, password })
@@ -29,65 +43,50 @@ async function tryOwnerLogin(phone: string, password: string): Promise<LoginResu
 
     if (!res.ok) return null;
 
-    const json = await res.json();
-    // Backend wraps: { message, data: { accessToken, user, shopId, shop } }
+    const json = (await res.json()) as AuthResponseBody;
     const data = json?.data;
     if (!data?.accessToken) return null;
-
-    return {
-      id: data.user.id,
-      name: data.user.name,
-      phone: data.user.phone,
-      role: 'OWNER',
-      shopId: data.shopId ?? null,
-      shopName: data.shop?.name ?? null,
-      accessToken: data.accessToken,
-      subscriptionEndsAt: data.shop?.subscriptionEndsAt ?? null
-    };
+    return data;
   } catch {
     return null;
   }
 }
 
+async function tryOwnerLogin(phone: string, password: string): Promise<LoginResult | null> {
+  const data = await executeAuthPost('/auth/login', phone, password);
+  if (!data?.accessToken || !data.user) return null;
+
+  return {
+    id: data.user.id,
+    name: data.user.name,
+    phone: data.user.phone,
+    role: 'OWNER',
+    shopId: data.shopId ?? null,
+    shopName: data.shop?.name ?? null,
+    accessToken: data.accessToken,
+    subscriptionEndsAt: data.shop?.subscriptionEndsAt ?? null
+  };
+}
+
 async function tryPlatformAdminLogin(phone: string, password: string): Promise<LoginResult | null> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/auth/platform-admin/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phone, password })
-    });
+  const data = await executeAuthPost('/auth/platform-admin/login', phone, password);
+  if (!data?.accessToken || !data.admin) return null;
 
-    if (!res.ok) return null;
-
-    const json = await res.json();
-    // Backend wraps: { message, data: { accessToken, admin: { id, name, phone } } }
-    const data = json?.data;
-    if (!data?.accessToken) return null;
-
-    return {
-      id: data.admin.id,
-      name: data.admin.name,
-      phone: data.admin.phone,
-      // Backend calls it PLATFORM_ADMIN; the rest of the frontend uses SUPER_ADMIN.
-      role: 'SUPER_ADMIN',
-      shopId: null,
-      shopName: null,
-      accessToken: data.accessToken,
-      subscriptionEndsAt: null
-    };
-  } catch {
-    return null;
-  }
+  return {
+    id: data.admin.id,
+    name: data.admin.name,
+    phone: data.admin.phone,
+    role: 'SUPER_ADMIN',
+    shopId: null,
+    shopName: null,
+    accessToken: data.accessToken,
+    subscriptionEndsAt: null
+  };
 }
 
 const credentialsSchema = z.object({
   phone: z.string().refine(isValidPkMobile, 'Enter a valid mobile number'),
   password: z.string().min(1),
-  /**
-   * When true the form is on /platform-admin/login and we skip the owner
-   * attempt entirely. This prevents leaking that a number is registered as
-   * an owner when a platform admin tries to log in.
-   */
   isPlatformAdmin: z.enum(['true', 'false']).optional()
 });
 
@@ -108,12 +107,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const phone = normalizePhone(parsed.data.phone);
         const { password, isPlatformAdmin } = parsed.data;
 
-        // Platform admin page → only try the admin endpoint.
         if (isPlatformAdmin === 'true') {
           return await tryPlatformAdminLogin(phone, password);
         }
 
-        // Owner login page → try owner first, then fall back to platform admin.
         const ownerResult = await tryOwnerLogin(phone, password);
         if (ownerResult) return ownerResult;
 

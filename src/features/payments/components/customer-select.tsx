@@ -40,7 +40,6 @@ export function CustomerSelectCombobox({
     }
   }, [selectedCustomer]);
 
-  // Debounce search query
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search.trim());
@@ -72,7 +71,6 @@ export function CustomerSelectCombobox({
     return data?.pages.flatMap((p) => p.items) ?? [];
   }, [data]);
 
-  // If we have a selected customer from outside or local, find it in the list if possible
   const currentCustomer = localCustomer || allCustomers.find((c) => c.id === value) || null;
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -150,7 +148,6 @@ export function CustomerSelectCombobox({
         sideOffset={4}
         className='w-(--anchor-width) min-w-[280px] p-0 overflow-hidden shadow-lg border border-border bg-popover z-50'
       >
-        {/* Search header */}
         <div className='flex items-center border-b px-2.5 py-1.5 gap-2'>
           <Icons.search className='size-4 shrink-0 text-muted-foreground' />
           <Input
@@ -171,7 +168,6 @@ export function CustomerSelectCombobox({
           )}
         </div>
 
-        {/* Customer list with infinite scroll */}
         <div
           className='max-h-60 overflow-y-auto p-1 text-xs divide-y divide-border/30'
           onScroll={handleScroll}

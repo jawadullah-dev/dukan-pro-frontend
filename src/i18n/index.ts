@@ -7,7 +7,7 @@ import ps from '../../messages/ps.json';
 
 export type LegacyLocale = 'en' | 'ur' | 'ps';
 
-const catalogs: Record<LegacyLocale, Record<string, any>> = { en, ur, ps };
+const catalogs: Record<LegacyLocale, Record<string, unknown>> = { en, ur, ps };
 let activeLocale: LegacyLocale = 'en';
 
 export function setLocale(locale: string): void {
@@ -26,15 +26,15 @@ export function getLocale(): LegacyLocale {
   return activeLocale;
 }
 
-function getMessage(catalog: Record<string, any>, key: string): string | undefined {
+function getMessage(catalog: Record<string, unknown>, key: string): string | undefined {
   if (!key) return undefined;
-  let value: any = catalog;
+  let value: unknown = catalog;
 
   for (const segment of key.split('.')) {
     if (typeof value !== 'object' || value === null || !(segment in value)) {
       return undefined;
     }
-    value = value[segment];
+    value = (value as Record<string, unknown>)[segment];
   }
 
   return typeof value === 'string' ? value : undefined;

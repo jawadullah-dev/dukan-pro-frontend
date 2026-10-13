@@ -113,7 +113,6 @@ export function RecordPaymentDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4'>
-          {/* Customer select */}
           <div className='space-y-1.5'>
             <Label className='text-xs font-medium'>
               Customer <span className='text-destructive'>*</span>
@@ -128,7 +127,6 @@ export function RecordPaymentDialog({
             />
           </div>
 
-          {/* Selected Customer details preview */}
           {selectedCustomer && (
             <div className='rounded-lg border bg-muted/30 p-2.5 text-xs flex justify-between items-center'>
               <div className='flex items-center gap-1.5'>
@@ -148,7 +146,6 @@ export function RecordPaymentDialog({
             </div>
           )}
 
-          {/* Amount input */}
           <div className='space-y-1.5'>
             <Label htmlFor='payment-amount' className='text-xs font-medium text-foreground'>
               Amount Received (PKR) <span className='text-destructive'>*</span>
@@ -171,7 +168,6 @@ export function RecordPaymentDialog({
             </div>
           </div>
 
-          {/* Payment Date */}
           <div className='space-y-1.5'>
             <Label htmlFor='payment-date' className='text-xs font-medium text-foreground'>
               Payment Date <span className='text-destructive'>*</span>
@@ -186,7 +182,6 @@ export function RecordPaymentDialog({
             />
           </div>
 
-          {/* Payment Method */}
           <div className='space-y-1.5'>
             <Label htmlFor='payment-method' className='text-xs font-medium text-foreground'>
               Payment Method
@@ -240,7 +235,6 @@ export function RecordPaymentDialog({
             </Select>
           </div>
 
-          {/* Notes */}
           <div className='space-y-1.5'>
             <Label htmlFor='payment-notes' className='text-xs font-medium text-foreground'>
               Notes (Optional)

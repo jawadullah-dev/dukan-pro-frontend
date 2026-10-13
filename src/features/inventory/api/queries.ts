@@ -29,7 +29,3 @@ export const inventoryAdjustmentsQueryOptions = (
     queryKey: inventoryKeys.adjustments(filters),
     queryFn: () => listInventoryAdjustments(filters, token)
   });
-
-// Backward-compatible exports
-export const stockQueryOptions = inventoryStockQueryOptions;
-export const inventoryMovementsQueryOptions = inventoryAdjustmentsQueryOptions;

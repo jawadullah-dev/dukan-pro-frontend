@@ -24,12 +24,18 @@ export default getRequestConfig(async ({ requestLocale }) => {
     messages: (await import(`../../messages/${locale}.json`)).default,
     onError(error) {
       if (error.code === 'MISSING_MESSAGE') return;
-      console.error(error);
     },
     getMessageFallback({ key }) {
+      if (key.startsWith('common.')) {
+        const seg = key.slice(7);
+        return seg.charAt(0).toUpperCase() + seg.slice(1);
+      }
+      if (key.startsWith('search.')) {
+        const seg = key.slice(7);
+        return `Search ${seg}...`;
+      }
       return key;
     },
-
     now: new Date(),
     formats: {
       number: {

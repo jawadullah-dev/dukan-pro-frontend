@@ -267,7 +267,7 @@ function CompactOrFullTable<TData>({
                 return (
                   <TableHead
                     key={header.id}
-                    style={colSize ? { width: `${colSize}px` } : undefined}
+                    style={{ width: colSize ? `${colSize}px` : undefined }}
                     className={cn(
                       'bg-background sticky top-0 z-20 shadow-[0_1px_0_0_var(--border)]',
                       isActions && 'w-20 text-end pe-3',
@@ -304,7 +304,7 @@ function CompactOrFullTable<TData>({
                   return (
                     <TableCell
                       key={header.id}
-                      style={colSize ? { width: `${colSize}px` } : undefined}
+                      style={{ width: colSize ? `${colSize}px` : undefined }}
                       className={cn(
                         isActions && 'w-20 text-end pe-3',
                         isSticky &&
@@ -354,7 +354,7 @@ function CompactOrFullTable<TData>({
                   return (
                     <TableCell
                       key={cell.id}
-                      style={colSize ? { width: `${colSize}px` } : undefined}
+                      style={{ width: colSize ? `${colSize}px` : undefined }}
                       data-slot={isActions ? 'action-cell' : undefined}
                       onClick={isActions ? (e) => e.stopPropagation() : undefined}
                       className={cn(

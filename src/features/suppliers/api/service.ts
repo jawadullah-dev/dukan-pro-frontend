@@ -5,31 +5,16 @@ import type {
   CreateSupplierInput,
   UpdateSupplierInput
 } from '@/lib/api/types';
-import { ApiError } from '@/lib/api/types';
+import { appFetch } from '@/lib/api/app-fetch';
 
 export interface SupplierListFilters {
   page?: number;
   pageSize?: number;
-  limit?: number; // backwards-compatible alias
+  limit?: number;
   search?: string;
   isActive?: boolean;
   sortBy?: 'name' | 'phone' | 'createdAt' | 'updatedAt' | 'openingBalance';
   sortOrder?: 'asc' | 'desc';
-}
-
-async function supplierFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, { ...init, cache: 'no-store' });
-  const body = (await res.json()) as T & { error?: string; message?: string | string[] };
-
-  if (!res.ok) {
-    const rawMessage = (body as { message?: string | string[] }).message;
-    const message = Array.isArray(rawMessage)
-      ? rawMessage.join(', ')
-      : (rawMessage ?? 'An error occurred');
-    throw new ApiError(res.status, message);
-  }
-
-  return body;
 }
 
 export async function listSuppliers(
@@ -48,24 +33,15 @@ export async function listSuppliers(
 
   const qs = params.toString() ? `?${params.toString()}` : '';
 
-  // Server-side prefetch with token: call NestJS backend directly
   if (token) {
     return apiRequest<PaginatedResponse<SupplierDTO>>(`/suppliers${qs}`, undefined, token);
   }
 
-  // Client-side: proxy through Next.js route handler
-  return supplierFetch<PaginatedResponse<SupplierDTO>>(`/api/suppliers${qs}`);
-}
-
-export async function getSupplierById(id: string, token?: string): Promise<SupplierDTO> {
-  if (token) {
-    return apiRequest<SupplierDTO>(`/suppliers/${id}`, undefined, token);
-  }
-  return supplierFetch<SupplierDTO>(`/api/suppliers/${id}`);
+  return appFetch<PaginatedResponse<SupplierDTO>>(`/api/suppliers${qs}`);
 }
 
 export async function createSupplier(data: CreateSupplierInput): Promise<SupplierDTO> {
-  return supplierFetch<SupplierDTO>('/api/suppliers', {
+  return appFetch<SupplierDTO>('/api/suppliers', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
@@ -73,7 +49,7 @@ export async function createSupplier(data: CreateSupplierInput): Promise<Supplie
 }
 
 export async function updateSupplier(id: string, data: UpdateSupplierInput): Promise<SupplierDTO> {
-  return supplierFetch<SupplierDTO>(`/api/suppliers/${id}`, {
+  return appFetch<SupplierDTO>(`/api/suppliers/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
@@ -86,8 +62,4 @@ export async function deactivateSupplier(id: string): Promise<SupplierDTO> {
 
 export async function reactivateSupplier(id: string): Promise<SupplierDTO> {
   return updateSupplier(id, { isActive: true });
-}
-
-export async function deleteSupplier(id: string): Promise<unknown> {
-  return supplierFetch<unknown>(`/api/suppliers/${id}`, { method: 'DELETE' });
 }

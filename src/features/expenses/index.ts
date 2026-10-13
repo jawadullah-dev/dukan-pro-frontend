@@ -1,14 +1,5 @@
 export * from './api/queries';
 export * from './api/mutations';
 export * from './api/service';
-export * from './schemas/expense-schema';
 export { ExpensesClient } from './components/expenses';
-export { ExpensesTable } from './components/expenses-table';
-export { RecordExpenseDialog } from './components/record-expense-dialog';
-export { CancelExpenseDialog } from './components/cancel-expense-dialog';
-export { ExpenseDetailSheet } from './components/expense-detail-sheet';
-export { AddCategoryDialog } from './components/add-category-dialog';
-export { ExpenseCategoryDialog } from './components/expense-category-dialog';
-export { CategorySelectCombobox } from './components/category-select';
 export { ExpenseCategoriesClient } from './components/expense-categories';
-export { ExpenseCategoriesTable } from './components/expense-categories-table';

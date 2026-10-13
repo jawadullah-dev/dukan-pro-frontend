@@ -37,10 +37,6 @@ import { deactivateSupplier, reactivateSupplier } from '../api/service';
 import type { SupplierListFilters } from '../api/service';
 import { SupplierDialog } from './supplier-dialog';
 
-// ---------------------------------------------------------------------------
-// Cell Action
-// ---------------------------------------------------------------------------
-
 interface SupplierCellActionProps {
   data: SupplierDTO;
 }
@@ -126,10 +122,6 @@ function SupplierCellAction({ data }: SupplierCellActionProps) {
     </div>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Columns
-// ---------------------------------------------------------------------------
 
 const supplierColumns: ColumnDef<SupplierDTO>[] = [
   {
@@ -348,10 +340,6 @@ const supplierDetail: DetailConfig<SupplierDTO> = {
     }
   ]
 };
-
-// ---------------------------------------------------------------------------
-// Table Component
-// ---------------------------------------------------------------------------
 
 interface SuppliersTableProps {
   toolbarAction?: ReactNode;

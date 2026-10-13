@@ -34,7 +34,7 @@ export function SupplierPaymentDetailSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className='flex flex-col gap-6 sm:max-w-md overflow-y-auto'>
         <SheetHeader>
-          <div className='flex items-center justify-between pr-6'>
+          <div className='flex items-center justify-between pe-6'>
             <SheetTitle className='text-lg font-semibold'>
               {payment.supplierName || 'Supplier Payment'}
             </SheetTitle>
@@ -45,7 +45,6 @@ export function SupplierPaymentDetailSheet({
           </SheetDescription>
         </SheetHeader>
 
-        {/* Amount Hero Card */}
         <div className='rounded-xl border border-border/70 bg-muted/40 p-4 text-center'>
           <span className='text-xs font-normal text-muted-foreground'>Payment Amount</span>
           <p className='mt-1 text-2xl font-bold tracking-tight text-foreground'>
@@ -56,7 +55,6 @@ export function SupplierPaymentDetailSheet({
           </span>
         </div>
 
-        {/* Payment Metadata Details */}
         <div className='space-y-3 divide-y divide-border/60 text-sm'>
           <div className='flex justify-between py-2'>
             <span className='text-muted-foreground'>Supplier</span>
@@ -114,7 +112,6 @@ export function SupplierPaymentDetailSheet({
           )}
         </div>
 
-        {/* Footer Actions */}
         {!isCancelled && onCancelClick && (
           <div className='mt-auto pt-4'>
             <Button

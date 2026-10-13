@@ -84,14 +84,13 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-          {/* Amount */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-amount' className='text-sm font-normal text-foreground'>
               {t('dukaan.cash.openingAmount') || 'Opening Amount (PKR)'}{' '}
               <span className='text-destructive'>*</span>
             </Label>
             <div className='relative w-full'>
-              <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
+              <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
                 Rs
               </span>
               <Input
@@ -103,14 +102,13 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
                 value={amountStr}
                 onChange={(e) => setAmountStr(e.target.value)}
                 disabled={createMutation.isPending}
-                className='h-10 pl-9 text-sm font-normal text-foreground w-full'
+                className='h-10 ps-9 text-sm font-normal text-foreground w-full'
                 autoFocus
                 required
               />
             </div>
           </div>
 
-          {/* Date */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-date' className='text-sm font-normal text-foreground'>
               {t('dukaan.cash.startDate') || 'Start Date'}{' '}
@@ -127,7 +125,6 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
             />
           </div>
 
-          {/* Notes */}
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-notes' className='text-sm font-normal text-foreground'>
               {t('dukaan.cash.notes') || 'Notes'}{' '}

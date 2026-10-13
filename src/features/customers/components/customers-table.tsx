@@ -40,10 +40,6 @@ import { deactivateCustomer, reactivateCustomer } from '../api/service';
 import type { CustomerListFilters } from '../api/service';
 import { CustomerDialog } from './customer-dialog';
 
-// ---------------------------------------------------------------------------
-// Cell action
-// ---------------------------------------------------------------------------
-
 interface CustomerCellActionProps {
   data: CustomerDTO;
 }
@@ -141,10 +137,6 @@ function CustomerCellAction({ data }: CustomerCellActionProps) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Columns: Phone except phone, all others have sorting enabled
-// ---------------------------------------------------------------------------
-
 const customerColumns: ColumnDef<CustomerDTO>[] = [
   {
     id: 'name',
@@ -175,7 +167,7 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
       return <DataTableColumnHeader column={column} title={t('table.col.phone')} />;
     },
     meta: { label: 'table.col.phone', type: 'phone', priority: 2, mobile: 'subtitle' },
-    enableSorting: true, // Phone sorting enabled
+    enableSorting: true,
     cell: ({ row }) => row.original.phone || '—'
   },
   {
@@ -249,7 +241,7 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
       mobile: 'badge'
     },
     enableColumnFilter: true,
-    enableSorting: true, // Status also has sorting enabled
+    enableSorting: true,
     cell: ({ row }) => {
       const t = useT();
       return (
@@ -353,10 +345,6 @@ const customerDetail: DetailConfig<CustomerDTO> = {
   ]
 };
 
-// ---------------------------------------------------------------------------
-// Table component
-// ---------------------------------------------------------------------------
-
 interface CustomersTableProps {
   toolbarAction?: ReactNode;
 }
@@ -364,11 +352,9 @@ interface CustomersTableProps {
 export function CustomersTable({ toolbarAction }: CustomersTableProps) {
   const t = useT();
 
-  // All columns have sorting enabled
   const sortableColumnIds = ['name', 'phone', 'openingBalance', 'createdAt', 'isActive'];
   const { params } = useDukaanListParams(sortableColumnIds, 'name', ['isActive']);
 
-  // URL state synchronization for search and status filter
   const [nameParam] = useQueryState('name', parseAsString);
   const [searchParam] = useQueryState('search', parseAsString);
   const [isActiveParam] = useQueryState('isActive', parseAsString);
@@ -384,7 +370,6 @@ export function CustomersTable({ toolbarAction }: CustomersTableProps) {
     }
   }
 
-  // Determine sort parameters safely
   const sortItem = params.sort[0];
   let sortBy: CustomerListFilters['sortBy'] = 'createdAt';
   let sortOrder: 'asc' | 'desc' = 'desc';

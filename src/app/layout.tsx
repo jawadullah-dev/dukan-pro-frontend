@@ -151,12 +151,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       data-theme={themeToApply}
       data-appearance-density={densityToApply}
       data-appearance-digits={digitsToApply}
-      style={{
-        ['--primary' as string]: ACCENT_OKLCH[accentToApply],
-        ['--radius' as string]: RADIUS_REM[radiusToApply]
-      }}
     >
       <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `:root { --primary: ${ACCENT_OKLCH[accentToApply]}; --radius: ${RADIUS_REM[radiusToApply]}; }`
+          }}
+        />
         <script
           id='theme-and-extension-attribute-bootstrap'
           dangerouslySetInnerHTML={{

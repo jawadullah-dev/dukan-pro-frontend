@@ -49,7 +49,6 @@ export function RecordExpenseDialog({
     message: string;
   } | null>(null);
 
-  // Separate dialog for adding category
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
 
   const recordMutation = useMutation({
@@ -136,7 +135,6 @@ export function RecordExpenseDialog({
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
-            {/* Category Select (Full Width Combobox with infinite scroll & search) */}
             <div className='space-y-1.5 w-full'>
               <div className='flex items-center justify-between'>
                 <Label className='text-sm font-normal text-foreground'>
@@ -165,13 +163,12 @@ export function RecordExpenseDialog({
               />
             </div>
 
-            {/* Amount Input */}
             <div className='space-y-1.5 w-full'>
               <Label htmlFor='expense-amount' className='text-sm font-normal text-foreground'>
                 Amount (PKR) <span className='text-destructive'>*</span>
               </Label>
               <div className='relative w-full'>
-                <span className='absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
+                <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
                   Rs
                 </span>
                 <Input
@@ -183,13 +180,12 @@ export function RecordExpenseDialog({
                   value={amountStr}
                   onChange={(e) => setAmountStr(e.target.value)}
                   disabled={recordMutation.isPending}
-                  className='h-10 pl-9 text-sm font-normal text-foreground w-full'
+                  className='h-10 ps-9 text-sm font-normal text-foreground w-full'
                   required
                 />
               </div>
             </div>
 
-            {/* Expense Date */}
             <div className='space-y-1.5 w-full'>
               <Label htmlFor='expense-date' className='text-sm font-normal text-foreground'>
                 Expense Date <span className='text-destructive'>*</span>
@@ -205,7 +201,6 @@ export function RecordExpenseDialog({
               />
             </div>
 
-            {/* Description */}
             <div className='space-y-1.5 w-full'>
               <Label htmlFor='expense-description' className='text-sm font-normal text-foreground'>
                 Description <span className='text-xs text-muted-foreground'>(Optional)</span>
@@ -221,7 +216,6 @@ export function RecordExpenseDialog({
               />
             </div>
 
-            {/* Overdraft Warning Banner */}
             {overdraftPrompt && (
               <div className='rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 space-y-2.5 text-xs text-amber-900 dark:text-amber-200'>
                 <div className='flex items-start gap-2'>
@@ -244,7 +238,6 @@ export function RecordExpenseDialog({
               </div>
             )}
 
-            {/* Footer Actions: Cancel and Save */}
             <DialogFooter className='gap-2 sm:gap-2.5 pt-2'>
               <DialogCancelButton
                 onClick={() => onOpenChange(false)}
@@ -260,7 +253,6 @@ export function RecordExpenseDialog({
         </DialogContent>
       </Dialog>
 
-      {/* New Category Dialog */}
       <AddCategoryDialog
         open={addCategoryOpen}
         onOpenChange={setAddCategoryOpen}

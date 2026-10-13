@@ -1,6 +1,5 @@
 import { apiRequest } from '@/lib/api/client';
 import type { PaginatedResponse } from '@/lib/api/types';
-import { ApiError } from '@/lib/api/types';
 import type {
   CashMovementDTO,
   CashMovementQueryFilter,
@@ -10,28 +9,7 @@ import type {
   CreateOwnerWithdrawalResult,
   CashStatusResult
 } from '@/types/cash';
-import { dukaan, type ListFilters } from '@/lib/dukaan';
-
-const APP_URL =
-  typeof window !== 'undefined'
-    ? ''
-    : (process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3006').replace(/\/+$/, '');
-
-async function cashFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = path.startsWith('http') ? path : `${APP_URL}${path}`;
-  const res = await fetch(url, { ...init, cache: 'no-store' });
-  const body = (await res.json()) as T & { error?: string; message?: string | string[] };
-
-  if (!res.ok) {
-    const rawMessage = body.message ?? body.error;
-    const message = Array.isArray(rawMessage)
-      ? rawMessage.join(', ')
-      : (rawMessage ?? 'An error occurred');
-    throw new ApiError(res.status, message);
-  }
-
-  return body;
-}
+import { appFetch } from '@/lib/api/app-fetch';
 
 export async function listCashMovements(
   filters: CashMovementQueryFilter = {},
@@ -55,11 +33,11 @@ export async function listCashMovements(
     return apiRequest<PaginatedResponse<CashMovementDTO>>(`/cash/movements${qs}`, undefined, token);
   }
 
-  return cashFetch<PaginatedResponse<CashMovementDTO>>(`/api/cash/movements${qs}`);
+  return appFetch<PaginatedResponse<CashMovementDTO>>(`/api/cash/movements${qs}`);
 }
 
 export async function createOpeningCash(input: CreateOpeningCashInput): Promise<CashStatusResult> {
-  return cashFetch<CashStatusResult>('/api/cash/opening', {
+  return appFetch<CashStatusResult>('/api/cash/opening', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -69,7 +47,7 @@ export async function createOpeningCash(input: CreateOpeningCashInput): Promise<
 export async function createOwnerInvestment(
   input: CreateOwnerInvestmentInput
 ): Promise<CashStatusResult> {
-  return cashFetch<CashStatusResult>('/api/cash/investments', {
+  return appFetch<CashStatusResult>('/api/cash/investments', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
@@ -79,13 +57,9 @@ export async function createOwnerInvestment(
 export async function createOwnerWithdrawal(
   input: CreateOwnerWithdrawalInput
 ): Promise<CreateOwnerWithdrawalResult> {
-  return cashFetch<CreateOwnerWithdrawalResult>('/api/cash/withdrawals', {
+  return appFetch<CreateOwnerWithdrawalResult>('/api/cash/withdrawals', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
   });
-}
-
-export async function listPayments(filters: ListFilters = {}) {
-  return dukaan.listPayments(filters);
 }

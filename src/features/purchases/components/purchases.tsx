@@ -10,7 +10,6 @@ import { PurchasesTable } from './purchases-table';
 import { PurchaseCreateDialog } from './purchase-create-dialog';
 
 export { PurchaseDetailClient } from './purchase-detail-client';
-export { PurchaseCreateDialog, PurchaseCreateForm } from './purchase-create-dialog';
 
 interface PurchasesHeaderActionProps {
   className?: string;

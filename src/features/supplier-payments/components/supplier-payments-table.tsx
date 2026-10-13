@@ -30,10 +30,6 @@ import { CancelSupplierPaymentDialog } from './cancel-supplier-payment-dialog';
 import { RecordSupplierPaymentDialog } from './record-supplier-payment-dialog';
 import { SupplierPaymentDetailSheet } from './supplier-payment-detail-sheet';
 
-// ---------------------------------------------------------------------------
-// Row Actions
-// ---------------------------------------------------------------------------
-
 interface SupplierPaymentRowActionsProps {
   payment: SupplierPaymentDTO;
   onCancel: (payment: SupplierPaymentDTO) => void;
@@ -70,10 +66,6 @@ function SupplierPaymentRowActions({ payment, onCancel }: SupplierPaymentRowActi
   );
 }
 
-// ---------------------------------------------------------------------------
-// Mobile Item Configuration
-// ---------------------------------------------------------------------------
-
 const supplierPaymentMobileItem: MobileItemConfig<SupplierPaymentDTO> = {
   title: (row: SupplierPaymentDTO) => row.supplierName || 'Supplier',
   subtitle: (row: SupplierPaymentDTO) =>
@@ -85,10 +77,6 @@ const supplierPaymentMobileItem: MobileItemConfig<SupplierPaymentDTO> = {
   }),
   meta: [(row: SupplierPaymentDTO) => (row.paymentDate ? row.paymentDate.split('T')[0] : '—')]
 };
-
-// ---------------------------------------------------------------------------
-// Detail View Configuration
-// ---------------------------------------------------------------------------
 
 const supplierPaymentDetail: DetailConfig<SupplierPaymentDTO> = {
   mode: 'sheet',
@@ -115,10 +103,6 @@ const supplierPaymentDetail: DetailConfig<SupplierPaymentDTO> = {
     }
   ]
 };
-
-// ---------------------------------------------------------------------------
-// SupplierPaymentsTable Component
-// ---------------------------------------------------------------------------
 
 interface SupplierPaymentsTableProps {
   toolbarAction?: ReactNode;

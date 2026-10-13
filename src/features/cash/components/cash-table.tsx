@@ -31,10 +31,6 @@ import { OpeningCashDialog } from './opening-cash-dialog';
 import { OwnerInvestmentDialog } from './owner-investment-dialog';
 import { OwnerWithdrawalDialog } from './owner-withdrawal-dialog';
 
-// ---------------------------------------------------------------------------
-// Mobile & Detail Configurations
-// ---------------------------------------------------------------------------
-
 const cashMobileItem: MobileItemConfig<CashMovementDTO> = {
   title: (row: CashMovementDTO) => formatLabel(row.type),
   subtitle: (row: CashMovementDTO) => row.note || '—',
@@ -84,10 +80,6 @@ const cashDetail: DetailConfig<CashMovementDTO> = {
     }
   ]
 };
-
-// ---------------------------------------------------------------------------
-// Main CashTable Component
-// ---------------------------------------------------------------------------
 
 interface CashTableProps {
   toolbarAction?: ReactNode;

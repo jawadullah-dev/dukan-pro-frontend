@@ -15,8 +15,6 @@ export const createPartyFormSchema = (t: Translator) =>
     isActive: z.boolean().optional()
   });
 
-export const createCustomerFormSchema = createPartyFormSchema;
-
 export const createReceivePaymentSchema = (t: Translator) =>
   z.object({
     amount: z
@@ -24,5 +22,5 @@ export const createReceivePaymentSchema = (t: Translator) =>
       .positive(t('validation.amountPositive'))
   });
 
-export type CustomerFormValues = z.infer<ReturnType<typeof createPartyFormSchema>>;
-export type ReceivePaymentFormValues = z.infer<ReturnType<typeof createReceivePaymentSchema>>;
+type CustomerFormValues = z.infer<ReturnType<typeof createPartyFormSchema>>;
+type ReceivePaymentFormValues = z.infer<ReturnType<typeof createReceivePaymentSchema>>;

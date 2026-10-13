@@ -9,6 +9,7 @@ import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import type { SupplierDTO } from '@/types/supplier-payment';
 import type { PaginatedResponse } from '@/lib/api/types';
+import { AppError } from '@/lib/errors';
 
 interface SupplierSelectComboboxProps {
   value: string;
@@ -59,7 +60,7 @@ export function SupplierSelectCombobox({
       }
       const res = await fetch(`/api/suppliers?${params.toString()}`);
       if (!res.ok) {
-        throw new Error('Failed to load suppliers');
+        throw new AppError('Failed to load suppliers');
       }
       return (await res.json()) as PaginatedResponse<SupplierDTO>;
     },
@@ -145,19 +146,19 @@ export function SupplierSelectCombobox({
       >
         <div className='p-2 pb-1.5'>
           <div className='relative flex items-center'>
-            <Icons.search className='pointer-events-none absolute left-2.5 size-4 text-muted-foreground' />
+            <Icons.search className='pointer-events-none absolute start-2.5 size-4 text-muted-foreground' />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder='Search supplier by name or phone...'
-              className='h-9 pl-8 pr-8 text-sm font-normal text-foreground'
+              className='h-9 ps-8 pe-8 text-sm font-normal text-foreground'
               autoFocus
             />
             {search && (
               <button
                 type='button'
                 onClick={() => setSearch('')}
-                className='absolute right-2.5 text-muted-foreground hover:text-foreground'
+                className='absolute end-2.5 text-muted-foreground hover:text-foreground'
               >
                 <Icons.close className='size-3.5' />
               </button>

@@ -5,9 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { CreateProductInput, UpdateProductInput } from '@/lib/api/types';
 
 import {
-  bulkPublish,
   createProduct,
-  deleteProduct,
   deleteProductImage,
   reorderProductImages,
   updateProduct,
@@ -41,39 +39,6 @@ export function useUpdateProduct(id: string) {
       queryClient.invalidateQueries({ queryKey: productsQueryKeys.lists() });
       queryClient.invalidateQueries({ queryKey: productsQueryKeys.detail(id) });
       toast.success(t('productUpdated'));
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    }
-  });
-}
-
-export function useDeleteProduct(id: string) {
-  const t = useTranslations('dukaan.product');
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: () => deleteProduct(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: productsQueryKeys.lists() });
-      toast.success(t('productDeactivated'));
-    },
-    onError: (error: Error) => {
-      toast.error(error.message);
-    }
-  });
-}
-
-export function useBulkPublish() {
-  const t = useTranslations('dukaan.product');
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ ids, isPublished }: { ids: string[]; isPublished: boolean }) =>
-      bulkPublish(ids, isPublished),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: productsQueryKeys.lists() });
-      toast.success(t('publishUpdated'));
     },
     onError: (error: Error) => {
       toast.error(error.message);

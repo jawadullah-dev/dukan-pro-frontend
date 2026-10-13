@@ -1,15 +1,23 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { ListFilters } from '@/lib/dukaan';
-import { listSuppliers } from './service';
+import { listSuppliers, getSupplierById } from './service';
+import type { SupplierListFilters } from './service';
 
 export const supplierKeys = {
   all: ['suppliers'] as const,
   lists: () => [...supplierKeys.all, 'list'] as const,
-  list: (filters?: ListFilters) => [...supplierKeys.lists(), filters] as const
+  list: (filters?: SupplierListFilters) => [...supplierKeys.lists(), filters] as const,
+  details: () => [...supplierKeys.all, 'detail'] as const,
+  detail: (id: string) => [...supplierKeys.details(), id] as const
 };
 
-export const suppliersQueryOptions = (filters: ListFilters = {}) =>
+export const suppliersQueryOptions = (filters: SupplierListFilters = {}, token?: string) =>
   queryOptions({
     queryKey: supplierKeys.list(filters),
-    queryFn: () => listSuppliers(filters)
+    queryFn: () => listSuppliers(filters, token)
+  });
+
+export const supplierQueryOptions = (id: string, token?: string) =>
+  queryOptions({
+    queryKey: supplierKeys.detail(id),
+    queryFn: () => getSupplierById(id, token)
   });

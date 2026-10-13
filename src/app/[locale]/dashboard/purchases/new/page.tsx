@@ -23,7 +23,7 @@ export default async function Page() {
     await qc.prefetchQuery(purchasesQueryOptions({ limit: 100 }, token));
   }
   void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
-  void qc.prefetchQuery(productsQueryOptions({ limit: 100 }));
+  void qc.prefetchQuery(productsQueryOptions({ page: 1, pageSize: 100 }));
   return (
     <PageContainer
       fill

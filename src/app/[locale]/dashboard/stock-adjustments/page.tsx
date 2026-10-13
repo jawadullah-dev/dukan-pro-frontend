@@ -1,9 +1,12 @@
 import PageContainer from '@/components/layout/page-container';
 import { StockAdjustmentsClient, inventoryAdjustmentsQueryOptions } from '@/features/inventory';
+import { productsQueryOptions } from '@/features/products';
+import { unitsQueryOptions } from '@/features/dukaan/api/queries';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
+import { auth } from '@/auth';
 
 export async function generateMetadata() {
   const t = await getTranslations('metadata');
@@ -12,12 +15,11 @@ export async function generateMetadata() {
   };
 }
 
-import { auth } from '@/auth';
-
 export default async function Page() {
   const session = await auth();
   const token = session?.accessToken;
   const qc = getQueryClient();
+
   if (token) {
     await qc.prefetchQuery(
       inventoryAdjustmentsQueryOptions(
@@ -26,6 +28,9 @@ export default async function Page() {
       )
     );
   }
+  void qc.prefetchQuery(productsQueryOptions({ page: 1, pageSize: 100 }, token));
+  void qc.prefetchQuery(unitsQueryOptions());
+
   return (
     <PageContainer
       fill

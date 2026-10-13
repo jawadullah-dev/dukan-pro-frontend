@@ -1,171 +1,56 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { toast } from 'sonner';
-import { AlertModal } from '@/components/modal/alert-modal';
-import { Icons } from '@/components/icons';
+import { IconDotsCircleHorizontal, IconTrash } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
+
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { dukaan } from '@/lib/dukaan';
-import type { Brand, Category, Product } from '@/lib/dukaan/types';
-import { dukaanKeys } from '@/features/dukaan/api/queries';
-import {
-  BrandDialog,
-  CategoryDialog,
-  ProductDialog
-} from '@/features/dukaan/components/catalog-dialogs';
-import { useT } from '@/i18n/use-t';
+import type { ProductDTO } from '@/lib/api/types';
 
-interface ActionMenuProps {
-  onEdit: () => void;
-  onDelete: () => void;
+import { useDeleteProduct } from '../api/mutations';
+
+interface ProductCellActionsProps {
+  product: ProductDTO;
+  onEdit: (product: ProductDTO) => void;
 }
 
-function ActionMenu({ onEdit, onDelete }: ActionMenuProps) {
-  const t = useT();
+export function ProductCellActions({ product, onEdit }: ProductCellActionsProps) {
+  const t = useTranslations('dukaan.product');
+  const tCommon = useTranslations('common');
+  const [open, setOpen] = useState(false);
+  const deleteProduct = useDeleteProduct(product.id);
+
+  const handleDelete = () => {
+    deleteProduct.mutate();
+    setOpen(false);
+  };
+
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-        <span className='sr-only'>{t('common.openMenu')}</span>
-        <Icons.ellipsis className='h-4 w-4' />
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger>
+        <Button variant='ghost' size='icon' className='h-8 w-8'>
+          <IconDotsCircleHorizontal className='h-4 w-4' />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
-        <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={() => {
-              requestAnimationFrame(onEdit);
-            }}
-          >
-            <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              requestAnimationFrame(onDelete);
-            }}
-          >
-            <Icons.trash className='me-2 h-4 w-4' /> {t('common.delete')}
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
+        <DropdownMenuItem onClick={() => onEdit(product)}>{tCommon('edit')}</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={handleDelete}
+          disabled={deleteProduct.isPending}
+          className='text-destructive'
+        >
+          <IconTrash className='mr-2 h-4 w-4' />
+          {t('deactivate')}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-interface CategoryCellActionProps {
-  data: Category;
-}
-
-export function CategoryCellAction({ data }: CategoryCellActionProps) {
-  const t = useT();
-  const qc = useQueryClient();
-  const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  const remove = useMutation({
-    mutationFn: () => dukaan.deleteCategory(data.id),
-    onSuccess: () => {
-      toast.success(t('dukaan.category.deleted'));
-      setDeleteOpen(false);
-      void qc.invalidateQueries({ queryKey: dukaanKeys.all });
-    },
-    onError: (e: Error) => toast.error(e.message)
-  });
-
-  return (
-    <>
-      <AlertModal
-        isOpen={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        onConfirm={() => remove.mutate()}
-        loading={remove.isPending}
-        title={t('dukaan.category.deleteTitle')}
-        description={t('dukaan.category.deleteDescription')}
-        confirmLabel={t('common.delete')}
-      />
-      <CategoryDialog open={editOpen} onOpenChange={setEditOpen} category={data} />
-      <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
-    </>
-  );
-}
-
-interface BrandCellActionProps {
-  data: Brand;
-}
-
-export function BrandCellAction({ data }: BrandCellActionProps) {
-  const t = useT();
-  const qc = useQueryClient();
-  const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  const remove = useMutation({
-    mutationFn: () => dukaan.deleteBrand(data.id),
-    onSuccess: () => {
-      toast.success(t('dukaan.brand.deleted'));
-      setDeleteOpen(false);
-      void qc.invalidateQueries({ queryKey: dukaanKeys.all });
-    },
-    onError: (e: Error) => toast.error(e.message)
-  });
-
-  return (
-    <>
-      <AlertModal
-        isOpen={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        onConfirm={() => remove.mutate()}
-        loading={remove.isPending}
-        title={t('dukaan.brand.deleteTitle')}
-        description={t('dukaan.brand.deleteDescription')}
-        confirmLabel={t('common.delete')}
-      />
-      <BrandDialog open={editOpen} onOpenChange={setEditOpen} brand={data} />
-      <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
-    </>
-  );
-}
-
-interface ProductCellActionProps {
-  data: Product;
-}
-
-export function ProductCellAction({ data }: ProductCellActionProps) {
-  const t = useT();
-  const qc = useQueryClient();
-  const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
-
-  const remove = useMutation({
-    mutationFn: () => dukaan.deleteProduct(data.id),
-    onSuccess: () => {
-      toast.success(t('dukaan.product.deleted'));
-      setDeleteOpen(false);
-      void qc.invalidateQueries({ queryKey: dukaanKeys.all });
-    },
-    onError: (e: Error) => toast.error(e.message)
-  });
-
-  return (
-    <>
-      <AlertModal
-        isOpen={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        onConfirm={() => remove.mutate()}
-        loading={remove.isPending}
-        title={t('dukaan.product.deleteTitle')}
-        description={t('dukaan.product.deleteDescription')}
-        confirmLabel={t('common.delete')}
-      />
-      <ProductDialog open={editOpen} onOpenChange={setEditOpen} product={data} />
-      <ActionMenu onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
-    </>
   );
 }

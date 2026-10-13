@@ -1,10 +1,10 @@
 import PageContainer from '@/components/layout/page-container';
-import { SuppliersListClient } from '@/features/suppliers';
-import { suppliersQueryOptions } from '@/features/suppliers';
+import { SuppliersPageClient, suppliersQueryOptions } from '@/features/suppliers';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
+import { auth } from '@/auth';
 
 export async function generateMetadata() {
   const t = await getTranslations('metadata');
@@ -13,9 +13,19 @@ export async function generateMetadata() {
   };
 }
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
   const qc = getQueryClient();
-  void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
+
+  if (session?.accessToken) {
+    await qc.prefetchQuery(
+      suppliersQueryOptions(
+        { page: 1, pageSize: 20, sortBy: 'createdAt', sortOrder: 'desc' },
+        session.accessToken
+      )
+    );
+  }
+
   return (
     <PageContainer
       fill
@@ -24,7 +34,7 @@ export default function Page() {
     >
       <HydrationBoundary state={dehydrate(qc)}>
         <Suspense>
-          <SuppliersListClient />
+          <SuppliersPageClient />
         </Suspense>
       </HydrationBoundary>
     </PageContainer>

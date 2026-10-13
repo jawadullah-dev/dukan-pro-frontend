@@ -1,8 +1,10 @@
 'use client';
 
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useT } from '@/i18n/use-t';
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
+
 import {
   Dialog,
   DialogContent,
@@ -13,234 +15,71 @@ import {
 } from '@/components/ui/dialog';
 import { FieldGroup } from '@/components/ui/field';
 import { useAppForm } from '@/lib/form';
-import { dukaan } from '@/lib/dukaan';
 import { fromPaisa, toPaisa } from '@/lib/dukaan/numbers';
-import type { Brand, Category, Product } from '@/lib/dukaan/types';
-import { dukaanKeys } from '@/features/dukaan/api/queries';
-import {
-  createNameOnlySchema,
-  createProductFormSchema,
-  type ProductFormValues
-} from '@/features/dukaan/schemas/forms';
+import type { ProductDTO, ProductImageDTO } from '@/lib/api/types';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { FormEntitySelect } from '@/components/forms/form-entity-select';
 
-interface NameDialogProps {
+import { useCreateProduct, useUpdateProduct } from '../api/mutations';
+import { productsQueryKeys, useProductImagesQuery } from '../api/queries';
+import { productFormSchema, type ProductFormValues } from '../schemas/product-schema';
+import { ProductPhotoManager } from './product-photo-manager';
+import { listCategories } from '@/features/categories/api/service';
+import { listBrands } from '@/features/brands/api/service';
+
+interface ProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-interface CategoryDialogProps extends NameDialogProps {
-  category?: Category | null;
-}
-
-export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {open ? (
-        <CategoryDialogBody
-          key={category?.id ?? 'new'}
-          category={category}
-          onOpenChange={onOpenChange}
-        />
-      ) : null}
-    </Dialog>
-  );
-}
-
-interface CategoryDialogBodyProps {
-  category?: Category | null;
-  onOpenChange: (open: boolean) => void;
-}
-
-function CategoryDialogBody({ category, onOpenChange }: CategoryDialogBodyProps) {
-  const qc = useQueryClient();
-  const isEdit = Boolean(category);
-  const t = useT();
-
-  const save = useMutation({
-    mutationFn: async (name: string) => {
-      if (category) return dukaan.updateCategory(category.id, { name });
-      return dukaan.createCategory(name);
-    },
-    onSuccess: () => {
-      toast.success(isEdit ? t('dukaan.category.updated') : t('dukaan.category.created'));
-      void qc.invalidateQueries({ queryKey: dukaanKeys.all });
-      onOpenChange(false);
-    },
-    onError: (e: Error) => toast.error(e.message)
-  });
-
-  const form = useAppForm({
-    defaultValues: { name: category?.name ?? '' },
-    validators: { onSubmit: createNameOnlySchema(t) },
-    onSubmit: ({ value }) => {
-      save.mutate(value.name.trim());
-    }
-  });
-
-  return (
-    <DialogContent className='sm:max-w-lg'>
-      <DialogHeader className='pe-12'>
-        <DialogTitle>
-          {isEdit ? t('dukaan.category.editTitle') : t('dukaan.category.addTitle')}
-        </DialogTitle>
-        <DialogDescription>
-          {isEdit ? t('dukaan.category.editDescription') : t('dukaan.category.addDescription')}
-        </DialogDescription>
-      </DialogHeader>
-      <form
-        className='grid gap-4'
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
-        <FieldGroup>
-          <form.AppField
-            name='name'
-            children={(field) => (
-              <field.TextField
-                label={t('dukaan.party.name')}
-                required
-                placeholder={t('dukaan.category.namePlaceholder')}
-                autoFocus
-              />
-            )}
-          />
-        </FieldGroup>
-        <DialogFooter>
-          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={save.isPending} />
-          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} loading={save.isPending} />
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  );
-}
-
-interface BrandDialogProps extends NameDialogProps {
-  brand?: Brand | null;
-}
-
-export function BrandDialog({ open, onOpenChange, brand }: BrandDialogProps) {
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {open ? (
-        <BrandDialogBody key={brand?.id ?? 'new'} brand={brand} onOpenChange={onOpenChange} />
-      ) : null}
-    </Dialog>
-  );
-}
-
-interface BrandDialogBodyProps {
-  brand?: Brand | null;
-  onOpenChange: (open: boolean) => void;
-}
-
-function BrandDialogBody({ brand, onOpenChange }: BrandDialogBodyProps) {
-  const qc = useQueryClient();
-  const isEdit = Boolean(brand);
-  const t = useT();
-
-  const save = useMutation({
-    mutationFn: async (name: string) => {
-      if (brand) return dukaan.updateBrand(brand.id, { name });
-      return dukaan.createBrand(name);
-    },
-    onSuccess: () => {
-      toast.success(isEdit ? t('dukaan.brand.updated') : t('dukaan.brand.created'));
-      void qc.invalidateQueries({ queryKey: dukaanKeys.all });
-      onOpenChange(false);
-    },
-    onError: (e: Error) => toast.error(e.message)
-  });
-
-  const form = useAppForm({
-    defaultValues: { name: brand?.name ?? '' },
-    validators: { onSubmit: createNameOnlySchema(t) },
-    onSubmit: ({ value }) => {
-      save.mutate(value.name.trim());
-    }
-  });
-
-  return (
-    <DialogContent className='sm:max-w-lg'>
-      <DialogHeader className='pe-12'>
-        <DialogTitle>
-          {isEdit ? t('dukaan.brand.editTitle') : t('dukaan.brand.addTitle')}
-        </DialogTitle>
-        <DialogDescription>
-          {isEdit ? t('dukaan.brand.editDescription') : t('dukaan.brand.addDescription')}
-        </DialogDescription>
-      </DialogHeader>
-      <form
-        className='grid gap-4'
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
-        <FieldGroup>
-          <form.AppField
-            name='name'
-            children={(field) => (
-              <field.TextField
-                label={t('dukaan.party.name')}
-                required
-                placeholder={t('dukaan.brand.namePlaceholder')}
-                autoFocus
-              />
-            )}
-          />
-        </FieldGroup>
-        <DialogFooter>
-          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={save.isPending} />
-          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} loading={save.isPending} />
-        </DialogFooter>
-      </form>
-    </DialogContent>
-  );
-}
-
-interface ProductDialogProps extends NameDialogProps {
-  product?: Product | null;
+  product?: ProductDTO | null;
 }
 
 function emptyProductForm(): ProductFormValues {
   return {
     name: '',
-    category_id: '',
-    brand_id: '',
-    tracking_type: 'QUANTITY',
-    default_purchase_price: 0,
-    default_selling_price: 0,
-    low_stock_threshold: 5,
+    categoryId: '',
+    brandId: '',
+    trackingType: 'QUANTITY',
+    defaultPurchasePrice: 0,
+    defaultSellingPrice: 0,
+    lowStockThreshold: 5,
     model: '',
     color: '',
     ram: '',
     storage: '',
     sku: '',
     barcode: '',
-    description: ''
+    description: '',
+    imageUrl: '',
+    isActive: true,
+    isPublished: false,
+    publicDescription: '',
+    contactForPrice: false,
+    ptaStatus: null
   };
 }
 
-function productToForm(product: Product): ProductFormValues {
+function productToForm(product: ProductDTO): ProductFormValues {
   return {
     name: product.name,
-    category_id: product.category_id,
-    brand_id: product.brand_id,
-    tracking_type: product.tracking_type,
-    default_purchase_price: fromPaisa(product.default_purchase_price),
-    default_selling_price: fromPaisa(product.default_selling_price),
-    low_stock_threshold: product.low_stock_threshold,
+    categoryId: product.categoryId,
+    brandId: product.brandId,
+    trackingType: product.trackingType,
+    defaultPurchasePrice: fromPaisa(product.defaultPurchasePrice),
+    defaultSellingPrice: fromPaisa(product.defaultSellingPrice),
+    lowStockThreshold: product.lowStockThreshold,
     model: product.model ?? '',
     color: product.color ?? '',
     ram: product.ram ?? '',
     storage: product.storage ?? '',
     sku: product.sku ?? '',
     barcode: product.barcode ?? '',
-    description: product.description ?? ''
+    description: product.description ?? '',
+    imageUrl: product.imageUrl ?? '',
+    isActive: product.isActive,
+    isPublished: product.isPublished,
+    publicDescription: product.publicDescription ?? '',
+    contactForPrice: product.contactForPrice,
+    ptaStatus: product.ptaStatus ?? null
   };
 }
 
@@ -259,73 +98,122 @@ export function ProductDialog({ open, onOpenChange, product }: ProductDialogProp
 }
 
 interface ProductDialogBodyProps {
-  product?: Product | null;
+  product?: ProductDTO | null;
   onOpenChange: (open: boolean) => void;
 }
 
 function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
   const qc = useQueryClient();
+  const t = useTranslations('dukaan.product');
   const isEdit = Boolean(product);
-  const t = useT();
 
-  const save = useMutation({
-    mutationFn: async (value: ProductFormValues) => {
-      const optional = {
-        model: value.model || undefined,
-        color: value.color || undefined,
-        ram: value.ram || undefined,
-        storage: value.storage || undefined,
-        sku: value.sku || undefined,
-        barcode: value.barcode || undefined,
-        description: value.description || undefined
-      };
-      if (product) {
-        return dukaan.updateProduct(product.id, {
-          name: value.name.trim(),
-          category_id: value.category_id,
-          brand_id: value.brand_id,
-          default_purchase_price: toPaisa(value.default_purchase_price),
-          default_selling_price: toPaisa(value.default_selling_price),
-          low_stock_threshold: value.low_stock_threshold,
-          ...optional
-        });
-      }
-      return dukaan.createProduct({
-        name: value.name.trim(),
-        category_id: value.category_id,
-        brand_id: value.brand_id,
-        tracking_type: value.tracking_type,
-        default_purchase_price: toPaisa(value.default_purchase_price),
-        default_selling_price: toPaisa(value.default_selling_price),
-        low_stock_threshold: value.low_stock_threshold,
-        ...optional
-      });
-    },
-    onSuccess: () => {
-      toast.success(isEdit ? t('dukaan.product.updated') : t('dukaan.product.created'));
-      void qc.invalidateQueries({ queryKey: dukaanKeys.all });
-      onOpenChange(false);
-    },
-    onError: (e: Error) => toast.error(e.message)
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct(product?.id ?? '');
+
+  const { data: imagesData } = useProductImagesQuery(product?.id ?? '', undefined, {
+    enabled: isEdit && !!product?.id
   });
+  const [images, setImages] = useState<ProductImageDTO[]>([]);
+
+  useEffect(() => {
+    if (imagesData?.items) {
+      setImages(imagesData.items);
+    }
+  }, [imagesData]);
 
   const form = useAppForm({
     defaultValues: product ? productToForm(product) : emptyProductForm(),
-    validators: { onSubmit: createProductFormSchema(t) },
+    validators: {
+      onSubmit: ({ value }) => {
+        const result = productFormSchema.safeParse(value);
+        if (!result.success) {
+          const firstError = result.error.issues[0]?.message ?? 'Please check required fields';
+          toast.error(firstError);
+          return firstError;
+        }
+        return undefined;
+      }
+    },
     onSubmit: ({ value }) => {
-      save.mutate(value);
+      const cleanString = (val?: string | null) => {
+        const trimmed = val?.trim();
+        return trimmed ? trimmed : undefined;
+      };
+
+      if (product) {
+        // Edit mode: can update everything including online store
+        updateProduct.mutate(
+          {
+            name: value.name.trim(),
+            categoryId: value.categoryId,
+            brandId: value.brandId,
+            defaultPurchasePrice: toPaisa(Number(value.defaultPurchasePrice || 0)),
+            defaultSellingPrice: toPaisa(Number(value.defaultSellingPrice || 0)),
+            lowStockThreshold: Number(value.lowStockThreshold || 0),
+            model: cleanString(value.model),
+            color: cleanString(value.color),
+            ram: cleanString(value.ram),
+            storage: cleanString(value.storage),
+            sku: cleanString(value.sku),
+            barcode: cleanString(value.barcode),
+            description: cleanString(value.description),
+            imageUrl: cleanString(value.imageUrl),
+            isActive: value.isActive ?? true,
+            isPublished: value.isPublished ?? false,
+            publicDescription: cleanString(value.publicDescription),
+            contactForPrice: value.contactForPrice ?? false,
+            ptaStatus: value.ptaStatus || undefined
+          },
+          {
+            onSuccess: () => {
+              void qc.invalidateQueries({ queryKey: productsQueryKeys.all });
+              onOpenChange(false);
+            },
+            onError: (err: Error) => {
+              toast.error(err.message || 'Failed to update product');
+            }
+          }
+        );
+      } else {
+        // Add mode: only send the fields the backend allows for new products
+        createProduct.mutate(
+          {
+            name: value.name.trim(),
+            categoryId: value.categoryId,
+            brandId: value.brandId,
+            trackingType: value.trackingType,
+            defaultPurchasePrice: toPaisa(Number(value.defaultPurchasePrice || 0)),
+            defaultSellingPrice: toPaisa(Number(value.defaultSellingPrice || 0)),
+            lowStockThreshold: Number(value.lowStockThreshold || 0),
+            model: cleanString(value.model),
+            color: cleanString(value.color),
+            ram: cleanString(value.ram),
+            storage: cleanString(value.storage),
+            sku: cleanString(value.sku),
+            barcode: cleanString(value.barcode),
+            description: cleanString(value.description),
+            imageUrl: cleanString(value.imageUrl),
+            isActive: true
+          },
+          {
+            onSuccess: () => {
+              void qc.invalidateQueries({ queryKey: productsQueryKeys.all });
+              onOpenChange(false);
+            },
+            onError: (err: Error) => {
+              toast.error(err.message || 'Failed to create product');
+            }
+          }
+        );
+      }
     }
   });
 
   return (
-    <DialogContent className='flex max-h-[85vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl'>
+    <DialogContent className='flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl'>
       <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
-        <DialogTitle>
-          {isEdit ? t('dukaan.product.editTitle') : t('dukaan.product.addTitle')}
-        </DialogTitle>
-        <DialogDescription>
-          {isEdit ? t('dukaan.product.editDescription') : t('dukaan.product.addDescription')}
-        </DialogDescription>
+        <DialogTitle>{isEdit ? t('editTitle') : t('addTitle')}</DialogTitle>
+        <DialogDescription>{isEdit ? t('editDescription') : t('addDescription')}</DialogDescription>
       </DialogHeader>
       <form
         className='flex min-h-0 flex-1 flex-col'
@@ -336,142 +224,224 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
       >
         <div className='no-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-4'>
           <FieldGroup className='gap-4'>
+            {/* 1. Basic Info */}
             <form.AppField
               name='name'
-              children={(field) => <field.TextField label={t('dukaan.product.name')} required />}
+              children={(field) => <field.TextField label={t('name')} required />}
             />
             <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
               <form.Field
-                name='category_id'
+                name='categoryId'
                 children={(field) => {
                   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <FormEntitySelect
                       name={field.name}
-                      label={t('dukaan.product.category')}
+                      label={t('category')}
                       required
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onValueChange={(id) => field.handleChange(id)}
                       isInvalid={isInvalid}
                       errors={field.state.meta.errors}
-                      queryKey={dukaanKeys.categories()}
-                      fetchPage={(filters) => dukaan.listCategories(filters)}
-                      placeholder={t('dukaan.product.selectCategory')}
-                      searchPlaceholder={t('dukaan.product.searchCategories')}
+                      queryKey={['categories', 'infinite-select']}
+                      fetchPage={async (filters) => {
+                        const res = await listCategories(filters);
+                        return {
+                          items: res.items,
+                          total: res.total,
+                          page: res.page,
+                          limit: res.pageSize
+                        };
+                      }}
+                      placeholder={t('selectCategory')}
+                      searchPlaceholder={t('searchCategories')}
                     />
                   );
                 }}
               />
               <form.Field
-                name='brand_id'
+                name='brandId'
                 children={(field) => {
                   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
                   return (
                     <FormEntitySelect
                       name={field.name}
-                      label={t('dukaan.product.brand')}
+                      label={t('brand')}
                       required
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onValueChange={(id) => field.handleChange(id)}
                       isInvalid={isInvalid}
                       errors={field.state.meta.errors}
-                      queryKey={dukaanKeys.brands()}
-                      fetchPage={(filters) => dukaan.listBrands(filters)}
-                      placeholder={t('dukaan.product.selectBrand')}
-                      searchPlaceholder={t('dukaan.product.searchBrands')}
+                      queryKey={['brands', 'infinite-select']}
+                      fetchPage={async (filters) => {
+                        const res = await listBrands(filters);
+                        return {
+                          items: res.items,
+                          total: res.total,
+                          page: res.page,
+                          limit: res.pageSize
+                        };
+                      }}
+                      placeholder={t('selectBrand')}
+                      searchPlaceholder={t('searchBrands')}
                     />
                   );
                 }}
               />
             </div>
+
+            {/* Tracking type is chosen once on creation */}
             {!isEdit ? (
               <form.AppField
-                name='tracking_type'
+                name='trackingType'
                 children={(field) => (
                   <field.SelectField
-                    label={t('dukaan.product.trackingType')}
+                    label={t('trackingType')}
                     required
                     options={[
-                      { value: 'SERIALIZED', label: t('dukaan.product.serialized') },
-                      { value: 'QUANTITY', label: t('dukaan.product.quantity') }
+                      { value: 'QUANTITY', label: t('quantity') },
+                      { value: 'SERIALIZED', label: t('serialized') }
                     ]}
                   />
                 )}
               />
             ) : null}
+
+            {/* 2. Prices */}
             <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
               <form.AppField
-                name='default_purchase_price'
+                name='defaultPurchasePrice'
                 children={(field) => (
-                  <field.TextField
-                    label={t('dukaan.product.purchasePrice')}
-                    type='number'
-                    required
-                  />
+                  <field.TextField label={t('purchasePrice')} type='number' required />
                 )}
               />
               <form.AppField
-                name='default_selling_price'
+                name='defaultSellingPrice'
                 children={(field) => (
-                  <field.TextField
-                    label={t('dukaan.product.sellingPrice')}
-                    type='number'
-                    required
-                  />
+                  <field.TextField label={t('sellingPrice')} type='number' required />
                 )}
               />
             </div>
-            <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
-              <form.AppField
-                name='model'
-                children={(field) => <field.TextField label={t('dukaan.product.model')} />}
-              />
-              <form.AppField
-                name='color'
-                children={(field) => <field.TextField label={t('dukaan.product.color')} />}
-              />
-            </div>
-            <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
-              <form.AppField
-                name='ram'
-                children={(field) => <field.TextField label={t('dukaan.product.ram')} />}
-              />
-              <form.AppField
-                name='storage'
-                children={(field) => <field.TextField label={t('dukaan.product.storage')} />}
-              />
-            </div>
+
+            {/* 3. Specs - show phone specs when SERIALIZED */}
+            <form.Subscribe
+              selector={(state) => state.values.trackingType}
+              children={(trackingType) => (
+                <>
+                  <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
+                    <form.AppField
+                      name='model'
+                      children={(field) => (
+                        <field.TextField
+                          label={t('model')}
+                          placeholder={trackingType === 'SERIALIZED' ? 'e.g. SM-A155F' : undefined}
+                        />
+                      )}
+                    />
+                    <form.AppField
+                      name='color'
+                      children={(field) => <field.TextField label={t('color')} />}
+                    />
+                  </div>
+                  {trackingType === 'SERIALIZED' && (
+                    <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
+                      <form.AppField
+                        name='ram'
+                        children={(field) => (
+                          <field.TextField label={t('ram')} placeholder='e.g. 8GB' />
+                        )}
+                      />
+                      <form.AppField
+                        name='storage'
+                        children={(field) => (
+                          <field.TextField label={t('storage')} placeholder='e.g. 128GB' />
+                        )}
+                      />
+                    </div>
+                  )}
+                  {/* PTA status is only available when editing a serialized product */}
+                  {isEdit && trackingType === 'SERIALIZED' && (
+                    <form.AppField
+                      name='ptaStatus'
+                      children={(field) => (
+                        <field.SelectField
+                          label={t('ptaStatus')}
+                          options={[
+                            { value: 'PTA_APPROVED', label: t('ptaApproved') },
+                            { value: 'NON_PTA', label: t('nonPta') }
+                          ]}
+                        />
+                      )}
+                    />
+                  )}
+                </>
+              )}
+            />
+
             <div className='grid min-w-0 gap-4 sm:grid-cols-2'>
               <form.AppField
                 name='sku'
-                children={(field) => <field.TextField label={t('dukaan.product.sku')} />}
+                children={(field) => <field.TextField label={t('sku')} />}
               />
               <form.AppField
                 name='barcode'
-                children={(field) => <field.TextField label={t('dukaan.product.barcode')} />}
+                children={(field) => <field.TextField label={t('barcode')} />}
               />
             </div>
             <form.AppField
-              name='low_stock_threshold'
+              name='lowStockThreshold'
               children={(field) => (
-                <field.TextField
-                  label={t('dukaan.product.lowStockThreshold')}
-                  type='number'
-                  required
-                />
+                <field.TextField label={t('lowStockThreshold')} type='number' required />
               )}
             />
             <form.AppField
               name='description'
-              children={(field) => <field.TextareaField label={t('dukaan.product.description')} />}
+              children={(field) => <field.TextareaField label={t('description')} />}
             />
+
+            {/* 4. Online Store Section - ONLY shown when EDITING an existing product */}
+            {isEdit && (
+              <>
+                <div className='border-t pt-4'>
+                  <h4 className='text-sm font-semibold mb-3'>Online Store Settings</h4>
+                  <form.AppField
+                    name='publicDescription'
+                    children={(field) => <field.TextareaField label={t('publicDescription')} />}
+                  />
+                  <div className='grid min-w-0 gap-4 sm:grid-cols-2 mt-3'>
+                    <form.AppField
+                      name='isPublished'
+                      children={(field) => <field.CheckboxField label={t('isPublished')} />}
+                    />
+                    <form.AppField
+                      name='contactForPrice'
+                      children={(field) => <field.CheckboxField label={t('contactForPrice')} />}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </FieldGroup>
+
+          {/* Photo manager only when editing an existing product */}
+          {isEdit && product?.id ? (
+            <div className='mt-6 border-t pt-4'>
+              <h4 className='text-sm font-semibold mb-3'>{t('images')}</h4>
+              <ProductPhotoManager productId={product.id} images={images} onChange={setImages} />
+            </div>
+          ) : null}
         </div>
         <DialogFooter className='mx-0 mb-0 shrink-0'>
-          <DialogCancelButton onClick={() => onOpenChange(false)} disabled={save.isPending} />
-          <DialogPrimaryButton mode={isEdit ? 'edit' : 'add'} loading={save.isPending} />
+          <DialogCancelButton
+            onClick={() => onOpenChange(false)}
+            disabled={createProduct.isPending || updateProduct.isPending}
+          />
+          <DialogPrimaryButton
+            mode={isEdit ? 'edit' : 'add'}
+            loading={createProduct.isPending || updateProduct.isPending}
+          />
         </DialogFooter>
       </form>
     </DialogContent>

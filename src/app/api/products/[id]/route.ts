@@ -1,38 +1,89 @@
-import { fakeProducts } from '@/constants/mock-api';
+import { auth } from '@/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-type Params = { params: Promise<{ id: string }> };
+import { backendApiUrl } from '@/lib/dukaan/backend-api';
 
-export async function GET(request: NextRequest, { params }: Params) {
+type Params = {
+  params: Promise<{ id: string }>;
+};
+
+export async function GET(_request: NextRequest, { params }: Params) {
   const { id } = await params;
-  const data = await fakeProducts.getProductById(Number(id));
+  const session = await auth();
+  const token = session?.accessToken;
 
-  if (!data.success) {
-    return NextResponse.json(data, { status: 404 });
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  return NextResponse.json(data);
+  const response = await fetch(`${backendApiUrl}/products/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json'
+    },
+    cache: 'no-store'
+  });
+
+  const body = await response.json();
+
+  if (!response.ok) {
+    return NextResponse.json(body, { status: response.status });
+  }
+
+  return NextResponse.json(body.data ?? body, { status: response.status });
 }
 
-export async function PUT(request: NextRequest, { params }: Params) {
+export async function PATCH(request: NextRequest, { params }: Params) {
   const { id } = await params;
+  const session = await auth();
+  const token = session?.accessToken;
+
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const body = await request.json();
-  const data = await fakeProducts.updateProduct(Number(id), body);
+  const response = await fetch(`${backendApiUrl}/products/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
 
-  if (!data.success) {
-    return NextResponse.json(data, { status: 404 });
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    return NextResponse.json(responseBody, { status: response.status });
   }
 
-  return NextResponse.json(data);
+  return NextResponse.json(responseBody.data ?? responseBody, { status: response.status });
 }
 
-export async function DELETE(request: NextRequest, { params }: Params) {
+export async function DELETE(_request: NextRequest, { params }: Params) {
   const { id } = await params;
-  const data = await fakeProducts.deleteProduct(Number(id));
+  const session = await auth();
+  const token = session?.accessToken;
 
-  if (!data.success) {
-    return NextResponse.json(data, { status: 404 });
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  return NextResponse.json(data);
+  const response = await fetch(`${backendApiUrl}/products/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json'
+    }
+  });
+
+  const responseBody = await response.json();
+
+  if (!response.ok) {
+    return NextResponse.json(responseBody, { status: response.status });
+  }
+
+  return NextResponse.json(responseBody.data ?? responseBody, { status: response.status });
 }

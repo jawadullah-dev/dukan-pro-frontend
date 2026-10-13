@@ -78,3 +78,34 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+/**
+ * POST /api/suppliers
+ * Proxies to POST /suppliers on the NestJS backend.
+ */
+export async function POST(request: NextRequest) {
+  const session = await auth();
+  if (!session?.accessToken) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const body = await request.json();
+
+  const upstream = await fetch(`${BACKEND}/suppliers`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body),
+    cache: 'no-store'
+  });
+
+  const responseBody = await upstream.json();
+
+  if (!upstream.ok) {
+    return NextResponse.json(responseBody, { status: upstream.status });
+  }
+
+  return NextResponse.json(responseBody.data, { status: 201 });
+}

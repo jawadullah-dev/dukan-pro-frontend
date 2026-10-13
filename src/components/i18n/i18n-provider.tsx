@@ -1,12 +1,16 @@
 'use client';
 
 import { NextIntlClientProvider } from 'next-intl';
-import { t as staticT } from '@/i18n';
+import { t as staticT, setLocale } from '@/i18n';
 import type { ComponentProps } from 'react';
 
 type Props = ComponentProps<typeof NextIntlClientProvider>;
 
-export function I18nProvider(props: Props) {
+export function I18nProvider({ children, ...props }: Props) {
+  if (props.locale) {
+    setLocale(props.locale as string);
+  }
+
   return (
     <NextIntlClientProvider
       {...props}
@@ -31,6 +35,8 @@ export function I18nProvider(props: Props) {
 
         return key;
       }}
-    />
+    >
+      {children}
+    </NextIntlClientProvider>
   );
 }

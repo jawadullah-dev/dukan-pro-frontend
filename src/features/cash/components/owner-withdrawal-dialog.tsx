@@ -22,12 +22,15 @@ import { createOwnerWithdrawalMutation } from '../api/mutations';
 import { cashKeys } from '../api/queries';
 import type { CashOverdraftPrompt, CreateOwnerWithdrawalResult } from '@/types/cash';
 
+import { useT } from '@/i18n/use-t';
+
 export interface OwnerWithdrawalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDialogProps) {
+  const t = useT();
   const qc = useQueryClient();
   const [amountStr, setAmountStr] = useState('');
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -44,7 +47,7 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
         return;
       }
 
-      toast.success('Owner withdrawal recorded successfully');
+      toast.success(t('dukaan.cash.withdrawalSuccess') || 'Owner withdrawal recorded successfully');
       await qc.invalidateQueries({ queryKey: cashKeys.all });
       await qc.invalidateQueries({ queryKey: ['dashboard'] });
       setAmountStr('');
@@ -89,17 +92,20 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
     >
       <DialogContent className='w-full sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Record Owner Withdrawal</DialogTitle>
+          <DialogTitle>
+            {t('dukaan.cash.recordWithdrawalTitle') || 'Record Owner Withdrawal'}
+          </DialogTitle>
           <DialogDescription>
-            Record cash the owner takes out of the shop drawer. This is not counted as an operating
-            expense.
+            {t('dukaan.cash.recordWithdrawalDesc') ||
+              'Record cash the owner takes out of the shop drawer. This is not counted as an operating expense.'}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='withdrawal-amount' className='text-sm font-normal text-foreground'>
-              Withdrawal Amount (PKR) <span className='text-destructive'>*</span>
+              {t('dukaan.cash.withdrawalAmount') || 'Withdrawal Amount (PKR)'}{' '}
+              <span className='text-destructive'>*</span>
             </Label>
             <div className='relative w-full'>
               <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
@@ -127,7 +133,7 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
 
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='withdrawal-date' className='text-sm font-normal text-foreground'>
-              Date <span className='text-destructive'>*</span>
+              {t('dukaan.cash.date') || 'Date'} <span className='text-destructive'>*</span>
             </Label>
             <Input
               id='withdrawal-date'
@@ -142,7 +148,10 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
 
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='withdrawal-notes' className='text-sm font-normal text-foreground'>
-              Notes <span className='text-xs text-muted-foreground'>(Optional)</span>
+              {t('dukaan.cash.notes') || 'Notes'}{' '}
+              <span className='text-xs text-muted-foreground'>
+                ({t('common.optional') || 'Optional'})
+              </span>
             </Label>
             <Textarea
               id='withdrawal-notes'
@@ -160,7 +169,9 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
               <div className='flex items-start gap-2'>
                 <Icons.warning className='size-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5' />
                 <div className='flex-1'>
-                  <p className='font-semibold'>Cash Shortfall Warning</p>
+                  <p className='font-semibold'>
+                    {t('dukaan.cash.shortfallWarningTitle') || 'Cash Shortfall Warning'}
+                  </p>
                   <p className='mt-0.5 text-muted-foreground'>
                     {overdraftPrompt.message ||
                       `This withdrawal takes drawer cash below zero by ${formatPkr(overdraftPrompt.shortfall)}.`}
@@ -172,7 +183,10 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
                   checked={confirmOverdraft}
                   onCheckedChange={(c) => setConfirmOverdraft(Boolean(c))}
                 />
-                <span>Confirm withdrawal despite cash deficit</span>
+                <span>
+                  {t('dukaan.cash.confirmOverdraftLabel') ||
+                    'Confirm withdrawal despite cash deficit'}
+                </span>
               </label>
             </div>
           )}

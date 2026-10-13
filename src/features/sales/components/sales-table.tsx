@@ -335,7 +335,11 @@ export function SalesTable({ toolbarAction }: SalesTableProps) {
 
   let statusFilter: 'ACTIVE' | 'CANCELLED' | undefined;
   if (statusParam) {
-    const statuses = statusParam.split(',');
+    const statuses = Array.isArray(statusParam)
+      ? (statusParam as string[])
+      : typeof statusParam === 'string'
+        ? statusParam.split(',')
+        : [];
     if (statuses.includes('ACTIVE') && !statuses.includes('CANCELLED')) {
       statusFilter = 'ACTIVE';
     } else if (statuses.includes('CANCELLED') && !statuses.includes('ACTIVE')) {

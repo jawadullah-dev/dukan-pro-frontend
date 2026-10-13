@@ -110,7 +110,13 @@
       "outstanding": "پاتې",
       "description": "توضیح",
       "when": "کله",
-      "dir": "لوری"
+      "dir": "لوری",
+      "qtyDelta": "د مقدار بدلون",
+      "createdAt": "جوړیدو نیټه",
+      "updatedAt": "د تازه کولو نیټه",
+      "reason": "لامل",
+      "target": "هدف",
+      "notes": "یادښتونه"
     }
   },
   "nav": {
@@ -185,12 +191,7 @@
     "delete": "ړنګول",
     "archive": "آرشیف کړئ",
     "activate": "فعال کړئ",
-    "archiveCustomer": "آرشیف کړئ",
-    "activateCustomer": "فعال کړئ",
     "deactivate": "غیر فعال کړئ",
-    "reactivate": "فعال کړئ",
-    "deactivateCustomer": "پیرودونکی غیر فعال کړئ",
-    "reactivateCustomer": "پیرودونکی فعال کړئ",
     "loading": "بارېږي...",
     "areYouSure": "ایا تاسو ډاډه یاست؟",
     "cannotUndo": "دا عمل بیرته نه شي راګرځېدلی.",
@@ -206,12 +207,7 @@
     "addBrand": "برانډ اضافه",
     "addPayment": "تادیه اضافه",
     "createProduct": "محصول جوړ کړئ",
-    "editProduct": "محصول سم کړئ",
-    "addNew": "نوی اضافه کړئ",
     "browse": "پلټنه وکړئ",
-    "updateProduct": "محصول تازه کړئ",
-    "productImage": "د محصول انځور",
-    "uploadProductImage": "د خپل محصول انځور پورته کړئ",
     "productName": "د محصول نوم",
     "category": "کټګوري",
     "price": "بیه",
@@ -220,24 +216,17 @@
     "selectCategory": "کټګوري وټاکئ",
     "enterPrice": "بیه ولیکئ",
     "enterProductDescription": "د محصول تفصیل ولیکئ",
-    "productCreated": "محصول په بریا سره جوړ شو",
-    "productUpdated": "محصول په بریا سره تازه شو",
-    "productCreateFailed": "د محصول په جوړولو کې ستونزه راغله",
-    "productUpdateFailed": "د محصول په تازه کولو کې ستونزه راغله",
     "showPassword": "پټنوم ښکاره کړئ",
     "hidePassword": "پټنوم پټ کړئ",
     "select": "وټاکئ...",
     "selected": "وټاکل شو",
     "loadingPage": "پاڼه بارېږي...",
     "back": "شاته",
-    "confirmCancel": "لغوه تایید کړئ",
-    "pdfPrintReceipt": "پی ډی ایف / پرنټ رسید",
     "payments": "تادیات",
     "receipt": "رسید",
     "subtotal": "فرعي مجموعه",
     "discount": "تخفیف",
     "total": "ټول",
-    "cancelledInfo": "لغوه شوی: {reason} ({date})",
     "openMenu": "مینو پرانیزئ",
     "actions": "کړنې",
     "pickDate": "نېټه وټاکئ",
@@ -254,9 +243,11 @@
     "create": "جوړول",
     "update": "تازه کول",
     "name": "نوم",
-    "productDeleteFailed": "د محصول په ړنګولو کې ستونزه راغله",
-    "demoPrefix": "ډیمو:",
-    "passwordValue": "پټنوم: {password}"
+    "investCash": "نغد اضافه کول",
+    "withdraw": "نغد ایستل",
+    "openingBalance": "پیل بیلانس",
+    "adjustStock": "د مال تعدیل",
+    "optional": "اختیاري"
   },
   "status": {
     "active": "فعال",
@@ -368,7 +359,12 @@
       "qtyHeader": "مقدار",
       "unitCostHeader": "د هر واحد لګښت",
       "lineHeader": "کرښه",
-      "outstanding": "پاتې"
+      "outstanding": "پاتې",
+      "conditionNew": "نوی",
+      "conditionUsed": "کارول شوی",
+      "addLine": "کرښه اضافه کړئ",
+      "imei1List": "د IMEI شمیرې (په هر لاین کې یو)",
+      "imeiHelp": "د IMEI شمیرې دننه کړئ"
     },
     "sale": {
       "newTitle": "نوی پلور",
@@ -500,8 +496,11 @@
       "publishUpdated": "شائع کرنے کی حیثیت اپ ڈیٹ ہو گئی",
       "imageAdded": "تصویر کامیابی سے شامل ہو گئی",
       "imageRemoved": "تصویر کامیابی سے ہٹا دی گئی",
-      "imageReordered": "تصاویر کامیابی سے دوبارہ ترتیب دی گئیں",
-      "searchPlaceholder": "مصنوعات تلاش کریں..."
+      "imageReordered": "انځورونه په بریالیتوب سره بیا تنظیم شول",
+      "searchPlaceholder": "محصولات ولټوئ...",
+      "status": "حالت",
+      "active": "فعال",
+      "inactive": "غیر فعال"
     },
     "party": {
       "customerAddTitle": "پیرودونکی اضافه کړئ",
@@ -559,6 +558,25 @@
       "confirmCancel": "لغوه تایید کړئ",
       "softOverdraft": "لنډمهاله پور",
       "cashArrow": "نغدې {current} → {projected}"
+    },
+    "cash": {
+      "recordInvestmentTitle": "د مالک پانګونه ثبت کړئ",
+      "recordInvestmentDesc": "هغه نغدې پیسې ثبت کړئ چې مالک یې د دوکان دراز ته اچوي. دا د دوکان عاید نه ګڼل کیږي.",
+      "recordWithdrawalTitle": "د مالک لخوا د پیسو ایستل ثبت کړئ",
+      "recordWithdrawalDesc": "هغه نغدې پیسې ثبت کړئ چې مالک یې له دوکانه باسي. دا عملیاتي لګښت نه ګڼل کیږي.",
+      "recordOpeningTitle": "پیل نغد بیلانس ثبت کړئ",
+      "recordOpeningDesc": "په راجستر کې د لومړۍ ورځې نغد بیلانس. دا په هر دوکان کې یوازې یو ځل ټاکل کیدی شي.",
+      "investmentAmount": "د پانګونې اندازه (روپۍ)",
+      "withdrawalAmount": "د وتلو اندازه (روپۍ)",
+      "openingAmount": "د پیل اندازه (روپۍ)",
+      "date": "نېټه",
+      "startDate": "د پیل نېټه",
+      "notes": "یادښتونه",
+      "shortfallWarningTitle": "د نغدو پیسو د کمښت خبرداری",
+      "confirmOverdraftLabel": "د نغدو کمښت سره سره د پیسو ایستل تایید کړئ",
+      "investmentSuccess": "د مالک پانګونه په بریالیتوب سره ثبت شوه",
+      "withdrawalSuccess": "د مالک لخوا پیسې ایستل په بریالیتوب سره ثبت شول",
+      "openingSuccess": "پیل نغد په بریالیتوب سره ثبت شو"
     }
   },
   "validation": {
@@ -606,7 +624,8 @@
     "selectCountry": "مهرباني وکړئ هېواد وټاکئ",
     "selectState": "مهرباني وکړئ ولایت وټاکئ",
     "usernameTaken": "دا کارن نوم دمخه کارول کیږي",
-    "passwordsDoNotMatch": "پټنومونه سمون نه کوي"
+    "passwordsDoNotMatch": "پټنومونه سمون نه کوي",
+    "lineItemsMinOne": "لږترلږه یو توکی اړین دی"
   },
   "pages": {
     "dashboard": {
@@ -1012,7 +1031,9 @@
     "adjustments": "سمونې وپلټئ...",
     "supplierPayments": "د عرضه کوونکي تادیات وپلټئ...",
     "option": "ولټوئ...",
-    "noResults": "هیڅ پایله ونه موندل شوه."
+    "noResults": "هیڅ پایله ونه موندل شوه.",
+    "adjustments": "تعدیلات لټول...",
+    "supplierPayments": "د عرضه کونکي تادیات لټول..."
   },
   "select": {
     "option": "یو اختیار وټاکئ",

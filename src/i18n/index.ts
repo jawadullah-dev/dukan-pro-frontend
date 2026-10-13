@@ -10,7 +10,7 @@ export type LegacyLocale = 'en' | 'ur' | 'ps';
 const catalogs: Record<LegacyLocale, Record<string, unknown>> = { en, ur, ps };
 let activeLocale: LegacyLocale = 'en';
 
-function setLocale(locale: string): void {
+export function setLocale(locale: string): void {
   if (locale === 'en' || locale === 'ur' || locale === 'ps') {
     activeLocale = locale;
   }

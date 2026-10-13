@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { formatDateTime, formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type {
   CashMovementDTO,
+  CashMovementQueryFilter,
   CashMovementSortField,
   CashMovementType,
   CashDirection
@@ -92,7 +93,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
   const [withdrawalOpen, setWithdrawalOpen] = useState(false);
 
   const sortableColumnIds = ['movementDate', 'amount', 'createdAt'];
-  const { params } = useDukaanListParams(sortableColumnIds, 'note', ['type', 'direction']);
+  const { params, filters } = useDukaanListParams(sortableColumnIds, 'note', ['type', 'direction']);
 
   const [searchParam] = useQueryState('search', parseAsString);
   const [noteParam] = useQueryState('note', parseAsString);
@@ -101,17 +102,27 @@ export function CashTable({ toolbarAction }: CashTableProps) {
 
   const search = searchParam || noteParam || undefined;
 
+  const rawType = (filters as Record<string, unknown>).type ?? typeParam;
   let typeFilter: CashMovementType | undefined;
-  if (typeParam) {
-    const parts = typeParam.split(',');
+  if (rawType) {
+    const parts = Array.isArray(rawType)
+      ? (rawType as string[])
+      : typeof rawType === 'string'
+        ? rawType.split(',')
+        : [];
     if (parts.length === 1) {
       typeFilter = parts[0] as CashMovementType;
     }
   }
 
+  const rawDir = (filters as Record<string, unknown>).direction ?? directionParam;
   let directionFilter: CashDirection | undefined;
-  if (directionParam) {
-    const dirs = directionParam.split(',');
+  if (rawDir) {
+    const dirs = Array.isArray(rawDir)
+      ? (rawDir as string[])
+      : typeof rawDir === 'string'
+        ? rawDir.split(',')
+        : [];
     if (dirs.includes('IN') && !dirs.includes('OUT')) {
       directionFilter = 'IN';
     } else if (dirs.includes('OUT') && !dirs.includes('IN')) {
@@ -128,17 +139,17 @@ export function CashTable({ toolbarAction }: CashTableProps) {
     sortOrder = sortItem.desc ? 'desc' : 'asc';
   }
 
-  const { data, isLoading, isFetching } = useQuery(
-    cashMovementsQueryOptions({
-      page: params.page,
-      pageSize: params.perPage,
-      search,
-      type: typeFilter,
-      direction: directionFilter,
-      sortBy,
-      sortOrder
-    })
-  );
+  const queryFilter: CashMovementQueryFilter = {
+    page: params.page,
+    pageSize: params.perPage,
+    ...(search ? { search } : {}),
+    ...(typeFilter ? { type: typeFilter } : {}),
+    ...(directionFilter ? { direction: directionFilter } : {}),
+    sortBy,
+    sortOrder
+  };
+
+  const { data, isLoading, isFetching } = useQuery(cashMovementsQueryOptions(queryFilter));
 
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
@@ -302,7 +313,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
       {toolbarAction}
       <Button size='sm' className='h-8 gap-1.5' onClick={() => setInvestmentOpen(true)}>
         <Icons.add className='h-3.5 w-3.5' />
-        <span>Invest cash</span>
+        <span>{t('common.investCash')}</span>
       </Button>
       <Button
         size='sm'
@@ -311,7 +322,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
         onClick={() => setWithdrawalOpen(true)}
       >
         <Icons.minus className='h-3.5 w-3.5' />
-        <span>Withdraw</span>
+        <span>{t('common.withdraw')}</span>
       </Button>
       <Button
         size='sm'
@@ -320,7 +331,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
         onClick={() => setOpeningCashOpen(true)}
       >
         <Icons.wallet className='h-3.5 w-3.5' />
-        <span>Opening balance</span>
+        <span>{t('common.openingBalance')}</span>
       </Button>
     </div>
   );

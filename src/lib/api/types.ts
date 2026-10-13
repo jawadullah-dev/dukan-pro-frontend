@@ -374,6 +374,7 @@ export interface CreateInventoryAdjustmentResult {
   message?: string;
   data?: unknown;
 }
+
 export interface SupplierDTO {
   id: string;
   shopId: string;

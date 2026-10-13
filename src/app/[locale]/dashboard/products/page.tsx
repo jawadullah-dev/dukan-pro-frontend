@@ -1,10 +1,11 @@
 import PageContainer from '@/components/layout/page-container';
-import { ProductsListClient } from '@/features/products';
-import { productsQueryOptions } from '@/features/products';
+import { ProductsPageClient, productsQueryOptions } from '@/features/products';
 import { getQueryClient } from '@/lib/query-client';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
+import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { getTranslations } from 'next-intl/server';
+import { auth } from '@/auth';
 
 export async function generateMetadata() {
   const t = await getTranslations('metadata');
@@ -13,9 +14,14 @@ export async function generateMetadata() {
   };
 }
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
   const qc = getQueryClient();
-  void qc.prefetchQuery(productsQueryOptions({ page: 1, limit: 20 }));
+
+  if (session?.accessToken) {
+    await qc.prefetchQuery(productsQueryOptions({ page: 1, pageSize: 20 }, session.accessToken));
+  }
+
   return (
     <PageContainer
       fill
@@ -23,8 +29,8 @@ export default function Page() {
       pageDescription='pages.products.description'
     >
       <HydrationBoundary state={dehydrate(qc)}>
-        <Suspense>
-          <ProductsListClient />
+        <Suspense fallback={<DataTableSkeleton rowCount={3} columnCount={5} />}>
+          <ProductsPageClient />
         </Suspense>
       </HydrationBoundary>
     </PageContainer>

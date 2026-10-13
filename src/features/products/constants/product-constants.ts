@@ -1,31 +1,12 @@
-import { t } from '@/i18n';
+import type { TrackingType, PtaStatus } from '@/lib/api/types';
 
-export const TRACKING_TYPE_OPTIONS = [
-  {
-    get label() {
-      return t('status.serialized');
-    },
-    value: 'SERIALIZED'
-  },
-  {
-    get label() {
-      return t('status.quantity');
-    },
-    value: 'QUANTITY'
-  }
-];
-
-export const ACTIVE_STATUS_OPTIONS = [
-  {
-    get label() {
-      return t('status.active');
-    },
-    value: 'true'
-  },
-  {
-    get label() {
-      return t('status.inactive');
-    },
-    value: 'false'
-  }
-];
+export const productConstantOptions = {
+  trackingTypes: [
+    { labelKey: 'trackingType.quantity', value: 'QUANTITY' as TrackingType },
+    { labelKey: 'trackingType.serialized', value: 'SERIALIZED' as TrackingType }
+  ],
+  ptaStatuses: [
+    { labelKey: 'ptaApproved', value: 'PTA_APPROVED' as PtaStatus },
+    { labelKey: 'nonPta', value: 'NON_PTA' as PtaStatus }
+  ]
+};

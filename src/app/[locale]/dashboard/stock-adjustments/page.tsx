@@ -16,7 +16,7 @@ export async function generateMetadata() {
 
 export default function Page() {
   const qc = getQueryClient();
-  void qc.prefetchQuery(productsQueryOptions({ limit: 100 }));
+  void qc.prefetchQuery(productsQueryOptions({ page: 1, pageSize: 100 }));
   void qc.prefetchQuery(unitsQueryOptions());
   return (
     <PageContainer

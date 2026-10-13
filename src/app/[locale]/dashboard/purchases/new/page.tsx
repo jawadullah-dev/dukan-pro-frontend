@@ -18,7 +18,7 @@ export default function Page() {
   const qc = getQueryClient();
   void qc.prefetchQuery(purchasesQueryOptions({ limit: 100 }));
   void qc.prefetchQuery(suppliersQueryOptions({ limit: 100 }));
-  void qc.prefetchQuery(productsQueryOptions({ limit: 100 }));
+  void qc.prefetchQuery(productsQueryOptions({ page: 1, pageSize: 100 }));
   return (
     <PageContainer
       fill

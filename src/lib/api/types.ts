@@ -275,6 +275,132 @@ export interface CancelPaymentInput {
   confirmOverdraft?: boolean;
 }
 
+/** Matches ResponseSupplierDto from the NestJS suppliers controller. */
+export interface SupplierDTO {
+  id: string;
+  shopId: string;
+  name: string;
+  phone?: string | null;
+  address?: string | null;
+  notes?: string | null;
+  openingBalance: number; // in PAISA
+  isSystem: boolean;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateSupplierInput {
+  name: string;
+  phone?: string;
+  address?: string;
+  notes?: string;
+  openingBalance?: number; // in PAISA
+  isActive?: boolean;
+}
+
+export interface UpdateSupplierInput {
+  name?: string;
+  phone?: string;
+  address?: string;
+  notes?: string;
+  openingBalance?: number; // in PAISA
+  isActive?: boolean;
+}
+
+export type TrackingType = 'QUANTITY' | 'SERIALIZED';
+
+export type PtaStatus = 'PTA_APPROVED' | 'NON_PTA';
+
+export interface ProductImageDTO {
+  id: string;
+  url: string;
+  sortOrder: number;
+}
+
+/** Matches ResponseProductDto from the NestJS products controller. */
+export interface ProductDTO {
+  id: string;
+  shopId: string;
+  categoryId: string;
+  brandId: string;
+  categoryName: string;
+  brandName: string;
+  name: string;
+  trackingType: TrackingType;
+  model?: string | null;
+  color?: string | null;
+  ram?: string | null;
+  storage?: string | null;
+  sku?: string | null;
+  barcode?: string | null;
+  description?: string | null;
+  imageUrl?: string | null;
+  defaultPurchasePrice: number; // in PAISA
+  defaultSellingPrice: number; // in PAISA
+  lowStockThreshold: number;
+  isActive: boolean;
+  isPublished: boolean;
+  publicDescription?: string | null;
+  contactForPrice: boolean;
+  ptaStatus?: PtaStatus | null;
+  quantityOnHand: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateProductInput {
+  name: string;
+  categoryId: string;
+  brandId: string;
+  trackingType: TrackingType;
+  model?: string;
+  color?: string;
+  ram?: string;
+  storage?: string;
+  sku?: string;
+  barcode?: string;
+  description?: string;
+  imageUrl?: string;
+  defaultPurchasePrice?: number; // in PAISA
+  defaultSellingPrice?: number; // in PAISA
+  lowStockThreshold?: number;
+  isActive?: boolean;
+}
+
+export interface UpdateProductInput {
+  name?: string;
+  categoryId?: string;
+  brandId?: string;
+  trackingType?: TrackingType;
+  model?: string | null;
+  color?: string | null;
+  ram?: string | null;
+  storage?: string | null;
+  sku?: string | null;
+  barcode?: string | null;
+  description?: string | null;
+  imageUrl?: string | null;
+  defaultPurchasePrice?: number; // in PAISA
+  defaultSellingPrice?: number; // in PAISA
+  lowStockThreshold?: number;
+  isActive?: boolean;
+  isPublished?: boolean;
+  publicDescription?: string | null;
+  contactForPrice?: boolean;
+  ptaStatus?: PtaStatus | null;
+}
+
+export interface ProductListFilters {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  categoryId?: string;
+  brandId?: string;
+  trackingType?: TrackingType | string;
+  isActive?: 'true' | 'false' | boolean | string;
+}
+
 export * from '@/types/supplier-payment';
 export * from '@/types/expense';
 export * from '@/types/cash';

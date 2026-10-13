@@ -110,7 +110,13 @@
       "outstanding": "Outstanding",
       "description": "Description",
       "when": "When",
-      "dir": "Dir"
+      "dir": "Dir",
+      "qtyDelta": "Qty Change",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "reason": "Reason",
+      "target": "Target",
+      "notes": "Notes"
     }
   },
   "nav": {
@@ -185,13 +191,8 @@
     "delete": "Delete",
     "archive": "Archive",
     "activate": "Active",
-    "archiveCustomer": "Archive",
-    "activateCustomer": "Active",
     "deactivate": "Deactivate",
-    "reactivate": "Reactivate",
-    "deactivateCustomer": "Deactivate customer",
-    "reactivateCustomer": "Reactivate customer",
-    "loading": "Loading\u2026",
+    "loading": "Loading…",
     "areYouSure": "Are you sure?",
     "cannotUndo": "This action cannot be undone.",
     "noAccess": "You do not have access to this page.",
@@ -205,12 +206,7 @@
     "addBrand": "Add brand",
     "addPayment": "Add payment",
     "createProduct": "Create New Product",
-    "editProduct": "Edit Product",
-    "addNew": "Add New",
     "browse": "Browse",
-    "updateProduct": "Update Product",
-    "productImage": "Product Image",
-    "uploadProductImage": "Upload a product image",
     "productName": "Product Name",
     "category": "Category",
     "price": "Price",
@@ -219,24 +215,17 @@
     "selectCategory": "Select category",
     "enterPrice": "Enter price",
     "enterProductDescription": "Enter product description",
-    "productCreated": "Product created",
-    "productUpdated": "Product updated",
-    "productCreateFailed": "Couldn't create product. Try again.",
-    "productUpdateFailed": "Couldn't update product. Try again.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "select": "Select...",
     "selected": "Selected",
     "loadingPage": "Loading page",
     "back": "Back",
-    "confirmCancel": "Confirm cancel",
-    "pdfPrintReceipt": "PDF / Print receipt",
     "payments": "Payments",
     "receipt": "Receipt",
     "subtotal": "Subtotal",
     "discount": "Discount",
     "total": "Total",
-    "cancelledInfo": "Cancelled: {reason} ({date})",
     "openMenu": "Open menu",
     "actions": "Actions",
     "pickDate": "Pick a date",
@@ -248,14 +237,16 @@
     "toggleSidebar": "Toggle Sidebar",
     "commandPalette": "Command Palette",
     "searchForCommand": "Search for a command to run...",
-    "demoPrefix": "Demo:",
-    "passwordValue": "Password: {password}",
     "search": "Search",
     "view": "View",
     "create": "Create",
     "update": "Update",
     "name": "Name",
-    "productDeleteFailed": "Failed to delete product"
+    "investCash": "Invest cash",
+    "withdraw": "Withdraw",
+    "openingBalance": "Opening balance",
+    "adjustStock": "Adjust stock",
+    "optional": "Optional"
   },
   "status": {
     "active": "Active",
@@ -367,7 +358,12 @@
       "qtyHeader": "Qty",
       "unitCostHeader": "Unit cost",
       "lineHeader": "Line",
-      "outstanding": "Outstanding"
+      "outstanding": "Outstanding",
+      "conditionNew": "New",
+      "conditionUsed": "Used",
+      "addLine": "Add Line",
+      "imei1List": "IMEIs (one per line)",
+      "imeiHelp": "Enter IMEIs"
     },
     "sale": {
       "newTitle": "New sale",
@@ -560,7 +556,26 @@
       "reason": "Reason",
       "confirmCancel": "Confirm cancel",
       "softOverdraft": "Soft overdraft",
-      "cashArrow": "cash {current} \u2192 {projected}"
+      "cashArrow": "cash {current} → {projected}"
+    },
+    "cash": {
+      "recordInvestmentTitle": "Record Owner Investment",
+      "recordInvestmentDesc": "Record cash the owner puts into the shop drawer. This is not counted as shop revenue.",
+      "recordWithdrawalTitle": "Record Owner Withdrawal",
+      "recordWithdrawalDesc": "Record cash the owner takes out of the shop drawer. This is not counted as an operating expense.",
+      "recordOpeningTitle": "Record Opening Cash",
+      "recordOpeningDesc": "Day-0 cash balance in the register drawer. Can only be set once per shop.",
+      "investmentAmount": "Investment Amount (PKR)",
+      "withdrawalAmount": "Withdrawal Amount (PKR)",
+      "openingAmount": "Opening Amount (PKR)",
+      "date": "Date",
+      "startDate": "Start Date",
+      "notes": "Notes",
+      "shortfallWarningTitle": "Cash Shortfall Warning",
+      "confirmOverdraftLabel": "Confirm withdrawal despite cash deficit",
+      "investmentSuccess": "Owner investment recorded successfully",
+      "withdrawalSuccess": "Owner withdrawal recorded successfully",
+      "openingSuccess": "Opening cash recorded successfully"
     }
   },
   "validation": {
@@ -608,7 +623,8 @@
     "selectCountry": "Please select a country",
     "selectState": "Please select a state",
     "usernameTaken": "Username is already taken",
-    "passwordsDoNotMatch": "Passwords do not match"
+    "passwordsDoNotMatch": "Passwords do not match",
+    "lineItemsMinOne": "At least one line item is required"
   },
   "pages": {
     "dashboard": {
@@ -1012,7 +1028,9 @@
     "payments": "Search payments...",
     "movements": "Search movements...",
     "option": "Search...",
-    "noResults": "No results found."
+    "noResults": "No results found.",
+    "adjustments": "Search adjustments...",
+    "supplierPayments": "Search supplier payments..."
   },
   "select": {
     "option": "Select an option",

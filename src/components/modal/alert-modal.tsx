@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
-import { useT } from '@/i18n/use-t';
+import { useT, translateMaybe } from '@/i18n/use-t';
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -36,10 +36,10 @@ export function AlertModal({
   closeOnOutsideClick = true
 }: AlertModalProps) {
   const t = useT();
-  const resolvedTitle = title ?? t('common.areYouSure');
-  const resolvedDescription = description ?? t('common.cannotUndo');
-  const resolvedConfirm = confirmLabel ?? t('common.continue');
-  const resolvedCancel = cancelLabel ?? t('common.cancel');
+  const resolvedTitle = translateMaybe(title ?? 'common.areYouSure', t);
+  const resolvedDescription = translateMaybe(description ?? 'common.cannotUndo', t);
+  const resolvedConfirm = translateMaybe(confirmLabel ?? 'common.continue', t);
+  const resolvedCancel = translateMaybe(cancelLabel ?? 'common.cancel', t);
 
   const handleOutsideClick = () => {
     if (closeOnOutsideClick && !loading) {

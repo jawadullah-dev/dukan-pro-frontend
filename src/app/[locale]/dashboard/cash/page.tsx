@@ -1,7 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
-import { CashLedgerClient } from '@/features/cash';
-import { cashQueryOptions } from '@/features/cash';
+import { CashLedgerClient, cashQueryOptions } from '@/features/cash';
 import { getQueryClient } from '@/lib/query-client';
+import { auth } from '@/auth';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
@@ -13,9 +13,15 @@ export async function generateMetadata() {
   };
 }
 
-export default function Page() {
+export default async function Page() {
+  const session = await auth();
+  const token = session?.accessToken;
   const qc = getQueryClient();
-  void qc.prefetchQuery(cashQueryOptions({ limit: 100 }));
+  if (token) {
+    await qc.prefetchQuery(
+      cashQueryOptions({ page: 1, pageSize: 20, sortBy: 'movementDate', sortOrder: 'desc' }, token)
+    );
+  }
   return (
     <PageContainer fill pageTitle='pages.cash.title' pageDescription='pages.cash.description'>
       <HydrationBoundary state={dehydrate(qc)}>

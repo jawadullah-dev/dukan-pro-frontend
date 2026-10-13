@@ -17,6 +17,7 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
+import { t } from '@/i18n';
 import { AlertModal } from '@/components/modal/alert-modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -142,28 +143,28 @@ const categoryMobileItem: MobileItemConfig<CategoryDTO> = {
   leading: 'icon',
   leadingIcon: Icons.folder,
   title: (row) => row.name,
-  subtitle: (row) => (row.isActive ? 'Active' : 'Inactive'),
-  ariaLabel: (row) => `${row.name}, ${row.isActive ? 'Active' : 'Inactive'}`
+  subtitle: (row) => (row.isActive ? t('status.active') : t('status.inactive')),
+  ariaLabel: (row) => `${row.name}, ${row.isActive ? t('status.active') : t('status.inactive')}`
 };
 
 const categoryDetail: DetailConfig<CategoryDTO> = {
   mode: 'sheet',
   title: (row) => row.name,
   badge: (row) => ({
-    label: row.isActive ? 'Active' : 'Inactive',
+    label: row.isActive ? t('status.active') : t('status.inactive'),
     status: row.isActive ? 'ACTIVE' : 'INACTIVE'
   }),
   sections: (row) => [
     {
-      title: 'Category',
+      title: t('table.col.category'),
       fields: [
-        { label: 'Name', value: row.name },
+        { label: t('table.col.name'), value: row.name },
         {
-          label: 'Status',
+          label: t('table.col.status'),
           value: (
             <StatusBadge
               status={row.isActive ? 'ACTIVE' : 'INACTIVE'}
-              label={row.isActive ? 'Active' : 'Inactive'}
+              label={row.isActive ? t('status.active') : t('status.inactive')}
             />
           )
         }

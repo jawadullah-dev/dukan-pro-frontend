@@ -5,35 +5,63 @@ import en from '../../messages/en.json';
 import ur from '../../messages/ur.json';
 import ps from '../../messages/ps.json';
 
-type LegacyLocale = 'en' | 'ur' | 'ps';
+export type LegacyLocale = 'en' | 'ur' | 'ps';
 
-const catalogs = { en, ur, ps } satisfies Record<LegacyLocale, object>;
+const catalogs: Record<LegacyLocale, Record<string, any>> = { en, ur, ps };
 let activeLocale: LegacyLocale = 'en';
 
-function setLocale(locale: LegacyLocale): void {
-  activeLocale = locale;
+export function setLocale(locale: string): void {
+  if (locale === 'en' || locale === 'ur' || locale === 'ps') {
+    activeLocale = locale;
+  }
 }
 
-function getLocale(): LegacyLocale {
+export function getLocale(): LegacyLocale {
+  if (typeof window !== 'undefined') {
+    const match = window.location.pathname.match(/^\/(en|ur|ps)(\/|$)/);
+    if (match) return match[1] as LegacyLocale;
+    const lang = document.documentElement.lang;
+    if (lang === 'ur' || lang === 'ps' || lang === 'en') return lang as LegacyLocale;
+  }
   return activeLocale;
 }
 
-function getMessage(catalog: object, key: string): string | undefined {
-  let value: unknown = catalog;
+function getMessage(catalog: Record<string, any>, key: string): string | undefined {
+  if (!key) return undefined;
+  let value: any = catalog;
 
   for (const segment of key.split('.')) {
     if (typeof value !== 'object' || value === null || !(segment in value)) {
       return undefined;
     }
-    value = (value as Record<string, unknown>)[segment];
+    value = value[segment];
   }
 
   return typeof value === 'string' ? value : undefined;
 }
 
 export function t(key: string, vars?: Record<string, string | number>): string {
-  const catalog = catalogs[activeLocale] ?? en;
-  let text = getMessage(catalog, key) ?? getMessage(en, key) ?? key;
+  if (!key) return '';
+  const currentLocale = getLocale();
+  const catalog = catalogs[currentLocale] ?? catalogs.en;
+
+  let text =
+    getMessage(catalog, key) ??
+    (key.startsWith('common.') ? getMessage(catalog, key.slice(7)) : undefined) ??
+    (!key.includes('.') ? getMessage(catalog, `common.${key}`) : undefined) ??
+    getMessage(catalogs.en, key) ??
+    (key.startsWith('common.') ? getMessage(catalogs.en, key.slice(7)) : undefined) ??
+    (!key.includes('.') ? getMessage(catalogs.en, `common.${key}`) : undefined);
+
+  if (!text) {
+    if (key.startsWith('common.')) {
+      const seg = key.slice(7);
+      text = seg.charAt(0).toUpperCase() + seg.slice(1);
+    } else {
+      text = key;
+    }
+  }
+
   if (vars) {
     for (const [name, value] of Object.entries(vars)) {
       text = text.replaceAll(`{${name}}`, String(value));

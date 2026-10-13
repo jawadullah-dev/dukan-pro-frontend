@@ -1,11 +1,15 @@
 import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
 import { inventoryKeys } from './queries';
-import { adjustStock } from './service';
+import { createInventoryAdjustment } from './service';
+import type { CreateInventoryAdjustmentInput } from '@/lib/api/types';
 
-export const adjustStockMutation = mutationOptions({
-  mutationFn: (payload: Parameters<typeof adjustStock>[0]) => adjustStock(payload),
+export const createAdjustmentMutation = mutationOptions({
+  mutationFn: (payload: CreateInventoryAdjustmentInput) => createInventoryAdjustment(payload),
   onSuccess: () => {
     getQueryClient().invalidateQueries({ queryKey: inventoryKeys.all });
   }
 });
+
+// Backward-compatible export
+export const adjustStockMutation = createAdjustmentMutation;

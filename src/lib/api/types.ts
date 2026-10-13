@@ -275,6 +275,135 @@ export interface CancelPaymentInput {
   confirmOverdraft?: boolean;
 }
 
+/** Matches ResponsePurchaseItemDto from NestJS purchases controller. */
+export interface PurchaseItemDTO {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitCost: number; // in PAISA
+  totalCost: number; // in PAISA
+  imeis?: string[];
+}
+
+/** Matches ResponsePurchaseDto from NestJS purchases controller. */
+export interface PurchaseDTO {
+  id: string;
+  shopId: string;
+  supplierId: string;
+  supplierName?: string;
+  purchaseNo: string;
+  supplierInvoiceRef?: string | null;
+  purchaseDate: string;
+  totalAmount: number; // in PAISA
+  isOpeningStock: boolean;
+  status: 'ACTIVE' | 'CANCELLED';
+  cancelledAt?: string | null;
+  cancelReason?: string | null;
+  cancelledById?: string | null;
+  clientRequestId: string;
+  notes?: string | null;
+  createdById: string;
+  createdAt: string;
+  updatedAt: string;
+  items: PurchaseItemDTO[];
+}
+
+export interface CreatePurchaseItemInput {
+  productId: string;
+  quantity: number;
+  unitCost: number; // in PAISA
+  imeis?: string[];
+  condition?: 'NEW' | 'USED';
+}
+
+export interface CreatePurchaseInput {
+  clientRequestId: string;
+  supplierId: string;
+  supplierInvoiceRef?: string;
+  purchaseDate: string;
+  items: CreatePurchaseItemInput[];
+  paidNow?: number; // in PAISA
+  isOpeningStock?: boolean;
+  confirmOverdraft?: boolean;
+  notes?: string;
+}
+
+export interface CancelPurchaseInput {
+  cancelReason: string;
+}
+
+export interface CreatePurchaseResult {
+  confirmOverdraft?: boolean;
+  shortfall?: number;
+  message?: string;
+  success?: boolean;
+  purchase?: PurchaseDTO;
+}
+
+/** Matches InventoryReportRowDTO from NestJS reports controller */
+export interface InventoryItemDTO {
+  id: string; // productId
+  name: string;
+  sku?: string | null;
+  barcode?: string | null;
+  categoryName?: string | null;
+  brandName?: string | null;
+  trackingType: 'QUANTITY' | 'SERIALIZED';
+  inStock: number;
+  stockValue: number; // in PAISA
+  lowStock: boolean;
+  imeis?: string[];
+}
+
+export interface InventoryReportSummary {
+  countProducts: number;
+  countLowStock: number;
+  countUnitsInStock: number;
+  stockValueTotal: number;
+}
+
+export interface InventoryReportResponse {
+  page: number;
+  pageSize: number;
+  total: number;
+  from?: string;
+  to?: string;
+  summary?: InventoryReportSummary;
+  items: InventoryItemDTO[];
+}
+
+/** Matches InventoryAdjustment row from NestJS inventory controller */
+export interface InventoryAdjustmentDTO {
+  id: string;
+  shopId: string;
+  productId: string;
+  productName: string;
+  inventoryUnitId?: string | null;
+  imei?: string | null;
+  type: 'ADJUSTMENT' | 'DAMAGED' | 'LOST';
+  quantityChange: number;
+  reason: string;
+  referenceType?: string | null;
+  referenceId?: string | null;
+  createdAt: string;
+}
+
+export interface CreateInventoryAdjustmentInput {
+  productId: string;
+  type: 'ADJUSTMENT' | 'DAMAGED' | 'LOST';
+  reason: string;
+  countedQuantity?: number;
+  quantity?: number;
+  inventoryUnitId?: string;
+}
+
+export interface CreateInventoryAdjustmentResult {
+  kind?: string;
+  message?: string;
+  data?: unknown;
+}
+
 /** Matches ResponseSupplierDto from the NestJS suppliers controller. */
 export interface SupplierDTO {
   id: string;

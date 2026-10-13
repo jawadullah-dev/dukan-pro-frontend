@@ -44,7 +44,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(responseBody, { status: upstream.status });
     }
 
-    return NextResponse.json(responseBody.data !== undefined ? responseBody.data : responseBody, {
+    const payload =
+      responseBody.data !== undefined
+        ? { message: responseBody.message, ...responseBody.data }
+        : responseBody;
+    return NextResponse.json(payload, {
       status: upstream.status
     });
   } catch (error) {

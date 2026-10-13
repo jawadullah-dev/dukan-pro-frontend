@@ -1,6 +1,6 @@
 import { isLocale, locales } from '@/i18n/request';
 import { notFound } from 'next/navigation';
-import { NextIntlClientProvider } from 'next-intl';
+import { I18nProvider } from '@/components/i18n/i18n-provider';
 import { getMessages, getNow, getTimeZone, setRequestLocale } from 'next-intl/server';
 import { cookies } from 'next/headers';
 import Providers from '@/components/layout/providers';
@@ -36,7 +36,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       : DEFAULT_THEME;
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages} now={now} timeZone={timeZone}>
+    <I18nProvider locale={locale} messages={messages} now={now} timeZone={timeZone}>
       <LocaleDocumentAttributes />
       <Providers activeThemeValue={themeToApply}>
         <PwaShell>
@@ -44,6 +44,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
           {children}
         </PwaShell>
       </Providers>
-    </NextIntlClientProvider>
+    </I18nProvider>
   );
 }

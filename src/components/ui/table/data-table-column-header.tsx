@@ -6,6 +6,8 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+import { useT, translateMaybe } from '@/i18n/use-t';
+
 interface DataTableColumnHeaderProps<TData, TValue> extends React.ComponentProps<typeof Button> {
   column: Column<TData, TValue>;
   title: string;
@@ -17,8 +19,12 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
   ...props
 }: DataTableColumnHeaderProps<TData, TValue>) {
+  const t = useT();
+  const metaLabel = column.columnDef.meta?.label;
+  const displayTitle = metaLabel ? translateMaybe(metaLabel, t) : translateMaybe(title, t);
+
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>;
+    return <div className={cn(className)}>{displayTitle}</div>;
   }
 
   const isSorted = column.getIsSorted();
@@ -35,7 +41,7 @@ export function DataTableColumnHeader<TData, TValue>({
       )}
       {...props}
     >
-      <span>{title}</span>
+      <span>{displayTitle}</span>
       {isSorted === 'desc' ? (
         <Icons.chevronDown />
       ) : isSorted === 'asc' ? (

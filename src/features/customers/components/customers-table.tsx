@@ -3,7 +3,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { useQueryState, parseAsString } from 'nuqs';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';

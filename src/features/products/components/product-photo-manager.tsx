@@ -125,6 +125,7 @@ export function ProductPhotoManager({ productId, images, onChange }: ProductPhot
                   variant='secondary'
                   size='icon'
                   className='h-8 w-8'
+                  aria-label={t('common.moveUp')}
                   onClick={() => handleMove(index, index - 1)}
                   disabled={index === 0 || reorderMutation.isPending}
                 >
@@ -135,6 +136,7 @@ export function ProductPhotoManager({ productId, images, onChange }: ProductPhot
                   variant='destructive'
                   size='icon'
                   className='h-8 w-8'
+                  aria-label={t('common.delete')}
                   onClick={() => handleDelete(image.id)}
                   disabled={deleteMutation.isPending}
                 >
@@ -145,6 +147,7 @@ export function ProductPhotoManager({ productId, images, onChange }: ProductPhot
                   variant='secondary'
                   size='icon'
                   className='h-8 w-8'
+                  aria-label={t('common.moveDown')}
                   onClick={() => handleMove(index, index + 1)}
                   disabled={index === images.length - 1 || reorderMutation.isPending}
                 >

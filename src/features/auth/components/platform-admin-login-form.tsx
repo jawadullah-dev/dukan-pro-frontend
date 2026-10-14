@@ -5,19 +5,17 @@ import { FieldGroup } from '@/components/ui/field';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { z } from 'zod';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { signIn, getSession } from 'next-auth/react';
+import { useRouter } from '@/i18n/navigation';
 import { useState } from 'react';
 import { Icons } from '@/components/icons';
-import { useTranslations, useLocale } from 'next-intl';
-import { homePathForRole } from '@/lib/auth/routes';
+import { useTranslations } from 'next-intl';
+import { PLATFORM_HOME } from '@/lib/auth/routes';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
-import { getSession } from 'next-auth/react';
 import type { PlatformAdminLoginValues } from '@/types/auth';
 
 export function PlatformAdminLoginForm() {
   const t = useTranslations();
-  const locale = useLocale();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
@@ -52,9 +50,8 @@ export function PlatformAdminLoginForm() {
         return;
       }
 
-      const session = await getSession();
-      const role = session?.user?.role;
-      router.replace(homePathForRole(role, locale));
+      await getSession();
+      router.replace(PLATFORM_HOME);
       router.refresh();
     }
   });

@@ -1,8 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { Suspense, useState } from 'react';
 import { toast } from 'sonner';
 import { FloatingActionButton } from '@/components/common/floating-action-button';

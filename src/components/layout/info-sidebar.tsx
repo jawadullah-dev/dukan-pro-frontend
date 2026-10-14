@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { Icons } from '@/components/icons';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { translateMaybe, useT } from '@/i18n/use-t';
 import {
   Infobar,

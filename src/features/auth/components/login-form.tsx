@@ -6,19 +6,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { z } from 'zod';
 import { signIn, getSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Icons } from '@/components/icons';
-import { homePathForRole, canAccessPath, platformAdminLoginPath } from '@/lib/auth/routes';
+import { SHOP_HOME, PLATFORM_HOME, canAccessPath, delocalize } from '@/lib/auth/routes';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
+import { Link, useRouter } from '@/i18n/navigation';
 import type { LoginValues } from '@/types/auth';
 
 export function LoginForm() {
   const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const locale = useLocale();
   const callbackUrl = searchParams.get('callbackUrl') ?? '/dashboard';
   const [error, setError] = useState<string | null>(null);
 
@@ -53,10 +53,10 @@ export function LoginForm() {
 
       const session = await getSession();
       const role = session?.user?.role;
-      const home = homePathForRole(role, locale);
+      const home = role === 'SUPER_ADMIN' ? PLATFORM_HOME : SHOP_HOME;
       const target =
         callbackUrl && callbackUrl.startsWith('/') && canAccessPath(callbackUrl, role)
-          ? callbackUrl
+          ? delocalize(callbackUrl)
           : home;
 
       router.replace(target);
@@ -124,12 +124,12 @@ export function LoginForm() {
 
           <p className='text-muted-foreground text-center text-xs leading-relaxed'>
             {t('auth.platformAdminPrompt')}{' '}
-            <a
-              href={platformAdminLoginPath(locale)}
+            <Link
+              href='/platform-admin/login'
               className='text-foreground underline-offset-4 hover:underline'
             >
               {t('auth.platformAdminSignInLink')}
-            </a>
+            </Link>
           </p>
         </form>
       </CardContent>

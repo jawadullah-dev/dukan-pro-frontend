@@ -1,7 +1,7 @@
 'use client';
 
 import { useSuspenseQuery } from '@tanstack/react-query';
-import Link from 'next/link';
+import { Link } from '@/i18n/navigation';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { dashboardQueryOptions, sessionQueryOptions } from '../api/queries';

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/navigation';
 import { type Row, type Table as TanstackTable, flexRender } from '@tanstack/react-table';
 import {
   Table,

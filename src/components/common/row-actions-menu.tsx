@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {

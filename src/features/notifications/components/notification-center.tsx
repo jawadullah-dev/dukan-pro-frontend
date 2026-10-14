@@ -1,14 +1,13 @@
 'use client';
 
 import { Icons } from '@/components/icons';
-import Link from 'next/link';
+import { Link, useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { NotificationCard } from '@/components/ui/notification-card';
 import { useNotificationStore } from '../utils/store';
-import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useT } from '@/i18n/use-t';
 
@@ -33,7 +32,15 @@ export function NotificationCenter() {
   return (
     <Popover>
       <PopoverTrigger
-        render={<Button type='button' variant='ghost' size='icon' className='relative h-8 w-8' />}
+        render={
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            aria-label={t('notifications.title')}
+            className='relative h-8 w-8'
+          />
+        }
       >
         <Icons.notification className='h-4 w-4' />
         {count > 0 && (

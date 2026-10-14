@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useKBar } from 'kbar';
-import { useRouter } from 'next/navigation';
 import { SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 import { Breadcrumbs } from '../breadcrumbs';
@@ -15,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { useTranslations } from 'next-intl';
 import { pageTitleKeyFromPath } from '@/lib/i18n/path-titles';
-import { usePathname } from '@/i18n/navigation';
+import { usePathname, useRouter } from '@/i18n/navigation';
 
 function isDetailPath(pathname: string): boolean {
   const parts = pathname.split('/').filter(Boolean);

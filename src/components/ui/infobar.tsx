@@ -18,7 +18,7 @@ import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { VariantProps, cva } from 'class-variance-authority';
 import { Icons } from '@/components/icons';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/i18n/navigation';
 import { useT } from '@/i18n/use-t';
 import * as React from 'react';
 

@@ -50,6 +50,7 @@ export function ThemeModeToggle() {
             type='button'
             variant='secondary'
             size='icon'
+            aria-label={t('appearance.theme')}
             className='group/toggle size-8'
             onClick={handleThemeToggle}
           />

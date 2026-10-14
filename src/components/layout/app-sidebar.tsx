@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/sidebar';
 import { getNavGroupsForRole } from '@/config/nav-config';
 import { useFilteredNavGroups } from '@/hooks/use-nav';
-import type { SessionRole } from '@/lib/dukaan/session';
 import type { NavGroup, NavItem, AppSidebarProps } from '@/types';
 export type { AppSidebarProps };
 import { Link, usePathname } from '@/i18n/navigation';

@@ -32,7 +32,9 @@ function readInstalledFlag(): boolean {
 function writeInstalledFlag(): void {
   try {
     localStorage.setItem(INSTALLED_FLAG_KEY, '1');
-  } catch {}
+  } catch {
+    installed = true;
+  }
 }
 
 export function subscribeInstallState(listener: Listener): () => void {
@@ -54,7 +56,9 @@ export function clearInstalledMark(): void {
   installed = false;
   try {
     localStorage.removeItem(INSTALLED_FLAG_KEY);
-  } catch {}
+  } catch {
+    installed = false;
+  }
   emit();
 }
 
@@ -81,7 +85,9 @@ export function ensureInstallListeners(): void {
     installed = false;
     try {
       localStorage.removeItem(INSTALLED_FLAG_KEY);
-    } catch {}
+    } catch {
+      installed = false;
+    }
     emit();
   });
 
@@ -160,11 +166,15 @@ export async function detectPwaAlreadyInstalled(): Promise<boolean> {
       installed = false;
       try {
         localStorage.removeItem(INSTALLED_FLAG_KEY);
-      } catch {}
+      } catch {
+        installed = false;
+      }
       emit();
       return false;
     }
-  } catch {}
+  } catch {
+    return installed || readInstalledFlag();
+  }
 
   return installed || readInstalledFlag();
 }

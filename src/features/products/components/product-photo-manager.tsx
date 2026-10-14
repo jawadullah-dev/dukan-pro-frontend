@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import {
   IconPhoto as ImageIcon,
   IconLoader2,
@@ -109,11 +110,14 @@ export function ProductPhotoManager({ productId, images, onChange }: ProductPhot
         <div className='grid grid-cols-2 gap-3 sm:grid-cols-4'>
           {images.map((image, index) => (
             <div key={image.id} className='group relative overflow-hidden rounded-lg border'>
-              <img
+              <Image
                 src={image.url}
                 alt={`${t('images')} ${index + 1}`}
+                width={200}
+                height={128}
                 className='h-32 w-full object-cover'
                 loading='lazy'
+                unoptimized
               />
               <div className='absolute inset-0 flex items-center justify-center gap-1 bg-black/40 opacity-0 transition-opacity group-hover:opacity-100'>
                 <Button
@@ -185,7 +189,7 @@ function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => resolve(img);
       img.onerror = reject;
       img.src = e.target?.result as string;

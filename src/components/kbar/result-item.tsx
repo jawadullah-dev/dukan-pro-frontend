@@ -1,4 +1,3 @@
-import type { ActionId, ActionImpl } from 'kbar';
 import * as React from 'react';
 import { Kbd } from '@/components/ui/kbd';
 import { cn } from '@/lib/utils';

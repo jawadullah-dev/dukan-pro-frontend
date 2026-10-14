@@ -6,10 +6,10 @@ import { cn } from '@/lib/utils';
 import type { QuickFilterChip, QuickFilterChipsProps } from './types';
 
 export function QuickFilterChips<TData>({ table, chips, className }: QuickFilterChipsProps<TData>) {
+  const t = useTranslations();
   if (chips.length === 0) return null;
 
   const activeId = resolveActiveChip(table, chips);
-  const t = useTranslations();
 
   return (
     <div

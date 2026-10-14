@@ -1,7 +1,6 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +16,7 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
+import { t as staticT } from '@/i18n/static-t';
 import { AlertModal } from '@/components/modal/alert-modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,11 +25,10 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { productsQueryOptions, productsQueryKeys } from '../api/queries';
-import { deleteProduct, updateProduct } from '../api/service';
+import { deleteProduct } from '../api/service';
 import type { ProductDTO } from '@/lib/api/types';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
@@ -91,10 +90,9 @@ const productColumns: ColumnDef<ProductDTO>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('table.col.name')} />
+    ),
     meta: {
       label: 'table.col.name',
       placeholderKey: 'table.search' as const,
@@ -117,66 +115,58 @@ const productColumns: ColumnDef<ProductDTO>[] = [
   {
     id: 'categoryName',
     accessorKey: 'categoryName',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('dukaan.product.category')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('dukaan.product.category')} />
+    ),
     meta: { label: 'dukaan.product.category', type: 'text', priority: 2 },
     cell: ({ row }) => <span>{row.original.categoryName || '—'}</span>
   },
   {
     id: 'brandName',
     accessorKey: 'brandName',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('dukaan.product.brand')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('dukaan.product.brand')} />
+    ),
     meta: { label: 'dukaan.product.brand', type: 'text', priority: 3 },
     cell: ({ row }) => <span>{row.original.brandName || '—'}</span>
   },
   {
     id: 'defaultSellingPrice',
     accessorKey: 'defaultSellingPrice',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('dukaan.product.sellingPrice')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('dukaan.product.sellingPrice')} />
+    ),
     meta: { label: 'dukaan.product.sellingPrice', type: 'money', priority: 2 },
     cell: ({ row }) => formatPkr(row.original.defaultSellingPrice)
   },
   {
     id: 'quantityOnHand',
     accessorKey: 'quantityOnHand',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('dukaan.product.stock')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('dukaan.product.stock')} />
+    ),
     meta: { label: 'dukaan.product.stock', type: 'number', priority: 2 },
     cell: ({ row }) => <span>{row.original.quantityOnHand ?? 0}</span>
   },
   {
     id: 'isActive',
     accessorKey: 'isActive',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('table.col.status')} />
+    ),
     meta: { label: 'table.col.status', type: 'boolean', priority: 2 },
-    cell: ({ row }) => {
-      const t = useT();
-      return (
-        <div className='flex flex-col gap-1'>
-          <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-            {row.original.isActive ? t('status.active') : t('status.inactive')}
-          </Badge>
-          <span className='text-[10px] text-muted-foreground'>
-            {row.original.isPublished
-              ? t('dukaan.product.published')
-              : t('dukaan.product.unpublished')}
-          </span>
-        </div>
-      );
-    }
+    cell: ({ row }) => (
+      <div className='flex flex-col gap-1'>
+        <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
+          {row.original.isActive ? staticT('status.active') : staticT('status.inactive')}
+        </Badge>
+        <span className='text-[10px] text-muted-foreground'>
+          {row.original.isPublished
+            ? staticT('dukaan.product.published')
+            : staticT('dukaan.product.unpublished')}
+        </span>
+      </div>
+    )
   },
   {
     id: 'actions',

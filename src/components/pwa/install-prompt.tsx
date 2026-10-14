@@ -54,20 +54,27 @@ function resolveSurface(): Surface {
   return 'android';
 }
 
+let inMemoryAutoPrompt = false;
+
 function takeAutoPromptFlag(): boolean {
   try {
-    if (sessionStorage.getItem(AUTO_PROMPT_KEY) !== '1') return false;
+    if (sessionStorage.getItem(AUTO_PROMPT_KEY) !== '1') return inMemoryAutoPrompt;
     sessionStorage.removeItem(AUTO_PROMPT_KEY);
+    inMemoryAutoPrompt = false;
     return true;
   } catch {
-    return false;
+    const val = inMemoryAutoPrompt;
+    inMemoryAutoPrompt = false;
+    return val;
   }
 }
 
 function setAutoPromptFlag(): void {
   try {
     sessionStorage.setItem(AUTO_PROMPT_KEY, '1');
-  } catch {}
+  } catch {
+    inMemoryAutoPrompt = true;
+  }
 }
 
 export function InstallPrompt({ variant = 'both', className }: InstallPromptProps) {
@@ -151,7 +158,11 @@ export function InstallPrompt({ variant = 'both', className }: InstallPromptProp
   const dismissBanner = () => {
     try {
       localStorage.setItem(DISMISS_KEY, String(Date.now()));
-    } catch {}
+    } catch {
+      setShowBanner(false);
+      setEligible(false);
+      return;
+    }
     setShowBanner(false);
     setEligible(false);
   };

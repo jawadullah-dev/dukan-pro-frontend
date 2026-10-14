@@ -4,10 +4,9 @@ import { usePathname } from '@/i18n/navigation';
 import { useMemo } from 'react';
 import { useT } from '@/i18n/use-t';
 import { pageTitleKeyFromPath } from '@/lib/i18n/path-titles';
-
 import type { BreadcrumbItem } from '@/types/layout';
 
-export function useBreadcrumbs() {
+export function useBreadcrumbs(): BreadcrumbItem[] {
   const pathname = usePathname();
   const t = useT();
 
@@ -37,7 +36,12 @@ export function useBreadcrumbs() {
       if (segKey) {
         try {
           return { title: t(segKey), link: path };
-        } catch {}
+        } catch {
+          return {
+            title: segment.charAt(0).toUpperCase() + segment.slice(1),
+            link: path
+          };
+        }
       }
 
       return {

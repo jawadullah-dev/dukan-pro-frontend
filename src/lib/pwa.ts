@@ -6,12 +6,16 @@ export async function clearPwaCaches(): Promise<void> {
       const keys = await caches.keys();
       await Promise.all(keys.map((key) => caches.delete(key)));
     }
-  } catch {}
+  } catch {
+    return;
+  }
 
   try {
     const reg = await navigator.serviceWorker?.getRegistration();
     reg?.active?.postMessage({ type: 'CLEAR_RUNTIME_CACHES' });
-  } catch {}
+  } catch {
+    return;
+  }
 }
 
 export function isStandaloneDisplay(): boolean {

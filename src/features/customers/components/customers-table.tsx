@@ -1,7 +1,6 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,7 +13,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
@@ -68,7 +66,12 @@ function CustomerCellAction({ data }: CustomerCellActionProps) {
   });
 
   return (
-    <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
+    <div
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
+      role='presentation'
+      data-slot='action-cell'
+    >
       <AlertModal
         isOpen={archiveOpen}
         onClose={() => setArchiveOpen(false)}
@@ -138,10 +141,7 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.name')} />,
     meta: {
       label: 'table.col.name',
       placeholderKey: 'search.customers' as const,
@@ -159,10 +159,7 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
     id: 'phone',
     accessorKey: 'phone',
     size: 160,
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.phone')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.phone')} />,
     meta: { label: 'table.col.phone', type: 'phone', priority: 2, mobile: 'subtitle' },
     enableSorting: true,
     cell: ({ row }) => row.original.phone || '—'
@@ -171,12 +168,9 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
     id: 'openingBalance',
     accessorKey: 'openingBalance',
     size: 180,
-    header: ({ column }) => {
-      const t = useT();
-      return (
-        <DataTableColumnHeader column={column} title={t('dukaan.party.customerOpeningBalance')} />
-      );
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={t('dukaan.party.customerOpeningBalance')} />
+    ),
     meta: {
       label: 'dukaan.party.customerOpeningBalance',
       type: 'money',
@@ -190,10 +184,7 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
     id: 'createdAt',
     accessorKey: 'createdAt',
     size: 140,
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.date')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
     meta: {
       label: 'table.col.date',
       type: 'date',
@@ -212,10 +203,7 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
     id: 'isActive',
     accessorKey: 'isActive',
     size: 110,
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.status')} />,
     meta: {
       label: 'table.col.status',
       variant: 'select',
@@ -239,26 +227,20 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
     },
     enableColumnFilter: true,
     enableSorting: true,
-    cell: ({ row }) => {
-      const t = useT();
-      return (
-        <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-          {row.original.isActive ? t('status.active') : t('status.inactive')}
-        </Badge>
-      );
-    }
+    cell: ({ row }) => (
+      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
+        {row.original.isActive ? t('status.active') : t('status.inactive')}
+      </Badge>
+    )
   },
   {
     id: 'actions',
     size: 72,
-    header: () => {
-      const t = useT();
-      return (
-        <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
-          {t('table.actions')}
-        </span>
-      );
-    },
+    header: () => (
+      <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
+        {t('table.actions')}
+      </span>
+    ),
     enableSorting: false,
     enableHiding: false,
     meta: { mobile: 'hidden' },

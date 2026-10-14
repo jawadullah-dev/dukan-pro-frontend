@@ -43,6 +43,7 @@ const CHECKS = [
   { id: 'tenancy',            cmd: ['node', 'scripts/code/check-tenancy.cjs'] },
   { id: 'financial-safety',   cmd: ['node', 'scripts/code/check-financial-safety.cjs'] },
   { id: 'error-boundaries',   cmd: ['node', 'scripts/code/check-error-boundaries.cjs'] },
+  { id: 'catch-handling',     cmd: ['node', 'scripts/code/check-catch.cjs'] },
   { id: 'mutation-hooks',     cmd: ['node', 'scripts/code/check-mutation-hooks.cjs'] },
   { id: 'list-tables',        cmd: ['node', 'scripts/check-list-tables.mjs'] },
   { id: 'duplicates',         cmd: ['npx', '--yes', 'jscpd', '--config', '.jscpd.json'] },

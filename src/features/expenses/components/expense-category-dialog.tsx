@@ -52,7 +52,11 @@ function ExpenseCategoryDialogBody({
           if (found) {
             onCategoryCreated(found);
           }
-        } catch {}
+        } catch (lookupErr) {
+          toast.error(
+            lookupErr instanceof Error ? lookupErr.message : t('expenses.categoryCreateFailed')
+          );
+        }
       }
 
       onOpenChange(false);

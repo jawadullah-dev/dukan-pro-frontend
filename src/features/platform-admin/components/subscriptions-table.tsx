@@ -16,17 +16,16 @@ import type { PlatformSubscription } from '../api/types';
 import { platformSubscriptionsQueryOptions } from '../api/queries';
 import { PLATFORM_PLAN_OPTIONS, PLATFORM_STATUS_OPTIONS } from '../constants/filters';
 import { ShopStatusBadge } from './shop-status-badge';
-import { useT } from '@/i18n/use-t';
+import { t as staticT } from '@/i18n/static-t';
 import { Icons } from '@/components/icons';
 
 const columns: ColumnDef<PlatformSubscription>[] = [
   {
     id: 'shop_name',
     accessorKey: 'shop_name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('platform.shop')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('platform.shop')} />
+    ),
     meta: {
       label: 'platform.shop',
       placeholder: 'platform.searchSubscriptions',
@@ -41,10 +40,9 @@ const columns: ColumnDef<PlatformSubscription>[] = [
   {
     id: 'plan',
     accessorKey: 'plan',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('platform.plan')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('platform.plan')} />
+    ),
     cell: ({ row }) => <span className='capitalize'>{row.original.plan.toLowerCase()}</span>,
     meta: {
       label: 'platform.all',
@@ -58,10 +56,9 @@ const columns: ColumnDef<PlatformSubscription>[] = [
   {
     id: 'status',
     accessorKey: 'status',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('table.col.status')} />
+    ),
     cell: ({ row }) => <ShopStatusBadge status={row.original.status} />,
     meta: {
       label: 'platform.allStatuses',
@@ -75,20 +72,18 @@ const columns: ColumnDef<PlatformSubscription>[] = [
   {
     id: 'next_due_at',
     accessorKey: 'next_due_at',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('platform.nextDue')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('platform.nextDue')} />
+    ),
     cell: ({ row }) => row.original.next_due_at ?? '—',
     meta: { label: 'platform.nextDue', type: 'date', priority: 2 }
   },
   {
     id: 'amount_paisa',
     accessorKey: 'amount_paisa',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('platform.amount')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('platform.amount')} />
+    ),
     cell: ({ row }) =>
       row.original.amount_paisa > 0 ? formatPkr(row.original.amount_paisa) : 'Rs 0',
     meta: {
@@ -101,17 +96,14 @@ const columns: ColumnDef<PlatformSubscription>[] = [
   {
     id: 'actions',
     meta: { mobile: 'hidden' },
-    cell: () => {
-      const t = useT();
-      return (
-        <RowActionsMenu
-          actions={[
-            { label: t('platform.assignPlan'), onClick: () => {} },
-            { label: t('platform.viewShop'), href: '/dashboard/platform/shops' }
-          ]}
-        />
-      );
-    },
+    cell: () => (
+      <RowActionsMenu
+        actions={[
+          { label: staticT('platform.assignPlan'), onClick: () => {} },
+          { label: staticT('platform.viewShop'), href: '/dashboard/platform/shops' }
+        ]}
+      />
+    ),
     enableSorting: false
   }
 ];
@@ -130,24 +122,21 @@ const subscriptionDetail: DetailConfig<PlatformSubscription> = {
   title: (row) => row.shop_name,
   badge: (row) => ({ label: row.status, status: row.status }),
   value: (row) => (row.amount_paisa > 0 ? formatPkr(row.amount_paisa) : 'Rs 0'),
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('platform.subscription'),
-        fields: [
-          { label: t('platform.shop'), value: row.shop_name },
-          { label: t('platform.plan'), value: formatLabel(row.plan) },
-          { label: t('table.col.status'), value: <ShopStatusBadge status={row.status} /> },
-          { label: t('platform.nextDue'), value: row.next_due_at ?? '—' },
-          {
-            label: t('platform.amount'),
-            value: row.amount_paisa > 0 ? formatPkr(row.amount_paisa) : 'Rs 0'
-          }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: staticT('platform.subscription'),
+      fields: [
+        { label: staticT('platform.shop'), value: row.shop_name },
+        { label: staticT('platform.plan'), value: formatLabel(row.plan) },
+        { label: staticT('table.col.status'), value: <ShopStatusBadge status={row.status} /> },
+        { label: staticT('platform.nextDue'), value: row.next_due_at ?? '—' },
+        {
+          label: staticT('platform.amount'),
+          value: row.amount_paisa > 0 ? formatPkr(row.amount_paisa) : 'Rs 0'
+        }
+      ]
+    }
+  ]
 };
 
 export function PlatformSubscriptionsTable() {

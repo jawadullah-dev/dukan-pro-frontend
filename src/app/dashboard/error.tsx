@@ -28,7 +28,9 @@ export default function DashboardError({ error, reset }: DashboardErrorProps) {
           window.location.reload();
           return;
         }
-      } catch {}
+      } catch (storageErr) {
+        Sentry.captureException(storageErr);
+      }
     }
   }, [error]);
 

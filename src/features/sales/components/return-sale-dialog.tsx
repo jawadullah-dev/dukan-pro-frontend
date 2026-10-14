@@ -34,9 +34,7 @@ import { createReturnMutation, previewReturnMutation } from '../api/mutations';
 export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: ReturnSaleDialogProps) {
   const qc = useQueryClient();
   const t = useT();
-  const today = new Date().toISOString().split('T')[0];
-
-  const [returnDate, setReturnDate] = useState(today);
+  const [returnDate, setReturnDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [reason, setReason] = useState('');
   const [notes, setNotes] = useState('');
   const [refundPkr, setRefundPkr] = useState<number>(0);

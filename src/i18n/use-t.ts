@@ -23,7 +23,9 @@ export function translateMaybe(keyOrText: string, t?: ReturnType<typeof useTrans
           if (translated != null && translated !== commonKey) return String(translated);
         }
       }
-    } catch {}
+    } catch {
+      return staticT(keyOrText) || keyOrText;
+    }
   }
 
   const fallback = staticT(keyOrText);

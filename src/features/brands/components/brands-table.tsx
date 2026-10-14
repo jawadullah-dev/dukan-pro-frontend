@@ -1,7 +1,6 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -25,11 +24,10 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { brandsQueryOptions, brandKeys } from '../api/queries';
-import { deleteBrand, updateBrand, createBrand } from '../api/service';
+import { deleteBrand } from '../api/service';
 import type { BrandDTO } from '@/lib/api/types';
 import type { BrandCellActionProps, BrandsTableProps } from '@/types';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
@@ -87,10 +85,7 @@ const brandColumns: ColumnDef<BrandDTO>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.name')} />,
     meta: {
       label: 'table.col.name',
       placeholderKey: 'search.brands' as const,
@@ -105,19 +100,13 @@ const brandColumns: ColumnDef<BrandDTO>[] = [
   {
     id: 'isActive',
     accessorKey: 'isActive',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.status')} />,
     meta: { label: 'table.col.status', type: 'boolean', priority: 2 },
-    cell: ({ row }) => {
-      const t = useT();
-      return (
-        <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-          {row.original.isActive ? t('status.active') : t('status.inactive')}
-        </Badge>
-      );
-    }
+    cell: ({ row }) => (
+      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
+        {row.original.isActive ? t('status.active') : t('status.inactive')}
+      </Badge>
+    )
   },
   {
     id: 'actions',

@@ -124,7 +124,6 @@ export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
   const router = useRouter();
   const t = useT();
   const [clientRequestId] = useState(() => createClientRequestId());
-  const today = new Date().toISOString().split('T')[0];
 
   const save = useMutation({
     ...createSaleMutation,
@@ -162,7 +161,7 @@ export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
 
       const payload: CreateSaleInput = {
         clientRequestId,
-        saleDate: today,
+        saleDate: new Date().toISOString().split('T')[0],
         customerId: value.customer_id === '__walkin__' ? undefined : value.customer_id,
         items,
         discount: toPaisa(Number(value.discount) || 0),

@@ -13,12 +13,12 @@ export function BarGraphSkeleton() {
       </CardHeader>
       <CardContent>
         <div className='flex aspect-auto h-[280px] w-full items-end justify-around gap-2 pt-8'>
-          {Array.from({ length: 12 }).map((_, i) => (
+          {[45, 65, 30, 80, 55, 70, 40, 90, 60, 75, 50, 85].map((height, i) => (
             <Skeleton
               key={i}
               className='w-full rounded-t-sm'
               style={{
-                height: `${Math.max(20, Math.random() * 100)}%`
+                height: `${height}%`
               }}
             />
           ))}

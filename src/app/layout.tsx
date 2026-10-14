@@ -83,7 +83,9 @@ export async function generateMetadata(): Promise<Metadata> {
     try {
       const t = await getTranslations('Metadata');
       defaultTitle = t('title', { appName: APP_NAME });
-    } catch {}
+    } catch {
+      defaultTitle = APP_NAME;
+    }
 
     const alternates: Metadata['alternates'] = {
       canonical: `/${locale}`,

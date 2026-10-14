@@ -1,7 +1,6 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useQueryState, parseAsString } from 'nuqs';
@@ -64,7 +63,12 @@ function SupplierCellAction({ data }: SupplierCellActionProps) {
   });
 
   return (
-    <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
+    <div
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}
+      role='presentation'
+      data-slot='action-cell'
+    >
       <AlertModal
         isOpen={deactivateOpen}
         onClose={() => setDeactivateOpen(false)}
@@ -124,10 +128,7 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.name')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.name')} />,
     meta: {
       label: 'table.col.name',
       placeholderKey: 'search.suppliers' as const,
@@ -140,28 +141,22 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
     },
     enableColumnFilter: true,
     enableSorting: true,
-    cell: ({ row }) => {
-      const t = useT();
-      return (
-        <div className='flex items-center gap-2'>
-          <span className='font-medium'>{row.original.name}</span>
-          {row.original.isSystem && (
-            <Badge variant='outline' className='text-[10px] uppercase font-semibold'>
-              {t('common.system')}
-            </Badge>
-          )}
-        </div>
-      );
-    }
+    cell: ({ row }) => (
+      <div className='flex items-center gap-2'>
+        <span className='font-medium'>{row.original.name}</span>
+        {row.original.isSystem && (
+          <Badge variant='outline' className='text-[10px] uppercase font-semibold'>
+            {t('common.system')}
+          </Badge>
+        )}
+      </div>
+    )
   },
   {
     id: 'phone',
     accessorKey: 'phone',
     size: 160,
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.phone')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.phone')} />,
     meta: { label: 'table.col.phone', type: 'phone', priority: 2, mobile: 'subtitle' },
     enableSorting: true,
     cell: ({ row }) => row.original.phone || '—'
@@ -170,12 +165,9 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
     id: 'openingBalance',
     accessorKey: 'openingBalance',
     size: 180,
-    header: ({ column }) => {
-      const t = useT();
-      return (
-        <DataTableColumnHeader column={column} title={t('dukaan.party.supplierOpeningBalance')} />
-      );
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={t('dukaan.party.supplierOpeningBalance')} />
+    ),
     meta: {
       label: 'dukaan.party.supplierOpeningBalance',
       type: 'money',
@@ -189,10 +181,7 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
     id: 'createdAt',
     accessorKey: 'createdAt',
     size: 140,
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.date')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
     meta: {
       label: 'table.col.date',
       type: 'date',
@@ -211,10 +200,7 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
     id: 'isActive',
     accessorKey: 'isActive',
     size: 110,
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.status')} />,
     meta: {
       label: 'table.col.status',
       variant: 'select',
@@ -238,26 +224,20 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
     },
     enableColumnFilter: true,
     enableSorting: false,
-    cell: ({ row }) => {
-      const t = useT();
-      return (
-        <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-          {row.original.isActive ? t('status.active') : t('status.inactive')}
-        </Badge>
-      );
-    }
+    cell: ({ row }) => (
+      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
+        {row.original.isActive ? t('status.active') : t('status.inactive')}
+      </Badge>
+    )
   },
   {
     id: 'actions',
     size: 72,
-    header: () => {
-      const t = useT();
-      return (
-        <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
-          {t('table.actions')}
-        </span>
-      );
-    },
+    header: () => (
+      <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
+        {t('table.actions')}
+      </span>
+    ),
     enableSorting: false,
     enableHiding: false,
     meta: { mobile: 'hidden' },

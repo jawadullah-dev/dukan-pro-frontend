@@ -25,10 +25,9 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'name',
     accessorKey: 'name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.shopName')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('table.shopName')} />
+    ),
     cell: ({ row }) => (
       <div className='min-w-40'>
         <p className='font-medium'>{row.original.name}</p>
@@ -49,10 +48,9 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'owner_name',
     accessorKey: 'owner_name',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.ownerName')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('table.ownerName')} />
+    ),
     cell: ({ row }) => (
       <div>
         <p className='font-medium'>{row.original.owner_name}</p>
@@ -64,10 +62,7 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'city',
     accessorKey: 'city',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.city')} />;
-    },
+    header: ({ column }) => <DataTableColumnHeader column={column} title={staticT('table.city')} />,
     cell: ({ row }) => <span className='font-medium'>{row.original.city}</span>,
     meta: {
       label: 'platform.allCities',
@@ -81,10 +76,9 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'status',
     accessorKey: 'status',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.col.status')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('table.col.status')} />
+    ),
     cell: ({ row }) => <ShopStatusBadge status={row.original.status} />,
     meta: {
       label: 'platform.allStatuses',
@@ -98,20 +92,18 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'trial_ends_at',
     accessorKey: 'trial_ends_at',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.trialEnds')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('table.trialEnds')} />
+    ),
     cell: ({ row }) => row.original.trial_ends_at ?? '—',
     meta: { label: 'platform.trialEnds', type: 'date', priority: 3 }
   },
   {
     id: 'next_due_at',
     accessorKey: 'next_due_at',
-    header: ({ column }) => {
-      const t = useT();
-      return <DataTableColumnHeader column={column} title={t('table.nextDueDate')} />;
-    },
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title={staticT('table.nextDueDate')} />
+    ),
     cell: ({ row }) => row.original.next_due_at ?? '—',
     meta: {
       label: 'platform.nextDueDate',
@@ -123,20 +115,17 @@ const columns: ColumnDef<PlatformShop>[] = [
   {
     id: 'actions',
     meta: { mobile: 'hidden' },
-    cell: ({ row }) => {
-      const t = useT();
-      return (
-        <RowActionsMenu
-          actions={[
-            {
-              label: t('table.viewShop'),
-              href: `/dashboard/platform/shops?shop=${row.original.id}`
-            },
-            { label: t('nav.subscriptions'), href: '/dashboard/platform/subscriptions' }
-          ]}
-        />
-      );
-    },
+    cell: ({ row }) => (
+      <RowActionsMenu
+        actions={[
+          {
+            label: staticT('table.viewShop'),
+            href: `/dashboard/platform/shops?shop=${row.original.id}`
+          },
+          { label: staticT('nav.subscriptions'), href: '/dashboard/platform/subscriptions' }
+        ]}
+      />
+    ),
     enableSorting: false
   }
 ];
@@ -157,44 +146,41 @@ const shopDetail: DetailConfig<PlatformShop> = {
   title: (row) => row.name,
   badge: (row) => ({ label: row.status, status: row.status }),
   value: (row) => row.next_due_at ?? '—',
-  sections: (row) => {
-    const t = useT();
-    return [
-      {
-        title: t('platform.shop'),
-        fields: [
-          { label: t('table.col.name'), value: row.name },
-          { label: t('table.address'), value: row.address },
-          { label: t('table.city'), value: row.city },
-          { label: t('table.col.status'), value: <ShopStatusBadge status={row.status} /> }
-        ]
-      },
-      {
-        title: t('platform.owner'),
-        fields: [
-          { label: t('table.col.name'), value: row.owner_name },
-          {
-            label: t('table.col.phone'),
-            value: (
-              <a
-                className='text-primary underline-offset-2 hover:underline'
-                href={`tel:${row.owner_phone}`}
-              >
-                {row.owner_phone}
-              </a>
-            )
-          }
-        ]
-      },
-      {
-        title: t('table.billing'),
-        fields: [
-          { label: t('table.trialEndsLabel'), value: row.trial_ends_at ?? '—' },
-          { label: t('table.due'), value: row.next_due_at ?? '—' }
-        ]
-      }
-    ];
-  }
+  sections: (row) => [
+    {
+      title: staticT('platform.shop'),
+      fields: [
+        { label: staticT('table.col.name'), value: row.name },
+        { label: staticT('table.address'), value: row.address },
+        { label: staticT('table.city'), value: row.city },
+        { label: staticT('table.col.status'), value: <ShopStatusBadge status={row.status} /> }
+      ]
+    },
+    {
+      title: staticT('platform.owner'),
+      fields: [
+        { label: staticT('table.col.name'), value: row.owner_name },
+        {
+          label: staticT('table.col.phone'),
+          value: (
+            <a
+              className='text-primary underline-offset-2 hover:underline'
+              href={`tel:${row.owner_phone}`}
+            >
+              {row.owner_phone}
+            </a>
+          )
+        }
+      ]
+    },
+    {
+      title: staticT('table.billing'),
+      fields: [
+        { label: staticT('table.trialEndsLabel'), value: row.trial_ends_at ?? '—' },
+        { label: staticT('table.due'), value: row.next_due_at ?? '—' }
+      ]
+    }
+  ]
 };
 
 export function PlatformShopsTable() {

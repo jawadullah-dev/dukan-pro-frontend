@@ -28,7 +28,9 @@ export default function AppError({ error, reset }: AppErrorProps) {
           window.location.reload();
           return;
         }
-      } catch {}
+      } catch (storageErr) {
+        Sentry.captureException(storageErr);
+      }
     }
   }, [error]);
 

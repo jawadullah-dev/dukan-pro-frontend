@@ -30,18 +30,3 @@ export function OfflineBanner() {
     </div>
   );
 }
-
-function useIsOnline(): boolean {
-  const [online, setOnline] = React.useState(true);
-  React.useEffect(() => {
-    const sync = () => setOnline(navigator.onLine);
-    sync();
-    window.addEventListener('online', sync);
-    window.addEventListener('offline', sync);
-    return () => {
-      window.removeEventListener('online', sync);
-      window.removeEventListener('offline', sync);
-    };
-  }, []);
-  return online;
-}

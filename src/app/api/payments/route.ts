@@ -3,6 +3,12 @@ import { proxyToBackend } from '@/lib/api/proxy';
 import type { PaymentDTO, PaginatedListPayload } from '@/lib/api/types';
 import type { PaymentCreateBody } from '@/types/payment';
 
+function getPaymentMethod(item: PaymentDTO) {
+  const match = item.notes?.match(/\[Method:\s*([^\]]+)\]/i);
+  if (match && match[1]) return match[1].toLowerCase();
+  return (item.method || 'cash').toLowerCase();
+}
+
 export async function GET(request: NextRequest) {
   const sortBy = request.nextUrl.searchParams.get('sortBy');
   const sortOrder = request.nextUrl.searchParams.get('sortOrder');
@@ -33,14 +39,9 @@ export async function GET(request: NextRequest) {
           return sortOrder === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
         });
       } else if (sortBy === 'method') {
-        const getMethod = (item: PaymentDTO) => {
-          const match = item.notes?.match(/\[Method:\s*([^\]]+)\]/i);
-          if (match && match[1]) return match[1].toLowerCase();
-          return (item.method || 'cash').toLowerCase();
-        };
         items.sort((a: PaymentDTO, b: PaymentDTO) => {
-          const mA = getMethod(a);
-          const mB = getMethod(b);
+          const mA = getPaymentMethod(a);
+          const mB = getPaymentMethod(b);
           return sortOrder === 'asc' ? mA.localeCompare(mB) : mB.localeCompare(mA);
         });
       }

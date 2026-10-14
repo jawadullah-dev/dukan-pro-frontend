@@ -5,7 +5,6 @@ import { authConfig } from '@/auth.config';
 import {
   homePathForRole,
   loginPath,
-  platformAdminLoginPath,
   redirectForRole,
   shortcutPathForRole,
   extractLocale

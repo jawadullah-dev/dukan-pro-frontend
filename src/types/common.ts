@@ -71,10 +71,6 @@ export interface PwaShellProps {
   children: ReactNode;
 }
 
-export interface PwaUpdateInlineProps {
-  onReload: () => void;
-}
-
 export type ThemeContextType = {
   activeTheme: string;
   setActiveTheme: (theme: string) => void;

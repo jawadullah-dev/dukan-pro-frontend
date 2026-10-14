@@ -40,7 +40,9 @@ function getInitialAppearance() {
         };
       }
     }
-  } catch {}
+  } catch {
+    return DEFAULT_APPEARANCE;
+  }
   return DEFAULT_APPEARANCE;
 }
 

@@ -23,12 +23,12 @@ export default async function OfflinePage() {
       </div>
       <h1 className='text-xl font-semibold'>{title}</h1>
       <p className='text-muted-foreground max-w-sm text-sm'>{description}</p>
-      <a
+      <Link
         href='/'
         className='bg-primary text-primary-foreground inline-flex h-11 items-center justify-center rounded-md px-5 text-sm font-medium'
       >
         {tryAgain}
-      </a>
+      </Link>
       <Link
         href='/login'
         className='text-muted-foreground text-xs underline-offset-2 hover:underline'

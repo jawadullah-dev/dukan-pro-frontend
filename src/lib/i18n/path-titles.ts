@@ -1,4 +1,3 @@
-import { getTranslations } from 'next-intl/server';
 import { delocalize } from '@/lib/auth/routes';
 
 const PATH_TITLE_KEYS: Record<string, string> = {
@@ -41,11 +40,4 @@ export function pageTitleKeyFromPath(pathname: string): string | null {
     if (seg in PATH_TITLE_KEYS) return PATH_TITLE_KEYS[seg];
   }
   return 'pages.dashboard.title';
-}
-
-async function getTranslatedPageTitle(pathname: string): Promise<string | null> {
-  const key = pageTitleKeyFromPath(pathname);
-  if (!key) return null;
-  const t = await getTranslations();
-  return t(key);
 }

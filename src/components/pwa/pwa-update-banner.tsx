@@ -2,10 +2,8 @@
 
 import * as React from 'react';
 import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 import { env } from '@/config/env';
-import type { PwaUpdateInlineProps } from '@/types';
 
 export function PwaUpdateBanner() {
   const t = useTranslations();
@@ -73,19 +71,4 @@ export function PwaUpdateBanner() {
   }, [updateLabel, reloadLabel]);
 
   return null;
-}
-
-function PwaUpdateInline({ onReload }: PwaUpdateInlineProps) {
-  const t = useTranslations();
-  return (
-    <div
-      role='status'
-      className='bg-primary text-primary-foreground flex items-center justify-between gap-3 px-4 py-2 text-sm'
-    >
-      <span>{t('pwa.updateAvailable')}</span>
-      <Button type='button' size='sm' variant='secondary' onClick={onReload}>
-        {t('pwa.reload')}
-      </Button>
-    </div>
-  );
 }

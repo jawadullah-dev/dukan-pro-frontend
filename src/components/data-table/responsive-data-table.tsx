@@ -49,7 +49,9 @@ function getCachedTableRows(pathname: string): number | null {
           return parsed;
         }
       }
-    } catch {}
+    } catch {
+      return null;
+    }
   }
   return null;
 }
@@ -60,7 +62,9 @@ function setCachedTableRows(pathname: string, count: number) {
   if (typeof window !== 'undefined') {
     try {
       sessionStorage.setItem(`dukaan_table_rows_${pathname}`, String(count));
-    } catch {}
+    } catch {
+      routeRowCountCache[pathname] = count;
+    }
   }
 }
 

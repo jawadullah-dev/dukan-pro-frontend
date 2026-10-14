@@ -1,6 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import { SerwistProvider } from '@/components/pwa/serwist-provider';
 import { ThemeColorSync } from '@/components/pwa/theme-color-sync';
 import { PwaUpdateBanner } from '@/components/pwa/pwa-update-banner';

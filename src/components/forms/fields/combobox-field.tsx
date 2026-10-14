@@ -14,8 +14,9 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext, useFieldInvalid } from '@/lib/form-context';
 import { useT } from '@/i18n/use-t';
+import type { ComboboxFieldProps } from '@/types';
 
 export function ComboboxField({
   label,
@@ -25,12 +26,7 @@ export function ComboboxField({
   placeholder,
   searchPlaceholder,
   emptyMessage
-}: BaseFieldProps & {
-  options: { value: string; label: string; disabled?: boolean }[];
-  placeholder?: string;
-  searchPlaceholder?: string;
-  emptyMessage?: string;
-}) {
+}: ComboboxFieldProps) {
   const field = useFieldContext<string>();
   const isInvalid = useFieldInvalid();
   const t = useT();

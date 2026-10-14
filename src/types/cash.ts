@@ -61,6 +61,11 @@ export interface CreateOwnerWithdrawalInput {
   confirmOverdraft?: boolean;
 }
 
+export interface OverdraftPrompt {
+  shortfall?: number;
+  message?: string;
+}
+
 export interface CashOverdraftPrompt {
   confirmOverdraft: true;
   shortfall: number;

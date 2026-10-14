@@ -2,7 +2,8 @@
 
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Slider } from '@/components/ui/slider';
-import { useFieldContext, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext } from '@/lib/form-context';
+import type { SliderFieldProps } from '@/types';
 
 export function SliderField({
   label,
@@ -10,11 +11,7 @@ export function SliderField({
   min = 0,
   max = 100,
   step = 1
-}: Omit<BaseFieldProps, 'required'> & {
-  min?: number;
-  max?: number;
-  step?: number;
-}) {
+}: SliderFieldProps) {
   const field = useFieldContext<number>();
   const labelId = `${field.name}-label`;
 

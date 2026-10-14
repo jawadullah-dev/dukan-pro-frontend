@@ -24,6 +24,7 @@ import { expenseKeys } from '../api/queries';
 import { CategorySelectCombobox } from './category-select';
 import { AddCategoryDialog } from './add-category-dialog';
 import type { ExpenseCategoryDTO, RecordExpenseDialogProps } from '@/types/expense';
+import type { OverdraftPrompt } from '@/types';
 
 export function RecordExpenseDialog({
   open,
@@ -39,10 +40,7 @@ export function RecordExpenseDialog({
   const [expenseDate, setExpenseDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState('');
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);
-  const [overdraftPrompt, setOverdraftPrompt] = useState<{
-    shortfall: number;
-    message: string;
-  } | null>(null);
+  const [overdraftPrompt, setOverdraftPrompt] = useState<OverdraftPrompt | null>(null);
 
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
 

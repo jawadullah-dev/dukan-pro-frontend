@@ -5,10 +5,7 @@ import { useMemo } from 'react';
 import { useT } from '@/i18n/use-t';
 import { pageTitleKeyFromPath } from '@/lib/i18n/path-titles';
 
-type BreadcrumbItem = {
-  title: string;
-  link: string;
-};
+import type { BreadcrumbItem } from '@/types/layout';
 
 export function useBreadcrumbs() {
   const pathname = usePathname();

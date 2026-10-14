@@ -22,17 +22,33 @@ function isTypeFile(relPath) {
   );
 }
 
-function checkTypeAnnotation(node, relPath) {
-  if (!node || !node.typeAnnotation) return;
-  const tsType = node.typeAnnotation.typeAnnotation || node.typeAnnotation;
-  if (tsType && tsType.type === "TSTypeLiteral") {
-    if (tsType.members && tsType.members.length > 0) {
-      r.addViolation(
-        relPath,
-        tsType.loc ? tsType.loc.start.line : 0,
-        "Forbidden inline object type literal in parameter or prop — define and import a named type from src/types/ or a types file"
-      );
-    }
+function hasInlineObjectType(tsType) {
+  if (!tsType) return false;
+  if (tsType.type === "TSTypeLiteral" && tsType.members && tsType.members.length > 0) {
+    return true;
+  }
+  if (tsType.type === "TSArrayType") {
+    return hasInlineObjectType(tsType.elementType);
+  }
+  if (tsType.type === "TSUnionType" || tsType.type === "TSIntersectionType") {
+    return tsType.types.some(hasInlineObjectType);
+  }
+  if (tsType.type === "TSOptionalType") {
+    return hasInlineObjectType(tsType.typeAnnotation);
+  }
+  return false;
+}
+
+function checkType(node, relPath, context) {
+  if (!node) return;
+  const tsType = node.typeAnnotation || node;
+  const target = tsType.typeAnnotation || tsType;
+  if (hasInlineObjectType(target)) {
+    r.addViolation(
+      relPath,
+      target.loc ? target.loc.start.line : 0,
+      `Forbidden inline object type literal in ${context} — define and import a named type from src/types/ or a types file`
+    );
   }
 }
 
@@ -41,7 +57,15 @@ if (fs.existsSync(srcRoot)) {
     if (!/\.(ts|tsx)$/.test(absPath)) return;
 
     const relPath = relPathRaw.replace(/\\/g, "/");
-    if (relPath.includes("components/ui/")) return;
+    if (
+      relPath.includes("components/ui/") ||
+      relPath.endsWith(".d.ts") ||
+      relPath.includes("sw.ts") ||
+      relPath.includes("sw-network-retry") ||
+      relPath.includes("constants/mock-")
+    ) {
+      return;
+    }
 
     const code = fs.readFileSync(absPath, "utf8");
     let ast;
@@ -52,55 +76,76 @@ if (fs.existsSync(srcRoot)) {
       return;
     }
 
-    const isComponentFile =
-      relPath.includes("components/") ||
-      (relPath.includes("app/") && relPath.endsWith(".tsx"));
+    const isCodeFile = !isTypeFile(relPath);
 
     traverse(ast, {
       Function(p) {
         if (p.node.params) {
           p.node.params.forEach((param) => {
-            checkTypeAnnotation(param, relPath);
+            checkType(param.typeAnnotation, relPath, "parameter or prop");
           });
+        }
+        if (p.node.returnType) {
+          checkType(p.node.returnType, relPath, "function return type");
         }
       },
 
       TSFunctionType(p) {
         if (p.node.parameters) {
           p.node.parameters.forEach((param) => {
-            checkTypeAnnotation(param, relPath);
+            checkType(param.typeAnnotation, relPath, "function signature parameter");
           });
+        }
+        if (p.node.typeAnnotation) {
+          checkType(p.node.typeAnnotation, relPath, "function signature return type");
         }
       },
 
       TSMethodSignature(p) {
         if (p.node.parameters) {
           p.node.parameters.forEach((param) => {
-            checkTypeAnnotation(param, relPath);
+            checkType(param.typeAnnotation, relPath, "method parameter");
+          });
+        }
+        if (p.node.typeAnnotation) {
+          checkType(p.node.typeAnnotation, relPath, "method return type");
+        }
+      },
+
+      VariableDeclarator(p) {
+        if (p.node.id && p.node.id.typeAnnotation) {
+          checkType(p.node.id.typeAnnotation, relPath, "variable type annotation");
+        }
+      },
+
+      TSTypeParameterInstantiation(p) {
+        if (isCodeFile && p.node.params) {
+          p.node.params.forEach((param) => {
+            checkType(param, relPath, "generic type parameter");
           });
         }
       },
 
       TSInterfaceDeclaration(p) {
-        if (isComponentFile && !isTypeFile(relPath)) {
+        if (isCodeFile) {
           const name = p.node.id ? p.node.id.name : "unnamed";
           r.addViolation(
             relPath,
             p.node.loc ? p.node.loc.start.line : 0,
-            `Forbidden interface declaration "${name}" in component file — define and import from src/types/ or feature types.ts/types folder`
+            `Forbidden interface declaration "${name}" outside type files — define and import from src/types/ or feature types.ts/types folder`
           );
         }
       },
 
       TSTypeAliasDeclaration(p) {
-        if (isComponentFile && !isTypeFile(relPath)) {
+        if (isCodeFile) {
           const name = p.node.id ? p.node.id.name : "unnamed";
-          // Allow internal utility helpers or PageProps on route pages if needed, but flag component props
-          if (name !== "PageProps") {
+          const isComponent = relPath.endsWith(".tsx");
+          if (isComponent || hasInlineObjectType(p.node.typeAnnotation)) {
             r.addViolation(
               relPath,
               p.node.loc ? p.node.loc.start.line : 0,
-              `Forbidden type alias "${name}" in component file — define and import from src/types/ or feature types.ts/types folder`
+              `Forbidden type alias "${name}" in code file — define and import from src/types/ or feature types.ts/types folder`
             );
           }
         }

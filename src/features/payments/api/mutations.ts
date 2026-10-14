@@ -1,6 +1,7 @@
 import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
-import type { CreatePaymentInput, CancelPaymentInput } from '@/lib/api/types';
+import type { CreatePaymentInput } from '@/lib/api/types';
+import type { CancelPaymentMutationVariables } from '@/types';
 import { paymentKeys } from './queries';
 import { cancelPayment, createPayment } from './service';
 import { customerKeys } from '@/features/customers/api/queries';
@@ -19,11 +20,6 @@ export const createPaymentMutation = mutationOptions({
     invalidatePaymentDependencies();
   }
 });
-
-export interface CancelPaymentMutationVariables {
-  id: string;
-  input: CancelPaymentInput;
-}
 
 export const cancelPaymentMutation = mutationOptions({
   mutationFn: ({ id, input }: CancelPaymentMutationVariables) => cancelPayment(id, input),

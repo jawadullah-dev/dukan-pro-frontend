@@ -12,6 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
+import type { CustomHatchedBarProps } from '@/types/overview';
 
 const chartData = [
   { month: 'January', desktop: 186, mobile: 80 },
@@ -91,12 +92,7 @@ export function BarGraph() {
   );
 }
 
-const CustomHatchedBar = (
-  props: React.SVGProps<SVGRectElement> & {
-    dataKey?: string;
-    isHatched?: boolean;
-  }
-) => {
+const CustomHatchedBar = (props: CustomHatchedBarProps) => {
   const { fill, x, y, width, height, dataKey } = props;
 
   const isHatched = props.isHatched ?? true;

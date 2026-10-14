@@ -9,8 +9,6 @@ if (process.env.NEXT_PUBLIC_SENTRY_DISABLED !== 'true' && process.env.NEXT_PUBLI
   });
 }
 
-interface SentryClientModule {
-  captureRouterTransitionStart?: (href: string, navigationType: string) => void;
-}
+import type { SentryClientModule } from '@/types/common';
 
 export const onRouterTransitionStart = (Sentry as SentryClientModule).captureRouterTransitionStart;

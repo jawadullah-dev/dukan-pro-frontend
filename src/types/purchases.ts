@@ -1,6 +1,31 @@
-import type { ReactNode } from 'react';
-import type { PurchaseDTO } from '@/lib/api/types';
+import type { CancelPurchaseInput, PurchaseDTO } from '@/lib/api/types';
 import type { Product } from '@/lib/dukaan/types';
+
+export interface PurchasesListFilters {
+  page?: number;
+  pageSize?: number;
+  limit?: number;
+  search?: string;
+  supplierId?: string;
+  status?: 'ACTIVE' | 'CANCELLED';
+  isOpeningStock?: boolean;
+  from?: string;
+  to?: string;
+  sortBy?: 'purchaseDate' | 'purchaseNo' | 'totalAmount' | 'status' | 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CancelPurchaseMutationVariables {
+  id: string;
+  input: CancelPurchaseInput;
+}
+
+export interface CancelPurchaseResult {
+  success?: boolean;
+  message?: string;
+  confirmOverdraft?: boolean;
+  shortfall?: number;
+}
 
 export interface CancelPurchaseDialogProps {
   purchase: PurchaseDTO;

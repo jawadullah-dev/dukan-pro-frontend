@@ -6,22 +6,7 @@ import type {
   CancelPaymentInput,
   CancelImpactDTO
 } from '@/lib/api/types';
-
-export interface PaymentsListFilters {
-  page?: number;
-  pageSize?: number;
-  limit?: number;
-  search?: string;
-  customerId?: string;
-  saleId?: string;
-  receiptGroupId?: string;
-  status?: 'ACTIVE' | 'CANCELLED';
-  from?: string;
-  to?: string;
-  sortBy?: 'paymentDate' | 'amount' | 'createdAt' | 'updatedAt' | 'customerName' | 'method';
-  sortOrder?: 'asc' | 'desc';
-}
-
+import type { PaymentsListFilters, CancelPaymentResult } from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
 
 export async function listPayments(
@@ -76,13 +61,8 @@ export async function getPaymentCancelImpact(id: string, token?: string): Promis
 export async function cancelPayment(
   id: string,
   input: CancelPaymentInput
-): Promise<{ success: boolean; confirmOverdraft?: boolean; shortfall?: number; message?: string }> {
-  return appFetch<{
-    success: boolean;
-    confirmOverdraft?: boolean;
-    shortfall?: number;
-    message?: string;
-  }>(`/api/payments/${id}/cancel`, {
+): Promise<CancelPaymentResult> {
+  return appFetch<CancelPaymentResult>(`/api/payments/${id}/cancel`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)

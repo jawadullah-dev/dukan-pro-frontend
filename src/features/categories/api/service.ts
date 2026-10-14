@@ -1,12 +1,7 @@
 import { apiRequest } from '@/lib/api/client';
 import type { PaginatedResponse, CategoryDTO } from '@/lib/api/types';
+import type { CategoryListFilters } from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
-
-export interface CategoryListFilters {
-  page?: number;
-  pageSize?: number;
-  search?: string;
-}
 
 export async function listCategories(
   filters: CategoryListFilters = {},

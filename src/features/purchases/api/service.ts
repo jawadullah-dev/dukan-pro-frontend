@@ -9,19 +9,7 @@ import type {
   PurchaseDTO
 } from '@/lib/api/types';
 
-export interface PurchasesListFilters {
-  page?: number;
-  pageSize?: number;
-  limit?: number;
-  search?: string;
-  supplierId?: string;
-  status?: 'ACTIVE' | 'CANCELLED';
-  isOpeningStock?: boolean;
-  from?: string;
-  to?: string;
-  sortBy?: 'purchaseDate' | 'purchaseNo' | 'totalAmount' | 'status' | 'createdAt' | 'updatedAt';
-  sortOrder?: 'asc' | 'desc';
-}
+import type { PurchasesListFilters, CancelPurchaseResult } from '@/types';
 
 export async function listPurchases(
   filters: PurchasesListFilters = {},
@@ -77,10 +65,10 @@ export async function cancelPurchase(
   id: string,
   inputOrReason: CancelPurchaseInput | string,
   confirmOverdraft?: boolean
-): Promise<{ success?: boolean; message?: string }> {
+): Promise<CancelPurchaseResult> {
   const input: CancelPurchaseInput =
     typeof inputOrReason === 'string' ? { reason: inputOrReason, confirmOverdraft } : inputOrReason;
-  return appFetch<{ success?: boolean; message?: string }>(`/api/purchases/${id}/cancel`, {
+  return appFetch<CancelPurchaseResult>(`/api/purchases/${id}/cancel`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)

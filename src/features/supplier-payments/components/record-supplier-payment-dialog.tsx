@@ -23,6 +23,7 @@ import type {
   UnpaidPurchaseDTO,
   RecordSupplierPaymentDialogProps
 } from '@/types/supplier-payment';
+import type { OverdraftPrompt } from '@/types';
 import { createSupplierPaymentMutation } from '../api/mutations';
 import { supplierPaymentKeys, supplierPayableQueryOptions } from '../api/queries';
 import { SupplierSelectCombobox } from './supplier-select';
@@ -45,10 +46,7 @@ export function RecordSupplierPaymentDialog({
   const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);
-  const [overdraftPrompt, setOverdraftPrompt] = useState<{
-    shortfall: number;
-    message: string;
-  } | null>(null);
+  const [overdraftPrompt, setOverdraftPrompt] = useState<OverdraftPrompt | null>(null);
 
   const { data: payableData, isLoading: payableLoading } = useQuery({
     ...supplierPayableQueryOptions(supplierId),

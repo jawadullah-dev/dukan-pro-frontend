@@ -6,20 +6,9 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { dashboardQueryOptions, sessionQueryOptions } from '../api/queries';
 import { useT } from '@/i18n/use-t';
-import type { MessageKey } from '@/i18n/messages/en';
+import type { DashboardKpiLink } from '@/types/dukaan';
 
-const KPI_LINKS: {
-  key:
-    | 'today_sales'
-    | 'today_net_profit'
-    | 'customer_udhar'
-    | 'supplier_payable'
-    | 'today_expenses'
-    | 'low_stock_count'
-    | 'cash_position';
-  labelKey: MessageKey;
-  href: string;
-}[] = [
+const KPI_LINKS: DashboardKpiLink[] = [
   { key: 'today_sales', labelKey: 'dashboard.todaySales', href: '/dashboard/sales' },
   { key: 'today_net_profit', labelKey: 'dashboard.todayNetProfit', href: '/dashboard/overview' },
   { key: 'customer_udhar', labelKey: 'dashboard.customerUdhar', href: '/dashboard/customers' },

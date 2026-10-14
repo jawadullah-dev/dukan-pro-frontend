@@ -11,7 +11,8 @@ import {
   FieldSet
 } from '@/components/ui/field';
 import { cn } from '@/lib/utils';
-import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext, useFieldInvalid } from '@/lib/form-context';
+import type { CheckboxGroupFieldProps } from '@/types';
 
 export function CheckboxGroupField({
   label,
@@ -19,11 +20,7 @@ export function CheckboxGroupField({
   required,
   options,
   className
-}: BaseFieldProps & {
-  options: { value: string; label: string; disabled?: boolean }[];
-
-  className?: string;
-}) {
+}: CheckboxGroupFieldProps) {
   const field = useFieldContext<string[]>();
   const isInvalid = useFieldInvalid();
 

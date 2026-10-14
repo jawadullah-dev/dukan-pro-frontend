@@ -1,17 +1,7 @@
 import { DEMO_SHOP_ID, DEMO_SHOP_NAME, type AuthAccountRole } from '@/lib/auth/accounts';
 import type { MockSession } from '@/lib/dukaan/session';
 
-export interface SessionUserPayload {
-  id: string;
-  name?: string | null;
-  role: AuthAccountRole;
-  shopId: string | null;
-  shopName: string | null;
-}
-
-export interface DukaanSessionSource {
-  user: SessionUserPayload;
-}
+import type { SessionUserPayload, DukaanSessionSource } from '@/types/auth';
 
 export function toDukaanSession(session: DukaanSessionSource): MockSession {
   const isPlatform = session.user.role === 'SUPER_ADMIN';

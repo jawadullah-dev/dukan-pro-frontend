@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { Row } from '@tanstack/react-table';
-import type { PaymentDTO, CustomerDTO } from '@/lib/api/types';
+import type { PaymentDTO, CustomerDTO, CancelPaymentInput } from '@/lib/api/types';
 
 export type PaymentMethodOption =
   | 'CASH'
@@ -41,4 +41,37 @@ export interface RecordPaymentDialogProps {
   onOpenChange: (open: boolean) => void;
   defaultCustomerId?: string;
   onSuccess?: () => void;
+}
+
+export interface PaymentsListFilters {
+  page?: number;
+  pageSize?: number;
+  limit?: number;
+  search?: string;
+  customerId?: string;
+  saleId?: string;
+  receiptGroupId?: string;
+  status?: 'ACTIVE' | 'CANCELLED';
+  from?: string;
+  to?: string;
+  sortBy?: 'paymentDate' | 'amount' | 'createdAt' | 'updatedAt' | 'customerName' | 'method';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CancelPaymentMutationVariables {
+  id: string;
+  input: CancelPaymentInput;
+}
+
+export interface CancelPaymentResult {
+  success: boolean;
+  confirmOverdraft?: boolean;
+  shortfall?: number;
+  message?: string;
+}
+
+export interface PaymentCreateBody {
+  notes?: string;
+  method?: string;
+  [key: string]: unknown;
 }

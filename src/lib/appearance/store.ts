@@ -4,22 +4,21 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { applyAppearancePrefs } from './apply';
 
-export type AppearanceDensity = 'comfortable' | 'compact';
-export type AppearanceRadius = 'sharp' | 'medium' | 'round';
-export type AppearanceAccent = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'teal';
-export type AppearanceDigits = 'western' | 'eastern';
+import type {
+  AppearanceDensity,
+  AppearanceRadius,
+  AppearanceAccent,
+  AppearanceDigits,
+  AppearanceState
+} from '@/types/layout';
 
-export interface AppearanceState {
-  density: AppearanceDensity;
-  radius: AppearanceRadius;
-  accent: AppearanceAccent;
-  digits: AppearanceDigits;
-  setDensity: (density: AppearanceDensity) => void;
-  setRadius: (radius: AppearanceRadius) => void;
-  setAccent: (accent: AppearanceAccent) => void;
-  setDigits: (digits: AppearanceDigits) => void;
-  resetAll: () => void;
-}
+export type {
+  AppearanceDensity,
+  AppearanceRadius,
+  AppearanceAccent,
+  AppearanceDigits,
+  AppearanceState
+};
 
 export const DEFAULT_APPEARANCE = {
   density: 'comfortable' as AppearanceDensity,

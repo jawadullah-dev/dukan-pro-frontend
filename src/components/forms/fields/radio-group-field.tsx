@@ -9,16 +9,10 @@ import {
   FieldSet
 } from '@/components/ui/field';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext, useFieldInvalid } from '@/lib/form-context';
+import type { RadioGroupFieldProps } from '@/types';
 
-export function RadioGroupField({
-  label,
-  description,
-  required,
-  options
-}: BaseFieldProps & {
-  options: { value: string; label: string; disabled?: boolean }[];
-}) {
+export function RadioGroupField({ label, description, required, options }: RadioGroupFieldProps) {
   const field = useFieldContext<string>();
   const isInvalid = useFieldInvalid();
 

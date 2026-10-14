@@ -1,6 +1,48 @@
-import type { ReactNode } from 'react';
-import type { SaleDTO } from '@/lib/api/types';
+import type {
+  SaleDTO,
+  SaleReturnDTO,
+  CancelSaleInput,
+  ReturnPreviewInput,
+  CreateReturnInput
+} from '@/lib/api/types';
 import type { Product } from '@/lib/dukaan/types';
+
+export interface SaleOverdraftPrompt {
+  confirmOverdraft?: boolean;
+  shortfall?: number;
+  message?: string;
+}
+
+export type CancelSaleResult = SaleOverdraftPrompt | SaleDTO;
+export type CreateReturnResult = SaleOverdraftPrompt | SaleReturnDTO;
+
+export interface SalesListFilters {
+  page?: number;
+  pageSize?: number;
+  limit?: number;
+  search?: string;
+  customerId?: string;
+  status?: 'ACTIVE' | 'CANCELLED';
+  from?: string;
+  to?: string;
+  sortBy?: 'saleDate' | 'saleNo' | 'totalAmount' | 'paid' | 'status' | 'createdAt' | 'updatedAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CancelSaleMutationVariables {
+  id: string;
+  input: CancelSaleInput;
+}
+
+export interface PreviewReturnMutationVariables {
+  id: string;
+  input: ReturnPreviewInput;
+}
+
+export interface CreateReturnMutationVariables {
+  id: string;
+  input: CreateReturnInput;
+}
 
 export interface CancelSaleDialogProps {
   sale: SaleDTO;

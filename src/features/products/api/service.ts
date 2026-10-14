@@ -7,6 +7,7 @@ import type {
   UpdateProductInput,
   ProductImageDTO
 } from '@/lib/api/types';
+import type { ProductImageListResponse, ProductImageReorderItem } from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
 
 export async function listProducts(
@@ -61,15 +62,11 @@ export async function deleteProduct(id: string): Promise<unknown> {
 export async function listProductImages(
   productId: string,
   token?: string
-): Promise<{ items: ProductImageDTO[] }> {
+): Promise<ProductImageListResponse> {
   if (token) {
-    return apiRequest<{ items: ProductImageDTO[] }>(
-      `/products/${productId}/images`,
-      undefined,
-      token
-    );
+    return apiRequest<ProductImageListResponse>(`/products/${productId}/images`, undefined, token);
   }
-  return appFetch<{ items: ProductImageDTO[] }>(`/api/products/${productId}/images`);
+  return appFetch<ProductImageListResponse>(`/api/products/${productId}/images`);
 }
 
 export async function uploadProductImage(productId: string, file: File): Promise<ProductImageDTO> {
@@ -83,7 +80,7 @@ export async function uploadProductImage(productId: string, file: File): Promise
 
 export async function reorderProductImages(
   productId: string,
-  items: { id: string; sortOrder: number }[]
+  items: ProductImageReorderItem[]
 ): Promise<unknown> {
   return appFetch<unknown>(`/api/products/${productId}/images/order`, {
     method: 'PATCH',

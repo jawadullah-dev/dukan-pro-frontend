@@ -1,12 +1,7 @@
 import { apiRequest } from '@/lib/api/client';
 import type { PaginatedResponse, BrandDTO } from '@/lib/api/types';
+import type { BrandListFilters } from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
-
-export interface BrandListFilters {
-  page?: number;
-  pageSize?: number;
-  search?: string;
-}
 
 export async function listBrands(
   filters: BrandListFilters = {},

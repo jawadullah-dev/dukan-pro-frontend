@@ -9,20 +9,11 @@ import type {
 import { saleKeys } from './queries';
 import { cancelSale, createReturn, createSale, previewReturn } from './service';
 
-export interface CancelSaleMutationVariables {
-  id: string;
-  input: CancelSaleInput;
-}
-
-export interface PreviewReturnMutationVariables {
-  id: string;
-  input: ReturnPreviewInput;
-}
-
-export interface CreateReturnMutationVariables {
-  id: string;
-  input: CreateReturnInput;
-}
+import type {
+  CancelSaleMutationVariables,
+  PreviewReturnMutationVariables,
+  CreateReturnMutationVariables
+} from '@/types';
 
 export const createSaleMutation = mutationOptions({
   mutationFn: (input: CreateSaleInput) => createSale(input),

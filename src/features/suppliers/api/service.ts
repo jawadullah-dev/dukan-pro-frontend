@@ -5,17 +5,8 @@ import type {
   CreateSupplierInput,
   UpdateSupplierInput
 } from '@/lib/api/types';
+import type { SupplierListFilters } from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
-
-export interface SupplierListFilters {
-  page?: number;
-  pageSize?: number;
-  limit?: number;
-  search?: string;
-  isActive?: boolean;
-  sortBy?: 'name' | 'phone' | 'createdAt' | 'updatedAt' | 'openingBalance';
-  sortOrder?: 'asc' | 'desc';
-}
 
 export async function listSuppliers(
   filters: SupplierListFilters = {},

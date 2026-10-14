@@ -2,6 +2,11 @@ import type * as React from 'react';
 import type { SessionRole } from '@/lib/dukaan/session';
 import type { InfobarContent } from '@/components/ui/infobar';
 
+export interface BreadcrumbItem {
+  title: string;
+  link: string;
+}
+
 export interface AppSidebarProps {
   role: SessionRole;
 }
@@ -55,4 +60,21 @@ export interface AccountMenuItemsProps {
 
 export interface ShellProps {
   children: React.ReactNode;
+}
+
+export type AppearanceDensity = 'comfortable' | 'compact';
+export type AppearanceRadius = 'sharp' | 'medium' | 'round';
+export type AppearanceAccent = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'teal';
+export type AppearanceDigits = 'western' | 'eastern';
+
+export interface AppearanceState {
+  density: AppearanceDensity;
+  radius: AppearanceRadius;
+  accent: AppearanceAccent;
+  digits: AppearanceDigits;
+  setDensity: (density: AppearanceDensity) => void;
+  setRadius: (radius: AppearanceRadius) => void;
+  setAccent: (accent: AppearanceAccent) => void;
+  setDigits: (digits: AppearanceDigits) => void;
+  resetAll: () => void;
 }

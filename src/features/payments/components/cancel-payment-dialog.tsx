@@ -19,6 +19,7 @@ import { Icons } from '@/components/icons';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { useT } from '@/i18n/use-t';
 import type { CancelPaymentDialogProps } from '@/types/payment';
+import type { OverdraftPrompt } from '@/types';
 import { paymentCancelImpactQueryOptions, paymentKeys } from '../api/queries';
 import { cancelPaymentMutation } from '../api/mutations';
 
@@ -38,10 +39,7 @@ export function CancelPaymentDialog({
   const qc = useQueryClient();
   const [reason, setReason] = useState('');
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);
-  const [overdraftPrompt, setOverdraftPrompt] = useState<{
-    shortfall?: number;
-    message?: string;
-  } | null>(null);
+  const [overdraftPrompt, setOverdraftPrompt] = useState<OverdraftPrompt | null>(null);
 
   const { data: impact, isLoading: impactLoading } = useQuery({
     ...paymentCancelImpactQueryOptions(payment.id),

@@ -31,6 +31,7 @@ import type {
   PurchaseCreateFormProps,
   PurchaseCreateDialogProps
 } from '@/types/purchases';
+import type { OverdraftPrompt } from '@/types';
 import { purchaseKeys } from '../api/queries';
 import { createPurchaseMutation } from '../api/mutations';
 import { createPurchaseFormSchema } from '../schemas/purchase-schema';
@@ -59,7 +60,7 @@ export function PurchaseCreateForm({ onDone }: PurchaseCreateFormProps) {
   const router = useRouter();
   const t = useT();
   const [clientRequestId] = useState(() => createClientRequestId());
-  const [warning, setWarning] = useState<{ shortfall?: number; message?: string } | null>(null);
+  const [warning, setWarning] = useState<OverdraftPrompt | null>(null);
 
   const save = useMutation({
     ...createPurchaseMutation,

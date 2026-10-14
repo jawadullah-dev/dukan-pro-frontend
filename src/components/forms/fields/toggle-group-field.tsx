@@ -3,13 +3,10 @@
 import * as React from 'react';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { ToggleGroup } from '@/components/ui/toggle-group';
-import { useFieldContext, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext } from '@/lib/form-context';
+import type { ToggleGroupFieldProps } from '@/types';
 
-export function ToggleGroupField({
-  label,
-  description,
-  children
-}: Omit<BaseFieldProps, 'required'> & { children: React.ReactNode }) {
+export function ToggleGroupField({ label, description, children }: ToggleGroupFieldProps) {
   const field = useFieldContext<string[]>();
   const labelId = `${field.name}-label`;
 

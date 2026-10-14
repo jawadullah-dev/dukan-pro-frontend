@@ -1,4 +1,4 @@
-import { ApiError } from '@/lib/api/types';
+import { ApiError, type ApiResponseBodyError } from '@/lib/api/types';
 import { APP_BASE_URL } from '@/constants/api';
 
 export async function appFetch<T>(path: string, init?: RequestInit): Promise<T> {
@@ -6,7 +6,7 @@ export async function appFetch<T>(path: string, init?: RequestInit): Promise<T> 
   const res = await fetch(url, { ...init, cache: 'no-store' });
 
   const text = await res.text();
-  let body: (T & { error?: string; message?: string | string[] }) | null = null;
+  let body: (T & ApiResponseBodyError) | null = null;
   if (text) {
     try {
       body = JSON.parse(text);

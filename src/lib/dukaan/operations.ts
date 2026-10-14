@@ -13,6 +13,7 @@ import { ValidationError } from '@/lib/errors';
 import { assertShopActive, canCancelRecords, getSession, setRuntimeSession } from './session';
 import { toDukaanSession } from '@/lib/auth/session-map';
 import { getStore, runTransaction } from './store';
+import type { ColumnSort } from '@tanstack/react-table';
 import type {
   Brand,
   Category,
@@ -32,96 +33,28 @@ import type {
   SoftCashWarning,
   Supplier,
   SupplierPayment,
-  TrackingType
+  TrackingType,
+  PurchaseLineInput,
+  SaleLineInput,
+  ResolvedSaleLine,
+  PaymentTargetAllocation,
+  CreateProductInput,
+  UpdateProductData,
+  CreateSupplierInput,
+  CreateCustomerInput,
+  CreatePurchaseInput,
+  CreateSupplierPaymentInput,
+  AdjustStockInput,
+  CreateSaleInput,
+  ReceiveCustomerPaymentInput,
+  CreateExpenseInput,
+  CreatePurchaseOperationResult,
+  CreateSupplierPaymentOperationResult,
+  CreateSaleOperationResult,
+  ReceiveCustomerPaymentOperationResult,
+  CreateExpenseOperationResult,
+  CancelOperationResult
 } from './types';
-
-interface CreateProductInput {
-  category_id: string;
-  brand_id: string;
-  name: string;
-  model?: string;
-  color?: string;
-  ram?: string;
-  storage?: string;
-  sku?: string;
-  barcode?: string;
-  description?: string;
-  tracking_type: TrackingType;
-  default_purchase_price: number;
-  default_selling_price: number;
-  low_stock_threshold: number;
-}
-
-interface CreateSupplierInput {
-  name: string;
-  phone: string;
-  address?: string;
-  notes?: string;
-  opening_balance?: number;
-}
-
-interface CreateCustomerInput {
-  name: string;
-  phone: string;
-  address?: string;
-  notes?: string;
-  opening_balance?: number;
-}
-
-interface CreatePurchaseInput {
-  supplier_id: string;
-  supplier_invoice_ref?: string;
-  purchase_date?: string;
-  paid_now: number;
-  is_opening_stock?: boolean;
-  confirm_overdraft?: boolean;
-  client_request_id: string;
-  lines: PurchaseLineInput[];
-}
-
-interface CreateSupplierPaymentInput {
-  supplier_id: string;
-  purchase_id?: string;
-  amount: number;
-  payment_date?: string;
-  notes?: string;
-  confirm_overdraft?: boolean;
-  client_request_id: string;
-}
-
-interface AdjustStockInput {
-  product_id: string;
-  inventory_unit_id?: string;
-  type: 'ADJUSTMENT' | 'DAMAGED' | 'LOST';
-  counted_quantity?: number;
-  reason: string;
-}
-
-interface CreateSaleInput {
-  customer_id?: string;
-  discount?: number;
-  paid_now: number;
-  method?: PaymentMethod;
-  due_date?: string;
-  client_request_id: string;
-  lines: SaleLineInput[];
-}
-
-interface ReceiveCustomerPaymentInput {
-  customer_id: string;
-  amount: number;
-  method?: PaymentMethod;
-  sale_id?: string;
-  client_request_id: string;
-}
-
-interface CreateExpenseInput {
-  category_id: string;
-  amount: number;
-  expense_date?: string;
-  description?: string;
-  confirm_overdraft?: boolean;
-}
 
 function delay(ms = 80): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
@@ -130,7 +63,7 @@ function delay(ms = 80): Promise<void> {
 function applySort<T>(items: T[], sort?: string): T[] {
   if (!sort) return items;
   try {
-    const parsed = JSON.parse(sort) as Array<{ id: string; desc: boolean }>;
+    const parsed = JSON.parse(sort) as ColumnSort[];
     if (!parsed.length) return items;
     const [{ id, desc }] = parsed;
     return items.toSorted((a, b) => {
@@ -423,12 +356,7 @@ async function createProduct(input: CreateProductInput): Promise<Product> {
   });
 }
 
-async function updateProduct(
-  id: string,
-  data: Partial<Omit<Product, 'id' | 'shop_id' | 'tracking_type' | 'created_at'>> & {
-    is_active?: boolean;
-  }
-) {
+async function updateProduct(id: string, data: UpdateProductData) {
   await delay();
   const sid = shopId();
   return runTransaction((store) => {
@@ -589,15 +517,6 @@ async function updateCustomer(
   });
 }
 
-type PurchaseLineInput = {
-  product_id: string;
-  quantity: number;
-  unit_cost: number;
-  imei1?: string[];
-  imei2?: string[];
-  condition?: InventoryCondition;
-};
-
 function imeiAlreadyExists(
   store: ReturnType<typeof getStore>,
   shopId: string,
@@ -659,9 +578,7 @@ async function getPurchase(id: string) {
   };
 }
 
-async function createPurchase(
-  input: CreatePurchaseInput
-): Promise<{ purchase?: Purchase; cash_warning?: SoftCashWarning }> {
+async function createPurchase(input: CreatePurchaseInput): Promise<CreatePurchaseOperationResult> {
   await delay();
   const sid = shopId();
 
@@ -836,7 +753,7 @@ async function createPurchase(
 
 async function createSupplierPayment(
   input: CreateSupplierPaymentInput
-): Promise<{ payment?: SupplierPayment; cash_warning?: SoftCashWarning }> {
+): Promise<CreateSupplierPaymentOperationResult> {
   await delay();
   const sid = shopId();
 
@@ -1030,13 +947,6 @@ async function adjustStock(input: AdjustStockInput) {
   });
 }
 
-export type SaleLineInput = {
-  product_id: string;
-  quantity: number;
-  unit_price: number;
-  inventory_unit_id?: string;
-};
-
 async function listSales(filters: ListFilters = {}) {
   await delay();
   const sid = shopId();
@@ -1095,9 +1005,7 @@ export async function getSale(id: string) {
   };
 }
 
-async function createSale(
-  input: CreateSaleInput
-): Promise<{ sale: Sale; below_cost_warning?: boolean }> {
+async function createSale(input: CreateSaleInput): Promise<CreateSaleOperationResult> {
   await delay();
   const sid = shopId();
 
@@ -1111,7 +1019,7 @@ async function createSale(
   const sale = runTransaction((store) => {
     let hasPhone = false;
     let belowCost = false;
-    const resolved: Array<SaleLineInput & { unit_cost: number }> = [];
+    const resolved: ResolvedSaleLine[] = [];
 
     for (const line of input.lines) {
       const product = store.products.find((p) => p.id === line.product_id && p.shop_id === sid);
@@ -1259,7 +1167,7 @@ async function createSale(
 
 export async function receiveCustomerPayment(
   input: ReceiveCustomerPaymentInput
-): Promise<{ payments: Payment[] }> {
+): Promise<ReceiveCustomerPaymentOperationResult> {
   await delay();
   const sid = shopId();
 
@@ -1280,7 +1188,7 @@ export async function receiveCustomerPayment(
     const created: Payment[] = [];
     let remaining = input.amount;
 
-    const targets: Array<{ sale_id?: string; outstanding: number }> = [];
+    const targets: PaymentTargetAllocation[] = [];
 
     if (input.sale_id) {
       targets.push({ sale_id: input.sale_id, outstanding: getSaleOutstanding(input.sale_id) });
@@ -1453,9 +1361,7 @@ async function listExpenses(filters: ListFilters = {}) {
   return paginate(items, filters);
 }
 
-async function createExpense(
-  input: CreateExpenseInput
-): Promise<{ expense?: Expense; cash_warning?: SoftCashWarning }> {
+async function createExpense(input: CreateExpenseInput): Promise<CreateExpenseOperationResult> {
   await delay();
   const sid = shopId();
   if (input.amount <= 0) throw new ValidationError('Amount must be more than 0');
@@ -1544,7 +1450,7 @@ async function cancelSale(
   id: string,
   reason: string,
   confirm_overdraft?: boolean
-): Promise<{ ok: boolean; cash_warning?: SoftCashWarning }> {
+): Promise<CancelOperationResult> {
   await delay();
   const sid = shopId();
   const session = getSession();
@@ -1653,7 +1559,7 @@ async function cancelPurchase(
   id: string,
   reason: string,
   confirm_overdraft?: boolean
-): Promise<{ ok: boolean; cash_warning?: SoftCashWarning }> {
+): Promise<CancelOperationResult> {
   await delay();
   const sid = shopId();
   if (!canCancelRecords()) throw new ValidationError('Only owner can cancel');
@@ -1767,7 +1673,7 @@ async function cancelPayment(
   reason: string,
   kind: 'customer' | 'supplier',
   confirm_overdraft?: boolean
-): Promise<{ ok: boolean; cash_warning?: SoftCashWarning }> {
+): Promise<CancelOperationResult> {
   await delay();
   const sid = shopId();
   if (!canCancelRecords()) throw new ValidationError('Only owner can cancel');

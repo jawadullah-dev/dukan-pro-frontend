@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
 import type { CreateProductInput, UpdateProductInput } from '@/lib/api/types';
+import type { ProductImageReorderItem } from '@/types';
 
 import {
   createProduct,
@@ -68,8 +69,7 @@ export function useReorderProductImages(productId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (items: { id: string; sortOrder: number }[]) =>
-      reorderProductImages(productId, items),
+    mutationFn: (items: ProductImageReorderItem[]) => reorderProductImages(productId, items),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: productsQueryKeys.imageList(productId) });
       toast.success(t('imageReordered'));

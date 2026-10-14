@@ -19,6 +19,7 @@ import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import type { CancelSaleDialogProps } from '@/types/sales';
+import type { OverdraftPrompt } from '@/types';
 import { cancelImpactQueryOptions, saleKeys } from '../api/queries';
 import { cancelSaleMutation } from '../api/mutations';
 
@@ -27,10 +28,7 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
   const t = useT();
   const [reason, setReason] = useState('');
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);
-  const [overdraftPrompt, setOverdraftPrompt] = useState<{
-    shortfall?: number;
-    message?: string;
-  } | null>(null);
+  const [overdraftPrompt, setOverdraftPrompt] = useState<OverdraftPrompt | null>(null);
 
   const { data: impact, isLoading: impactLoading } = useQuery({
     ...cancelImpactQueryOptions(sale.id),

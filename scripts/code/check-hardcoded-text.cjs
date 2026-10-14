@@ -19,7 +19,7 @@ const EXCLUDE_PATHS = [
   "styles/",
   "types/",
   "config/",
-  "constants/",
+  "src/constants/",
   "i18n/",
   "__tests__/",
   ".test.",
@@ -53,8 +53,29 @@ const STRING_PROPS = new Set([
   "subheading",
   "summary",
   "badge",
+  "badgeText",
+  "statusText",
   "alt",
-  "aria-label"
+  "aria-label",
+  "aria-placeholder",
+  "aria-description",
+  "aria-roledescription",
+  "text",
+  "cta",
+  "ctaText",
+  "actionLabel",
+  "submitText",
+  "saveText",
+  "content",
+  "help",
+  "helpText",
+  "alert",
+  "notice",
+  "warning",
+  "modalTitle",
+  "dialogTitle",
+  "emptyTitle",
+  "emptyDescription"
 ]);
 
 // Ignored non-human-text tokens
@@ -143,6 +164,29 @@ if (fs.existsSync(srcRoot)) {
       args.forEach(inspect);
     }
 
+    function inspectPropExpression(expr, propName) {
+      if (!expr) return;
+      if (expr.type === "ArrayExpression") {
+        expr.elements.forEach((el) => inspectPropExpression(el, propName));
+      } else if (expr.type === "ObjectExpression") {
+        expr.properties.forEach((prop) => {
+          if (prop.type === "ObjectProperty") {
+            const keyName = prop.key && (prop.key.name || prop.key.value);
+            if (keyName && STRING_PROPS.has(keyName)) {
+              if (prop.value.type === "StringLiteral") {
+                report(`Prop ${propName}.[${keyName}]`, prop.value.value, prop.value);
+              } else if (prop.value.type === "TemplateLiteral") {
+                const raw = prop.value.quasis.map((q) => q.value.raw).join(" ").trim();
+                if (raw) report(`Prop ${propName}.[${keyName}]`, raw, prop.value);
+              }
+            } else if (prop.value) {
+              inspectPropExpression(prop.value, `${propName}.${keyName || ""}`);
+            }
+          }
+        });
+      }
+    }
+
     traverse(ast, {
       JSXText(nodePath) {
         const text = nodePath.node.value.trim();
@@ -165,25 +209,32 @@ if (fs.existsSync(srcRoot)) {
 
       JSXAttribute(nodePath) {
         const attrName = nodePath.node.name && nodePath.node.name.name;
-        if (!attrName || !STRING_PROPS.has(attrName)) return;
+        if (!attrName) return;
 
         const val = nodePath.node.value;
         if (!val) return;
 
-        if (val.type === "StringLiteral") {
-          report(`Prop: ${attrName}`, val.value, nodePath.node);
-        } else if (val.type === "JSXExpressionContainer") {
-          const expr = val.expression;
-          if (expr.type === "StringLiteral") {
-            report(`Prop: ${attrName}`, expr.value, nodePath.node);
-          } else if (expr.type === "TemplateLiteral") {
-            const raw = expr.quasis.map((q) => q.value.raw).join(" ").trim();
-            if (raw) report(`Prop: ${attrName}`, raw, nodePath.node);
-          } else if (expr.type === "LogicalExpression" || expr.type === "BinaryExpression") {
-            if (expr.right && expr.right.type === "StringLiteral") {
-              report(`Prop: ${attrName}`, expr.right.value, nodePath.node);
+        if (STRING_PROPS.has(attrName)) {
+          if (val.type === "StringLiteral") {
+            report(`Prop: ${attrName}`, val.value, nodePath.node);
+          } else if (val.type === "JSXExpressionContainer") {
+            const expr = val.expression;
+            if (expr.type === "StringLiteral") {
+              report(`Prop: ${attrName}`, expr.value, nodePath.node);
+            } else if (expr.type === "TemplateLiteral") {
+              const raw = expr.quasis.map((q) => q.value.raw).join(" ").trim();
+              if (raw) report(`Prop: ${attrName}`, raw, nodePath.node);
+            } else if (expr.type === "LogicalExpression" || expr.type === "BinaryExpression") {
+              if (expr.right && expr.right.type === "StringLiteral") {
+                report(`Prop: ${attrName}`, expr.right.value, nodePath.node);
+              }
             }
           }
+        }
+
+        // Recursively inspect objects & arrays passed as props (e.g. options={[{ label: "..." }]})
+        if (val.type === "JSXExpressionContainer") {
+          inspectPropExpression(val.expression, attrName);
         }
       },
 
@@ -219,12 +270,18 @@ if (fs.existsSync(srcRoot)) {
 
         const isToastOrAlertFunc =
           callee.type === "Identifier" &&
-          ["showToast", "showMessage", "showError", "showSuccess", "toast", "alert"].includes(
+          ["showToast", "showMessage", "showError", "showSuccess", "toast", "alert", "confirm", "prompt"].includes(
             callee.name
           );
 
-        if (isToastMember || isAlertMember || isToastOrAlertFunc) {
-          checkCallExpressionStrings(args, "Toast/Alert");
+        const isWindowDialog =
+          callee.type === "MemberExpression" &&
+          callee.object.type === "Identifier" &&
+          callee.object.name === "window" &&
+          ["alert", "confirm", "prompt"].includes(callee.property.name);
+
+        if (isToastMember || isAlertMember || isToastOrAlertFunc || isWindowDialog) {
+          checkCallExpressionStrings(args, "Toast/Alert/Confirm");
         }
       }
     });

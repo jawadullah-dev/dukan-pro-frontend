@@ -9,8 +9,9 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext, useFieldInvalid } from '@/lib/form-context';
 import { useT } from '@/i18n/use-t';
+import type { SelectFieldProps } from '@/types';
 
 export function SelectField({
   label,
@@ -18,10 +19,7 @@ export function SelectField({
   required,
   placeholder,
   options
-}: BaseFieldProps & {
-  placeholder?: string;
-  options: { value: string; label: string; disabled?: boolean }[];
-}) {
+}: SelectFieldProps) {
   const field = useFieldContext<string>();
   const isInvalid = useFieldInvalid();
   const t = useT();

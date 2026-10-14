@@ -8,8 +8,9 @@ import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import type { DateRange } from 'react-day-picker';
-import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext, useFieldInvalid } from '@/lib/form-context';
 import { useT } from '@/i18n/use-t';
+import type { DatePickerFieldProps, DateRangePickerFieldProps } from '@/types';
 
 export function DatePickerField({
   label,
@@ -17,10 +18,7 @@ export function DatePickerField({
   required,
   placeholder,
   disabledDates
-}: BaseFieldProps & {
-  placeholder?: string;
-  disabledDates?: (date: Date) => boolean;
-}) {
+}: DatePickerFieldProps) {
   const field = useFieldContext<Date | undefined>();
   const isInvalid = useFieldInvalid();
   const t = useT();
@@ -71,7 +69,7 @@ export function DateRangeField({
   description,
   required,
   placeholder
-}: BaseFieldProps & { placeholder?: string }) {
+}: DateRangePickerFieldProps) {
   const field = useFieldContext<DateRange | undefined>();
   const isInvalid = useFieldInvalid();
   const range = field.state.value;

@@ -81,6 +81,11 @@ export interface CancelSupplierPaymentInput {
   cancelReason: string;
 }
 
+export interface CancelSupplierPaymentMutationVariables {
+  id: string;
+  input: CancelSupplierPaymentInput;
+}
+
 export interface CancelSupplierPaymentResult {
   status: boolean;
   message: string;

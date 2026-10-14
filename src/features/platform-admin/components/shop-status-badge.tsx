@@ -2,12 +2,9 @@ import { cn } from '@/lib/utils';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import type { PlatformShopStatus } from '../api/types';
-import type { ShopStatusBadgeProps } from '@/types';
+import type { ShopStatusBadgeProps, ShopStatusConfig } from '@/types';
 
-const STATUS_CONFIG: Record<
-  PlatformShopStatus,
-  { labelKey: string; className: string; icon: keyof typeof Icons }
-> = {
+const STATUS_CONFIG: Record<PlatformShopStatus, ShopStatusConfig> = {
   ACTIVE: {
     labelKey: 'platform.active',
     className:

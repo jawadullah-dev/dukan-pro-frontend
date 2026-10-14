@@ -1,6 +1,19 @@
 import type { ReactNode } from 'react';
 import type { ProductDTO, ProductImageDTO } from '@/lib/api/types';
 
+export interface ProductImageListResponse {
+  items: ProductImageDTO[];
+}
+
+export interface ProductImageReorderItem {
+  id: string;
+  sortOrder: number;
+}
+
+export interface ProductImageQueryExtraOptions {
+  enabled?: boolean;
+}
+
 export interface ProductDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

@@ -1,9 +1,9 @@
 import { isStandaloneDisplay } from '@/lib/pwa';
-
-export type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-};
+import type {
+  BeforeInstallPromptEvent,
+  RelatedApp,
+  NavigatorWithRelatedApps
+} from '@/types/common';
 
 type Listener = () => void;
 
@@ -142,16 +142,12 @@ export function isDesktopInstallSurface(): boolean {
   return window.matchMedia('(min-width: 640px)').matches;
 }
 
-type RelatedApp = { platform: string; url?: string; id?: string };
-
 export async function detectPwaAlreadyInstalled(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
   if (isStandaloneDisplay()) return true;
 
   try {
-    const nav = navigator as Navigator & {
-      getInstalledRelatedApps?: () => Promise<RelatedApp[]>;
-    };
+    const nav = navigator as NavigatorWithRelatedApps;
     if (typeof nav.getInstalledRelatedApps === 'function') {
       const apps = await nav.getInstalledRelatedApps();
       if (apps.some((app) => app.platform === 'webapp')) {

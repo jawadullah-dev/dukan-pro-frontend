@@ -12,11 +12,13 @@ import {
 } from '@/lib/auth/routes';
 import { routing } from '@/i18n/routing';
 
+import type { AuthRedirectSession } from '@/types/auth';
+
 const handleI18nRouting = createIntlMiddleware(routing);
 
 const { auth } = NextAuth(authConfig);
 
-function handleAuthRedirects(req: NextRequest, session: { user?: { role?: string } } | null) {
+function handleAuthRedirects(req: NextRequest, session: AuthRedirectSession | null) {
   const { pathname } = req.nextUrl;
   const repeatedLocalePrefix = pathname.match(/^\/(?:en|ur|ps)(?:\/(?:en|ur|ps))+(?=\/|$)/);
   if (repeatedLocalePrefix) {

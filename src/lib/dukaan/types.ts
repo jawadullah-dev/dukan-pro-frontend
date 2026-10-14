@@ -341,3 +341,161 @@ export interface LedgerEntry {
   running_balance: number;
   reference_id?: string;
 }
+
+export type SessionRole = 'OWNER' | 'ADMIN' | 'SUPER_ADMIN';
+
+export interface MockSession {
+  user_id: string;
+  shop_id: string;
+  role: SessionRole;
+  user_name: string;
+  shop_name: string;
+}
+
+export interface PurchaseLineInput {
+  product_id: string;
+  quantity: number;
+  unit_cost: number;
+  imei1?: string[];
+  imei2?: string[];
+  condition?: InventoryCondition;
+}
+
+export interface SaleLineInput {
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  inventory_unit_id?: string;
+}
+
+export interface ResolvedSaleLine extends SaleLineInput {
+  unit_cost: number;
+}
+
+export interface PaymentTargetAllocation {
+  sale_id?: string;
+  outstanding: number;
+}
+
+export interface CreateProductInput {
+  category_id: string;
+  brand_id: string;
+  name: string;
+  model?: string;
+  color?: string;
+  ram?: string;
+  storage?: string;
+  sku?: string;
+  barcode?: string;
+  description?: string;
+  tracking_type: TrackingType;
+  default_purchase_price: number;
+  default_selling_price: number;
+  low_stock_threshold: number;
+}
+
+export interface UpdateProductData extends Partial<
+  Omit<Product, 'id' | 'shop_id' | 'tracking_type' | 'created_at'>
+> {
+  is_active?: boolean;
+}
+
+export interface CreateSupplierInput {
+  name: string;
+  phone: string;
+  address?: string;
+  notes?: string;
+  opening_balance?: number;
+}
+
+export interface CreateCustomerInput {
+  name: string;
+  phone: string;
+  address?: string;
+  notes?: string;
+  opening_balance?: number;
+}
+
+export interface CreatePurchaseInput {
+  supplier_id: string;
+  supplier_invoice_ref?: string;
+  purchase_date?: string;
+  paid_now: number;
+  is_opening_stock?: boolean;
+  confirm_overdraft?: boolean;
+  client_request_id: string;
+  lines: PurchaseLineInput[];
+}
+
+export interface CreateSupplierPaymentInput {
+  supplier_id: string;
+  purchase_id?: string;
+  amount: number;
+  payment_date?: string;
+  notes?: string;
+  confirm_overdraft?: boolean;
+  client_request_id: string;
+}
+
+export interface AdjustStockInput {
+  product_id: string;
+  inventory_unit_id?: string;
+  type: 'ADJUSTMENT' | 'DAMAGED' | 'LOST';
+  counted_quantity?: number;
+  reason: string;
+}
+
+export interface CreateSaleInput {
+  customer_id?: string;
+  discount?: number;
+  paid_now: number;
+  method?: PaymentMethod;
+  due_date?: string;
+  client_request_id: string;
+  lines: SaleLineInput[];
+}
+
+export interface ReceiveCustomerPaymentInput {
+  customer_id: string;
+  amount: number;
+  method?: PaymentMethod;
+  sale_id?: string;
+  client_request_id: string;
+}
+
+export interface CreateExpenseInput {
+  category_id: string;
+  amount: number;
+  expense_date?: string;
+  description?: string;
+  confirm_overdraft?: boolean;
+}
+
+export interface CreatePurchaseOperationResult {
+  purchase?: Purchase;
+  cash_warning?: SoftCashWarning;
+}
+
+export interface CreateSupplierPaymentOperationResult {
+  payment?: SupplierPayment;
+  cash_warning?: SoftCashWarning;
+}
+
+export interface CreateSaleOperationResult {
+  sale: Sale;
+  below_cost_warning?: boolean;
+}
+
+export interface ReceiveCustomerPaymentOperationResult {
+  payments: Payment[];
+}
+
+export interface CreateExpenseOperationResult {
+  expense?: Expense;
+  cash_warning?: SoftCashWarning;
+}
+
+export interface CancelOperationResult {
+  ok: boolean;
+  cash_warning?: SoftCashWarning;
+}

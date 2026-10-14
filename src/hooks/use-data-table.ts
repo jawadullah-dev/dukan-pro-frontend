@@ -32,7 +32,7 @@ import * as React from 'react';
 
 import { useDebouncedCallback } from '@/hooks/use-debounced-callback';
 import { getSortingStateParser } from '@/lib/parsers';
-import type { ExtendedColumnSort } from '@/types/data-table';
+import type { ExtendedColumnSort, UseDataTableProps } from '@/types/data-table';
 
 const PAGE_KEY = 'page';
 const PER_PAGE_KEY = 'perPage';
@@ -40,31 +40,6 @@ const SORT_KEY = 'sort';
 const ARRAY_SEPARATOR = ',';
 const DEBOUNCE_MS = 300;
 const THROTTLE_MS = 50;
-
-interface UseDataTableProps<TData>
-  extends
-    Omit<
-      TableOptions<TData>,
-      | 'state'
-      | 'pageCount'
-      | 'getCoreRowModel'
-      | 'manualFiltering'
-      | 'manualPagination'
-      | 'manualSorting'
-    >,
-    Required<Pick<TableOptions<TData>, 'pageCount'>> {
-  initialState?: Omit<Partial<TableState>, 'sorting'> & {
-    sorting?: ExtendedColumnSort<TData>[];
-  };
-  history?: 'push' | 'replace';
-  debounceMs?: number;
-  throttleMs?: number;
-  clearOnDefault?: boolean;
-  enableAdvancedFilter?: boolean;
-  scroll?: boolean;
-  shallow?: boolean;
-  startTransition?: React.TransitionStartFunction;
-}
 
 export function useDataTable<TData>(props: UseDataTableProps<TData>) {
   const {

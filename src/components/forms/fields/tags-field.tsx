@@ -6,15 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
-import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext, useFieldInvalid } from '@/lib/form-context';
 import { useT } from '@/i18n/use-t';
+import type { TagsFieldProps } from '@/types';
 
-export function TagsField({
-  label,
-  description,
-  required,
-  placeholder
-}: BaseFieldProps & { placeholder?: string }) {
+export function TagsField({ label, description, required, placeholder }: TagsFieldProps) {
   const field = useFieldContext<string[]>();
   const isInvalid = useFieldInvalid();
   const t = useT();

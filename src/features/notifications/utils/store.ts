@@ -1,24 +1,6 @@
 import { create } from 'zustand';
 
-import type { NotificationStatus, NotificationAction } from '@/components/ui/notification-card';
-
-export type Notification = {
-  id: string;
-  title: string;
-  body: string;
-  status: NotificationStatus;
-  createdAt: string;
-  actions?: NotificationAction[];
-};
-
-type NotificationState = {
-  notifications: Notification[];
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  removeNotification: (id: string) => void;
-  addNotification: (notification: Omit<Notification, 'status'>) => void;
-  unreadCount: () => number;
-};
+import type { Notification, NotificationState } from '@/types/notifications';
 
 const mockNotifications: Notification[] = [
   {

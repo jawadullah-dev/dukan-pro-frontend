@@ -1,6 +1,7 @@
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 
 import type { ProductListFilters } from '@/lib/api/types';
+import type { ProductImageQueryExtraOptions } from '@/types';
 
 import { getProduct, listProductImages, listProducts } from './service';
 
@@ -28,10 +29,6 @@ export function productImagesQueryOptions(productId: string, token?: string) {
     queryFn: () => listProductImages(productId, token),
     enabled: !!productId
   });
-}
-
-export interface ProductImageQueryExtraOptions {
-  enabled?: boolean;
 }
 
 export function useProductImagesQuery(

@@ -11,18 +11,7 @@ import type {
   SaleReturnDTO
 } from '@/lib/api/types';
 
-export interface SalesListFilters {
-  page?: number;
-  pageSize?: number;
-  limit?: number;
-  search?: string;
-  customerId?: string;
-  status?: 'ACTIVE' | 'CANCELLED';
-  from?: string;
-  to?: string;
-  sortBy?: 'saleDate' | 'saleNo' | 'totalAmount' | 'paid' | 'status' | 'createdAt' | 'updatedAt';
-  sortOrder?: 'asc' | 'desc';
-}
+import type { SalesListFilters, CancelSaleResult, CreateReturnResult } from '@/types';
 
 import { appFetch } from '@/lib/api/app-fetch';
 
@@ -73,18 +62,12 @@ export async function getCancelImpact(id: string, token?: string): Promise<Cance
   return appFetch<CancelImpactDTO>(`/api/sales/${id}/cancel-impact`);
 }
 
-export async function cancelSale(
-  id: string,
-  input: CancelSaleInput
-): Promise<{ confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleDTO> {
-  return appFetch<{ confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleDTO>(
-    `/api/sales/${id}/cancel`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input)
-    }
-  );
+export async function cancelSale(id: string, input: CancelSaleInput): Promise<CancelSaleResult> {
+  return appFetch<CancelSaleResult>(`/api/sales/${id}/cancel`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input)
+  });
 }
 
 export async function previewReturn(
@@ -101,10 +84,8 @@ export async function previewReturn(
 export async function createReturn(
   id: string,
   input: CreateReturnInput
-): Promise<{ confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleReturnDTO> {
-  return appFetch<
-    { confirmOverdraft?: boolean; shortfall?: number; message?: string } | SaleReturnDTO
-  >(`/api/sales/${id}/returns`, {
+): Promise<CreateReturnResult> {
+  return appFetch<CreateReturnResult>(`/api/sales/${id}/returns`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)

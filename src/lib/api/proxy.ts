@@ -2,37 +2,22 @@ import { auth } from '@/auth';
 import { NextRequest, NextResponse } from 'next/server';
 import { API_BASE_URL } from '@/constants/api';
 
-export interface RouteIdContext {
-  params: Promise<{ id: string }>;
-}
+import type {
+  RouteIdContext,
+  RouteSupplierIdContext,
+  RouteProductImageContext,
+  PaginatedListPayload,
+  UpstreamErrorBody,
+  ProxyOptions
+} from './types';
 
-export interface RouteSupplierIdContext {
-  params: Promise<{ supplierId: string }>;
-}
-
-export interface RouteProductImageContext {
-  params: Promise<{ id: string; imageId: string }>;
-}
-
-export interface ProxyErrorResult {
-  handled: boolean;
-  data?: unknown;
-  status?: number;
-}
-
-export interface PaginatedListPayload<T> {
-  items?: T[];
-  total?: number;
-  page?: number;
-  pageSize?: number;
-  [key: string]: unknown;
-}
-
-export interface UpstreamErrorBody {
-  message?: string | string[];
-  error?: string;
-  [key: string]: unknown;
-}
+export type {
+  RouteIdContext,
+  RouteSupplierIdContext,
+  RouteProductImageContext,
+  PaginatedListPayload,
+  ProxyOptions
+};
 
 export function isCancelledStatusError(errorBody: unknown, status: number): boolean {
   if (status !== 400) return false;
@@ -41,17 +26,6 @@ export function isCancelledStatusError(errorBody: unknown, status: number): bool
     ? body.message.join(' ')
     : body?.message || body?.error || '';
   return rawMsg.includes('CANCELLED status') || rawMsg.includes('Cannot modify a cancelled');
-}
-
-export interface ProxyOptions {
-  method?: string;
-  allowedParams?: string[];
-  paramAliases?: Record<string, string>;
-  body?: unknown;
-  statusOnSuccess?: number;
-  forwardFormData?: boolean;
-  transformResponse?: (data: unknown) => unknown;
-  transformError?: (errorBody: unknown, status: number) => ProxyErrorResult | undefined;
 }
 
 export async function proxyToBackend(

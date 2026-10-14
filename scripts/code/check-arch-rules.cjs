@@ -13,8 +13,35 @@ const roots = [path.join(__dirname, "../../src"), path.join(__dirname, "../../ap
   fs.existsSync(p),
 );
 
-const RTL_UNSAFE_REGEX = /\b(?:ml|mr|pl|pr|left|right)-[a-zA-Z0-9_\-\.]+\b|\btext-(?:left|right)\b/;
+const RTL_UNSAFE_REGEX = /\b(?:ml|mr|pl|pr|rounded-l|rounded-r|border-l|border-r)-[a-zA-Z0-9_\-\.]+\b|\btext-(?:left|right)\b/;
 const HEX_COLOR_REGEX = /#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b/;
+
+function extractClassStrings(node, results = []) {
+  if (!node) return results;
+  if (node.type === "StringLiteral") {
+    results.push({ value: node.value, line: node.loc ? node.loc.start.line : 0 });
+  } else if (node.type === "TemplateLiteral") {
+    node.quasis.forEach((q) => {
+      if (q.value.raw) {
+        results.push({ value: q.value.raw, line: q.loc ? q.loc.start.line : 0 });
+      }
+    });
+    node.expressions.forEach((expr) => extractClassStrings(expr, results));
+  } else if (node.type === "JSXExpressionContainer") {
+    extractClassStrings(node.expression, results);
+  } else if (node.type === "CallExpression") {
+    node.arguments.forEach((arg) => extractClassStrings(arg, results));
+  } else if (node.type === "LogicalExpression" || node.type === "BinaryExpression") {
+    extractClassStrings(node.left, results);
+    extractClassStrings(node.right, results);
+  } else if (node.type === "ConditionalExpression") {
+    extractClassStrings(node.consequent, results);
+    extractClassStrings(node.alternate, results);
+  } else if (node.type === "ArrayExpression") {
+    node.elements.forEach((el) => extractClassStrings(el, results));
+  }
+  return results;
+}
 
 roots.forEach((root) => {
   walkTree(root, (absPath, relPathRaw) => {
@@ -93,27 +120,26 @@ roots.forEach((root) => {
 
         // Check RTL unsafe classes and hex colors in className
         if (p.node.name.name === "className" && !isUi) {
-          const val = p.node.value;
-          let str = "";
-          if (val && val.type === "StringLiteral") {
-            str = val.value;
-          }
-          if (str) {
-            if (RTL_UNSAFE_REGEX.test(str)) {
+          const strings = extractClassStrings(p.node.value);
+          strings.forEach(({ value: str, line }) => {
+            if (!str) return;
+            const rtlMatch = str.match(RTL_UNSAFE_REGEX);
+            if (rtlMatch) {
               r.addViolation(
                 relPath,
-                p.node.loc.start.line,
-                `Forbidden RTL-unsafe class in className ("${str.match(RTL_UNSAFE_REGEX)[0]}") — use logical utilities (ms-, me-, ps-, pe-, start-, end-, text-start, text-end)`,
+                line || p.node.loc.start.line,
+                `Forbidden RTL-unsafe class in className ("${rtlMatch[0]}") — use logical utilities (ms-, me-, ps-, pe-, start-, end-, text-start, text-end)`,
               );
             }
-            if (HEX_COLOR_REGEX.test(str) && !isStyle) {
+            const hexMatch = str.match(HEX_COLOR_REGEX);
+            if (hexMatch && !isStyle) {
               r.addViolation(
                 relPath,
-                p.node.loc.start.line,
-                `Forbidden hardcoded hex color in className ("${str.match(HEX_COLOR_REGEX)[0]}") — use semantic theme tokens`,
+                line || p.node.loc.start.line,
+                `Forbidden hardcoded hex color in className ("${hexMatch[0]}") — use semantic theme tokens`,
               );
             }
-          }
+          });
         }
       },
 

@@ -1,7 +1,8 @@
 import type { PlatformShopStatus, SubscriptionPlan } from '../api/types';
+import type { PlatformStatusOption, PlatformPlanOption } from '@/types';
 import { t } from '@/i18n';
 
-export const PLATFORM_STATUS_OPTIONS: { label: string; value: PlatformShopStatus }[] = [
+export const PLATFORM_STATUS_OPTIONS: PlatformStatusOption[] = [
   {
     get label() {
       return t('status.active');
@@ -22,7 +23,7 @@ export const PLATFORM_STATUS_OPTIONS: { label: string; value: PlatformShopStatus
   }
 ];
 
-export const PLATFORM_PLAN_OPTIONS: { label: string; value: SubscriptionPlan }[] = [
+export const PLATFORM_PLAN_OPTIONS: PlatformPlanOption[] = [
   {
     get label() {
       return t('plan.trial');

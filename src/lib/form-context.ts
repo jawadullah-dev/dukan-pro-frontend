@@ -10,9 +10,4 @@ export function useFieldInvalid() {
   return field.state.meta.isTouched && !field.state.meta.isValid;
 }
 
-export type BaseFieldProps = {
-  label: string;
-  description?: string;
-
-  required?: boolean;
-};
+export type { BaseFieldProps } from '@/types/forms';

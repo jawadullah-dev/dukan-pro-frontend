@@ -1,11 +1,6 @@
 import { NextRequest } from 'next/server';
 import { proxyToBackend } from '@/lib/api/proxy';
-import type { PurchaseDTO } from '@/lib/api/types';
-
-interface PurchaseListPayload {
-  items?: PurchaseDTO[];
-  [key: string]: unknown;
-}
+import type { PurchaseDTO, PaginatedListPayload } from '@/lib/api/types';
 
 export async function GET(request: NextRequest) {
   const sortBy = request.nextUrl.searchParams.get('sortBy');
@@ -25,7 +20,7 @@ export async function GET(request: NextRequest) {
       'sortOrder'
     ],
     transformResponse: (payload: unknown) => {
-      const data = payload as PurchaseListPayload | null;
+      const data = payload as PaginatedListPayload<PurchaseDTO> | null;
       if (!data || !Array.isArray(data.items)) return payload;
       let items = [...data.items];
       if (sortBy === 'status') {

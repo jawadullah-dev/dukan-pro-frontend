@@ -1,17 +1,8 @@
-import type { Shop, User } from './types';
+import type { Shop, User, SessionRole, MockSession } from './types';
 import { getStore } from './store';
 import { DEMO_SHOP_ID } from '@/lib/auth/accounts';
 import { AppError } from '@/lib/errors';
-
-export type SessionRole = 'OWNER' | 'ADMIN' | 'SUPER_ADMIN';
-
-export interface MockSession {
-  user_id: string;
-  shop_id: string;
-  role: SessionRole;
-  user_name: string;
-  shop_name: string;
-}
+export type { SessionRole, MockSession };
 
 let runtimeSession: MockSession | null = null;
 

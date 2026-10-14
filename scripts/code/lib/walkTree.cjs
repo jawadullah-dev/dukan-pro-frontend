@@ -29,7 +29,8 @@ function walkTree(rootDir, onFile, opts = {}) {
 
   const includeTests = opts.includeTests === true;
 
-  const projectRoot = path.join(rootDir, "..");
+  const defaultProjectRoot = path.resolve(__dirname, "../../..");
+  const projectRoot = opts.projectRoot || defaultProjectRoot;
 
   function _walk(dir) {
     if (!fs.existsSync(dir)) return;
@@ -51,6 +52,12 @@ function walkTree(rootDir, onFile, opts = {}) {
       }
 
       if (!entry.isFile()) continue;
+
+      if (entry.name.startsWith(".") || entry.name.endsWith("~") || entry.name.endsWith(".swp")) {
+        if (entry.name !== ".env" && !entry.name.startsWith(".env.")) {
+          continue;
+        }
+      }
 
       const ext = path.extname(entry.name);
       if (!exts.has(ext)) continue;

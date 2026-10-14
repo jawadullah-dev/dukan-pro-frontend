@@ -164,3 +164,13 @@ export interface RecordExpenseDialogProps {
   defaultCategoryId?: string;
   onSuccess?: () => void;
 }
+
+export interface CancelExpenseMutationVariables {
+  id: string;
+  input: CancelExpenseInput;
+}
+
+export interface UpdateExpenseCategoryMutationVariables {
+  id: string;
+  input: UpdateExpenseCategoryInput;
+}

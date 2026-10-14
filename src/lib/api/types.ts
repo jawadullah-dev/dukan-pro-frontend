@@ -502,3 +502,68 @@ export interface ProductListFilters {
 export * from '@/types/supplier-payment';
 export * from '@/types/expense';
 export * from '@/types/cash';
+
+export interface RouteIdParams {
+  id: string;
+}
+
+export interface RouteSupplierIdParams {
+  supplierId: string;
+}
+
+export interface RouteProductImageParams {
+  id: string;
+  imageId: string;
+}
+
+export interface RouteIdContext {
+  params: Promise<RouteIdParams>;
+}
+
+export interface RouteSupplierIdContext {
+  params: Promise<RouteSupplierIdParams>;
+}
+
+export interface RouteProductImageContext {
+  params: Promise<RouteProductImageParams>;
+}
+
+export interface RouteUserIdContext {
+  params: Promise<{ id: string }>;
+}
+
+export interface ProxyErrorResult {
+  handled: boolean;
+  data?: unknown;
+  status?: number;
+}
+
+export interface PaginatedListPayload<T> {
+  items?: T[];
+  total?: number;
+  page?: number;
+  pageSize?: number;
+  [key: string]: unknown;
+}
+
+export interface UpstreamErrorBody {
+  message?: string | string[];
+  error?: string;
+  [key: string]: unknown;
+}
+
+export interface ProxyOptions {
+  method?: string;
+  allowedParams?: string[];
+  paramAliases?: Record<string, string>;
+  body?: unknown;
+  statusOnSuccess?: number;
+  forwardFormData?: boolean;
+  transformResponse?: (data: unknown) => unknown;
+  transformError?: (errorBody: unknown, status: number) => ProxyErrorResult | undefined;
+}
+
+export interface ApiResponseBodyError {
+  error?: string;
+  message?: string | string[];
+}

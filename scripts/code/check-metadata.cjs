@@ -20,7 +20,7 @@ function findAllPages(dir, results = []) {
         continue;
       }
       findAllPages(fullPath, results);
-    } else if (entry.isFile() && entry.name === "page.tsx") {
+    } else if (entry.isFile() && /^page\.(tsx|ts|jsx|js)$/.test(entry.name)) {
       results.push(fullPath);
     }
   }
@@ -80,6 +80,12 @@ pages.forEach((absPath) => {
 
       if (declaration.type === "VariableDeclaration") {
         declaration.declarations.forEach((d) => {
+          if (d.id.type === "Identifier" && d.id.name === "generateMetadata") {
+            hasGenerateMetadata = true;
+            hasTitle = true;
+            hasDescription = true;
+            hasOpenGraph = true;
+          }
           if (d.id.type === "Identifier" && d.id.name === "metadata") {
             hasMetadata = true;
             if (d.init && d.init.type === "ObjectExpression") {

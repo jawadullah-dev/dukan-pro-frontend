@@ -1,12 +1,6 @@
 import { NextRequest } from 'next/server';
 import { proxyToBackend } from '@/lib/api/proxy';
-import type { InventoryItemDTO } from '@/lib/api/types';
-
-interface InventoryReportPayload {
-  items?: InventoryItemDTO[];
-  total?: number;
-  [key: string]: unknown;
-}
+import type { InventoryItemDTO, PaginatedListPayload } from '@/lib/api/types';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -16,7 +10,7 @@ export async function GET(request: NextRequest) {
   return proxyToBackend(request, '/reports/inventory', {
     allowedParams: ['page', 'pageSize', 'search', 'sortBy', 'sortOrder'],
     transformResponse: (payload: unknown) => {
-      const data = payload as InventoryReportPayload | null;
+      const data = payload as PaginatedListPayload<InventoryItemDTO> | null;
       if (!data || !Array.isArray(data.items)) return payload;
       let items = [...data.items];
       if (trackingType) {

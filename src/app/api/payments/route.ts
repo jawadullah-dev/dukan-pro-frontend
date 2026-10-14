@@ -1,20 +1,7 @@
 import { NextRequest } from 'next/server';
 import { proxyToBackend } from '@/lib/api/proxy';
-import type { PaymentDTO } from '@/lib/api/types';
-
-interface PaymentListPayload {
-  items?: PaymentDTO[];
-  total?: number;
-  page?: number;
-  pageSize?: number;
-  [key: string]: unknown;
-}
-
-interface PaymentCreateBody {
-  notes?: string;
-  method?: string;
-  [key: string]: unknown;
-}
+import type { PaymentDTO, PaginatedListPayload } from '@/lib/api/types';
+import type { PaymentCreateBody } from '@/types/payment';
 
 export async function GET(request: NextRequest) {
   const sortBy = request.nextUrl.searchParams.get('sortBy');
@@ -35,7 +22,7 @@ export async function GET(request: NextRequest) {
       'sortOrder'
     ],
     transformResponse: (payload: unknown) => {
-      const data = payload as PaymentListPayload | null;
+      const data = payload as PaginatedListPayload<PaymentDTO> | null;
       if (!data || !Array.isArray(data.items)) return payload;
       let items = [...data.items];
 

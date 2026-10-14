@@ -4,30 +4,8 @@ import { z } from 'zod';
 import { authConfig } from '@/auth.config';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
 import type { AuthAccountRole } from '@/lib/auth/accounts';
+import type { LoginResult, AuthResponseData, AuthResponseBody } from '@/types/auth';
 import { API_BASE_URL } from '@/constants/api';
-
-interface LoginResult {
-  id: string;
-  name: string;
-  phone: string;
-  role: AuthAccountRole;
-  shopId: string | null;
-  shopName: string | null;
-  accessToken: string;
-  subscriptionEndsAt: string | null;
-}
-
-interface AuthResponseData {
-  accessToken?: string;
-  user?: { id: string; name: string; phone: string };
-  admin?: { id: string; name: string; phone: string };
-  shopId?: string | null;
-  shop?: { name?: string | null; subscriptionEndsAt?: string | null } | null;
-}
-
-interface AuthResponseBody {
-  data?: AuthResponseData;
-}
 
 async function executeAuthPost(
   endpoint: string,

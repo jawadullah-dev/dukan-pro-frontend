@@ -1,7 +1,6 @@
-export interface ThemeTransitionOrigin {
-  clientX: number;
-  clientY: number;
-}
+import type { ThemeTransitionOrigin } from '@/types/common';
+
+export type { ThemeTransitionOrigin };
 
 export function startThemeTransition(apply: () => void, origin?: ThemeTransitionOrigin) {
   const root = document.documentElement;

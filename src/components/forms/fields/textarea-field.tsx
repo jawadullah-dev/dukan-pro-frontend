@@ -3,7 +3,8 @@
 import * as React from 'react';
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Textarea } from '@/components/ui/textarea';
-import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
+import { useFieldContext, useFieldInvalid } from '@/lib/form-context';
+import type { TextareaFieldProps } from '@/types';
 
 export function TextareaField({
   label,
@@ -11,9 +12,7 @@ export function TextareaField({
   required,
   showCount,
   ...textareaProps
-}: BaseFieldProps & {
-  showCount?: boolean;
-} & Omit<React.ComponentProps<typeof Textarea>, 'value' | 'onChange' | 'onBlur'>) {
+}: TextareaFieldProps) {
   const field = useFieldContext<string>();
   const isInvalid = useFieldInvalid();
 

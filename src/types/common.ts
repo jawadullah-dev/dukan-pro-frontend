@@ -84,3 +84,39 @@ export interface ActiveThemeProviderProps {
   children: ReactNode;
   initialTheme?: string;
 }
+
+export interface UseControllableStateParams<T> {
+  prop?: T | undefined;
+  defaultProp?: T | undefined;
+  onChange?: (state: T) => void;
+}
+
+export type SetStateFn<T> = (prevState?: T) => T;
+
+export interface SentryClientModule {
+  captureRouterTransitionStart?: (href: string, navigationType: string) => void;
+}
+
+export interface ThemeTransitionOrigin {
+  clientX: number;
+  clientY: number;
+}
+
+export interface InstallPromptUserChoice {
+  outcome: 'accepted' | 'dismissed';
+}
+
+export interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<InstallPromptUserChoice>;
+}
+
+export interface RelatedApp {
+  platform: string;
+  url?: string;
+  id?: string;
+}
+
+export interface NavigatorWithRelatedApps extends Navigator {
+  getInstalledRelatedApps?: () => Promise<RelatedApp[]>;
+}

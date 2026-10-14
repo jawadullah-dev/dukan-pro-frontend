@@ -1,34 +1,11 @@
 import { apiRequest } from '@/lib/api/client';
 import type { PaginatedResponse, CustomerDTO } from '@/lib/api/types';
-
-export interface CustomerListFilters {
-  page?: number;
-  pageSize?: number;
-  limit?: number;
-  search?: string;
-  isActive?: boolean;
-  sortBy?: 'name' | 'phone' | 'isActive' | 'openingBalance' | 'createdAt' | 'updatedAt';
-  sortOrder?: 'asc' | 'desc';
-}
-
-export interface CreateCustomerInput {
-  name: string;
-  phone?: string;
-  address?: string;
-  notes?: string;
-  openingBalance?: number;
-  isActive?: boolean;
-}
-
-export interface UpdateCustomerInput {
-  name?: string;
-  phone?: string | null;
-  address?: string | null;
-  notes?: string | null;
-  openingBalance?: number;
-  isActive?: boolean;
-}
-
+import type {
+  CustomerListFilters,
+  CreateCustomerInput,
+  UpdateCustomerInput,
+  CustomerMutationResult
+} from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
 
 export async function listCustomers(
@@ -71,22 +48,18 @@ export async function createCustomer(input: CreateCustomerInput): Promise<Custom
 export async function updateCustomer(
   id: string,
   input: UpdateCustomerInput
-): Promise<{ status: boolean; message: string }> {
-  return appFetch<{ status: boolean; message: string }>(`/api/customers/${id}`, {
+): Promise<CustomerMutationResult> {
+  return appFetch<CustomerMutationResult>(`/api/customers/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
   });
 }
 
-export async function deactivateCustomer(
-  id: string
-): Promise<{ status: boolean; message: string }> {
+export async function deactivateCustomer(id: string): Promise<CustomerMutationResult> {
   return updateCustomer(id, { isActive: false });
 }
 
-export async function reactivateCustomer(
-  id: string
-): Promise<{ status: boolean; message: string }> {
+export async function reactivateCustomer(id: string): Promise<CustomerMutationResult> {
   return updateCustomer(id, { isActive: true });
 }

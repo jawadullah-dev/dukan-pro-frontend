@@ -2,13 +2,7 @@ import * as React from 'react';
 
 import { useCallbackRef } from '@/hooks/use-callback-ref';
 
-type UseControllableStateParams<T> = {
-  prop?: T | undefined;
-  defaultProp?: T | undefined;
-  onChange?: (state: T) => void;
-};
-
-type SetStateFn<T> = (prevState?: T) => T;
+import type { UseControllableStateParams, SetStateFn } from '@/types/common';
 
 function useControllableState<T>({
   prop,

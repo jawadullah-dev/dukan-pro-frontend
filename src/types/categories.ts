@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react';
 import type { CategoryDTO } from '@/lib/api/types';
 
+export interface CategoryListFilters {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+}
+
 export interface CategoryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

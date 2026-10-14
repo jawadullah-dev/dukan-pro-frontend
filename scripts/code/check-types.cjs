@@ -21,7 +21,7 @@ if (fs.existsSync(srcRoot)) {
 
     const code = fs.readFileSync(absPath, "utf8");
 
-    // Check comments for @ts-ignore or @ts-expect-error
+    // Check comments for @ts-ignore, @ts-expect-error, or @ts-nocheck
     const lines = code.split("\n");
     lines.forEach((line, idx) => {
       if (line.includes("@ts-ignore")) {
@@ -29,6 +29,9 @@ if (fs.existsSync(srcRoot)) {
       }
       if (line.includes("@ts-expect-error")) {
         r.addViolation(relPath, idx + 1, "Forbidden `@ts-expect-error` — fix type error instead of suppressing it");
+      }
+      if (line.includes("@ts-nocheck")) {
+        r.addViolation(relPath, idx + 1, "Forbidden `@ts-nocheck` — fix type error instead of disabling type checks");
       }
     });
 
@@ -75,6 +78,24 @@ if (fs.existsSync(srcRoot)) {
         }
       },
 
+      TSTypeAssertion(p) {
+        const targetType = p.node.typeAnnotation;
+        if (targetType.type === "TSUnknownKeyword") {
+          r.addViolation(
+            relPath,
+            p.node.loc ? p.node.loc.start.line : 0,
+            "Forbidden `<unknown>` assertion"
+          );
+        }
+        if (targetType.type === "TSAnyKeyword") {
+          r.addViolation(
+            relPath,
+            p.node.loc ? p.node.loc.start.line : 0,
+            "Forbidden `<any>` assertion"
+          );
+        }
+      },
+
       TSTypeReference(p) {
         const name = p.node.typeName && p.node.typeName.name;
         if (name === "Function") {
@@ -89,6 +110,13 @@ if (fs.existsSync(srcRoot)) {
             relPath,
             p.node.loc ? p.node.loc.start.line : 0,
             "Forbidden bare `Object` type — use Record<string, T> or an explicit interface"
+          );
+        }
+        if (name === "String" || name === "Number" || name === "Boolean" || name === "Symbol") {
+          r.addViolation(
+            relPath,
+            p.node.loc ? p.node.loc.start.line : 0,
+            `Forbidden boxed primitive type \`${name}\` — use lowercase \`${name.toLowerCase()}\``
           );
         }
         if (name === "Record") {

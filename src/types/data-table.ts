@@ -1,6 +1,7 @@
+import type * as React from 'react';
 import type { DataTableConfig } from '@/config/data-table';
 import type { FilterItemSchema } from '@/lib/parsers';
-import type { ColumnSort, Row, RowData } from '@tanstack/react-table';
+import type { ColumnSort, Row, RowData, TableOptions, TableState } from '@tanstack/react-table';
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -54,9 +55,31 @@ export interface ExtendedColumnFilter<TData> extends FilterItemSchema {
   id: Extract<keyof TData, string>;
 }
 
-interface DataTableRowAction<TData> {
-  row: Row<TData>;
-  variant: 'update' | 'delete';
+export interface DataTableInitialState<TData> extends Omit<Partial<TableState>, 'sorting'> {
+  sorting?: ExtendedColumnSort<TData>[];
+}
+
+export interface UseDataTableProps<TData>
+  extends
+    Omit<
+      TableOptions<TData>,
+      | 'state'
+      | 'pageCount'
+      | 'getCoreRowModel'
+      | 'manualFiltering'
+      | 'manualPagination'
+      | 'manualSorting'
+    >,
+    Required<Pick<TableOptions<TData>, 'pageCount'>> {
+  initialState?: DataTableInitialState<TData>;
+  history?: 'push' | 'replace';
+  debounceMs?: number;
+  throttleMs?: number;
+  clearOnDefault?: boolean;
+  enableAdvancedFilter?: boolean;
+  scroll?: boolean;
+  shallow?: boolean;
+  startTransition?: React.TransitionStartFunction;
 }
 
 export * from '@/components/data-table/types';

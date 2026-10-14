@@ -4,7 +4,9 @@ import type {
   CreateExpenseInput,
   CancelExpenseInput,
   CreateExpenseCategoryInput,
-  UpdateExpenseCategoryInput
+  UpdateExpenseCategoryInput,
+  CancelExpenseMutationVariables,
+  UpdateExpenseCategoryMutationVariables
 } from '@/types/expense';
 import { expenseKeys } from './queries';
 import {
@@ -23,16 +25,6 @@ export const createExpenseMutation = mutationOptions({
     qc.invalidateQueries({ queryKey: ['cash'] });
   }
 });
-
-export interface CancelExpenseMutationVariables {
-  id: string;
-  input: CancelExpenseInput;
-}
-
-export interface UpdateExpenseCategoryMutationVariables {
-  id: string;
-  input: UpdateExpenseCategoryInput;
-}
 
 export const cancelExpenseMutation = mutationOptions({
   mutationFn: ({ id, input }: CancelExpenseMutationVariables) => cancelExpense(id, input),

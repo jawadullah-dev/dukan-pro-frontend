@@ -2,7 +2,8 @@ import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
 import type {
   CreateSupplierPaymentInput,
-  CancelSupplierPaymentInput
+  CancelSupplierPaymentInput,
+  CancelSupplierPaymentMutationVariables
 } from '@/types/supplier-payment';
 import { supplierPaymentKeys } from './queries';
 import { cancelSupplierPayment, createSupplierPayment } from './service';
@@ -22,11 +23,6 @@ export const createSupplierPaymentMutation = mutationOptions({
     invalidateSupplierPaymentDependencies();
   }
 });
-
-export interface CancelSupplierPaymentMutationVariables {
-  id: string;
-  input: CancelSupplierPaymentInput;
-}
 
 export const cancelSupplierPaymentMutation = mutationOptions({
   mutationFn: ({ id, input }: CancelSupplierPaymentMutationVariables) =>

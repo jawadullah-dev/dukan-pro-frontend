@@ -1,4 +1,3 @@
-import type { PlatformShopStatus, SubscriptionPlan } from '../api/types';
 import type { PlatformStatusOption, PlatformPlanOption } from '@/types';
 import { t } from '@/i18n';
 

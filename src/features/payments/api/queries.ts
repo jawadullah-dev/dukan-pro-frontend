@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { PaymentsListFilters } from '@/types';
-import { getPayment, getPaymentCancelImpact, listPayments } from './service';
+import { getPaymentCancelImpact, listPayments } from './service';
 
 export const paymentKeys = {
   all: ['payments'] as const,

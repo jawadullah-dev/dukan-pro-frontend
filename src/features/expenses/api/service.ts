@@ -34,13 +34,6 @@ export async function listExpenses(
   return appFetch<PaginatedResponse<ExpenseDTO>>(`/api/expenses${qs}`);
 }
 
-export async function getExpense(id: string, token?: string): Promise<ExpenseDTO> {
-  if (token) {
-    return apiRequest<ExpenseDTO>(`/expenses/${id}`, undefined, token);
-  }
-  return appFetch<ExpenseDTO>(`/api/expenses/${id}`);
-}
-
 export async function createExpense(input: CreateExpenseInput): Promise<CreateExpenseResult> {
   return appFetch<CreateExpenseResult>('/api/expenses', {
     method: 'POST',
@@ -88,13 +81,6 @@ export async function createExpenseCategory(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input)
   });
-}
-
-export async function getExpenseCategory(id: string, token?: string): Promise<ExpenseCategoryDTO> {
-  if (token) {
-    return apiRequest<ExpenseCategoryDTO>(`/expense-categories/${id}`, undefined, token);
-  }
-  return appFetch<ExpenseCategoryDTO>(`/api/expense-categories/${id}`);
 }
 
 export async function updateExpenseCategory(

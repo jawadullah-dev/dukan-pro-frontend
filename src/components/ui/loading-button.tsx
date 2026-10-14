@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { useTranslations } from 'next-intl';
 import { Button, type ButtonProps } from '@/components/ui/button';
 

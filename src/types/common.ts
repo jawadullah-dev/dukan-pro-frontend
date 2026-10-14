@@ -118,3 +118,22 @@ export interface NavigatorWithRelatedApps extends Navigator {
 }
 
 export type IdKeyed = { id: string };
+
+export type OverdraftAlertVariant = 'compact' | 'banner';
+
+export interface OverdraftAlertProps {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
+  variant?: OverdraftAlertVariant;
+  id?: string;
+  className?: string;
+}
+
+export interface PresetReasonPillsProps {
+  reasons: readonly string[] | string[];
+  onSelect: (reason: string) => void;
+  className?: string;
+}

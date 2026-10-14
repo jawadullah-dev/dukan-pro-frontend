@@ -14,10 +14,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { OverdraftAlert } from '@/components/common/overdraft-alert';
 import type { CancelSaleDialogProps } from '@/types/sales';
 import type { OverdraftPrompt } from '@/types';
 import { cancelImpactQueryOptions, saleKeys } from '../api/queries';
@@ -165,28 +165,14 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
             </div>
 
             {(impact?.willCauseOverdraft || overdraftPrompt) && (
-              <div className='space-y-2 rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-900 dark:text-amber-200'>
-                <div className='flex items-start gap-2'>
-                  <Icons.warning className='mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400' />
-                  <div>
-                    <p className='font-semibold'>{t('sales.cancelDialog.overdraftWarning')}</p>
-                    <p className='mt-0.5 text-xs'>
-                      {overdraftPrompt?.message || t('dukaan.actions.cashBelowZeroWarning')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className='flex items-center space-x-2 pt-1'>
-                  <Checkbox
-                    id='overdraft'
-                    checked={confirmOverdraft}
-                    onCheckedChange={(checked) => setConfirmOverdraft(Boolean(checked))}
-                  />
-                  <Label htmlFor='overdraft' className='text-xs font-normal cursor-pointer'>
-                    {t('sales.cancelDialog.confirmOverdraft')}
-                  </Label>
-                </div>
-              </div>
+              <OverdraftAlert
+                variant='banner'
+                checked={confirmOverdraft}
+                onCheckedChange={setConfirmOverdraft}
+                title={t('sales.cancelDialog.overdraftWarning')}
+                description={overdraftPrompt?.message || t('dukaan.actions.cashBelowZeroWarning')}
+                confirmLabel={t('sales.cancelDialog.confirmOverdraft')}
+              />
             )}
 
             <div className='space-y-1.5'>

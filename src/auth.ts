@@ -3,7 +3,6 @@ import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import { authConfig } from '@/auth.config';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
-import type { AuthAccountRole } from '@/lib/auth/accounts';
 import type { LoginResult, AuthResponseData, AuthResponseBody } from '@/types/auth';
 import { API_BASE_URL } from '@/constants/api';
 

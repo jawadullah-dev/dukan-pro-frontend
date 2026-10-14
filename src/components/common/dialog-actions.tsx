@@ -3,7 +3,6 @@
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { useT } from '@/i18n/use-t';
-import { ACTION_LABELS } from '@/features/dukaan/constants/ui';
 import type { DialogCancelButtonProps, DialogPrimaryButtonProps } from '@/types';
 
 export function DialogCancelButton({ onClick, disabled }: DialogCancelButtonProps) {

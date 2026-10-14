@@ -69,7 +69,6 @@ import {
   IconPhoto,
   IconPizza,
   IconPlus,
-  IconProps,
   IconReceipt,
   IconRosetteDiscountCheck,
   IconSearch,

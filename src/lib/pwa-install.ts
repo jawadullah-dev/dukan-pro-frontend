@@ -1,9 +1,5 @@
 import { isStandaloneDisplay } from '@/lib/pwa';
-import type {
-  BeforeInstallPromptEvent,
-  RelatedApp,
-  NavigatorWithRelatedApps
-} from '@/types/common';
+import type { BeforeInstallPromptEvent, NavigatorWithRelatedApps } from '@/types/common';
 
 type Listener = () => void;
 
@@ -42,10 +38,6 @@ export function subscribeInstallState(listener: Listener): () => void {
   return () => {
     listeners.delete(listener);
   };
-}
-
-function getDeferredPrompt(): BeforeInstallPromptEvent | null {
-  return deferred;
 }
 
 export function isInstallMarkedInstalled(): boolean {

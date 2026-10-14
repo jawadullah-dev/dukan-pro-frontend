@@ -15,7 +15,6 @@ import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { fromPaisa, toPaisa } from '@/lib/dukaan/numbers';
-import type { CustomerDTO } from '@/lib/api/types';
 import { customerKeys } from '../api/queries';
 import { createCustomer, updateCustomer } from '../api/service';
 import { createPartyFormSchema } from '../schemas/customer-schema';

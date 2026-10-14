@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { StatusBadge } from './status-badge';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import type { DetailConfig, RecordDetailProps } from './types';
+import type { RecordDetailProps } from './types';
 
 export function RecordDetail<TData>({
   open,

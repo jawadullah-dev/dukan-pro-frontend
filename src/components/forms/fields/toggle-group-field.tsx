@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { ToggleGroup } from '@/components/ui/toggle-group';
 import { useFieldContext } from '@/lib/form-context';

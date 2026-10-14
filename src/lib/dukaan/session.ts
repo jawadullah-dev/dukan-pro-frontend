@@ -1,4 +1,4 @@
-import type { Shop, User, SessionRole, MockSession } from './types';
+import type { Shop, SessionRole, MockSession } from './types';
 import { getStore } from './store';
 import { DEMO_SHOP_ID } from '@/lib/auth/accounts';
 import { AppError } from '@/lib/errors';
@@ -8,10 +8,6 @@ let runtimeSession: MockSession | null = null;
 
 export function setRuntimeSession(session: MockSession | null): void {
   runtimeSession = session;
-}
-
-function getRuntimeSession(): MockSession | null {
-  return runtimeSession;
 }
 
 export function getSession(): MockSession {
@@ -66,44 +62,6 @@ export function getCurrentShop(): Shop {
     shop = newShop;
   }
   return shop;
-}
-
-function getCurrentUser(): User {
-  const session = getSession();
-  const { user_id, role, shop_id } = session;
-  const store = getStore();
-  if (role === 'SUPER_ADMIN') {
-    let owner = store.users.find((u) => u.shop_id === shop_id && u.role === 'OWNER');
-    if (!owner) {
-      const newOwner: User = {
-        id: user_id,
-        shop_id,
-        name: session.user_name || 'Owner',
-        phone: '03115514151',
-        role: 'OWNER',
-        status: 'ACTIVE',
-        created_at: new Date().toISOString()
-      };
-      store.users.push(newOwner);
-      owner = newOwner;
-    }
-    return owner;
-  }
-  let user = store.users.find((u) => u.id === user_id);
-  if (!user) {
-    const newUser: User = {
-      id: user_id,
-      shop_id,
-      name: session.user_name || 'User',
-      phone: '03115514151',
-      role: 'OWNER',
-      status: 'ACTIVE',
-      created_at: new Date().toISOString()
-    };
-    store.users.push(newUser);
-    user = newUser;
-  }
-  return user;
 }
 
 export function assertShopActive(): void {

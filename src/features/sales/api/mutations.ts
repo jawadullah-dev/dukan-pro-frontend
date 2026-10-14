@@ -1,11 +1,6 @@
 import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
-import type {
-  CreateSaleInput,
-  CancelSaleInput,
-  ReturnPreviewInput,
-  CreateReturnInput
-} from '@/lib/api/types';
+import type { CreateSaleInput } from '@/lib/api/types';
 import { saleKeys } from './queries';
 import { cancelSale, createReturn, createSale, previewReturn } from './service';
 

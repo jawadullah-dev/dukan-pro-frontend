@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/chart';
 import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
-import React from 'react';
 import { useT } from '@/i18n/use-t';
 import type { DottedBackgroundPatternProps } from '@/types';
 

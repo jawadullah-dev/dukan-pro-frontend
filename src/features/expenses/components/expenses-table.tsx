@@ -27,7 +27,7 @@ import type {
   ExpenseRowActionsProps,
   ExpensesTableProps
 } from '@/types/expense';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { expensesQueryOptions } from '../api/queries';
 import { CancelExpenseDialog } from './cancel-expense-dialog';
 import { RecordExpenseDialog } from './record-expense-dialog';

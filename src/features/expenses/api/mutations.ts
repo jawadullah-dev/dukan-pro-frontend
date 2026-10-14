@@ -2,9 +2,7 @@ import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
 import type {
   CreateExpenseInput,
-  CancelExpenseInput,
   CreateExpenseCategoryInput,
-  UpdateExpenseCategoryInput,
   CancelExpenseMutationVariables,
   UpdateExpenseCategoryMutationVariables
 } from '@/types/expense';

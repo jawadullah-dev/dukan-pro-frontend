@@ -7,5 +7,3 @@ export const createCategoryFormSchema = (t: Translator) =>
   z.object({
     name: z.string().trim().min(1, t('validation.nameRequired'))
   });
-
-type CategoryFormValues = z.infer<ReturnType<typeof createCategoryFormSchema>>;

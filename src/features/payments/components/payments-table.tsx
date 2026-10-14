@@ -22,7 +22,7 @@ import {
 import { formatIsoDate } from '@/lib/dates';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import type { PaymentDTO } from '@/lib/api/types';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { paymentsQueryOptions } from '../api/queries';
 import type { PaymentsListFilters } from '@/types';
 import { CancelPaymentDialog } from './cancel-payment-dialog';

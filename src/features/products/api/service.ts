@@ -25,13 +25,6 @@ export async function listProducts(
   return appFetch<PaginatedResponse<ProductDTO>>(`/api/products${qs}`);
 }
 
-export async function getProduct(id: string, token?: string): Promise<ProductDTO> {
-  if (token) {
-    return apiRequest<ProductDTO>(`/products/${id}`, undefined, token);
-  }
-  return appFetch<ProductDTO>(`/api/products/${id}`);
-}
-
 export async function createProduct(input: CreateProductInput): Promise<ProductDTO> {
   return appFetch<ProductDTO>('/api/products', {
     method: 'POST',

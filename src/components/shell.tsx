@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import type { ShellProps } from '@/types';
 export type { ShellProps };
 

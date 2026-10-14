@@ -14,9 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Icons } from '@/components/icons';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
+import { OverdraftAlert } from '@/components/common/overdraft-alert';
 import { formatPkr, toPaisa } from '@/lib/dukaan/numbers';
 import { todayIsoDate } from '@/lib/dates';
 import { createOwnerWithdrawalMutation } from '../api/mutations';
@@ -158,27 +157,19 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
           </div>
 
           {overdraftPrompt && (
-            <div className='rounded-xl border border-amber-500/30 bg-amber-500/10 p-3.5 space-y-2.5 text-xs text-amber-900 dark:text-amber-200'>
-              <div className='flex items-start gap-2'>
-                <Icons.warning className='size-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5' />
-                <div className='flex-1'>
-                  <p className='font-semibold'>{t('dukaan.cash.shortfallWarningTitle')}</p>
-                  <p className='mt-0.5 text-muted-foreground'>
-                    {overdraftPrompt.message ||
-                      t('dukaan.cash.shortfallWarningDesc', {
-                        shortfall: formatPkr(overdraftPrompt.shortfall)
-                      })}
-                  </p>
-                </div>
-              </div>
-              <label className='flex cursor-pointer items-center gap-2 pt-1 font-medium'>
-                <Checkbox
-                  checked={confirmOverdraft}
-                  onCheckedChange={(c) => setConfirmOverdraft(Boolean(c))}
-                />
-                <span>{t('dukaan.cash.confirmOverdraftLabel')}</span>
-              </label>
-            </div>
+            <OverdraftAlert
+              variant='banner'
+              checked={confirmOverdraft}
+              onCheckedChange={setConfirmOverdraft}
+              title={t('dukaan.cash.shortfallWarningTitle')}
+              description={
+                overdraftPrompt.message ||
+                t('dukaan.cash.shortfallWarningDesc', {
+                  shortfall: formatPkr(overdraftPrompt.shortfall)
+                })
+              }
+              confirmLabel={t('dukaan.cash.confirmOverdraftLabel')}
+            />
           )}
 
           <DialogFooter className='gap-2 sm:gap-2.5 pt-2'>

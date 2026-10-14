@@ -992,12 +992,6 @@ export function getStore(): DukaanStore {
   return globalForDukaan.__dukaanStore;
 }
 
-function resetStore(): DukaanStore {
-  globalForDukaan.__dukaanStore = seedStore();
-  globalForDukaan.__dukaanSeedVersion = SEED_VERSION;
-  return globalForDukaan.__dukaanStore;
-}
-
 export function cloneStore(store: DukaanStore): DukaanStore {
   return structuredClone(store);
 }

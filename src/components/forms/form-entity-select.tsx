@@ -1,7 +1,6 @@
 'use client';
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import type { ListFilters, Paginated } from '@/lib/dukaan';
 import { InfiniteEntitySelect } from './infinite-entity-select';
 import type { NamedEntity, FormEntitySelectProps } from '@/types';
 export type { FormEntitySelectProps };

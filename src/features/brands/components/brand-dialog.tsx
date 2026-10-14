@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dialog';
 import { FieldGroup } from '@/components/ui/field';
 import { useAppForm } from '@/lib/form';
-import type { BrandDTO } from '@/lib/api/types';
 import type { BrandDialogProps, BrandDialogBodyProps } from '@/types';
 import { brandKeys } from '../api/queries';
 import { createBrand, updateBrand } from '../api/service';

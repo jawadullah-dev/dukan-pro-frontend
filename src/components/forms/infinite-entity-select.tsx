@@ -14,7 +14,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import type { ListFilters, Paginated } from '@/lib/dukaan';
 import { useT } from '@/i18n/use-t';
 import type { NamedEntity, InfiniteEntitySelectProps } from '@/types';
 export type { NamedEntity, InfiniteEntitySelectProps };

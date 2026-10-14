@@ -3,7 +3,7 @@
 import { Icons } from '@/components/icons';
 import Image from 'next/image';
 import * as React from 'react';
-import Dropzone, { type DropzoneProps, type FileRejection } from 'react-dropzone';
+import Dropzone, { type FileRejection } from 'react-dropzone';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { AppError } from '@/lib/errors';
 import { DEFAULT_THEME } from './theme.config';
 import type { ThemeContextType, ActiveThemeProviderProps } from '@/types';

@@ -27,17 +27,6 @@ export function isStandaloneDisplay(): boolean {
   return mq || ios;
 }
 
-function isIosSafari(): boolean {
-  if (typeof window === 'undefined') return false;
-  const ua = window.navigator.userAgent;
-  const iOS =
-    /iPad|iPhone|iPod/.test(ua) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  const webkit = /WebKit/.test(ua);
-  const chromeIos = /CriOS|FxiOS|EdgiOS/.test(ua);
-  return iOS && webkit;
-}
-
 export function isIosInstallCandidate(): boolean {
   if (typeof window === 'undefined') return false;
   const ua = window.navigator.userAgent;

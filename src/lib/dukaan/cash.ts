@@ -1,4 +1,4 @@
-import type { CashMovement, SoftCashWarning } from './types';
+import type { SoftCashWarning } from './types';
 import { getStore } from './store';
 
 export function getCashBalance(shopId: string): number {
@@ -17,10 +17,4 @@ export function checkSoftCashWarning(shopId: string, outflow: number): SoftCashW
     amount: outflow,
     projected_cash: projected
   };
-}
-
-function sumCashMovements(movements: CashMovement[]): number {
-  return movements.reduce((sum, m) => {
-    return m.direction === 'IN' ? sum + m.amount : sum - m.amount;
-  }, 0);
 }

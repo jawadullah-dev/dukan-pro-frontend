@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter, usePathname } from '@/i18n/navigation';
-import { type Row, type Table as TanstackTable, flexRender } from '@tanstack/react-table';
+import { type Row, flexRender } from '@tanstack/react-table';
 import {
   Table,
   TableBody,
@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
-import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
@@ -25,13 +24,7 @@ import { LoadMore } from './load-more';
 import { QuickFilterChips } from './quick-filter-chips';
 import { RecordDetail } from './record-detail';
 import { buildDetailFromTable, buildMobileItemFromTable } from './build-from-columns';
-import type {
-  DetailConfig,
-  MobileItemConfig,
-  QuickFilterChip,
-  ResponsiveDataTableProps,
-  CompactOrFullTableProps
-} from './types';
+import type { DetailConfig, ResponsiveDataTableProps, CompactOrFullTableProps } from './types';
 
 const routeRowCountCache: Record<string, number> = {};
 
@@ -82,7 +75,7 @@ export function ResponsiveDataTable<TData>({
   const t = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
-  const { ref, mode, wideCompact, measured } = useContainerMode();
+  const { ref, mode, wideCompact } = useContainerMode();
   const [sideRow, setSideRow] = React.useState<Row<TData> | null>(null);
   const isList = mode === 'list' || mode === 'cards';
 

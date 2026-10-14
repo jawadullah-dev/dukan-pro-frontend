@@ -1,4 +1,4 @@
-import type { ColumnSemanticType, ColumnLayoutMeta, ResolvedMobileSlots } from './types';
+import type { ColumnLayoutMeta, ResolvedMobileSlots } from './types';
 
 const SKIP_IDS = new Set(['actions', 'select', 'udhar_state']);
 

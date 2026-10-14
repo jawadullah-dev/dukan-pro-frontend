@@ -27,7 +27,7 @@ import type {
   SupplierPaymentRowActionsProps,
   SupplierPaymentsTableProps
 } from '@/types/supplier-payment';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { supplierPaymentsQueryOptions } from '../api/queries';
 import { CancelSupplierPaymentDialog } from './cancel-supplier-payment-dialog';
 import { RecordSupplierPaymentDialog } from './record-supplier-payment-dialog';

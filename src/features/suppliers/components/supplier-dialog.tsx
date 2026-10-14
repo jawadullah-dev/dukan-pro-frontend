@@ -15,7 +15,6 @@ import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { fromPaisa, toPaisa } from '@/lib/dukaan/numbers';
-import type { SupplierDTO } from '@/lib/api/types';
 import { supplierKeys } from '../api/queries';
 import { createSupplier, updateSupplier } from '../api/service';
 import { createSupplierFormSchema } from '../schemas/supplier-schema';

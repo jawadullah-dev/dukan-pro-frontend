@@ -1,11 +1,9 @@
 'use client';
 
-import React from 'react';
 import type { PageContainerProps } from '@/types';
 export type { PageContainerProps };
 import { Heading } from '../ui/heading';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
-import type { InfobarContent } from '@/components/ui/infobar';
 import { cn } from '@/lib/utils';
 import { useT, translateMaybe } from '@/i18n/use-t';
 

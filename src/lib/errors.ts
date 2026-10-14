@@ -11,10 +11,3 @@ export class ValidationError extends AppError {
     this.name = 'ValidationError';
   }
 }
-
-class NotFoundError extends AppError {
-  constructor(message: string) {
-    super(message);
-    this.name = 'NotFoundError';
-  }
-}

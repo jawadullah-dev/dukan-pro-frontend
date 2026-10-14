@@ -21,6 +21,3 @@ export const createReceivePaymentSchema = (t: Translator) =>
       .number({ error: t('validation.amountRequired') })
       .positive(t('validation.amountPositive'))
   });
-
-type CustomerFormValues = z.infer<ReturnType<typeof createPartyFormSchema>>;
-type ReceivePaymentFormValues = z.infer<ReturnType<typeof createReceivePaymentSchema>>;

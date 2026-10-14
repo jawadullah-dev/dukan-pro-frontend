@@ -7,5 +7,3 @@ export const createBrandFormSchema = (t: Translator) =>
   z.object({
     name: z.string().trim().min(1, t('validation.nameRequired'))
   });
-
-type BrandFormValues = z.infer<ReturnType<typeof createBrandFormSchema>>;

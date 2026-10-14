@@ -18,6 +18,7 @@ import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { formatIsoDate } from '@/lib/dates';
+import { PresetReasonPills } from '@/components/common/preset-reason-pills';
 import type { CancelExpenseDialogProps } from '@/types/expense';
 import { cancelExpenseMutation } from '../api/mutations';
 import { expenseKeys } from '../api/queries';
@@ -115,18 +116,7 @@ export function CancelExpenseDialog({
               {t('expenses.cancelReason')} <span className='text-destructive'>*</span>
             </Label>
 
-            <div className='flex flex-wrap gap-1.5'>
-              {PRESET_REASONS.map((preset) => (
-                <button
-                  key={preset}
-                  type='button'
-                  onClick={() => setReason(preset)}
-                  className='rounded-md border border-border/60 bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground hover:bg-accent hover:text-foreground transition-colors'
-                >
-                  + {preset}
-                </button>
-              ))}
-            </div>
+            <PresetReasonPills reasons={PRESET_REASONS} onSelect={setReason} />
 
             <Textarea
               id='expense-cancel-reason'

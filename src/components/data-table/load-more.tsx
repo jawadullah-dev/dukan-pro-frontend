@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import type { Table } from '@tanstack/react-table';
 import { IconLoader2 } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import type { LoadMoreProps } from './types';

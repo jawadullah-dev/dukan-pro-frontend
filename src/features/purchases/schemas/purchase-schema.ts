@@ -22,5 +22,3 @@ export const createPurchaseFormSchema = (t: Translator) =>
       )
       .min(1, t('validation.lineItemsMinOne'))
   });
-
-type PurchaseFormValues = z.infer<ReturnType<typeof createPurchaseFormSchema>>;

@@ -1,7 +1,6 @@
 import type * as React from 'react';
 import type { DataTableConfig } from '@/config/data-table';
-import type { FilterItemSchema } from '@/lib/parsers';
-import type { ColumnSort, Row, RowData, TableOptions, TableState } from '@tanstack/react-table';
+import type { ColumnSort, RowData, TableOptions, TableState } from '@tanstack/react-table';
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -43,15 +42,9 @@ export interface Option {
   icon?: React.FC<React.SVGProps<SVGSVGElement>>;
 }
 
-type FilterOperator = DataTableConfig['operators'][number];
 export type FilterVariant = DataTableConfig['filterVariants'][number];
-type JoinOperator = DataTableConfig['joinOperators'][number];
 
 export interface ExtendedColumnSort<TData> extends Omit<ColumnSort, 'id'> {
-  id: Extract<keyof TData, string>;
-}
-
-export interface ExtendedColumnFilter<TData> extends FilterItemSchema {
   id: Extract<keyof TData, string>;
 }
 

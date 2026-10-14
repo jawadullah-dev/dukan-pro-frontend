@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import type { Column, Table } from '@tanstack/react-table';
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';

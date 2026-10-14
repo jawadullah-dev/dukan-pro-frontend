@@ -13,7 +13,7 @@ import { StatusBadge } from '@/components/data-table';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { formatIsoDate } from '@/lib/dates';
 import { useT } from '@/i18n/use-t';
-import type { ExpenseDTO, ExpenseDetailSheetProps } from '@/types/expense';
+import type { ExpenseDetailSheetProps } from '@/types/expense';
 
 export function ExpenseDetailSheet({
   expense,

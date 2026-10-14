@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { ExpenseQueryFilter, ExpenseCategoryQueryFilter } from '@/types/expense';
-import { getExpense, getExpenseCategory, listExpenseCategories, listExpenses } from './service';
+import { listExpenseCategories, listExpenses } from './service';
 
 export const expenseKeys = {
   all: ['expenses'] as const,

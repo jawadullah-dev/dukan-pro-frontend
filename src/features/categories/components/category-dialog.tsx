@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dialog';
 import { FieldGroup } from '@/components/ui/field';
 import { useAppForm } from '@/lib/form';
-import type { CategoryDTO } from '@/lib/api/types';
 import type { CategoryDialogProps, CategoryDialogBodyProps } from '@/types';
 import { categoryKeys } from '../api/queries';
 import { createCategory, updateCategory } from '../api/service';

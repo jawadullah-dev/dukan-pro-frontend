@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import type { Column, Table } from '@tanstack/react-table';
 import { DataTableDateFilter } from '@/components/ui/table/data-table-date-filter';
 import { DataTableFacetedFilter } from '@/components/ui/table/data-table-faceted-filter';
 import { DataTableSliderFilter } from '@/components/ui/table/data-table-slider-filter';
@@ -13,7 +12,7 @@ import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { DataTableFiltersSheet } from './data-table-filters-sheet';
-import type { ContainerMode, DataTableToolbarProps, DataTableToolbarFilterProps } from './types';
+import type { DataTableToolbarProps, DataTableToolbarFilterProps } from './types';
 
 export function DataTableToolbar<TData>({
   table,

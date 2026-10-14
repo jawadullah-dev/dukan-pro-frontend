@@ -28,6 +28,7 @@ import { useT } from '@/i18n/use-t';
 import { formatPkr, toPaisa } from '@/lib/dukaan/numbers';
 import type { ReturnPreviewDTO, ReturnItemInput } from '@/lib/api/types';
 import { todayIsoDate } from '@/lib/dates';
+import { OverdraftAlert } from '@/components/common/overdraft-alert';
 import type { ReturnSaleDialogProps, ItemReturnState } from '@/types/sales';
 import { saleKeys } from '../api/queries';
 import { createReturnMutation, previewReturnMutation } from '../api/mutations';
@@ -331,18 +332,14 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
               </div>
 
               {previewData.willCauseOverdraft && (
-                <div className='mt-2 rounded border border-amber-500/30 bg-amber-500/10 p-2 text-amber-900 dark:text-amber-200'>
-                  <div className='flex items-center space-x-2'>
-                    <Checkbox
-                      id='return-overdraft'
-                      checked={confirmOverdraft}
-                      onCheckedChange={(checked) => setConfirmOverdraft(Boolean(checked))}
-                    />
-                    <Label htmlFor='return-overdraft' className='cursor-pointer text-xs'>
-                      {t('sales.returnDialog.overdraftNotice')}
-                    </Label>
-                  </div>
-                </div>
+                <OverdraftAlert
+                  variant='compact'
+                  checked={confirmOverdraft}
+                  onCheckedChange={setConfirmOverdraft}
+                  description={t('sales.returnDialog.overdraftNotice')}
+                  id='return-overdraft'
+                  className='mt-2 border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200 hover:bg-amber-500/15'
+                />
               )}
             </div>
           )}

@@ -1,12 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import type { Row, Table } from '@tanstack/react-table';
+import type { Row } from '@tanstack/react-table';
 import { MobileListItem } from './mobile-list-item';
 import { RecordDetail } from './record-detail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslations } from 'next-intl';
-import type { DetailConfig, MobileItemConfig, MobileListProps } from './types';
+import type { MobileListProps } from './types';
 
 export function MobileList<TData>({
   table,

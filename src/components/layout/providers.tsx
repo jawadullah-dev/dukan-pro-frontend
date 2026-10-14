@@ -1,5 +1,4 @@
 'use client';
-import React from 'react';
 import { ActiveThemeProvider } from '@/components/themes/active-theme';
 import QueryProvider from '@/components/layout/query-provider';
 import { AuthProvider } from '@/components/layout/auth-provider';

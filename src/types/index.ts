@@ -27,27 +27,6 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-export interface NavItemWithChildren extends NavItem {
-  items: NavItemWithChildren[];
-}
-
-export interface NavItemWithOptionalChildren extends NavItem {
-  items?: NavItemWithChildren[];
-}
-
-interface FooterItem {
-  title: string;
-  items: {
-    title: string;
-    href: string;
-    external?: boolean;
-  }[];
-}
-
-type MainNavItem = NavItemWithOptionalChildren;
-
-type SidebarNavItem = NavItemWithChildren;
-
 export * from './supplier-payment';
 export * from './expense';
 export * from './cash';

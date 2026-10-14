@@ -14,9 +14,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Icons } from '@/components/icons';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { OverdraftAlert } from '@/components/common/overdraft-alert';
+import { PresetReasonPills } from '@/components/common/preset-reason-pills';
 import { useT } from '@/i18n/use-t';
 import type { CancelPaymentDialogProps } from '@/types/payment';
 import type { OverdraftPrompt } from '@/types';
@@ -187,40 +188,20 @@ export function CancelPaymentDialog({
                 className='text-sm font-normal text-foreground'
                 required
               />
-              <div className='flex flex-wrap gap-1.5 pt-1'>
-                {PRESET_REASONS.map((preset) => (
-                  <button
-                    key={preset.key}
-                    type='button'
-                    onClick={() => setReason(t(preset.key))}
-                    className='rounded-md border bg-muted/50 px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors'
-                  >
-                    + {t(preset.key)}
-                  </button>
-                ))}
-              </div>
+              <PresetReasonPills
+                reasons={PRESET_REASONS.map((preset) => t(preset.key))}
+                onSelect={setReason}
+                className='pt-1'
+              />
             </div>
 
             {(impact?.willCauseOverdraft || overdraftPrompt) && (
-              <div
-                onClick={() => setConfirmOverdraft((prev) => !prev)}
-                className='flex items-start gap-2.5 rounded-lg border border-destructive/40 bg-destructive/10 p-3 cursor-pointer select-none transition-colors hover:bg-destructive/15'
-              >
-                <Checkbox
-                  id='confirm-overdraft'
-                  checked={confirmOverdraft}
-                  onCheckedChange={(c) => setConfirmOverdraft(Boolean(c))}
-                  onClick={(e) => e.stopPropagation()}
-                  className='size-4.5 rounded border-2 border-destructive/70 bg-background shadow-xs mt-0.5 shrink-0 data-checked:bg-destructive data-checked:border-destructive data-checked:text-destructive-foreground'
-                />
-                <Label
-                  htmlFor='confirm-overdraft'
-                  onClick={(e) => e.stopPropagation()}
-                  className='text-xs cursor-pointer leading-normal text-foreground font-normal'
-                >
-                  {t('payments.confirmNegativeDrawer')}
-                </Label>
-              </div>
+              <OverdraftAlert
+                variant='compact'
+                checked={confirmOverdraft}
+                onCheckedChange={setConfirmOverdraft}
+                description={t('payments.confirmNegativeDrawer')}
+              />
             )}
 
             <DialogFooter className='gap-2 sm:gap-2.5 pt-2'>

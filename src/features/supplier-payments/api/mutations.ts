@@ -2,7 +2,6 @@ import { mutationOptions } from '@tanstack/react-query';
 import { getQueryClient } from '@/lib/query-client';
 import type {
   CreateSupplierPaymentInput,
-  CancelSupplierPaymentInput,
   CancelSupplierPaymentMutationVariables
 } from '@/types/supplier-payment';
 import { supplierPaymentKeys } from './queries';

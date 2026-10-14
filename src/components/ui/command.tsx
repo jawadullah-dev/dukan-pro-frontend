@@ -13,7 +13,7 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
-import { IconSearch, IconCheck } from '@tabler/icons-react';
+import { IconSearch } from '@tabler/icons-react';
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (

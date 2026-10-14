@@ -5,7 +5,6 @@ import { useMemo } from 'react';
 import { getSortingStateParser } from '@/lib/parsers';
 import type { ListFilters } from '@/lib/dukaan';
 
-const DUKAAN_PAGE_SIZE_OPTIONS = [20, 30, 50, 100] as const;
 export const DUKAAN_DEFAULT_PAGE_SIZE = 20;
 
 function pickFilterValue(values: string[] | null | undefined): string | undefined {

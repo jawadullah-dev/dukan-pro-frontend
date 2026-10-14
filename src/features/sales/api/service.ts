@@ -7,8 +7,7 @@ import type {
   CancelImpactDTO,
   ReturnPreviewInput,
   ReturnPreviewDTO,
-  CreateReturnInput,
-  SaleReturnDTO
+  CreateReturnInput
 } from '@/lib/api/types';
 
 import type { SalesListFilters, CancelSaleResult, CreateReturnResult } from '@/types';

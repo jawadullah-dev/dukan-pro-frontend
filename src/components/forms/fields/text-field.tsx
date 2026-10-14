@@ -13,8 +13,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
-import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
-import type { IconComponent, TextFieldProps } from '@/types';
+import { useFieldContext, useFieldInvalid } from '@/lib/form-context';
+import type { TextFieldProps } from '@/types';
 export type { TextFieldProps };
 
 export function TextField({

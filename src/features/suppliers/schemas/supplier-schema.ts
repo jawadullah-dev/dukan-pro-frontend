@@ -17,5 +17,3 @@ export const createSupplierFormSchema = (t: Translator) =>
       .number({ error: t('validation.openingBalanceRequired') })
       .min(0, t('validation.valueNonNegative'))
   });
-
-type SupplierFormValues = z.infer<ReturnType<typeof createSupplierFormSchema>>;

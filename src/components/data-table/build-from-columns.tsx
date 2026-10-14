@@ -13,7 +13,6 @@ import type {
   ColumnLayoutMeta,
   ColumnSemanticType
 } from './types';
-import { env } from '@/config/env';
 
 function metaOf<TData>(col: Column<TData, unknown>): ColumnLayoutMeta {
   const m = col.columnDef.meta ?? {};

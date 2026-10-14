@@ -322,8 +322,3 @@ export async function listPlatformSubscriptions(
   }
   return paginate(rows, page, limit);
 }
-
-export async function listPlatformCities(): Promise<string[]> {
-  await delay();
-  return [...new Set(SHOPS.map((s) => s.city))].sort();
-}

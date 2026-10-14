@@ -26,7 +26,6 @@ import type {
   CreatePurchaseResult
 } from '@/lib/api/types';
 import type {
-  PurchaseLineItem,
   PurchaseFormValues,
   PurchaseLineDraft,
   PurchaseCreateFormProps,
@@ -59,7 +58,6 @@ const emptyLine = (): PurchaseLineDraft => ({
 
 export function PurchaseCreateForm({ onDone }: PurchaseCreateFormProps) {
   const qc = useQueryClient();
-  const router = useRouter();
   const t = useT();
   const [clientRequestId] = useState(() => createClientRequestId());
   const [warning, setWarning] = useState<OverdraftPrompt | null>(null);

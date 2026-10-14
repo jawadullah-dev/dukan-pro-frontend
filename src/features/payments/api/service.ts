@@ -27,13 +27,6 @@ export async function listPayments(
   return appFetch<PaginatedResponse<PaymentDTO>>(`/api/payments${qs}`);
 }
 
-export async function getPayment(id: string, token?: string): Promise<PaymentDTO> {
-  if (token) {
-    return apiRequest<PaymentDTO>(`/payments/${id}`, undefined, token);
-  }
-  return appFetch<PaymentDTO>(`/api/payments/${id}`);
-}
-
 export async function createPayment(input: CreatePaymentInput): Promise<PaymentDTO> {
   return appFetch<PaymentDTO>('/api/payments', {
     method: 'POST',

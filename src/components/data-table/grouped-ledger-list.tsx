@@ -1,11 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import type { Row, Table } from '@tanstack/react-table';
+import type { Row } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { RecordDetail } from './record-detail';
-import type { DetailConfig, MobileItemConfig, GroupedLedgerListProps } from './types';
+import type { GroupedLedgerListProps } from './types';
 
 function dateHeading(key: string): string {
   if (/^\d{4}-\d{2}-\d{2}/.test(key)) return key.slice(0, 10);

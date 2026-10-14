@@ -1,10 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
-import {
-  listInventoryAdjustments,
-  listInventoryStock,
-  type InventoryAdjustmentsFilters,
-  type InventoryStockFilters
-} from './service';
+import { listInventoryAdjustments, listInventoryStock } from './service';
+import type { InventoryAdjustmentsFilters, InventoryStockFilters } from '@/types';
 
 export const inventoryKeys = {
   all: ['inventory'] as const,

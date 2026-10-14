@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { CustomerListFilters } from './service';
+import type { CustomerListFilters } from '@/types';
 import { getCustomer, listCustomers } from './service';
 
 export const customerKeys = {

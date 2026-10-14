@@ -34,7 +34,7 @@ import { formatDate } from '@/lib/format';
 import type { SupplierDTO } from '@/lib/api/types';
 import { supplierKeys, suppliersQueryOptions } from '../api/queries';
 import { deactivateSupplier, reactivateSupplier } from '../api/service';
-import type { SupplierListFilters } from '../api/service';
+import type { SupplierListFilters } from '@/types';
 import { SupplierDialog } from './supplier-dialog';
 import type { SupplierCellActionProps, SuppliersTableProps } from '@/types/suppliers';
 

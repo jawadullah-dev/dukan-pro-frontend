@@ -31,7 +31,7 @@ import { formatPkr } from '@/lib/dukaan/numbers';
 import type { SaleDTO } from '@/lib/api/types';
 import type { SaleRowActionsProps, SalesTableProps } from '@/types/sales';
 import { salesQueryOptions } from '../api/queries';
-import type { SalesListFilters } from '../api/service';
+import type { SalesListFilters } from '@/types';
 import { CancelSaleDialog } from './cancel-sale-dialog';
 import { ReturnSaleDialog } from './return-sale-dialog';
 

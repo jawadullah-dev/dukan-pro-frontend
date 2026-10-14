@@ -26,7 +26,7 @@ import { formatPkr } from '@/lib/dukaan/numbers';
 import type { PaymentDTO } from '@/lib/api/types';
 import { useState, type ReactNode } from 'react';
 import { paymentsQueryOptions } from '../api/queries';
-import type { PaymentsListFilters } from '../api/service';
+import type { PaymentsListFilters } from '@/types';
 import { CancelPaymentDialog } from './cancel-payment-dialog';
 import { RecordPaymentDialog } from './record-payment-dialog';
 import type { PaymentRowActionsProps, PaymentsTableProps } from '@/types/payment';

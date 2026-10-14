@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { SalesListFilters } from './service';
+import type { SalesListFilters } from '@/types';
 import { getCancelImpact, getSale, listSales } from './service';
 
 export const saleKeys = {

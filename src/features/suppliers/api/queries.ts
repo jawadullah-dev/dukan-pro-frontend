@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { listSuppliers } from './service';
-import type { SupplierListFilters } from './service';
+import type { SupplierListFilters } from '@/types';
 
 export const supplierKeys = {
   all: ['suppliers'] as const,

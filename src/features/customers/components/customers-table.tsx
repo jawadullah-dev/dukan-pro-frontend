@@ -37,7 +37,7 @@ import { formatDate } from '@/lib/format';
 import type { CustomerDTO } from '@/lib/api/types';
 import { customerKeys, customersQueryOptions } from '../api/queries';
 import { deactivateCustomer, reactivateCustomer } from '../api/service';
-import type { CustomerListFilters } from '../api/service';
+import type { CustomerListFilters } from '@/types';
 import { CustomerDialog } from './customer-dialog';
 import type { CustomerCellActionProps, CustomersTableProps } from '@/types';
 

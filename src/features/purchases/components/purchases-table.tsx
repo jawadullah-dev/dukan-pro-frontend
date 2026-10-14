@@ -29,7 +29,7 @@ import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type { PurchaseDTO } from '@/lib/api/types';
 import type { PurchaseRowActionsProps, PurchasesTableProps } from '@/types/purchases';
 import { purchasesQueryOptions } from '../api/queries';
-import type { PurchasesListFilters } from '../api/service';
+import type { PurchasesListFilters } from '@/types';
 import { CancelPurchaseDialog } from './cancel-purchase-dialog';
 
 function PurchaseRowActions({ purchase }: PurchaseRowActionsProps) {

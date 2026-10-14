@@ -428,7 +428,7 @@ export function RecordSupplierPaymentDialog({
                   <p className='mt-0.5 text-muted-foreground'>
                     {overdraftPrompt.message ||
                       t('supplierPayments.shortfallWarningDesc', {
-                        shortfall: formatPkr(overdraftPrompt.shortfall)
+                        shortfall: formatPkr(overdraftPrompt.shortfall ?? 0)
                       })}
                   </p>
                 </div>

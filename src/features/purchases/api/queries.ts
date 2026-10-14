@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { PurchasesListFilters } from './service';
+import type { PurchasesListFilters } from '@/types';
 import { getCancelImpact, getPurchase, listPurchases } from './service';
 
 export const purchaseKeys = {

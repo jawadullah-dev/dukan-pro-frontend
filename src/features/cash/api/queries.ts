@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { CashMovementQueryFilter } from '@/types/cash';
-import type { PaymentsListFilters } from '@/features/payments/api/service';
+import type { PaymentsListFilters } from '@/types';
 import { listCashMovements } from './service';
 
 export const cashKeys = {

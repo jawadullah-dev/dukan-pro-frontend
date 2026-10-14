@@ -217,7 +217,7 @@ export function RecordExpenseDialog({
                     <p className='mt-0.5 text-muted-foreground'>
                       {overdraftPrompt.message ||
                         t('dukaan.cash.shortfallWarningDesc', {
-                          shortfall: formatPkr(overdraftPrompt.shortfall)
+                          shortfall: formatPkr(overdraftPrompt.shortfall ?? 0)
                         })}
                     </p>
                   </div>

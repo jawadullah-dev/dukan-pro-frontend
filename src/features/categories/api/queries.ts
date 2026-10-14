@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { CategoryListFilters } from './service';
+import type { CategoryListFilters } from '@/types';
 import { listCategories } from './service';
 
 export const categoryKeys = {

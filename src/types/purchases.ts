@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { CancelPurchaseInput, PurchaseDTO } from '@/lib/api/types';
 import type { Product } from '@/lib/dukaan/types';
 

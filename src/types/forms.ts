@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import type { DropzoneProps } from 'react-dropzone';
 import type { Textarea } from '@/components/ui/textarea';
+import type { Input } from '@/components/ui/input';
 import type { ListFilters, Paginated } from '@/lib/dukaan';
 
 export interface BaseFieldProps {

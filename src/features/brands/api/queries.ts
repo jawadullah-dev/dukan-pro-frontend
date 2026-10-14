@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { BrandListFilters } from './service';
+import type { BrandListFilters } from '@/types';
 import { listBrands } from './service';
 
 export const brandKeys = {

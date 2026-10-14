@@ -22,6 +22,7 @@ import { useFilteredNavGroups } from '@/hooks/use-nav';
 import type { NavGroup, NavItem, AppSidebarProps } from '@/types';
 export type { AppSidebarProps };
 import { Link, usePathname } from '@/i18n/navigation';
+import { useSelectedLayoutSegment } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '@/components/icons';
 import { useLocale, useTranslations } from 'next-intl';
@@ -65,6 +66,7 @@ export default function AppSidebar({ role }: AppSidebarProps) {
   const isRtl = isRtlLocale(locale);
   const labelOf = React.useCallback((key: string) => translateMaybe(key, t), [t]);
   const pathname = usePathname();
+  const segment = useSelectedLayoutSegment();
   const { isMobile, setOpenMobile } = useSidebar();
   const initialGroups = React.useMemo(() => getNavGroupsForRole(role), [role]);
   const filteredGroups = useFilteredNavGroups(initialGroups, role);
@@ -118,6 +120,7 @@ export default function AppSidebar({ role }: AppSidebarProps) {
                 const title = labelOf(item.title);
                 const isActive =
                   pathname === item.url ||
+                  (segment !== null && item.url === `/dashboard/${segment}`) ||
                   (item.url !== '/dashboard/platform' &&
                     item.url !== '/dashboard/overview' &&
                     pathname.startsWith(`${item.url}/`));

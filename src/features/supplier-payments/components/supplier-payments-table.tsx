@@ -44,7 +44,9 @@ function SupplierPaymentRowActions({ payment, onCancel }: SupplierPaymentRowActi
   return (
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <DropdownMenu modal={false}>
-        <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
+        <DropdownMenuTrigger
+          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
+        >
           <span className='sr-only'>{t('table.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
@@ -319,7 +321,7 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
   const recordActionButton = (
     <div className='flex items-center gap-2'>
       {toolbarAction}
-      <Button size='sm' className='h-8 gap-1.5' onClick={() => setRecordOpen(true)}>
+      <Button type='button' size='sm' className='h-8 gap-1.5' onClick={() => setRecordOpen(true)}>
         <Icons.add className='h-3.5 w-3.5' />
         <span>{t('supplierPayments.addPayment')}</span>
       </Button>

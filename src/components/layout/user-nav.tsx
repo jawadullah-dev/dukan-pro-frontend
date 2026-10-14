@@ -92,6 +92,7 @@ export function UserNav() {
       <DropdownMenuTrigger
         render={
           <Button
+            type='button'
             variant='ghost'
             size='icon'
             className='relative h-8 w-8 rounded-full'

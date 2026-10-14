@@ -71,6 +71,7 @@ export function DataTablePagination<TData>({
         <div className='flex items-center gap-1'>
           {!compact ? (
             <Button
+              type='button'
               aria-label={t('table.firstPage')}
               variant='outline'
               size='icon'
@@ -82,6 +83,7 @@ export function DataTablePagination<TData>({
             </Button>
           ) : null}
           <Button
+            type='button'
             aria-label={t('table.prevPage')}
             variant='outline'
             size={compact ? 'default' : 'icon'}
@@ -92,6 +94,7 @@ export function DataTablePagination<TData>({
             {compact ? t('table.prev') : <Icons.chevronLeft className='rtl:rotate-180' />}
           </Button>
           <Button
+            type='button'
             aria-label={t('table.nextPage')}
             variant='outline'
             size={compact ? 'default' : 'icon'}
@@ -103,6 +106,7 @@ export function DataTablePagination<TData>({
           </Button>
           {!compact ? (
             <Button
+              type='button'
               aria-label={t('table.lastPage')}
               variant='outline'
               size='icon'

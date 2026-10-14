@@ -15,10 +15,15 @@ export default function NotFound() {
       <h2 className='font-heading my-2 text-2xl font-bold'>{t('errors.notFoundTitle')}</h2>
       <p>{t('errors.notFoundDescription')}</p>
       <div className='mt-8 flex justify-center gap-2'>
-        <Button onClick={() => router.back()} variant='default' size='lg'>
+        <Button type='button' onClick={() => router.back()} variant='default' size='lg'>
           {t('errors.goBack')}
         </Button>
-        <Button onClick={() => router.push('/en/dashboard')} variant='ghost' size='lg'>
+        <Button
+          type='button'
+          onClick={() => router.push('/en/dashboard')}
+          variant='ghost'
+          size='lg'
+        >
           {t('errors.backHome')}
         </Button>
       </div>

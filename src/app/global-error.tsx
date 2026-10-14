@@ -24,6 +24,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           <h1 className='mb-2 text-2xl font-bold'>{t('errors.genericTitle')}</h1>
           <p className='mb-5 text-muted-foreground'>{t('errors.genericDescription')}</p>
           <button
+            type='button'
             onClick={() => reset()}
             className='cursor-pointer rounded-lg border border-border bg-transparent px-5 py-2 font-inherit'
           >

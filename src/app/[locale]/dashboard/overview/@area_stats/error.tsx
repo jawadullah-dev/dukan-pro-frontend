@@ -30,7 +30,7 @@ export default function AreaStatsError({ error, reset }: AreaStatsErrorProps) {
       message={t('overview.failedToLoadArea', { message: error.message })}
       action={
         <>
-          <Button variant='outline' size='sm' onClick={retry} isLoading={isPending}>
+          <Button type='button' variant='outline' size='sm' onClick={retry} isLoading={isPending}>
             {t('overview.tryAgain')}
           </Button>
           <span role='status' aria-live='polite' className='sr-only'>

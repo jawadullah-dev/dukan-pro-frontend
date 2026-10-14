@@ -23,6 +23,7 @@ export function RowActionsMenu({ actions }: RowActionsMenuProps) {
       <DropdownMenuTrigger
         render={
           <Button
+            type='button'
             variant='ghost'
             className='size-11 min-h-11 min-w-11 p-0 sm:size-8 sm:min-h-8 sm:min-w-8'
           />

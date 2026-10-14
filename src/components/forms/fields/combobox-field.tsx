@@ -53,6 +53,7 @@ export function ComboboxField({
         <PopoverTrigger
           render={
             <Button
+              type='button'
               id={field.name}
               variant='outline'
               role='combobox'

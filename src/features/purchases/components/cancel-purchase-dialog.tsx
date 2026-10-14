@@ -88,7 +88,7 @@ export function CancelPurchaseDialog({
               </p>
             </div>
             <DialogFooter>
-              <Button variant='outline' onClick={() => onOpenChange(false)}>
+              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
                 {t('purchases.cancelDialog.close')}
               </Button>
             </DialogFooter>

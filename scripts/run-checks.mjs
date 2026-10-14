@@ -45,6 +45,8 @@ const CHECKS = [
   { id: 'error-boundaries',   cmd: ['node', 'scripts/code/check-error-boundaries.cjs'] },
   { id: 'catch-handling',     cmd: ['node', 'scripts/code/check-catch.cjs'] },
   { id: 'max-lines',          cmd: ['node', 'scripts/code/check-max-lines.cjs'] },
+  { id: 'storage-safety',     cmd: ['node', 'scripts/code/check-storage-safety.cjs'] },
+  { id: 'button-safety',      cmd: ['node', 'scripts/code/check-button-safety.cjs'] },
   { id: 'mutation-hooks',     cmd: ['node', 'scripts/code/check-mutation-hooks.cjs'] },
   { id: 'list-tables',        cmd: ['node', 'scripts/check-list-tables.mjs'] },
   { id: 'duplicates',         cmd: ['npx', '--yes', 'jscpd', '--config', '.jscpd.json'] },

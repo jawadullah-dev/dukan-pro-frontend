@@ -67,7 +67,7 @@ export default function NotificationsPage() {
       pageDescription='pages.notifications.description'
       pageHeaderAction={
         count > 0 ? (
-          <Button variant='outline' size='sm' onClick={markAllAsRead}>
+          <Button type='button' variant='outline' size='sm' onClick={markAllAsRead}>
             {t('notifications.markAllAsRead')}
           </Button>
         ) : undefined

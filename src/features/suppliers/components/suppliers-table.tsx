@@ -80,7 +80,9 @@ function SupplierCellAction({ data }: SupplierCellActionProps) {
       />
       <SupplierDialog open={editOpen} onOpenChange={setEditOpen} supplier={data} />
       <DropdownMenu modal={false}>
-        <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
+        <DropdownMenuTrigger
+          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
+        >
           <span className='sr-only'>{t('common.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>

@@ -32,7 +32,9 @@ export function NotificationCenter() {
 
   return (
     <Popover>
-      <PopoverTrigger render={<Button variant='ghost' size='icon' className='relative h-8 w-8' />}>
+      <PopoverTrigger
+        render={<Button type='button' variant='ghost' size='icon' className='relative h-8 w-8' />}
+      >
         <Icons.notification className='h-4 w-4' />
         {count > 0 && (
           <span className='bg-primary text-primary-foreground absolute -top-0.5 -end-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-medium'>
@@ -60,6 +62,7 @@ export function NotificationCenter() {
             )}
             {count > 0 && (
               <Button
+                type='button'
                 variant='ghost'
                 size='sm'
                 className='text-muted-foreground h-auto px-2 py-1 text-xs'

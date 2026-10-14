@@ -41,10 +41,10 @@ export default function AppError({ error, reset }: LocaleAppErrorProps) {
         </p>
       </div>
       <div className='flex gap-2'>
-        <Button onClick={reset} variant='default'>
+        <Button type='button' onClick={reset} variant='default'>
           {t('common.tryAgain')}
         </Button>
-        <Button onClick={() => window.location.reload()} variant='outline'>
+        <Button type='button' onClick={() => window.location.reload()} variant='outline'>
           {t('common.reloadPage')}
         </Button>
       </div>

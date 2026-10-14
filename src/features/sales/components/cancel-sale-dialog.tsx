@@ -98,7 +98,7 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
               </p>
             </div>
             <DialogFooter>
-              <Button variant='outline' onClick={() => onOpenChange(false)}>
+              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
                 {t('sales.cancelDialog.close')}
               </Button>
             </DialogFooter>

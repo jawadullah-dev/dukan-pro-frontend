@@ -50,7 +50,9 @@ function ExpenseCategoryCellAction({
   return (
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <DropdownMenu modal={false}>
-        <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
+        <DropdownMenuTrigger
+          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
+        >
           <span className='sr-only'>{t('common.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
@@ -313,7 +315,7 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
   const toolbarActionButton = (
     <div className='flex items-center gap-2'>
       {toolbarAction}
-      <Button size='sm' className='h-8 gap-1.5' onClick={() => setCreateOpen(true)}>
+      <Button type='button' size='sm' className='h-8 gap-1.5' onClick={() => setCreateOpen(true)}>
         <Icons.add className='h-3.5 w-3.5' />
         <span>{t('expenses.addCategory')}</span>
       </Button>

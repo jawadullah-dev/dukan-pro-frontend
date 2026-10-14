@@ -289,7 +289,7 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
         table={table}
         toolbarAction={
           toolbarAction ?? (
-            <Button size='sm' onClick={() => setAdjustOpen(true)}>
+            <Button type='button' size='sm' onClick={() => setAdjustOpen(true)}>
               <IconPlus className='me-1.5 h-4 w-4' />
               {t('common.adjustStock')}
             </Button>

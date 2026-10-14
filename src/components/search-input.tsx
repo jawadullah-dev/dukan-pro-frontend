@@ -10,6 +10,7 @@ export default function SearchInput() {
   return (
     <div className='w-full space-y-2'>
       <Button
+        type='button'
         variant='outline'
         className='bg-background text-muted-foreground relative h-9 w-full justify-start rounded-[0.5rem] text-sm font-normal shadow-none sm:pe-12 md:w-40 lg:w-64'
         onClick={query.toggle}

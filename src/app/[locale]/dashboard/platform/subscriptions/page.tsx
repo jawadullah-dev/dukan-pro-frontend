@@ -28,7 +28,7 @@ export default async function PlatformSubscriptionsPage() {
       pageTitle='pages.subscriptions.title'
       pageDescription='platform.assignManagePlans'
       pageHeaderAction={
-        <Button>
+        <Button type='button'>
           <Icons.add className='ms-2 h-4 w-4' />
           {t('assignPlanButton')}
         </Button>

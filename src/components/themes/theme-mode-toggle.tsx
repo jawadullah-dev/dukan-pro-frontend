@@ -47,6 +47,7 @@ export function ThemeModeToggle() {
       <TooltipTrigger
         render={
           <Button
+            type='button'
             variant='secondary'
             size='icon'
             className='group/toggle size-8'

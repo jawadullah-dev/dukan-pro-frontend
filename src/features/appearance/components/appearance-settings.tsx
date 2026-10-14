@@ -49,11 +49,13 @@ function LivePreview() {
           <Badge>{t('status.active')}</Badge>
         </div>
         <div className='flex flex-wrap gap-2'>
-          <Button size='sm'>{t('appearance.previewButtonPrimary')}</Button>
-          <Button size='sm' variant='secondary'>
+          <Button type='button' size='sm'>
+            {t('appearance.previewButtonPrimary')}
+          </Button>
+          <Button type='button' size='sm' variant='secondary'>
             {t('appearance.previewButtonSecondary')}
           </Button>
-          <Button size='sm' variant='outline'>
+          <Button type='button' size='sm' variant='outline'>
             {t('appearance.previewButtonOutline')}
           </Button>
         </div>
@@ -103,7 +105,7 @@ export function AppearanceSettings() {
             <h2 className='text-2xl font-semibold tracking-tight'>{t('appearance.title')}</h2>
             <p className='text-muted-foreground text-sm'>{t('appearance.subtitle')}</p>
           </div>
-          <Button variant='outline' size='sm' onClick={() => prefs.resetAll()}>
+          <Button type='button' variant='outline' size='sm' onClick={() => prefs.resetAll()}>
             <Icons.history className='me-2 h-4 w-4' />
             {t('appearance.reset')}
           </Button>

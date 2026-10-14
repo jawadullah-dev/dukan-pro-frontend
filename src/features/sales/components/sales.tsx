@@ -671,7 +671,7 @@ export function SaleReceiptClient({ id }: SaleReceiptClientProps) {
           <span>{formatPkr(outstanding)}</span>
         </div>
       </div>
-      <Button className='print:hidden w-full' onClick={() => window.print()}>
+      <Button type='button' className='print:hidden w-full' onClick={() => window.print()}>
         {t('dukaan.sale.printReceipt')}
       </Button>
     </div>

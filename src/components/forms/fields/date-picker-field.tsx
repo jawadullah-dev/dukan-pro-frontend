@@ -34,6 +34,7 @@ export function DatePickerField({
         <PopoverTrigger
           render={
             <Button
+              type='button'
               id={field.name}
               variant='outline'
               aria-invalid={isInvalid}
@@ -86,6 +87,7 @@ export function DateRangeField({
         <PopoverTrigger
           render={
             <Button
+              type='button'
               id={field.name}
               variant='outline'
               aria-invalid={isInvalid}

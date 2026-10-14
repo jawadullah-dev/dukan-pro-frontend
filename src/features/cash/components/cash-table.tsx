@@ -311,11 +311,17 @@ export function CashTable({ toolbarAction }: CashTableProps) {
   const toolbarActionButton = (
     <div className='flex items-center gap-2'>
       {toolbarAction}
-      <Button size='sm' className='h-8 gap-1.5' onClick={() => setInvestmentOpen(true)}>
+      <Button
+        type='button'
+        size='sm'
+        className='h-8 gap-1.5'
+        onClick={() => setInvestmentOpen(true)}
+      >
         <Icons.add className='h-3.5 w-3.5' />
         <span>{t('common.investCash')}</span>
       </Button>
       <Button
+        type='button'
         size='sm'
         variant='outline'
         className='h-8 gap-1.5'
@@ -325,6 +331,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
         <span>{t('common.withdraw')}</span>
       </Button>
       <Button
+        type='button'
         size='sm'
         variant='outline'
         className='h-8 gap-1.5'

@@ -23,19 +23,20 @@ import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-h
 import { useDataTable } from '@/hooks/use-data-table';
 import { useDukaanListParams } from '@/components/data-table/list-params';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import type { SupplierPaymentDTO, SupplierPaymentQueryFilter } from '@/types/supplier-payment';
+import type {
+  SupplierPaymentDTO,
+  SupplierPaymentQueryFilter,
+  SupplierPaymentRowActionsProps,
+  SupplierPaymentsTableProps
+} from '@/types/supplier-payment';
 import { useState, type ReactNode } from 'react';
 import { supplierPaymentsQueryOptions } from '../api/queries';
 import { CancelSupplierPaymentDialog } from './cancel-supplier-payment-dialog';
 import { RecordSupplierPaymentDialog } from './record-supplier-payment-dialog';
 import { SupplierPaymentDetailSheet } from './supplier-payment-detail-sheet';
 
-interface SupplierPaymentRowActionsProps {
-  payment: SupplierPaymentDTO;
-  onCancel: (payment: SupplierPaymentDTO) => void;
-}
-
 function SupplierPaymentRowActions({ payment, onCancel }: SupplierPaymentRowActionsProps) {
+  const t = useT();
   const isCancelled = payment.status === 'CANCELLED';
 
   if (isCancelled) return null;
@@ -44,7 +45,7 @@ function SupplierPaymentRowActions({ payment, onCancel }: SupplierPaymentRowActi
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-          <span className='sr-only'>Open menu</span>
+          <span className='sr-only'>{t('table.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-32'>
@@ -57,7 +58,7 @@ function SupplierPaymentRowActions({ payment, onCancel }: SupplierPaymentRowActi
               }}
             >
               <Icons.close className='me-2 h-4 w-4' />
-              Cancel
+              {t('common.cancel')}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -103,10 +104,6 @@ const supplierPaymentDetail: DetailConfig<SupplierPaymentDTO> = {
     }
   ]
 };
-
-interface SupplierPaymentsTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTableProps) {
   const t = useT();
@@ -166,7 +163,9 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
     {
       id: 'supplierName',
       accessorKey: 'supplierName',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Supplier' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.supplier')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>
           {row.original.supplierName || <span className='text-muted-foreground italic'>—</span>}
@@ -188,7 +187,7 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
     {
       id: 'paymentDate',
       accessorKey: 'paymentDate',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
       cell: ({ row }) => {
         const val = row.original.paymentDate;
         const formatted = val ? val.split('T')[0] : '—';
@@ -206,7 +205,9 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
     {
       id: 'amount',
       accessorKey: 'amount',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.amount')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>{formatPkr(row.original.amount)}</span>
       ),
@@ -221,10 +222,14 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
     },
     {
       id: 'target',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Applied To' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('supplierPayments.appliedTo')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>
-          {row.original.purchaseNo ? `Bill #${row.original.purchaseNo}` : 'Opening Balance'}
+          {row.original.purchaseNo
+            ? `Bill #${row.original.purchaseNo}`
+            : t('supplierPayments.openingBalance')}
         </span>
       ),
       meta: {
@@ -239,7 +244,9 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
     {
       id: 'notes',
       accessorKey: 'notes',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Notes' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.notes')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-muted-foreground truncate max-w-[200px] inline-block'>
           {row.original.notes || '—'}
@@ -257,7 +264,9 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
     {
       id: 'status',
       accessorKey: 'status',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.status')} />
+      ),
       cell: ({ row }) => {
         const isCancelled = row.original.status === 'CANCELLED';
         return (
@@ -312,7 +321,7 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
       {toolbarAction}
       <Button size='sm' className='h-8 gap-1.5' onClick={() => setRecordOpen(true)}>
         <Icons.add className='h-3.5 w-3.5' />
-        <span>Add Payment</span>
+        <span>{t('supplierPayments.addPayment')}</span>
       </Button>
     </div>
   );

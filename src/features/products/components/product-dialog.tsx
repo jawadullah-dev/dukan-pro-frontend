@@ -26,12 +26,7 @@ import { productFormSchema, type ProductFormValues } from '../schemas/product-sc
 import { ProductPhotoManager } from './product-photo-manager';
 import { listCategories } from '@/features/categories/api/service';
 import { listBrands } from '@/features/brands/api/service';
-
-interface ProductDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  product?: ProductDTO | null;
-}
+import type { ProductDialogProps, ProductDialogBodyProps } from '@/types/products';
 
 function emptyProductForm(): ProductFormValues {
   return {
@@ -95,11 +90,6 @@ export function ProductDialog({ open, onOpenChange, product }: ProductDialogProp
       ) : null}
     </Dialog>
   );
-}
-
-interface ProductDialogBodyProps {
-  product?: ProductDTO | null;
-  onOpenChange: (open: boolean) => void;
 }
 
 function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
@@ -169,7 +159,7 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
               onOpenChange(false);
             },
             onError: (err: Error) => {
-              toast.error(err.message || 'Failed to update product');
+              toast.error(err.message || t('updateFailed'));
             }
           }
         );
@@ -199,7 +189,7 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
               onOpenChange(false);
             },
             onError: (err: Error) => {
-              toast.error(err.message || 'Failed to create product');
+              toast.error(err.message || t('createFailed'));
             }
           }
         );
@@ -344,13 +334,16 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
                       <form.AppField
                         name='ram'
                         children={(field) => (
-                          <field.TextField label={t('ram')} placeholder='e.g. 8GB' />
+                          <field.TextField label={t('ram')} placeholder={t('ramPlaceholder')} />
                         )}
                       />
                       <form.AppField
                         name='storage'
                         children={(field) => (
-                          <field.TextField label={t('storage')} placeholder='e.g. 128GB' />
+                          <field.TextField
+                            label={t('storage')}
+                            placeholder={t('storagePlaceholder')}
+                          />
                         )}
                       />
                     </div>
@@ -397,7 +390,7 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
             {isEdit && (
               <>
                 <div className='border-t pt-4'>
-                  <h4 className='text-sm font-semibold mb-3'>Online Store Settings</h4>
+                  <h4 className='text-sm font-semibold mb-3'>{t('onlineStoreSettings')}</h4>
                   <form.AppField
                     name='publicDescription'
                     children={(field) => <field.TextareaField label={t('publicDescription')} />}

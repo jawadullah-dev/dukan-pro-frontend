@@ -36,10 +36,7 @@ import { supplierKeys, suppliersQueryOptions } from '../api/queries';
 import { deactivateSupplier, reactivateSupplier } from '../api/service';
 import type { SupplierListFilters } from '../api/service';
 import { SupplierDialog } from './supplier-dialog';
-
-interface SupplierCellActionProps {
-  data: SupplierDTO;
-}
+import type { SupplierCellActionProps, SuppliersTableProps } from '@/types/suppliers';
 
 function SupplierCellAction({ data }: SupplierCellActionProps) {
   const t = useT();
@@ -143,16 +140,19 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
     },
     enableColumnFilter: true,
     enableSorting: true,
-    cell: ({ row }) => (
-      <div className='flex items-center gap-2'>
-        <span className='font-medium'>{row.original.name}</span>
-        {row.original.isSystem && (
-          <Badge variant='outline' className='text-[10px] uppercase font-semibold'>
-            System
-          </Badge>
-        )}
-      </div>
-    )
+    cell: ({ row }) => {
+      const t = useT();
+      return (
+        <div className='flex items-center gap-2'>
+          <span className='font-medium'>{row.original.name}</span>
+          {row.original.isSystem && (
+            <Badge variant='outline' className='text-[10px] uppercase font-semibold'>
+              {t('common.system')}
+            </Badge>
+          )}
+        </div>
+      );
+    }
   },
   {
     id: 'phone',
@@ -340,10 +340,6 @@ const supplierDetail: DetailConfig<SupplierDTO> = {
     }
   ]
 };
-
-interface SuppliersTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function SuppliersTable({ toolbarAction }: SuppliersTableProps) {
   const t = useT();

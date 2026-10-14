@@ -23,7 +23,8 @@ import type {
   CashMovementQueryFilter,
   CashMovementSortField,
   CashMovementType,
-  CashDirection
+  CashDirection,
+  CashTableProps
 } from '@/types/cash';
 import { CASH_TYPE_OPTIONS } from '../constants/cash-constants';
 import { cashMovementsQueryOptions } from '../api/queries';
@@ -80,10 +81,6 @@ const cashDetail: DetailConfig<CashMovementDTO> = {
     }
   ]
 };
-
-interface CashTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function CashTable({ toolbarAction }: CashTableProps) {
   const t = useT();
@@ -159,7 +156,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
     {
       id: 'movementDate',
       accessorKey: 'movementDate',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='When' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.when')} />,
       cell: ({ row }) => {
         const raw = row.original.movementDate ?? row.original.createdAt;
         return (
@@ -178,7 +175,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
     {
       id: 'type',
       accessorKey: 'type',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.type')} />,
       cell: ({ row }) => (
         <div className='flex items-center gap-1.5'>
           <span className='font-medium text-foreground capitalize'>
@@ -186,7 +183,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
           </span>
           {row.original.isOverdraft && (
             <Badge variant='destructive' className='text-[10px] px-1 py-0 h-4'>
-              Overdraft
+              {t('common.overdraft')}
             </Badge>
           )}
         </div>
@@ -204,7 +201,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
     {
       id: 'direction',
       accessorKey: 'direction',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Dir' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.dir')} />,
       cell: ({ row }) => {
         const isIncoming = row.original.direction === 'IN';
         return (
@@ -236,7 +233,9 @@ export function CashTable({ toolbarAction }: CashTableProps) {
     {
       id: 'amount',
       accessorKey: 'amount',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.amount')} />
+      ),
       cell: ({ row }) => {
         const isIncoming = row.original.direction === 'IN';
         return (
@@ -265,7 +264,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
     {
       id: 'note',
       accessorKey: 'note',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Note' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.note')} />,
       cell: ({ row }) => {
         const note = row.original.note;
         const rev = row.original.reversesMovementId;
@@ -275,7 +274,8 @@ export function CashTable({ toolbarAction }: CashTableProps) {
             {note ?? ''}
             {rev ? (
               <span className='text-amber-600 dark:text-amber-400 font-mono text-xs'>
-                {note ? ' · ' : ''}reverses {rev.slice(0, 8)}…
+                {note ? ' · ' : ''}
+                {t('table.reverses')} {rev.slice(0, 8)}…
               </span>
             ) : null}
           </span>

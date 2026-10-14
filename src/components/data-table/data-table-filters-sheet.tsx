@@ -16,14 +16,7 @@ import {
 import { DataTableFacetedFilter } from '@/components/ui/table/data-table-faceted-filter';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-
-interface DataTableFiltersSheetProps<TData> {
-  table: Table<TData>;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-
-  pageSizeOptions?: number[];
-}
+import type { DataTableFiltersSheetProps, FilterBlockProps } from './types';
 
 export function DataTableFiltersSheet<TData>({
   table,
@@ -161,10 +154,6 @@ export function DataTableFiltersSheet<TData>({
       </SheetContent>
     </Sheet>
   );
-}
-
-interface FilterBlockProps<TData> {
-  column: Column<TData, unknown>;
 }
 
 function FilterBlock<TData>({ column }: FilterBlockProps<TData>) {

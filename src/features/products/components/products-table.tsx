@@ -34,10 +34,7 @@ import type { ProductDTO } from '@/lib/api/types';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { ProductDialog } from './product-dialog';
-
-interface ProductCellActionProps {
-  data: ProductDTO;
-}
+import type { ProductCellActionProps, ProductsTableProps } from '@/types/products';
 
 function ProductCellAction({ data }: ProductCellActionProps) {
   const t = useT();
@@ -238,10 +235,6 @@ const productDetail: DetailConfig<ProductDTO> = {
     }
   ]
 };
-
-interface ProductsTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function ProductsTable({ toolbarAction }: ProductsTableProps) {
   const columnIds = ['name', 'categoryName', 'brandName', 'isActive'];

@@ -99,3 +99,42 @@ export interface SupplierPaymentQueryFilter {
   sortBy?: 'paymentDate' | 'amount' | 'createdAt' | 'updatedAt' | 'supplierName' | 'purchaseNo';
   sortOrder?: 'asc' | 'desc';
 }
+
+export interface CancelSupplierPaymentDialogProps {
+  payment: SupplierPaymentDTO;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+}
+
+export interface RecordSupplierPaymentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultSupplierId?: string;
+  onSuccess?: () => void;
+}
+
+export interface SupplierPaymentDetailSheetProps {
+  payment: SupplierPaymentDTO | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCancelClick?: (payment: SupplierPaymentDTO) => void;
+}
+
+export interface SupplierPaymentRowActionsProps {
+  payment: SupplierPaymentDTO;
+  onCancel: (payment: SupplierPaymentDTO) => void;
+}
+
+export interface SupplierPaymentsTableProps {
+  toolbarAction?: React.ReactNode;
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
+export interface SupplierSelectComboboxProps {
+  value?: string;
+  selectedSupplier?: SupplierDTO | null;
+  onSelectSupplier: (supplier: SupplierDTO | null) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}

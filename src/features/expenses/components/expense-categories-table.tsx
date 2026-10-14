@@ -28,18 +28,15 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { useDukaanListParams } from '@/components/data-table/list-params';
 import { AlertModal } from '@/components/modal/alert-modal';
 import { formatDate } from '@/lib/format';
-import type { ExpenseCategoryDTO, ExpenseCategorySortField } from '@/types/expense';
+import type {
+  ExpenseCategoryDTO,
+  ExpenseCategorySortField,
+  ExpenseCategoryCellActionProps,
+  ExpenseCategoriesTableProps
+} from '@/types/expense';
 import { expenseCategoriesQueryOptions, expenseKeys } from '../api/queries';
 import { deleteExpenseCategoryMutation, updateExpenseCategoryMutation } from '../api/mutations';
 import { ExpenseCategoryDialog } from './expense-category-dialog';
-
-interface ExpenseCategoryCellActionProps {
-  category: ExpenseCategoryDTO;
-  onEdit: (category: ExpenseCategoryDTO) => void;
-  onDeactivate: (category: ExpenseCategoryDTO) => void;
-  onActivate: (category: ExpenseCategoryDTO) => void;
-  isActivating: boolean;
-}
 
 function ExpenseCategoryCellAction({
   category,
@@ -135,10 +132,6 @@ const categoryDetail: DetailConfig<ExpenseCategoryDTO> = {
   ]
 };
 
-interface ExpenseCategoriesTableProps {
-  toolbarAction?: ReactNode;
-}
-
 export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTableProps) {
   const t = useT();
   const qc = useQueryClient();
@@ -188,23 +181,23 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
   const activateMutation = useMutation({
     ...updateExpenseCategoryMutation,
     onSuccess: () => {
-      toast.success('Expense category activated successfully');
+      toast.success(t('expenses.categoryActivated'));
       void qc.invalidateQueries({ queryKey: expenseKeys.all });
     },
     onError: (e: Error) => {
-      toast.error(e.message || 'Failed to activate expense category');
+      toast.error(e.message || t('expenses.categoryActivateFailed'));
     }
   });
 
   const deactivateMutation = useMutation({
     ...deleteExpenseCategoryMutation,
     onSuccess: () => {
-      toast.success('Expense category deactivated successfully');
+      toast.success(t('expenses.categoryDeactivated'));
       setDeactivateTarget(null);
       void qc.invalidateQueries({ queryKey: expenseKeys.all });
     },
     onError: (e: Error) => {
-      toast.error(e.message || 'Failed to deactivate expense category');
+      toast.error(e.message || t('expenses.categoryDeactivateFailed'));
     }
   });
 
@@ -216,7 +209,9 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
     {
       id: 'name',
       accessorKey: 'name',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('expenses.nameCol')} />
+      ),
       cell: ({ row }) => <span className='font-medium text-foreground'>{row.original.name}</span>,
       meta: {
         label: 'table.col.name',
@@ -234,7 +229,9 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
     {
       id: 'isActive',
       accessorKey: 'isActive',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('expenses.statusCol')} />
+      ),
       cell: ({ row }) => (
         <StatusBadge
           status={row.original.isActive ? 'ACTIVE' : 'INACTIVE'}
@@ -257,7 +254,9 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
     {
       id: 'createdAt',
       accessorKey: 'createdAt',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Created At' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('expenses.createdAtCol')} />
+      ),
       cell: ({ row }) => {
         const val = row.original.createdAt;
         return <span className='font-normal text-foreground'>{val ? formatDate(val) : '—'}</span>;
@@ -316,7 +315,7 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
       {toolbarAction}
       <Button size='sm' className='h-8 gap-1.5' onClick={() => setCreateOpen(true)}>
         <Icons.add className='h-3.5 w-3.5' />
-        <span>Add category</span>
+        <span>{t('expenses.addCategory')}</span>
       </Button>
     </div>
   );
@@ -342,7 +341,7 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
           onConfirm={() => deactivateMutation.mutate(deactivateTarget.id)}
           loading={deactivateMutation.isPending}
           title={t('common.deactivate')}
-          description={`Are you sure you want to deactivate "${deactivateTarget.name}"? Historical expenses will keep this category, but it will be hidden from new expense entries.`}
+          description={t('expenses.deactivateDesc', { name: deactivateTarget.name })}
           confirmLabel={t('common.deactivate')}
         />
       )}

@@ -6,12 +6,9 @@ import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { useT } from '@/i18n/use-t';
+import type { BrandsHeaderActionProps } from '@/types';
 import { BrandDialog } from './brand-dialog';
 import { BrandsTable } from './brands-table';
-
-interface BrandsHeaderActionProps {
-  onAdd?: () => void;
-}
 
 export function BrandsHeaderAction({ onAdd }: BrandsHeaderActionProps) {
   const t = useT();

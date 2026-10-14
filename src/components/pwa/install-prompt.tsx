@@ -13,6 +13,8 @@ import {
 import { Icons } from '@/components/icons';
 import { useTranslations } from 'next-intl';
 import { isIosInstallCandidate, isStandaloneDisplay } from '@/lib/pwa';
+import type { Surface, InstallPromptProps } from '@/types';
+export type { InstallPromptProps };
 import {
   AUTO_PROMPT_KEY,
   bumpInstallVisitsOnce,
@@ -33,8 +35,6 @@ import { cn } from '@/lib/utils';
 const DISMISS_KEY = 'pwa-install-dismissed-at';
 const DISMISS_DAYS = 14;
 const MIN_VISITS = 2;
-
-type Surface = 'ios' | 'android' | 'desktop';
 
 function readDismissed(): boolean {
   try {
@@ -68,11 +68,6 @@ function setAutoPromptFlag(): void {
   try {
     sessionStorage.setItem(AUTO_PROMPT_KEY, '1');
   } catch {}
-}
-
-interface InstallPromptProps {
-  variant?: 'banner' | 'menu' | 'both';
-  className?: string;
 }
 
 export function InstallPrompt({ variant = 'both', className }: InstallPromptProps) {

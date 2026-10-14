@@ -16,12 +16,9 @@ import { StatusBadge } from '@/components/data-table';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import type { PurchaseDetailClientProps } from '@/types/purchases';
 import { purchaseKeys, purchaseQueryOptions } from '../api/queries';
 import { CancelPurchaseDialog } from './cancel-purchase-dialog';
-
-interface PurchaseDetailClientProps {
-  id: string;
-}
 
 export function PurchaseDetailClient({ id }: PurchaseDetailClientProps) {
   const qc = useQueryClient();
@@ -54,13 +51,13 @@ export function PurchaseDetailClient({ id }: PurchaseDetailClientProps) {
                 variant='outline'
                 className='border-blue-500/40 text-[10px] text-blue-600 dark:text-blue-400'
               >
-                {t('dukaan.purchase.openingStockLabel') || 'Opening Stock'}
+                {t('dukaan.purchase.openingStockLabel')}
               </Badge>
             ) : null}
           </div>
           {data.supplierInvoiceRef ? (
             <p className='text-muted-foreground text-sm'>
-              {t('dukaan.purchase.invoiceRef') || 'Supplier Invoice'}: {data.supplierInvoiceRef}
+              {t('dukaan.purchase.invoiceRef')}: {data.supplierInvoiceRef}
             </p>
           ) : null}
         </div>
@@ -73,7 +70,7 @@ export function PurchaseDetailClient({ id }: PurchaseDetailClientProps) {
             onClick={() => setCancelOpen(true)}
           >
             <Icons.close className='me-2 h-4 w-4' />
-            {t('dukaan.purchase.cancelTitle') || 'Cancel Purchase'}
+            {t('dukaan.purchase.cancelTitle')}
           </Button>
         )}
       </div>
@@ -81,10 +78,10 @@ export function PurchaseDetailClient({ id }: PurchaseDetailClientProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{t('dukaan.purchase.productHeader') || 'Product'}</TableHead>
-            <TableHead>{t('dukaan.purchase.qtyHeader') || 'Quantity'}</TableHead>
-            <TableHead>{t('dukaan.purchase.unitCostHeader') || 'Unit Cost'}</TableHead>
-            <TableHead>{t('dukaan.purchase.lineHeader') || 'Total Cost'}</TableHead>
+            <TableHead>{t('dukaan.purchase.productHeader')}</TableHead>
+            <TableHead>{t('dukaan.purchase.qtyHeader')}</TableHead>
+            <TableHead>{t('dukaan.purchase.unitCostHeader')}</TableHead>
+            <TableHead>{t('dukaan.purchase.lineHeader')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -94,7 +91,7 @@ export function PurchaseDetailClient({ id }: PurchaseDetailClientProps) {
                 <div className='font-medium'>{item.productName || item.productId}</div>
                 {item.imeis && item.imeis.length > 0 && (
                   <div className='text-muted-foreground text-xs font-mono mt-0.5'>
-                    IMEIs: {item.imeis.join(', ')}
+                    {t('purchases.imeisLabel')} {item.imeis.join(', ')}
                   </div>
                 )}
               </TableCell>

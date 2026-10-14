@@ -1,13 +1,7 @@
 'use client';
 
 import { ExpenseCategoryDialog } from './expense-category-dialog';
-import type { ExpenseCategoryDTO } from '@/types/expense';
-
-interface AddCategoryDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCategoryCreated?: (category: ExpenseCategoryDTO) => void;
-}
+import type { AddCategoryDialogProps } from '@/types/expense';
 
 export function AddCategoryDialog({
   open,

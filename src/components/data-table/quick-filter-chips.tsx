@@ -3,13 +3,7 @@
 import type { Table } from '@tanstack/react-table';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import type { QuickFilterChip } from './types';
-
-interface QuickFilterChipsProps<TData> {
-  table: Table<TData>;
-  chips: QuickFilterChip[];
-  className?: string;
-}
+import type { QuickFilterChip, QuickFilterChipsProps } from './types';
 
 export function QuickFilterChips<TData>({ table, chips, className }: QuickFilterChipsProps<TData>) {
   if (chips.length === 0) return null;

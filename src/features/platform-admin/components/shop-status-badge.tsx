@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import type { PlatformShopStatus } from '../api/types';
+import type { ShopStatusBadgeProps } from '@/types';
 
 const STATUS_CONFIG: Record<
   PlatformShopStatus,
@@ -25,10 +26,6 @@ const STATUS_CONFIG: Record<
     icon: 'circleX'
   }
 };
-
-interface ShopStatusBadgeProps {
-  status: PlatformShopStatus;
-}
 
 export function ShopStatusBadge({ status }: ShopStatusBadgeProps) {
   const t = useT();

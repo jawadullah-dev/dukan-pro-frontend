@@ -58,7 +58,10 @@ export function ThemeModeToggle() {
         <span className='sr-only'>{t('appearance.theme')}</span>
       </TooltipTrigger>
       <TooltipContent>
-        {t('appearance.theme')} <Kbd>⌘⇧D</Kbd> <Kbd>D D</Kbd>
+        {t('appearance.theme')} <Kbd>⌘</Kbd>
+        <Kbd>⇧</Kbd>
+        <Kbd>D</Kbd> <Kbd>D</Kbd>
+        <Kbd>D</Kbd>
       </TooltipContent>
     </Tooltip>
   );

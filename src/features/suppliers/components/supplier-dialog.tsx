@@ -20,12 +20,11 @@ import { supplierKeys } from '../api/queries';
 import { createSupplier, updateSupplier } from '../api/service';
 import { createSupplierFormSchema } from '../schemas/supplier-schema';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
-
-interface SupplierDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  supplier?: SupplierDTO | null;
-}
+import type {
+  SupplierDialogProps,
+  SupplierDialogBodyProps,
+  SupplierFormState
+} from '@/types/suppliers';
 
 export function SupplierDialog({ open, onOpenChange, supplier }: SupplierDialogProps) {
   return (
@@ -39,19 +38,6 @@ export function SupplierDialog({ open, onOpenChange, supplier }: SupplierDialogP
       ) : null}
     </Dialog>
   );
-}
-
-interface SupplierDialogBodyProps {
-  supplier?: SupplierDTO | null;
-  onOpenChange: (open: boolean) => void;
-}
-
-interface SupplierFormState {
-  name: string;
-  phone?: string;
-  address?: string;
-  notes?: string;
-  opening_balance: number;
 }
 
 function SupplierDialogBody({ supplier, onOpenChange }: SupplierDialogBodyProps) {

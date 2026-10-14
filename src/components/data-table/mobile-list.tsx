@@ -6,18 +6,7 @@ import { MobileListItem } from './mobile-list-item';
 import { RecordDetail } from './record-detail';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslations } from 'next-intl';
-import type { DetailConfig, MobileItemConfig } from './types';
-
-interface MobileListProps<TData> {
-  table: Table<TData>;
-  mobileItem: MobileItemConfig<TData>;
-  detail: DetailConfig<TData>;
-
-  preferNavigate?: boolean;
-  isLoading?: boolean;
-  skeletonRowCount?: number;
-  onNavigate?: (href: string) => void;
-}
+import type { DetailConfig, MobileItemConfig, MobileListProps } from './types';
 
 export function MobileList<TData>({
   table,

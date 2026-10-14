@@ -16,15 +16,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { toPaisa } from '@/lib/dukaan/numbers';
+import type { OpeningCashDialogProps } from '@/types/cash';
 import { createOpeningCashMutation } from '../api/mutations';
 import { cashKeys } from '../api/queries';
 
 import { useT } from '@/i18n/use-t';
-
-export interface OpeningCashDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
 
 export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps) {
   const t = useT();
@@ -36,7 +32,7 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
   const createMutation = useMutation({
     ...createOpeningCashMutation,
     onSuccess: async () => {
-      toast.success(t('dukaan.cash.openingSuccess') || 'Opening cash recorded successfully');
+      toast.success(t('dukaan.cash.openingSuccess'));
       await qc.invalidateQueries({ queryKey: cashKeys.all });
       await qc.invalidateQueries({ queryKey: ['dashboard'] });
       setAmountStr('');
@@ -44,7 +40,7 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
       onOpenChange(false);
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to record opening cash');
+      toast.error(err.message || t('dukaan.cash.openingFailed'));
     }
   });
 
@@ -52,7 +48,7 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
     e.preventDefault();
     const parsedAmount = parseFloat(amountStr);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      toast.error('Please enter a valid amount greater than 0');
+      toast.error(t('common.invalidAmount'));
       return;
     }
 
@@ -76,22 +72,18 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
     >
       <DialogContent className='w-full sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>{t('dukaan.cash.recordOpeningTitle') || 'Record Opening Cash'}</DialogTitle>
-          <DialogDescription>
-            {t('dukaan.cash.recordOpeningDesc') ||
-              'Day-0 cash balance in the register drawer. Can only be set once per shop.'}
-          </DialogDescription>
+          <DialogTitle>{t('dukaan.cash.recordOpeningTitle')}</DialogTitle>
+          <DialogDescription>{t('dukaan.cash.recordOpeningDesc')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-amount' className='text-sm font-normal text-foreground'>
-              {t('dukaan.cash.openingAmount') || 'Opening Amount (PKR)'}{' '}
-              <span className='text-destructive'>*</span>
+              {t('dukaan.cash.openingAmount')} <span className='text-destructive'>*</span>
             </Label>
             <div className='relative w-full'>
               <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
-                Rs
+                {t('common.currency')}
               </span>
               <Input
                 id='opening-amount'
@@ -111,8 +103,7 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
 
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-date' className='text-sm font-normal text-foreground'>
-              {t('dukaan.cash.startDate') || 'Start Date'}{' '}
-              <span className='text-destructive'>*</span>
+              {t('dukaan.cash.startDate')} <span className='text-destructive'>*</span>
             </Label>
             <Input
               id='opening-date'
@@ -127,15 +118,13 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
 
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='opening-notes' className='text-sm font-normal text-foreground'>
-              {t('dukaan.cash.notes') || 'Notes'}{' '}
-              <span className='text-xs text-muted-foreground'>
-                ({t('common.optional') || 'Optional'})
-              </span>
+              {t('dukaan.cash.notes')}{' '}
+              <span className='text-xs text-muted-foreground'>({t('common.optional')})</span>
             </Label>
             <Textarea
               id='opening-notes'
               rows={2}
-              placeholder='e.g. Cash register opening balance...'
+              placeholder={t('dukaan.cash.openingPlaceholder')}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               disabled={createMutation.isPending}

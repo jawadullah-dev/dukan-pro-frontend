@@ -13,14 +13,7 @@ import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { DataTableFiltersSheet } from './data-table-filters-sheet';
-import type { ContainerMode } from './use-container-mode';
-
-interface DataTableToolbarProps<TData> extends React.ComponentProps<'div'> {
-  table: Table<TData>;
-  mode: ContainerMode;
-
-  children?: React.ReactNode;
-}
+import type { ContainerMode, DataTableToolbarProps, DataTableToolbarFilterProps } from './types';
 
 export function DataTableToolbar<TData>({
   table,
@@ -132,10 +125,6 @@ export function DataTableToolbar<TData>({
       </div>
     </div>
   );
-}
-
-interface DataTableToolbarFilterProps<TData> {
-  column: Column<TData, unknown>;
 }
 
 function DataTableToolbarFilter<TData>({ column }: DataTableToolbarFilterProps<TData>) {

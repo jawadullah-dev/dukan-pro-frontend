@@ -11,18 +11,8 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { useT, translateMaybe } from '@/i18n/use-t';
-
-interface AlertModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  loading: boolean;
-  title?: string;
-  description?: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
-  closeOnOutsideClick?: boolean;
-}
+import type { AlertModalProps } from '@/types';
+export type { AlertModalProps };
 
 export function AlertModal({
   isOpen,

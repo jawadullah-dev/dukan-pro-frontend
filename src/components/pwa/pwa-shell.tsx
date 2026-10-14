@@ -10,9 +10,8 @@ import { env } from '@/config/env';
 
 const enableSw = env.NODE_ENV === 'production';
 
-export interface PwaShellProps {
-  children: ReactNode;
-}
+import type { PwaShellProps } from '@/types';
+export type { PwaShellProps };
 
 export function PwaShell({ children }: PwaShellProps) {
   const body = (

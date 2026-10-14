@@ -23,7 +23,7 @@ const PATTERNS = [
   { re: /['"`][A-Za-z0-9]{32}['"`]/, label: "Possible MD5/Key string" },
 ];
 
-const roots = [path.join(__dirname, "../src"), path.join(__dirname, "../app")].filter((p) =>
+const roots = [path.resolve(__dirname, "../../src")].filter((p) =>
   fs.existsSync(p),
 );
 

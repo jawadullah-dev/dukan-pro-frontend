@@ -4,12 +4,15 @@ import type * as React from 'react';
 import type { Column, ColumnDef, Table } from '@tanstack/react-table';
 import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import { StatusBadge } from './status-badge';
-import {
-  resolveMobileSlots,
-  type ColumnLayoutMeta,
-  type ColumnSemanticType
-} from './resolve-mobile-item';
-import type { DetailConfig, DetailSection, MobileItemConfig } from './types';
+import { resolveMobileSlots } from './resolve-mobile-item';
+import type {
+  DetailConfig,
+  DetailSection,
+  MobileItemConfig,
+  TranslateFn,
+  ColumnLayoutMeta,
+  ColumnSemanticType
+} from './types';
 import { env } from '@/config/env';
 
 function metaOf<TData>(col: Column<TData, unknown>): ColumnLayoutMeta {
@@ -34,8 +37,6 @@ function readValue<TData>(row: TData, columnDef: ColumnDef<TData, unknown>): unk
   }
   return undefined;
 }
-
-type TranslateFn = (key: string) => string;
 
 function formatByType(value: unknown, type?: ColumnSemanticType, t?: TranslateFn): React.ReactNode {
   if (value == null || value === '') return '—';

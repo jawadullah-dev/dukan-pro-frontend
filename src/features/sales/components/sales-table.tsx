@@ -1,11 +1,10 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQueryState, parseAsString } from 'nuqs';
+import { useState } from 'react';
+import { parseAsString, useQueryState } from 'nuqs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +12,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
@@ -31,17 +29,15 @@ import { useT } from '@/i18n/use-t';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import type { SaleDTO } from '@/lib/api/types';
+import type { SaleRowActionsProps, SalesTableProps } from '@/types/sales';
 import { salesQueryOptions } from '../api/queries';
 import type { SalesListFilters } from '../api/service';
 import { CancelSaleDialog } from './cancel-sale-dialog';
 import { ReturnSaleDialog } from './return-sale-dialog';
 
-interface SaleRowActionsProps {
-  sale: SaleDTO;
-}
-
 function SaleRowActions({ sale }: SaleRowActionsProps) {
   const router = useRouter();
+  const t = useT();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [returnOpen, setReturnOpen] = useState(false);
 
@@ -59,7 +55,7 @@ function SaleRowActions({ sale }: SaleRowActionsProps) {
 
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-          <span className='sr-only'>Open menu</span>
+          <span className='sr-only'>{t('common.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-36'>
@@ -71,7 +67,7 @@ function SaleRowActions({ sale }: SaleRowActionsProps) {
               }}
             >
               <Icons.page className='me-2 h-4 w-4' />
-              View
+              {t('common.view')}
             </DropdownMenuItem>
 
             {!isCancelled && (
@@ -82,7 +78,7 @@ function SaleRowActions({ sale }: SaleRowActionsProps) {
                 }}
               >
                 <Icons.history className='me-2 h-4 w-4 text-blue-500' />
-                Return
+                {t('sales.returnBadge')}
               </DropdownMenuItem>
             )}
           </DropdownMenuGroup>
@@ -99,7 +95,7 @@ function SaleRowActions({ sale }: SaleRowActionsProps) {
                   }}
                 >
                   <Icons.trash className='me-2 h-4 w-4' />
-                  Cancel
+                  {t('common.cancel')}
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </>
@@ -110,189 +106,57 @@ function SaleRowActions({ sale }: SaleRowActionsProps) {
   );
 }
 
-const salesColumns: ColumnDef<SaleDTO>[] = [
-  {
-    id: 'saleNo',
-    accessorKey: 'saleNo',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Sale #' />,
-    cell: ({ row }) => {
-      const hasReturns = (row.original.returns?.length ?? 0) > 0;
-      return (
-        <div className='flex items-center gap-1.5 font-normal text-foreground'>
-          <span>{row.original.saleNo}</span>
-          {hasReturns && (
-            <Badge
-              variant='outline'
-              className='border-amber-500/40 text-[10px] text-amber-600 dark:text-amber-400'
-            >
-              Return
-            </Badge>
-          )}
-        </div>
-      );
-    },
-    meta: {
-      label: 'table.col.no',
-      placeholderKey: 'search.sales',
-      variant: 'text',
-      icon: Icons.search,
-      type: 'text',
-      primary: true,
-      priority: 1,
-      mobile: 'title'
-    },
-    enableColumnFilter: true,
-    enableSorting: true
-  },
-  {
-    id: 'customerName',
-    accessorKey: 'customerName',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Customer' />,
-    cell: ({ row }) => (
-      <span className='font-normal text-foreground'>
-        {row.original.customerName || <span className='text-muted-foreground italic'>Walk-in</span>}
-      </span>
-    ),
-    meta: {
-      label: 'table.col.customer',
-      variant: 'text',
-      priority: 2,
-      mobile: 'subtitle'
-    },
-    enableColumnFilter: false,
-    enableSorting: false
-  },
-  {
-    id: 'saleDate',
-    accessorKey: 'saleDate',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
-    cell: ({ row }) => {
-      const dateVal = row.original.saleDate;
-      const formatted = dateVal ? dateVal.split('T')[0] : '—';
-      return <span className='font-normal text-foreground'>{formatted}</span>;
-    },
-    meta: {
-      label: 'table.col.date',
-      variant: 'date',
-      priority: 4,
-      mobile: 'meta'
-    },
-    enableColumnFilter: false,
-    enableSorting: true
-  },
-  {
-    id: 'totalAmount',
-    accessorKey: 'totalAmount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
-    cell: ({ row }) => (
-      <span className='font-normal text-foreground'>{formatPkr(row.original.totalAmount)}</span>
-    ),
-    meta: {
-      label: 'table.col.total',
-      variant: 'number',
-      priority: 3,
-      mobile: 'value'
-    },
-    enableColumnFilter: false,
-    enableSorting: true
-  },
-  {
-    id: 'paid',
-    accessorFn: (row) => {
-      const activePayments = (row.payments ?? []).filter((p) => p.status === 'ACTIVE');
-      return activePayments.reduce((acc, p) => acc + p.amount, 0);
-    },
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Paid' />,
-    cell: ({ row }) => {
-      const activePayments = (row.original.payments ?? []).filter((p) => p.status === 'ACTIVE');
-      const paid = activePayments.reduce((acc, p) => acc + p.amount, 0);
-
-      return <span className='font-normal text-foreground'>{formatPkr(paid)}</span>;
-    },
-    meta: {
-      label: 'table.col.paid',
-      variant: 'number',
-      priority: 3
-    },
-    enableSorting: true
-  },
-  {
-    id: 'status',
-    accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-    cell: ({ row }) => {
-      const isCancelled = row.original.status === 'CANCELLED';
-      return (
-        <StatusBadge status={row.original.status} label={isCancelled ? 'Cancelled' : 'Active'} />
-      );
-    },
-    meta: {
-      label: 'table.col.status',
-      variant: 'select',
-      options: [
-        { label: 'Active', value: 'ACTIVE' },
-        { label: 'Cancelled', value: 'CANCELLED' }
-      ],
-      priority: 3,
-      mobile: 'badge'
-    },
-    enableColumnFilter: true,
-    enableSorting: true
-  },
-  {
-    id: 'actions',
-    size: 72,
-    header: () => {
-      const t = useT();
-      return (
-        <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
-          {t('table.actions')}
-        </span>
-      );
-    },
-    cell: ({ row }) => <SaleRowActions sale={row.original} />,
-    enableSorting: false
-  }
-];
-
 const saleMobileItem: MobileItemConfig<SaleDTO> = {
-  title: (row: SaleDTO) => row.saleNo,
-  subtitle: (row: SaleDTO) => row.customerName || 'Walk-in',
-  value: (row: SaleDTO) => formatPkr(row.totalAmount),
-  badge: (row: SaleDTO) => ({
-    label: row.status === 'ACTIVE' ? 'Active' : 'Cancelled',
-    tone: row.status === 'ACTIVE' ? 'success' : 'danger'
+  leading: 'icon',
+  leadingIcon: Icons.receipt,
+  title: (row) => row.saleNo,
+  subtitle: (row) => row.customerName ?? 'Walk-in',
+  badge: (row) => ({
+    label: row.status === 'CANCELLED' ? 'Cancelled' : 'Active',
+    status: row.status
   }),
-  meta: [(row: SaleDTO) => (row.saleDate ? row.saleDate.split('T')[0] : '—')]
+  value: (row) => formatPkr(row.totalAmount),
+  meta: [(row: SaleDTO) => (row.saleDate ? row.saleDate.split('T')[0] : '—')],
+  ariaLabel: (row: SaleDTO) =>
+    `${row.saleNo}, ${row.customerName ?? 'Walk-in'}, ${formatPkr(row.totalAmount)}`
 };
 
 const saleDetail: DetailConfig<SaleDTO> = {
   mode: 'sheet',
-  title: (row: SaleDTO) => `Sale ${row.saleNo}`,
-  badge: (row: SaleDTO) => ({
-    label: row.status,
-    tone: row.status === 'ACTIVE' ? 'success' : 'danger'
+  title: (row) => row.saleNo,
+  badge: (row) => ({
+    label: row.status === 'CANCELLED' ? 'Cancelled' : 'Active',
+    status: row.status
   }),
-  sections: (row: SaleDTO) => [
+  value: (row) => formatPkr(row.totalAmount),
+  sections: (row) => [
     {
-      title: 'Financial Summary',
+      title: 'Sale Information',
       fields: [
-        { label: 'Total Amount', value: formatPkr(row.totalAmount) },
-        { label: 'Subtotal', value: formatPkr(row.subtotal) },
-        { label: 'Discount', value: formatPkr(row.discount) },
+        { label: 'Sale #', value: row.saleNo },
         { label: 'Sale Date', value: row.saleDate ? row.saleDate.split('T')[0] : '—' },
-        ...(row.dueDate ? [{ label: 'Due Date', value: row.dueDate }] : []),
-        ...(row.notes ? [{ label: 'Notes', value: row.notes }] : [])
+        { label: 'Customer', value: row.customerName ?? 'Walk-in' },
+        { label: 'Total Amount', value: formatPkr(row.totalAmount) },
+        {
+          label: 'Paid',
+          value: formatPkr(
+            (row.payments ?? [])
+              .filter((p) => p.status === 'ACTIVE')
+              .reduce((acc, p) => acc + p.amount, 0)
+          )
+        },
+        {
+          label: 'Status',
+          value: (
+            <StatusBadge
+              status={row.status}
+              label={row.status === 'CANCELLED' ? 'Cancelled' : 'Active'}
+            />
+          )
+        }
       ]
     },
-    {
-      title: `Items (${row.items?.length ?? 0})`,
-      fields: (row.items ?? []).map((item) => ({
-        label: `${item.productName} (x${item.quantity})`,
-        value: `${formatPkr(item.total)}${item.imei ? ` · IMEI: ${item.imei}` : ''}`
-      }))
-    },
-    ...(row.status === 'CANCELLED'
+    ...(row.status === 'CANCELLED' && row.cancelledAt
       ? [
           {
             title: 'Cancellation Details',
@@ -308,10 +172,6 @@ const saleDetail: DetailConfig<SaleDTO> = {
       : [])
   ]
 };
-
-interface SalesTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function SalesTable({ toolbarAction }: SalesTableProps) {
   const t = useT();
@@ -371,9 +231,161 @@ export function SalesTable({ toolbarAction }: SalesTableProps) {
   const total = data?.total ?? 0;
   const pageCount = Math.max(1, Math.ceil(total / params.perPage));
 
+  const columns: ColumnDef<SaleDTO>[] = [
+    {
+      id: 'saleNo',
+      accessorKey: 'saleNo',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('sales.saleNoCol')} />
+      ),
+      cell: ({ row }) => {
+        const hasReturns = (row.original.returns?.length ?? 0) > 0;
+        return (
+          <div className='flex items-center gap-1.5 font-normal text-foreground'>
+            <span>{row.original.saleNo}</span>
+            {hasReturns && (
+              <Badge
+                variant='outline'
+                className='border-amber-500/40 text-[10px] text-amber-600 dark:text-amber-400'
+              >
+                {t('sales.returnBadge')}
+              </Badge>
+            )}
+          </div>
+        );
+      },
+      meta: {
+        label: 'table.col.no',
+        placeholderKey: 'search.sales',
+        variant: 'text',
+        icon: Icons.search,
+        type: 'text',
+        primary: true,
+        priority: 1,
+        mobile: 'title'
+      },
+      enableColumnFilter: true,
+      enableSorting: true
+    },
+    {
+      id: 'customerName',
+      accessorKey: 'customerName',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.customer')} />
+      ),
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>
+          {row.original.customerName || (
+            <span className='text-muted-foreground italic'>{t('sales.walkInBadge')}</span>
+          )}
+        </span>
+      ),
+      meta: {
+        label: 'table.col.customer',
+        variant: 'text',
+        priority: 2,
+        mobile: 'subtitle'
+      },
+      enableColumnFilter: false,
+      enableSorting: false
+    },
+    {
+      id: 'saleDate',
+      accessorKey: 'saleDate',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
+      cell: ({ row }) => {
+        const dateVal = row.original.saleDate;
+        const formatted = dateVal ? dateVal.split('T')[0] : '—';
+        return <span className='font-normal text-foreground'>{formatted}</span>;
+      },
+      meta: {
+        label: 'table.col.date',
+        variant: 'date',
+        priority: 4,
+        mobile: 'meta'
+      },
+      enableColumnFilter: false,
+      enableSorting: true
+    },
+    {
+      id: 'totalAmount',
+      accessorKey: 'totalAmount',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.total')} />
+      ),
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>{formatPkr(row.original.totalAmount)}</span>
+      ),
+      meta: {
+        label: 'table.col.total',
+        variant: 'number',
+        priority: 3,
+        mobile: 'value'
+      },
+      enableColumnFilter: false,
+      enableSorting: true
+    },
+    {
+      id: 'paid',
+      accessorFn: (row) => {
+        const activePayments = (row.payments ?? []).filter((p) => p.status === 'ACTIVE');
+        return activePayments.reduce((acc, p) => acc + p.amount, 0);
+      },
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.paid')} />,
+      cell: ({ row }) => {
+        const activePayments = (row.original.payments ?? []).filter((p) => p.status === 'ACTIVE');
+        const paid = activePayments.reduce((acc, p) => acc + p.amount, 0);
+
+        return <span className='font-normal text-foreground'>{formatPkr(paid)}</span>;
+      },
+      meta: {
+        label: 'table.col.paid',
+        variant: 'number',
+        priority: 3
+      },
+      enableSorting: true
+    },
+    {
+      id: 'status',
+      accessorKey: 'status',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.status')} />
+      ),
+      cell: ({ row }) => {
+        const isCancelled = row.original.status === 'CANCELLED';
+        return (
+          <StatusBadge
+            status={row.original.status}
+            label={isCancelled ? t('status.cancelled') : t('status.active')}
+          />
+        );
+      },
+      meta: {
+        label: 'table.col.status',
+        variant: 'select',
+        options: [
+          { label: 'Active', value: 'ACTIVE' },
+          { label: 'Cancelled', value: 'CANCELLED' }
+        ],
+        priority: 3,
+        mobile: 'badge'
+      },
+      enableColumnFilter: true,
+      enableSorting: true
+    },
+    {
+      id: 'actions',
+      size: 48,
+      enableSorting: false,
+      enableHiding: false,
+      meta: { mobile: 'hidden' },
+      cell: ({ row }) => <SaleRowActions sale={row.original} />
+    }
+  ];
+
   const { table } = useDataTable({
     data: items,
-    columns: salesColumns,
+    columns,
     pageCount,
     rowCount: total,
     shallow: true,
@@ -387,13 +399,13 @@ export function SalesTable({ toolbarAction }: SalesTableProps) {
     { id: 'all', label: t('table.all') },
     {
       id: 'active',
-      label: 'Active',
+      label: t('status.active'),
       columnId: 'status',
       value: ['ACTIVE']
     },
     {
       id: 'cancelled',
-      label: 'Cancelled',
+      label: t('status.cancelled'),
       columnId: 'status',
       value: ['CANCELLED']
     }

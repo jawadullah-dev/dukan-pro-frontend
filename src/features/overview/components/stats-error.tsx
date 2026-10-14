@@ -3,11 +3,7 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
-
-interface StatsErrorAlertProps {
-  message: string;
-  action: React.ReactNode;
-}
+import type { StatsErrorAlertProps } from '@/types';
 
 export function StatsErrorAlert({ message, action }: StatsErrorAlertProps) {
   const t = useT();

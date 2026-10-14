@@ -16,16 +16,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import type { PurchaseDTO } from '@/lib/api/types';
+import { useT } from '@/i18n/use-t';
+import type { CancelPurchaseDialogProps } from '@/types';
 import { purchaseCancelImpactQueryOptions, purchaseKeys } from '../api/queries';
 import { cancelPurchaseMutation } from '../api/mutations';
-
-interface CancelPurchaseDialogProps {
-  purchase: PurchaseDTO;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-}
 
 export function CancelPurchaseDialog({
   purchase,
@@ -33,6 +27,7 @@ export function CancelPurchaseDialog({
   onOpenChange,
   onSuccess
 }: CancelPurchaseDialogProps) {
+  const t = useT();
   const qc = useQueryClient();
   const [reason, setReason] = useState('');
 
@@ -44,20 +39,20 @@ export function CancelPurchaseDialog({
   const cancel = useMutation({
     ...cancelPurchaseMutation,
     onSuccess: () => {
-      toast.success(`Purchase ${purchase.purchaseNo} cancelled successfully`);
+      toast.success(t('purchases.cancelDialog.success', { purchaseNo: purchase.purchaseNo }));
       void qc.invalidateQueries({ queryKey: purchaseKeys.all });
       onOpenChange(false);
       onSuccess?.();
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to cancel purchase');
+      toast.error(err.message || t('purchases.cancelDialog.failed'));
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
-      toast.error('Cancellation reason is required');
+      toast.error(t('purchases.cancelDialog.reasonRequired'));
       return;
     }
 
@@ -73,44 +68,51 @@ export function CancelPurchaseDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
-          <DialogTitle>Cancel Purchase {purchase.purchaseNo}</DialogTitle>
-          <DialogDescription>
-            Cancelling this purchase will remove received stock from inventory and reverse supplier
-            payments.
-          </DialogDescription>
+          <DialogTitle>
+            {t('purchases.cancelDialog.title', { purchaseNo: purchase.purchaseNo })}
+          </DialogTitle>
+          <DialogDescription>{t('purchases.cancelDialog.description')}</DialogDescription>
         </DialogHeader>
 
         {impactLoading ? (
           <div className='flex items-center justify-center py-8 text-muted-foreground'>
             <Icons.spinner className='me-2 h-5 w-5 animate-spin' />
-            Calculating cancellation impact...
+            {t('purchases.cancelDialog.calculatingImpact')}
           </div>
         ) : impact?.blocked ? (
           <div className='space-y-4 py-2'>
             <div className='rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive'>
-              <p className='font-semibold'>Cannot Cancel Purchase</p>
-              <p className='mt-1'>{impact.blockedReason || 'This purchase cannot be cancelled.'}</p>
+              <p className='font-semibold'>{t('purchases.cancelDialog.cannotCancel')}</p>
+              <p className='mt-1'>
+                {impact.blockedReason || t('purchases.cancelDialog.defaultBlockedReason')}
+              </p>
             </div>
             <DialogFooter>
               <Button variant='outline' onClick={() => onOpenChange(false)}>
-                Close
+                {t('purchases.cancelDialog.close')}
               </Button>
             </DialogFooter>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className='space-y-4 py-2'>
             <div className='space-y-2 rounded-lg border bg-muted/40 p-3 text-sm'>
-              <p className='font-semibold text-foreground'>Preview Impact:</p>
+              <p className='font-semibold text-foreground'>
+                {t('purchases.cancelDialog.previewImpact')}
+              </p>
 
               <div className='grid grid-cols-2 gap-2 text-xs'>
                 <div>
-                  <span className='text-muted-foreground'>Cash Returned to Drawer: </span>
+                  <span className='text-muted-foreground'>
+                    {t('purchases.cancelDialog.cashReturned')}{' '}
+                  </span>
                   <span className='font-medium text-emerald-600 dark:text-emerald-400'>
                     +{formatPkr(impact?.cashReversedAmount ?? 0)}
                   </span>
                 </div>
                 <div>
-                  <span className='text-muted-foreground'>Cash Drawer After: </span>
+                  <span className='text-muted-foreground'>
+                    {t('purchases.cancelDialog.cashDrawerAfter')}{' '}
+                  </span>
                   <span className='font-medium text-foreground'>
                     {formatPkr(impact?.cashAfter ?? 0)}
                   </span>
@@ -118,7 +120,9 @@ export function CancelPurchaseDialog({
                 {impact?.supplierPayableAfter !== null &&
                   impact?.supplierPayableAfter !== undefined && (
                     <div className='col-span-2'>
-                      <span className='text-muted-foreground'>Supplier Payable After: </span>
+                      <span className='text-muted-foreground'>
+                        {t('purchases.cancelDialog.supplierPayableAfter')}{' '}
+                      </span>
                       <span className='font-medium text-foreground'>
                         {formatPkr(impact.supplierPayableAfter)}
                       </span>
@@ -128,7 +132,9 @@ export function CancelPurchaseDialog({
 
               {impact?.stockItems && impact.stockItems.length > 0 && (
                 <div className='pt-2'>
-                  <p className='text-xs font-medium text-muted-foreground'>Stock Reductions:</p>
+                  <p className='text-xs font-medium text-muted-foreground'>
+                    {t('purchases.cancelDialog.stockReductions')}
+                  </p>
                   <ul className='mt-1 space-y-1 text-xs'>
                     {impact.stockItems.map((item, idx) => (
                       <li key={idx} className='flex items-center gap-1.5 text-foreground'>
@@ -136,7 +142,7 @@ export function CancelPurchaseDialog({
                         <span>{item.productName}</span>
                         {item.imei && (
                           <span className='font-mono text-muted-foreground'>
-                            (IMEI: {item.imei})
+                            {t('purchases.cancelDialog.imei', { imei: item.imei })}
                           </span>
                         )}
                       </li>
@@ -148,13 +154,14 @@ export function CancelPurchaseDialog({
 
             <div className='space-y-1.5'>
               <Label htmlFor='purchaseCancelReason'>
-                Reason for cancellation <span className='text-destructive'>*</span>
+                {t('purchases.cancelDialog.reasonLabel')}{' '}
+                <span className='text-destructive'>*</span>
               </Label>
               <Textarea
                 id='purchaseCancelReason'
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder='e.g., Wrong supplier selected, incorrect bill entered'
+                placeholder={t('purchases.cancelDialog.reasonPlaceholder')}
                 rows={3}
                 required
               />
@@ -167,7 +174,7 @@ export function CancelPurchaseDialog({
                 disabled={cancel.isPending}
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                {t('purchases.cancelDialog.cancel')}
               </Button>
               <Button
                 type='submit'
@@ -175,7 +182,7 @@ export function CancelPurchaseDialog({
                 disabled={cancel.isPending || !!impact?.blocked}
                 isLoading={cancel.isPending}
               >
-                Confirm Cancellation
+                {t('purchases.cancelDialog.confirm')}
               </Button>
             </DialogFooter>
           </form>

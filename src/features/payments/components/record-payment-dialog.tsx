@@ -11,13 +11,14 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { useT } from '@/i18n/use-t';
 import type { CustomerDTO } from '@/lib/api/types';
+import type { PaymentMethodOption, RecordPaymentDialogProps } from '@/types/payment';
 import {
   Select,
   SelectContent,
@@ -38,21 +39,13 @@ const PAYMENT_METHOD_OPTIONS = [
   { value: 'BANK', label: 'Bank Transfer' }
 ] as const;
 
-export type PaymentMethodOption = (typeof PAYMENT_METHOD_OPTIONS)[number]['value'];
-
-interface RecordPaymentDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  defaultCustomerId?: string;
-  onSuccess?: () => void;
-}
-
 export function RecordPaymentDialog({
   open,
   onOpenChange,
   defaultCustomerId,
   onSuccess
 }: RecordPaymentDialogProps) {
+  const t = useT();
   const qc = useQueryClient();
   const [customerId, setCustomerId] = useState(defaultCustomerId ?? '');
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerDTO | null>(null);
@@ -65,7 +58,10 @@ export function RecordPaymentDialog({
     ...createPaymentMutation,
     onSuccess: () => {
       toast.success(
-        `Payment of Rs ${amountStr} recorded for ${selectedCustomer?.name || 'customer'}`
+        t('payments.recordSuccess', {
+          amount: amountStr,
+          customer: selectedCustomer?.name || t('payments.customer')
+        })
       );
       void qc.invalidateQueries({ queryKey: paymentKeys.all });
       onOpenChange(false);
@@ -74,19 +70,19 @@ export function RecordPaymentDialog({
       onSuccess?.();
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to record payment');
+      toast.error(err.message || t('payments.recordFailed'));
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerId) {
-      toast.error('Please select a customer');
+      toast.error(t('payments.selectCustomer'));
       return;
     }
     const num = parseFloat(amountStr);
     if (!num || num <= 0) {
-      toast.error('Please enter a valid amount greater than 0');
+      toast.error(t('payments.validAmount'));
       return;
     }
 
@@ -106,16 +102,14 @@ export function RecordPaymentDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Record Customer Payment</DialogTitle>
-          <DialogDescription>
-            Record cash received from a customer against their outstanding Udhar.
-          </DialogDescription>
+          <DialogTitle>{t('payments.recordPaymentTitle')}</DialogTitle>
+          <DialogDescription>{t('payments.recordPaymentDesc')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4'>
           <div className='space-y-1.5'>
             <Label className='text-xs font-medium'>
-              Customer <span className='text-destructive'>*</span>
+              {t('payments.customer')} <span className='text-destructive'>*</span>
             </Label>
             <CustomerSelectCombobox
               value={customerId}
@@ -137,7 +131,7 @@ export function RecordPaymentDialog({
               </div>
               {selectedCustomer.openingBalance > 0 && (
                 <div className='text-end'>
-                  <span className='text-muted-foreground'>Opening Udhar: </span>
+                  <span className='text-muted-foreground'>{t('payments.openingUdhar')} </span>
                   <span className='font-normal text-amber-600 dark:text-amber-400'>
                     {formatPkr(selectedCustomer.openingBalance)}
                   </span>
@@ -148,11 +142,11 @@ export function RecordPaymentDialog({
 
           <div className='space-y-1.5'>
             <Label htmlFor='payment-amount' className='text-xs font-medium text-foreground'>
-              Amount Received (PKR) <span className='text-destructive'>*</span>
+              {t('payments.amountReceivedPkr')} <span className='text-destructive'>*</span>
             </Label>
             <div className='relative'>
               <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm font-normal text-foreground'>
-                Rs
+                {t('common.currency')}
               </span>
               <Input
                 id='payment-amount'
@@ -170,7 +164,7 @@ export function RecordPaymentDialog({
 
           <div className='space-y-1.5'>
             <Label htmlFor='payment-date' className='text-xs font-medium text-foreground'>
-              Payment Date <span className='text-destructive'>*</span>
+              {t('payments.paymentDate')} <span className='text-destructive'>*</span>
             </Label>
             <Input
               id='payment-date'
@@ -184,7 +178,7 @@ export function RecordPaymentDialog({
 
           <div className='space-y-1.5'>
             <Label htmlFor='payment-method' className='text-xs font-medium text-foreground'>
-              Payment Method
+              {t('payments.paymentMethod')}
             </Label>
             <Select
               value={paymentMethod}
@@ -201,7 +195,7 @@ export function RecordPaymentDialog({
                 className='w-full text-sm font-normal text-foreground h-9 justify-between'
               >
                 <SelectValue
-                  placeholder='Select payment method'
+                  placeholder={t('payments.selectPaymentMethod')}
                   className='text-sm font-normal text-foreground'
                 />
               </SelectTrigger>
@@ -237,11 +231,11 @@ export function RecordPaymentDialog({
 
           <div className='space-y-1.5'>
             <Label htmlFor='payment-notes' className='text-xs font-medium text-foreground'>
-              Notes (Optional)
+              {t('payments.notesOptional')}
             </Label>
             <Textarea
               id='payment-notes'
-              placeholder='e.g., Paid for last week purchases, cash given at shop'
+              placeholder={t('payments.notesPlaceholder')}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}

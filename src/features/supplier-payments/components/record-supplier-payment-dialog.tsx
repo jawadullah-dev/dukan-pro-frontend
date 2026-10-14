@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -11,26 +11,23 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Icons } from '@/components/icons';
 import { formatPkr, toPaisa, fromPaisa } from '@/lib/dukaan/numbers';
-import type { SupplierDTO, UnpaidPurchaseDTO } from '@/types/supplier-payment';
+import { useT } from '@/i18n/use-t';
+import type {
+  SupplierDTO,
+  UnpaidPurchaseDTO,
+  RecordSupplierPaymentDialogProps
+} from '@/types/supplier-payment';
 import { createSupplierPaymentMutation } from '../api/mutations';
 import { supplierPaymentKeys, supplierPayableQueryOptions } from '../api/queries';
 import { SupplierSelectCombobox } from './supplier-select';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-
-interface RecordSupplierPaymentDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  defaultSupplierId?: string;
-  onSuccess?: () => void;
-}
 
 export function RecordSupplierPaymentDialog({
   open,
@@ -38,6 +35,7 @@ export function RecordSupplierPaymentDialog({
   defaultSupplierId,
   onSuccess
 }: RecordSupplierPaymentDialogProps) {
+  const t = useT();
   const qc = useQueryClient();
   const [supplierId, setSupplierId] = useState(defaultSupplierId ?? '');
   const [selectedSupplier, setSelectedSupplier] = useState<SupplierDTO | null>(null);
@@ -70,32 +68,6 @@ export function RecordSupplierPaymentDialog({
 
   const maxRemainingRupees = fromPaisa(maxRemainingPaisa);
 
-  const recordMutation = useMutation({
-    ...createSupplierPaymentMutation,
-    onSuccess: (res) => {
-      if (res && res.confirmOverdraft) {
-        setOverdraftPrompt({
-          shortfall: res.shortfall,
-          message: res.message
-        });
-        setConfirmOverdraft(true);
-        toast.warning(res.message || 'Payment will cause cash overdraft');
-        return;
-      }
-
-      toast.success(
-        `Supplier payment of Rs ${amountStr} recorded for ${selectedSupplier?.name || payableData?.supplierName || 'supplier'}`
-      );
-      void qc.invalidateQueries({ queryKey: supplierPaymentKeys.all });
-      onOpenChange(false);
-      resetForm();
-      onSuccess?.();
-    },
-    onError: (err: Error) => {
-      toast.error(err.message || 'Failed to record supplier payment');
-    }
-  });
-
   const resetForm = () => {
     setSupplierId('');
     setSelectedSupplier(null);
@@ -106,6 +78,36 @@ export function RecordSupplierPaymentDialog({
     setConfirmOverdraft(false);
     setOverdraftPrompt(null);
   };
+
+  const recordMutation = useMutation({
+    ...createSupplierPaymentMutation,
+    onSuccess: (res) => {
+      if (res && res.confirmOverdraft) {
+        setOverdraftPrompt({
+          shortfall: res.shortfall,
+          message: res.message
+        });
+        setConfirmOverdraft(true);
+        toast.warning(res.message || t('supplierPayments.overdraftWarning'));
+        return;
+      }
+
+      toast.success(
+        t('supplierPayments.recordSuccess', {
+          amount: amountStr,
+          supplier:
+            selectedSupplier?.name || payableData?.supplierName || t('supplierPayments.supplier')
+        })
+      );
+      void qc.invalidateQueries({ queryKey: supplierPaymentKeys.all });
+      onOpenChange(false);
+      resetForm();
+      onSuccess?.();
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || t('supplierPayments.recordFailed'));
+    }
+  });
 
   const handleSupplierSelect = (supplier: SupplierDTO | null) => {
     setSelectedSupplier(supplier);
@@ -127,32 +129,30 @@ export function RecordSupplierPaymentDialog({
     e.preventDefault();
 
     if (!supplierId) {
-      toast.error('Please select a supplier');
+      toast.error(t('supplierPayments.supplierRequired'));
       return;
     }
 
     const num = parseFloat(amountStr);
     if (!num || num <= 0) {
-      toast.error('Please enter a valid amount greater than 0');
+      toast.error(t('common.invalidAmount'));
       return;
     }
 
     const paisaAmount = toPaisa(num);
 
     if (maxRemainingPaisa > 0 && paisaAmount > maxRemainingPaisa) {
-      toast.error(
-        `Amount exceeds remaining debt for this selection (${formatPkr(maxRemainingPaisa)})`
-      );
+      toast.error(t('supplierPayments.amountExceedsDebt'));
       return;
     }
 
     if (targetType === 'purchase' && !selectedPurchaseId) {
-      toast.error('Please select which purchase bill to pay against');
+      toast.error(t('supplierPayments.selectPurchaseBill'));
       return;
     }
 
     if (overdraftPrompt && !confirmOverdraft) {
-      toast.error('Please confirm the overdraft warning before saving');
+      toast.error(t('supplierPayments.confirmOverdraftBeforeSaving'));
       return;
     }
 
@@ -176,22 +176,20 @@ export function RecordSupplierPaymentDialog({
     >
       <DialogContent className='max-h-[92vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
-          <DialogTitle>Add Supplier Payment</DialogTitle>
-          <DialogDescription>
-            Pay a supplier against their opening balance or a specific purchase bill.
-          </DialogDescription>
+          <DialogTitle>{t('supplierPayments.addPaymentTitle')}</DialogTitle>
+          <DialogDescription>{t('supplierPayments.addPaymentDesc')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
           <div className='space-y-1.5'>
             <Label className='text-sm font-normal text-foreground'>
-              Supplier <span className='text-destructive'>*</span>
+              {t('supplierPayments.supplier')} <span className='text-destructive'>*</span>
             </Label>
             <SupplierSelectCombobox
               value={supplierId}
               selectedSupplier={selectedSupplier}
               onSelectSupplier={handleSupplierSelect}
-              placeholder='Search and select supplier...'
+              placeholder={t('supplierPayments.searchSupplierPlaceholder')}
               disabled={recordMutation.isPending}
             />
           </div>
@@ -201,24 +199,30 @@ export function RecordSupplierPaymentDialog({
               {payableLoading ? (
                 <div className='flex items-center gap-2 text-muted-foreground'>
                   <Icons.spinner className='size-4 animate-spin text-primary' />
-                  <span>Loading payable balance...</span>
+                  <span>{t('supplierPayments.loadingPayable')}</span>
                 </div>
               ) : payableData ? (
                 <div className='space-y-2'>
                   <div className='flex items-center justify-between'>
-                    <span className='font-normal text-muted-foreground'>Total Payable:</span>
+                    <span className='font-normal text-muted-foreground'>
+                      {t('supplierPayments.totalPayable')}
+                    </span>
                     <span className='font-semibold text-foreground'>{formatPkr(totalPayable)}</span>
                   </div>
                   <div className='flex items-center justify-between text-xs'>
-                    <span className='text-muted-foreground'>Opening Balance Remaining:</span>
+                    <span className='text-muted-foreground'>
+                      {t('supplierPayments.openingBalanceRemaining')}
+                    </span>
                     <span className='font-medium text-foreground'>
                       {formatPkr(openingRemaining)}
                     </span>
                   </div>
                   <div className='flex items-center justify-between text-xs'>
-                    <span className='text-muted-foreground'>Unpaid Purchases:</span>
+                    <span className='text-muted-foreground'>
+                      {t('supplierPayments.unpaidPurchases')}
+                    </span>
                     <span className='font-medium text-foreground'>
-                      {unpaidPurchases.length} bill(s)
+                      {unpaidPurchases.length} {t('supplierPayments.billsCount')}
                     </span>
                   </div>
                 </div>
@@ -228,7 +232,9 @@ export function RecordSupplierPaymentDialog({
 
           {supplierId && payableData && (
             <div className='space-y-2'>
-              <Label className='text-sm font-normal text-foreground'>Payment Target</Label>
+              <Label className='text-sm font-normal text-foreground'>
+                {t('supplierPayments.paymentTarget')}
+              </Label>
               <RadioGroup
                 value={targetType}
                 onValueChange={(val) => {
@@ -248,7 +254,7 @@ export function RecordSupplierPaymentDialog({
                   <div className='flex items-center gap-2'>
                     <RadioGroupItem value='opening' id='target-opening' />
                     <Label htmlFor='target-opening' className='cursor-pointer text-xs font-medium'>
-                      Opening Balance
+                      {t('supplierPayments.openingBalance')}
                     </Label>
                   </div>
                   <span className='text-xs font-semibold text-muted-foreground'>
@@ -278,11 +284,11 @@ export function RecordSupplierPaymentDialog({
                       disabled={unpaidPurchases.length === 0}
                     />
                     <Label htmlFor='target-purchase' className='cursor-pointer text-xs font-medium'>
-                      Specific Bill
+                      {t('supplierPayments.specificBill')}
                     </Label>
                   </div>
                   <span className='text-xs text-muted-foreground'>
-                    {unpaidPurchases.length} bill(s)
+                    {unpaidPurchases.length} {t('supplierPayments.billsCount')}
                   </span>
                 </div>
               </RadioGroup>
@@ -290,11 +296,11 @@ export function RecordSupplierPaymentDialog({
               {targetType === 'purchase' && (
                 <div className='mt-2 space-y-1.5'>
                   <Label className='text-xs font-normal text-muted-foreground'>
-                    Select Bill / Invoice
+                    {t('supplierPayments.selectBillInvoice')}
                   </Label>
                   {unpaidPurchases.length === 0 ? (
                     <p className='text-xs text-muted-foreground'>
-                      No unpaid bills for this supplier.
+                      {t('supplierPayments.noUnpaidBills')}
                     </p>
                   ) : (
                     <div className='max-h-36 space-y-1.5 overflow-y-auto rounded-lg border border-border/70 p-1.5'>
@@ -318,20 +324,24 @@ export function RecordSupplierPaymentDialog({
                                 {purchase.purchaseNo}
                                 {purchase.supplierInvoiceRef && (
                                   <span className='text-muted-foreground ms-1'>
-                                    (Inv: {purchase.supplierInvoiceRef})
+                                    {t('supplierPayments.inv', {
+                                      inv: purchase.supplierInvoiceRef
+                                    })}
                                   </span>
                                 )}
                               </span>
                               <span className='text-[10px] text-muted-foreground'>
-                                Date: {purchase.purchaseDate} · Total:{' '}
-                                {formatPkr(purchase.totalAmount)}
+                                {t('supplierPayments.date')} {purchase.purchaseDate}{' '}
+                                {t('supplierPayments.total')} {formatPkr(purchase.totalAmount)}
                               </span>
                             </div>
                             <div className='text-end'>
                               <span className='font-semibold text-foreground'>
                                 {formatPkr(purchase.remaining)}
                               </span>
-                              <div className='text-[10px] text-muted-foreground'>Remaining</div>
+                              <div className='text-[10px] text-muted-foreground'>
+                                {t('supplierPayments.remaining')}
+                              </div>
                             </div>
                           </div>
                         );
@@ -349,7 +359,7 @@ export function RecordSupplierPaymentDialog({
                 htmlFor='supplier-payment-amount'
                 className='text-sm font-normal text-foreground'
               >
-                Amount (PKR) <span className='text-destructive'>*</span>
+                {t('supplierPayments.amountPkr')} <span className='text-destructive'>*</span>
               </Label>
               {maxRemainingRupees > 0 && (
                 <button
@@ -357,13 +367,13 @@ export function RecordSupplierPaymentDialog({
                   onClick={handlePayFull}
                   className='text-xs font-medium text-primary hover:underline'
                 >
-                  Pay Full ({formatPkr(maxRemainingPaisa)})
+                  {t('supplierPayments.payFull', { amount: formatPkr(maxRemainingPaisa) })}
                 </button>
               )}
             </div>
             <div className='relative'>
               <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
-                Rs
+                {t('common.currency')}
               </span>
               <Input
                 id='supplier-payment-amount'
@@ -382,7 +392,7 @@ export function RecordSupplierPaymentDialog({
 
           <div className='space-y-1.5'>
             <Label htmlFor='supplier-payment-date' className='text-sm font-normal text-foreground'>
-              Payment Date <span className='text-destructive'>*</span>
+              {t('supplierPayments.paymentDateLabel')} <span className='text-destructive'>*</span>
             </Label>
             <Input
               id='supplier-payment-date'
@@ -397,12 +407,13 @@ export function RecordSupplierPaymentDialog({
 
           <div className='space-y-1.5'>
             <Label htmlFor='supplier-payment-notes' className='text-sm font-normal text-foreground'>
-              Notes <span className='text-xs text-muted-foreground'>(Optional)</span>
+              {t('supplierPayments.notes')}{' '}
+              <span className='text-xs text-muted-foreground'>({t('common.optional')})</span>
             </Label>
             <Textarea
               id='supplier-payment-notes'
               rows={2}
-              placeholder='e.g. Paid in cash at shop, bank reference...'
+              placeholder={t('supplierPayments.notesPlaceholder')}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               disabled={recordMutation.isPending}
@@ -415,10 +426,12 @@ export function RecordSupplierPaymentDialog({
               <div className='flex items-start gap-2'>
                 <Icons.warning className='size-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5' />
                 <div className='flex-1'>
-                  <p className='font-semibold'>Cash Shortfall Warning</p>
+                  <p className='font-semibold'>{t('supplierPayments.shortfallWarningTitle')}</p>
                   <p className='mt-0.5 text-muted-foreground'>
                     {overdraftPrompt.message ||
-                      `This payment takes drawer cash below zero by ${formatPkr(overdraftPrompt.shortfall)}.`}
+                      t('supplierPayments.shortfallWarningDesc', {
+                        shortfall: formatPkr(overdraftPrompt.shortfall)
+                      })}
                   </p>
                 </div>
               </div>
@@ -427,7 +440,7 @@ export function RecordSupplierPaymentDialog({
                   checked={confirmOverdraft}
                   onCheckedChange={(c) => setConfirmOverdraft(Boolean(c))}
                 />
-                <span>Confirm payment despite cash deficit</span>
+                <span>{t('supplierPayments.confirmOverdraft')}</span>
               </label>
             </div>
           )}

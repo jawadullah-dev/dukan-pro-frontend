@@ -15,29 +15,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
+import { useT } from '@/i18n/use-t';
 import { createExpenseCategoryMutation, updateExpenseCategoryMutation } from '../api/mutations';
 import { expenseKeys } from '../api/queries';
 import { listExpenseCategories } from '../api/service';
-import type { ExpenseCategoryDTO } from '@/types/expense';
-
-export interface ExpenseCategoryDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  category?: ExpenseCategoryDTO | null;
-  onCategoryCreated?: (category: ExpenseCategoryDTO) => void;
-}
-
-interface ExpenseCategoryDialogBodyProps {
-  category?: ExpenseCategoryDTO | null;
-  onOpenChange: (open: boolean) => void;
-  onCategoryCreated?: (category: ExpenseCategoryDTO) => void;
-}
+import type {
+  ExpenseCategoryDTO,
+  ExpenseCategoryDialogProps,
+  ExpenseCategoryDialogBodyProps
+} from '@/types/expense';
 
 function ExpenseCategoryDialogBody({
   category,
   onOpenChange,
   onCategoryCreated
 }: ExpenseCategoryDialogBodyProps) {
+  const t = useT();
   const qc = useQueryClient();
   const isEdit = Boolean(category);
 
@@ -47,7 +40,7 @@ function ExpenseCategoryDialogBody({
   const createMutation = useMutation({
     ...createExpenseCategoryMutation,
     onSuccess: async () => {
-      toast.success(`Expense category "${name.trim()}" created successfully`);
+      toast.success(t('expenses.categoryCreated', { name: name.trim() }));
       await qc.invalidateQueries({ queryKey: expenseKeys.all });
 
       if (onCategoryCreated) {
@@ -65,19 +58,19 @@ function ExpenseCategoryDialogBody({
       onOpenChange(false);
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to create expense category');
+      toast.error(err.message || t('expenses.categoryCreateFailed'));
     }
   });
 
   const updateMutation = useMutation({
     ...updateExpenseCategoryMutation,
     onSuccess: async () => {
-      toast.success(`Expense category "${name.trim()}" updated successfully`);
+      toast.success(t('expenses.categoryUpdated', { name: name.trim() }));
       await qc.invalidateQueries({ queryKey: expenseKeys.all });
       onOpenChange(false);
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to update expense category');
+      toast.error(err.message || t('expenses.categoryUpdateFailed'));
     }
   });
 
@@ -87,15 +80,15 @@ function ExpenseCategoryDialogBody({
     e.preventDefault();
     const trimmed = name.trim();
     if (!trimmed) {
-      toast.error('Category name is required');
+      toast.error(t('expenses.nameRequired'));
       return;
     }
     if (trimmed.length < 2) {
-      toast.error('Category name must be at least 2 characters');
+      toast.error(t('expenses.nameMinLength'));
       return;
     }
     if (trimmed.length > 100) {
-      toast.error('Category name cannot exceed 100 characters');
+      toast.error(t('expenses.nameMaxLength'));
       return;
     }
 
@@ -118,24 +111,22 @@ function ExpenseCategoryDialogBody({
   return (
     <DialogContent className='w-full sm:max-w-md'>
       <DialogHeader>
-        <DialogTitle>{isEdit ? 'Edit Expense Category' : 'Add Expense Category'}</DialogTitle>
+        <DialogTitle>{isEdit ? t('common.edit') : t('expenses.addCategory')}</DialogTitle>
         <DialogDescription>
-          {isEdit
-            ? 'Update the category name and its active status.'
-            : 'Create a new category to organize your shop operating expenses.'}
+          {isEdit ? t('expenses.deactivateDesc', { name }) : t('expenses.recordExpenseDesc')}
         </DialogDescription>
       </DialogHeader>
 
       <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
         <div className='space-y-1.5'>
           <Label htmlFor='category-name' className='text-sm font-normal text-foreground'>
-            Category Name <span className='text-destructive'>*</span>
+            {t('expenses.categoryName')} <span className='text-destructive'>*</span>
           </Label>
           <Input
             id='category-name'
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder='e.g. Generator Fuel, Marketing, Tea & Snacks'
+            placeholder={t('expenses.categoryPlaceholder')}
             disabled={isPending}
             className='h-10 text-sm font-normal text-foreground w-full'
             autoFocus
@@ -150,7 +141,7 @@ function ExpenseCategoryDialogBody({
                 htmlFor='category-status'
                 className='text-sm font-medium text-foreground cursor-pointer'
               >
-                Active Status
+                {t('expenses.activeStatus')}
               </Label>
               <p className='text-xs text-muted-foreground'>
                 {isActive

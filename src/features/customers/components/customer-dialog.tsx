@@ -20,12 +20,7 @@ import { customerKeys } from '../api/queries';
 import { createCustomer, updateCustomer } from '../api/service';
 import { createPartyFormSchema } from '../schemas/customer-schema';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
-
-interface CustomerDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  customer?: CustomerDTO | null;
-}
+import type { CustomerDialogProps, CustomerDialogBodyProps, CustomerFormState } from '@/types';
 
 export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogProps) {
   return (
@@ -39,19 +34,6 @@ export function CustomerDialog({ open, onOpenChange, customer }: CustomerDialogP
       ) : null}
     </Dialog>
   );
-}
-
-interface CustomerDialogBodyProps {
-  customer?: CustomerDTO | null;
-  onOpenChange: (open: boolean) => void;
-}
-
-interface CustomerFormState {
-  name: string;
-  phone: string;
-  address: string;
-  notes: string;
-  opening_balance: number;
 }
 
 function CustomerDialogBody({ customer, onOpenChange }: CustomerDialogBodyProps) {

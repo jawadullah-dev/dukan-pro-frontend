@@ -4,10 +4,7 @@ import { SessionProvider, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { setRuntimeSession } from '@/lib/dukaan/session';
 import { toDukaanSession } from '@/lib/auth/session-map';
-
-interface AuthSessionBridgeProps {
-  children: React.ReactNode;
-}
+import type { AuthSessionBridgeProps, AuthProviderProps } from '@/types';
 
 function AuthSessionBridge({ children }: AuthSessionBridgeProps) {
   const { data } = useSession();
@@ -21,10 +18,6 @@ function AuthSessionBridge({ children }: AuthSessionBridgeProps) {
   }, [data]);
 
   return <>{children}</>;
-}
-
-interface AuthProviderProps {
-  children: React.ReactNode;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {

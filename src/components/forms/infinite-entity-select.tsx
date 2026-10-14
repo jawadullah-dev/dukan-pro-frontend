@@ -16,32 +16,12 @@ import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import type { ListFilters, Paginated } from '@/lib/dukaan';
 import { useT } from '@/i18n/use-t';
+import type { NamedEntity, InfiniteEntitySelectProps } from '@/types';
+export type { NamedEntity, InfiniteEntitySelectProps };
 
 const PAGE_SIZE = 20;
 const EMPTY_EXTRA_ITEMS: NamedEntity[] = [];
 const LIST_ID = 'infinite-entity-select-list';
-
-export interface NamedEntity {
-  id: string;
-  name: string;
-  is_active?: boolean;
-}
-
-interface InfiniteEntitySelectProps<T extends NamedEntity> {
-  value: string;
-  onValueChange: (value: string, item: T | null) => void;
-  queryKey: readonly unknown[];
-  fetchPage: (filters: ListFilters) => Promise<Paginated<T>>;
-  placeholder?: string;
-  searchPlaceholder?: string;
-  emptyMessage?: string;
-  selectedLabel?: string;
-  activeOnly?: boolean;
-  disabled?: boolean;
-  className?: string;
-
-  extraItems?: NamedEntity[];
-}
 
 export function InfiniteEntitySelect<T extends NamedEntity>({
   value,

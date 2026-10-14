@@ -25,7 +25,13 @@ import { LoadMore } from './load-more';
 import { QuickFilterChips } from './quick-filter-chips';
 import { RecordDetail } from './record-detail';
 import { buildDetailFromTable, buildMobileItemFromTable } from './build-from-columns';
-import type { DetailConfig, MobileItemConfig, QuickFilterChip } from './types';
+import type {
+  DetailConfig,
+  MobileItemConfig,
+  QuickFilterChip,
+  ResponsiveDataTableProps,
+  CompactOrFullTableProps
+} from './types';
 
 const routeRowCountCache: Record<string, number> = {};
 
@@ -56,25 +62,6 @@ function setCachedTableRows(pathname: string, count: number) {
       sessionStorage.setItem(`dukaan_table_rows_${pathname}`, String(count));
     } catch {}
   }
-}
-
-export interface LedgerListConfig<TData> {
-  getDateKey: (row: TData) => string;
-}
-
-interface ResponsiveDataTableProps<TData> {
-  table: TanstackTable<TData>;
-  toolbarAction?: React.ReactNode;
-
-  mobileItem?: MobileItemConfig<TData>;
-
-  detail?: DetailConfig<TData> | Partial<DetailConfig<TData>>;
-  quickFilters?: QuickFilterChip[];
-
-  ledger?: LedgerListConfig<TData>;
-  className?: string;
-  isLoading?: boolean;
-  rowCount?: number;
 }
 
 export function ResponsiveDataTable<TData>({
@@ -221,15 +208,6 @@ export function ResponsiveDataTable<TData>({
       />
     </div>
   );
-}
-
-interface CompactOrFullTableProps<TData> {
-  table: TanstackTable<TData>;
-  mode: 'compact' | 'full';
-  wideCompact: boolean;
-  isLoading?: boolean;
-  skeletonRowCount?: number;
-  onRowClick?: (row: Row<TData>) => void;
 }
 
 function CompactOrFullTable<TData>({

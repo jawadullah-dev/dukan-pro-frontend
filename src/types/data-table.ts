@@ -58,3 +58,5 @@ interface DataTableRowAction<TData> {
   row: Row<TData>;
   variant: 'update' | 'delete';
 }
+
+export * from '@/components/data-table/types';

@@ -6,12 +6,9 @@ import { TablePageBody } from '@/components/layout/table-page-body';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { useT } from '@/i18n/use-t';
+import type { CategoriesHeaderActionProps } from '@/types';
 import { CategoryDialog } from './category-dialog';
 import { CategoriesTable } from './categories-table';
-
-interface CategoriesHeaderActionProps {
-  onAdd?: () => void;
-}
 
 export function CategoriesHeaderAction({ onAdd }: CategoriesHeaderActionProps) {
   const t = useT();

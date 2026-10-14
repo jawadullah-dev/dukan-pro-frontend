@@ -11,14 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { StatusBadge } from '@/components/data-table';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import type { SupplierPaymentDTO } from '@/types/supplier-payment';
-
-interface SupplierPaymentDetailSheetProps {
-  payment: SupplierPaymentDTO | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCancelClick?: (payment: SupplierPaymentDTO) => void;
-}
+import { useT } from '@/i18n/use-t';
+import type { SupplierPaymentDetailSheetProps } from '@/types/supplier-payment';
 
 export function SupplierPaymentDetailSheet({
   payment,
@@ -26,6 +20,7 @@ export function SupplierPaymentDetailSheet({
   onOpenChange,
   onCancelClick
 }: SupplierPaymentDetailSheetProps) {
+  const t = useT();
   if (!payment) return null;
 
   const isCancelled = payment.status === 'CANCELLED';
@@ -36,17 +31,19 @@ export function SupplierPaymentDetailSheet({
         <SheetHeader>
           <div className='flex items-center justify-between pe-6'>
             <SheetTitle className='text-lg font-semibold'>
-              {payment.supplierName || 'Supplier Payment'}
+              {payment.supplierName || t('supplierPayments.supplier')}
             </SheetTitle>
             <StatusBadge status={payment.status} />
           </div>
           <SheetDescription className='text-xs'>
-            Recorded payment transaction details
+            {t('supplierPayments.detailTitle')}
           </SheetDescription>
         </SheetHeader>
 
         <div className='rounded-xl border border-border/70 bg-muted/40 p-4 text-center'>
-          <span className='text-xs font-normal text-muted-foreground'>Payment Amount</span>
+          <span className='text-xs font-normal text-muted-foreground'>
+            {t('supplierPayments.paymentAmount')}
+          </span>
           <p className='mt-1 text-2xl font-bold tracking-tight text-foreground'>
             {formatPkr(payment.amount)}
           </p>
@@ -57,26 +54,28 @@ export function SupplierPaymentDetailSheet({
 
         <div className='space-y-3 divide-y divide-border/60 text-sm'>
           <div className='flex justify-between py-2'>
-            <span className='text-muted-foreground'>Supplier</span>
+            <span className='text-muted-foreground'>{t('supplierPayments.supplier')}</span>
             <span className='font-medium text-foreground'>{payment.supplierName || '—'}</span>
           </div>
 
           <div className='flex justify-between py-2'>
-            <span className='text-muted-foreground'>Applied To</span>
+            <span className='text-muted-foreground'>{t('supplierPayments.appliedTo')}</span>
             <span className='font-medium text-foreground'>
-              {payment.purchaseNo ? `Purchase #${payment.purchaseNo}` : 'Opening Balance'}
+              {payment.purchaseNo
+                ? `Purchase #${payment.purchaseNo}`
+                : t('supplierPayments.openingBalance')}
             </span>
           </div>
 
           <div className='flex justify-between py-2'>
-            <span className='text-muted-foreground'>Payment Date</span>
+            <span className='text-muted-foreground'>{t('supplierPayments.paymentDateLabel')}</span>
             <span className='font-medium text-foreground'>
               {payment.paymentDate ? payment.paymentDate.split('T')[0] : '—'}
             </span>
           </div>
 
           <div className='flex justify-between py-2'>
-            <span className='text-muted-foreground'>Status</span>
+            <span className='text-muted-foreground'>{t('supplierPayments.status')}</span>
             <span>
               <StatusBadge status={payment.status} />
             </span>
@@ -84,7 +83,9 @@ export function SupplierPaymentDetailSheet({
 
           {payment.notes && (
             <div className='py-2'>
-              <span className='text-muted-foreground block text-xs mb-1'>Notes</span>
+              <span className='text-muted-foreground block text-xs mb-1'>
+                {t('supplierPayments.notes')}
+              </span>
               <p className='rounded-md bg-muted/50 p-2 text-xs font-medium text-foreground whitespace-pre-wrap'>
                 {payment.notes}
               </p>
@@ -95,17 +96,20 @@ export function SupplierPaymentDetailSheet({
             <div className='space-y-2 rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-xs'>
               <div className='flex items-center gap-1.5 font-semibold text-destructive'>
                 <Icons.warning className='size-3.5' />
-                <span>Payment Cancelled</span>
+                <span>{t('supplierPayments.paymentCancelled')}</span>
               </div>
               {payment.cancelReason && (
                 <p className='text-muted-foreground'>
-                  <span className='font-medium text-foreground'>Reason: </span>
+                  <span className='font-medium text-foreground'>
+                    {t('supplierPayments.reason')}{' '}
+                  </span>
                   {payment.cancelReason}
                 </p>
               )}
               {payment.cancelledAt && (
                 <p className='text-muted-foreground text-[11px]'>
-                  Cancelled at: {new Date(payment.cancelledAt).toLocaleString()}
+                  {t('supplierPayments.cancelledAt')}{' '}
+                  {new Date(payment.cancelledAt).toLocaleString()}
                 </p>
               )}
             </div>
@@ -124,7 +128,7 @@ export function SupplierPaymentDetailSheet({
               }}
             >
               <Icons.close className='me-2 size-4' />
-              Cancel Payment
+              {t('supplierPayments.cancelPayment')}
             </Button>
           </div>
         )}

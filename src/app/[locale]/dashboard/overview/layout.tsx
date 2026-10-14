@@ -8,6 +8,8 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { redirect } from 'next/navigation';
+import type { OverViewLayoutProps } from '@/types';
+export type { OverViewLayoutProps };
 
 export const metadata = {
   title: 'Dashboard: Overview'
@@ -21,13 +23,6 @@ function DashboardSkeleton() {
       ))}
     </div>
   );
-}
-
-interface OverViewLayoutProps {
-  sales: React.ReactNode;
-  pie_stats: React.ReactNode;
-  bar_stats: React.ReactNode;
-  area_stats: React.ReactNode;
 }
 
 export default async function OverViewLayout({

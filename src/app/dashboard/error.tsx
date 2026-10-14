@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import type { DashboardErrorProps } from '@/types';
+export type { DashboardErrorProps };
 
 function isChunkLoadError(error: Error): boolean {
   return (
@@ -11,11 +13,6 @@ function isChunkLoadError(error: Error): boolean {
     /Loading chunk [\d]+ failed/i.test(error.message) ||
     /Failed to fetch dynamically imported module/i.test(error.message)
   );
-}
-
-interface DashboardErrorProps {
-  error: Error & { digest?: string };
-  reset: () => void;
 }
 
 export default function DashboardError({ error, reset }: DashboardErrorProps) {

@@ -12,26 +12,8 @@ import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useControllableState } from '@/hooks/use-controllable-state';
 import { cn, formatBytes } from '@/lib/utils';
-
-export interface FileUploaderProps extends React.HTMLAttributes<HTMLDivElement> {
-  value?: File[];
-
-  onValueChange?: React.Dispatch<React.SetStateAction<File[]>>;
-
-  onUpload?: (files: File[]) => Promise<void>;
-
-  progresses?: Record<string, number>;
-
-  accept?: DropzoneProps['accept'];
-
-  maxSize?: DropzoneProps['maxSize'];
-
-  maxFiles?: DropzoneProps['maxFiles'];
-
-  multiple?: boolean;
-
-  disabled?: boolean;
-}
+import type { FileUploaderProps, FileCardProps } from '@/types';
+export type { FileUploaderProps };
 
 export function FileUploader(props: FileUploaderProps) {
   const {
@@ -185,12 +167,6 @@ export function FileUploader(props: FileUploaderProps) {
       ) : null}
     </div>
   );
-}
-
-interface FileCardProps {
-  file: File;
-  onRemove: () => void;
-  progress?: number;
 }
 
 function FileCard({ file, progress, onRemove }: FileCardProps) {

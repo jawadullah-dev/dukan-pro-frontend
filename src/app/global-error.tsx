@@ -3,11 +3,8 @@
 import * as Sentry from '@sentry/nextjs';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect } from 'react';
-
-export interface GlobalErrorProps {
-  error: Error & { digest?: string };
-  reset: () => void;
-}
+import type { GlobalErrorProps } from '@/types';
+export type { GlobalErrorProps };
 
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   const t = useTranslations();

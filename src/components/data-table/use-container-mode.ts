@@ -2,15 +2,7 @@
 
 import * as React from 'react';
 
-export type ContainerMode = 'list' | 'cards' | 'compact' | 'full';
-
-export interface ContainerModeState {
-  width: number | null;
-  mode: ContainerMode;
-  wideCompact: boolean;
-  measured: boolean;
-  ref: React.RefObject<HTMLDivElement | null>;
-}
+import type { ContainerMode, ContainerModeState } from './types';
 
 const LIST_MAX = 639;
 const COMPACT_MAX = 1023;

@@ -3,12 +3,8 @@
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
-
-interface FloatingActionButtonProps {
-  label: string;
-  onClick: () => void;
-  className?: string;
-}
+import type { FloatingActionButtonProps } from '@/types';
+export type { FloatingActionButtonProps };
 
 export function FloatingActionButton({ label, onClick, className }: FloatingActionButtonProps) {
   return (

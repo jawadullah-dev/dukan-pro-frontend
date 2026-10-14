@@ -4,11 +4,7 @@ import * as React from 'react';
 import type { Table } from '@tanstack/react-table';
 import { IconLoader2 } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
-
-interface LoadMoreProps<TData> {
-  table: Table<TData>;
-  step?: number;
-}
+import type { LoadMoreProps } from './types';
 
 export function LoadMore<TData>({ table, step = 20 }: LoadMoreProps<TData>) {
   const t = useTranslations();

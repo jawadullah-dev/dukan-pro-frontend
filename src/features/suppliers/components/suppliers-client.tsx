@@ -8,10 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useT } from '@/i18n/use-t';
 import { SupplierDialog } from './supplier-dialog';
 import { SuppliersTable } from './suppliers-table';
-
-interface SuppliersHeaderActionProps {
-  onAdd?: () => void;
-}
+import type { SuppliersHeaderActionProps } from '@/types/suppliers';
 
 export function SuppliersHeaderAction({ onAdd }: SuppliersHeaderActionProps) {
   const t = useT();

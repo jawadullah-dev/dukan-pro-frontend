@@ -29,13 +29,10 @@ import { paymentsQueryOptions } from '../api/queries';
 import type { PaymentsListFilters } from '../api/service';
 import { CancelPaymentDialog } from './cancel-payment-dialog';
 import { RecordPaymentDialog } from './record-payment-dialog';
-
-interface PaymentRowActionsProps {
-  payment: PaymentDTO;
-  onCancel: (payment: PaymentDTO) => void;
-}
+import type { PaymentRowActionsProps, PaymentsTableProps } from '@/types/payment';
 
 function PaymentRowActions({ payment, onCancel }: PaymentRowActionsProps) {
+  const t = useT();
   const isCancelled = payment.status === 'CANCELLED';
 
   if (isCancelled) return null;
@@ -44,7 +41,7 @@ function PaymentRowActions({ payment, onCancel }: PaymentRowActionsProps) {
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-          <span className='sr-only'>Open menu</span>
+          <span className='sr-only'>{t('table.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-32'>
@@ -57,7 +54,7 @@ function PaymentRowActions({ payment, onCancel }: PaymentRowActionsProps) {
               }}
             >
               <Icons.trash className='me-2 h-4 w-4' />
-              Cancel
+              {t('common.cancel')}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -127,10 +124,6 @@ const paymentDetail: DetailConfig<PaymentDTO> = {
   }
 };
 
-interface PaymentsTableProps {
-  toolbarAction?: ReactNode;
-}
-
 export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
   const t = useT();
 
@@ -189,11 +182,13 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
     {
       id: 'customerName',
       accessorKey: 'customerName',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Customer' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.customer')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>
           {row.original.customerName || (
-            <span className='text-muted-foreground italic'>Walk-in</span>
+            <span className='text-muted-foreground italic'>{t('payments.walkIn')}</span>
           )}
         </span>
       ),
@@ -213,7 +208,7 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
     {
       id: 'paymentDate',
       accessorKey: 'paymentDate',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
       cell: ({ row }) => {
         const val = row.original.paymentDate;
         const formatted = val ? val.split('T')[0] : '—';
@@ -231,7 +226,9 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
     {
       id: 'amount',
       accessorKey: 'amount',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.amount')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>{formatPkr(row.original.amount)}</span>
       ),
@@ -247,10 +244,14 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
     {
       id: 'saleNo',
       accessorKey: 'saleNo',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Applied To' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('payments.appliedTo')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>
-          {row.original.saleNo ? `Sale #${row.original.saleNo}` : 'Old Udhar'}
+          {row.original.saleNo
+            ? t('payments.saleNumber', { number: row.original.saleNo })
+            : t('payments.oldUdhar')}
         </span>
       ),
       meta: {
@@ -265,7 +266,9 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
     {
       id: 'method',
       accessorKey: 'method',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Method' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.method')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>
           {formatPaymentMethod(row.original.method, row.original.notes)}
@@ -283,7 +286,9 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
     {
       id: 'status',
       accessorKey: 'status',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.status')} />
+      ),
       cell: ({ row }) => {
         const isCancelled = row.original.status === 'CANCELLED';
         return (
@@ -335,7 +340,7 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
       {toolbarAction}
       <Button size='sm' className='h-8 gap-1.5' onClick={() => setRecordOpen(true)}>
         <Icons.add className='h-3.5 w-3.5' />
-        <span>Record Payment</span>
+        <span>{t('payments.recordPayment')}</span>
       </Button>
     </div>
   );

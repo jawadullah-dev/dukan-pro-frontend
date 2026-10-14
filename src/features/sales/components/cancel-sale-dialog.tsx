@@ -16,20 +16,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Icons } from '@/components/icons';
+import { useT } from '@/i18n/use-t';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import type { SaleDTO } from '@/lib/api/types';
+import type { CancelSaleDialogProps } from '@/types/sales';
 import { cancelImpactQueryOptions, saleKeys } from '../api/queries';
 import { cancelSaleMutation } from '../api/mutations';
 
-interface CancelSaleDialogProps {
-  sale: SaleDTO;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-}
-
 export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: CancelSaleDialogProps) {
   const qc = useQueryClient();
+  const t = useT();
   const [reason, setReason] = useState('');
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);
   const [overdraftPrompt, setOverdraftPrompt] = useState<{
@@ -51,24 +46,24 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
           message: res.message
         });
         setConfirmOverdraft(true);
-        toast.warning(res.message || 'Overdraft confirmation required');
+        toast.warning(res.message || t('sales.cancelDialog.overdraftRequired'));
         return;
       }
 
-      toast.success(`Sale ${sale.saleNo} cancelled successfully`);
+      toast.success(t('sales.cancelDialog.success', { saleNo: sale.saleNo }));
       void qc.invalidateQueries({ queryKey: saleKeys.all });
       onOpenChange(false);
       onSuccess?.();
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to cancel sale');
+      toast.error(err.message || t('sales.cancelDialog.failed'));
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
-      toast.error('Cancellation reason is required');
+      toast.error(t('sales.cancelDialog.reasonRequired'));
       return;
     }
 
@@ -85,43 +80,51 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
-          <DialogTitle>Cancel Sale {sale.saleNo}</DialogTitle>
-          <DialogDescription>
-            Cancelling this sale will restore stock and reverse recorded cash payments.
-          </DialogDescription>
+          <DialogTitle>
+            {t('sales.cancelDialog.title')} {sale.saleNo}
+          </DialogTitle>
+          <DialogDescription>{t('sales.cancelDialog.description')}</DialogDescription>
         </DialogHeader>
 
         {impactLoading ? (
           <div className='flex items-center justify-center py-8 text-muted-foreground'>
             <Icons.spinner className='me-2 h-5 w-5 animate-spin' />
-            Calculating cancellation impact...
+            {t('sales.cancelDialog.calculatingImpact')}
           </div>
         ) : impact?.blocked ? (
           <div className='space-y-4 py-2'>
             <div className='rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive'>
-              <p className='font-semibold'>Cannot Cancel Sale</p>
-              <p className='mt-1'>{impact.blockedReason || 'This sale cannot be cancelled.'}</p>
+              <p className='font-semibold'>{t('sales.cancelDialog.cannotCancel')}</p>
+              <p className='mt-1'>
+                {impact.blockedReason || t('purchases.cancelDialog.defaultBlockedReason')}
+              </p>
             </div>
             <DialogFooter>
               <Button variant='outline' onClick={() => onOpenChange(false)}>
-                Close
+                {t('sales.cancelDialog.close')}
               </Button>
             </DialogFooter>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className='space-y-4 py-2'>
             <div className='space-y-2 rounded-lg border bg-muted/40 p-3 text-sm'>
-              <p className='font-semibold text-foreground'>Preview Impact:</p>
+              <p className='font-semibold text-foreground'>
+                {t('sales.cancelDialog.previewImpact')}
+              </p>
 
               <div className='grid grid-cols-2 gap-2 text-xs'>
                 <div>
-                  <span className='text-muted-foreground'>Cash Reversal: </span>
+                  <span className='text-muted-foreground'>
+                    {t('sales.cancelDialog.cashReversal')}{' '}
+                  </span>
                   <span className='font-medium text-destructive'>
                     -{formatPkr(impact?.cashReversedAmount ?? 0)}
                   </span>
                 </div>
                 <div>
-                  <span className='text-muted-foreground'>Cash After: </span>
+                  <span className='text-muted-foreground'>
+                    {t('sales.cancelDialog.cashAfter')}{' '}
+                  </span>
                   <span className='font-medium text-foreground'>
                     {formatPkr(impact?.cashAfter ?? 0)}
                   </span>
@@ -129,7 +132,9 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
                 {impact?.customerUdharAfter !== null &&
                   impact?.customerUdharAfter !== undefined && (
                     <div className='col-span-2'>
-                      <span className='text-muted-foreground'>Customer Udhar After: </span>
+                      <span className='text-muted-foreground'>
+                        {t('sales.cancelDialog.customerUdharAfter')}{' '}
+                      </span>
                       <span className='font-medium text-foreground'>
                         {formatPkr(impact.customerUdharAfter)}
                       </span>
@@ -139,7 +144,9 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
 
               {impact?.stockItems && impact.stockItems.length > 0 && (
                 <div className='pt-2'>
-                  <p className='text-xs font-medium text-muted-foreground'>Stock Restorations:</p>
+                  <p className='text-xs font-medium text-muted-foreground'>
+                    {t('sales.cancelDialog.stockRestorations')}
+                  </p>
                   <ul className='mt-1 space-y-1 text-xs'>
                     {impact.stockItems.map((item, idx) => (
                       <li key={idx} className='flex items-center gap-1.5 text-foreground'>
@@ -149,7 +156,7 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
                         <span>{item.productName}</span>
                         {item.imei && (
                           <span className='font-mono text-muted-foreground'>
-                            (IMEI: {item.imei})
+                            {t('sales.cancelDialog.imei', { imei: item.imei })}
                           </span>
                         )}
                       </li>
@@ -164,10 +171,9 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
                 <div className='flex items-start gap-2'>
                   <Icons.warning className='mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400' />
                   <div>
-                    <p className='font-semibold'>Cash Overdraft Warning</p>
+                    <p className='font-semibold'>{t('sales.cancelDialog.overdraftWarning')}</p>
                     <p className='mt-0.5 text-xs'>
-                      {overdraftPrompt?.message ||
-                        'Reversing this payment will take your drawer cash below zero.'}
+                      {overdraftPrompt?.message || t('dukaan.actions.cashBelowZeroWarning')}
                     </p>
                   </div>
                 </div>
@@ -179,7 +185,7 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
                     onCheckedChange={(checked) => setConfirmOverdraft(Boolean(checked))}
                   />
                   <Label htmlFor='overdraft' className='text-xs font-normal cursor-pointer'>
-                    Confirm and proceed with cash overdraft
+                    {t('sales.cancelDialog.confirmOverdraft')}
                   </Label>
                 </div>
               </div>
@@ -187,13 +193,13 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
 
             <div className='space-y-1.5'>
               <Label htmlFor='cancelReason'>
-                Reason for cancellation <span className='text-destructive'>*</span>
+                {t('sales.cancelDialog.reasonLabel')} <span className='text-destructive'>*</span>
               </Label>
               <Textarea
                 id='cancelReason'
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                placeholder='e.g., Wrong items recorded, customer changed mind'
+                placeholder={t('sales.cancelDialog.reasonPlaceholder')}
                 rows={3}
                 required
               />
@@ -206,7 +212,7 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
                 disabled={cancel.isPending}
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 type='submit'
@@ -217,7 +223,7 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
                 }
                 isLoading={cancel.isPending}
               >
-                Confirm Cancellation
+                {t('sales.cancelDialog.confirm')}
               </Button>
             </DialogFooter>
           </form>

@@ -7,25 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
-import type { SupplierDTO } from '@/types/supplier-payment';
+import { useT } from '@/i18n/use-t';
+import type { SupplierDTO, SupplierSelectComboboxProps } from '@/types/supplier-payment';
 import type { PaginatedResponse } from '@/lib/api/types';
 import { AppError } from '@/lib/errors';
-
-interface SupplierSelectComboboxProps {
-  value: string;
-  onSelectSupplier: (supplier: SupplierDTO | null) => void;
-  selectedSupplier?: SupplierDTO | null;
-  placeholder?: string;
-  disabled?: boolean;
-}
 
 export function SupplierSelectCombobox({
   value,
   onSelectSupplier,
   selectedSupplier,
-  placeholder = 'Select a supplier...',
+  placeholder,
   disabled
 }: SupplierSelectComboboxProps) {
+  const t = useT();
+  const effectivePlaceholder = placeholder || t('common.select');
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [debouncedSearch, setDebouncedSearch] = React.useState('');
@@ -53,16 +48,13 @@ export function SupplierSelectCombobox({
       params.set('page', '1');
       params.set('pageSize', '50');
       params.set('isActive', 'true');
-      params.set('sortBy', 'name');
-      params.set('sortOrder', 'asc');
-      if (debouncedSearch) {
-        params.set('search', debouncedSearch);
-      }
+      if (debouncedSearch) params.set('search', debouncedSearch);
+
       const res = await fetch(`/api/suppliers?${params.toString()}`);
       if (!res.ok) {
-        throw new AppError('Failed to load suppliers');
+        throw new AppError('Failed to fetch suppliers');
       }
-      return (await res.json()) as PaginatedResponse<SupplierDTO>;
+      return res.json();
     },
     enabled: open
   });
@@ -81,6 +73,7 @@ export function SupplierSelectCombobox({
     e.stopPropagation();
     setLocalSupplier(null);
     onSelectSupplier(null);
+    setSearch('');
   };
 
   return (
@@ -88,9 +81,7 @@ export function SupplierSelectCombobox({
       open={open}
       onOpenChange={(nextOpen) => {
         setOpen(nextOpen);
-        if (!nextOpen) {
-          setSearch('');
-        }
+        if (!nextOpen) setSearch('');
       }}
     >
       <PopoverTrigger
@@ -102,21 +93,26 @@ export function SupplierSelectCombobox({
             aria-expanded={open}
             disabled={disabled}
             className={cn(
-              'h-10 w-full justify-between rounded-lg border-input bg-background px-3 py-2 text-start font-normal shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground',
-              'text-sm font-normal text-foreground'
+              'w-full justify-between font-normal h-10 text-sm bg-background text-foreground',
+              !currentSupplier && 'text-muted-foreground'
             )}
           />
         }
       >
-        <span className='flex min-w-0 flex-1 items-center gap-2'>
-          <Icons.user className='size-4 shrink-0 text-muted-foreground' />
+        <span className='truncate text-start flex-1 text-sm font-normal text-foreground'>
           {currentSupplier ? (
-            <span className='truncate font-medium text-foreground'>{currentSupplier.name}</span>
+            <span className='flex items-center gap-2'>
+              <span className='font-normal text-foreground'>{currentSupplier.name}</span>
+              {currentSupplier.phone && (
+                <span className='text-xs text-muted-foreground'>({currentSupplier.phone})</span>
+              )}
+            </span>
           ) : (
-            <span className='truncate text-sm font-normal text-foreground'>{placeholder}</span>
+            <span>{effectivePlaceholder}</span>
           )}
         </span>
-        <span className='flex shrink-0 items-center gap-1.5'>
+
+        <span className='flex items-center gap-1.5 ms-2'>
           {currentSupplier && !disabled && (
             <span
               role='button'
@@ -131,7 +127,7 @@ export function SupplierSelectCombobox({
                 }
               }}
               className='cursor-pointer rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground'
-              title='Clear selection'
+              title={t('supplierPayments.clearSelection')}
             >
               <Icons.close className='size-3.5' />
             </span>
@@ -150,7 +146,7 @@ export function SupplierSelectCombobox({
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder='Search supplier by name or phone...'
+              placeholder={t('supplierPayments.searchSupplierInputPlaceholder')}
               className='h-9 ps-8 pe-8 text-sm font-normal text-foreground'
               autoFocus
             />
@@ -170,11 +166,11 @@ export function SupplierSelectCombobox({
           {isLoading && suppliers.length === 0 ? (
             <div className='flex items-center justify-center gap-2 py-6 text-sm font-normal text-muted-foreground'>
               <Icons.spinner className='size-4 animate-spin text-primary' />
-              <span>Loading suppliers...</span>
+              <span>{t('supplierPayments.loadingSuppliers')}</span>
             </div>
           ) : suppliers.length === 0 ? (
             <div className='py-6 text-center text-sm font-normal text-muted-foreground'>
-              No active suppliers found
+              {t('supplierPayments.noSuppliersFound')}
             </div>
           ) : (
             suppliers.map((supplier) => {
@@ -184,19 +180,19 @@ export function SupplierSelectCombobox({
                   key={supplier.id}
                   onClick={() => handleSelect(supplier)}
                   className={cn(
-                    'flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm transition-colors',
+                    'flex cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-sm transition-colors',
                     isSelected
                       ? 'bg-primary/10 font-semibold text-primary'
-                      : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+                      : 'hover:bg-muted text-foreground'
                   )}
                 >
-                  <div className='flex min-w-0 flex-1 flex-col'>
-                    <span className='truncate text-sm font-medium'>{supplier.name}</span>
+                  <div className='flex flex-col'>
+                    <span className='font-normal text-foreground'>{supplier.name}</span>
                     {supplier.phone && (
                       <span className='text-xs text-muted-foreground'>{supplier.phone}</span>
                     )}
                   </div>
-                  {isSelected && <Icons.check className='size-4 shrink-0 text-primary' />}
+                  {isSelected && <Icons.check className='size-4 text-primary' />}
                 </div>
               );
             })

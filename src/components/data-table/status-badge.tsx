@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatLabel } from '@/lib/dukaan/numbers';
 
-export type StatusTone = 'success' | 'warning' | 'neutral' | 'danger';
+export type { StatusTone, StatusBadgeProps } from './types';
+import type { StatusTone, StatusBadgeProps } from './types';
 
 export function statusTone(status: string): StatusTone {
   const key = status.trim().toUpperCase().replace(/\s+/g, '_');
@@ -56,13 +57,6 @@ const toneClass: Record<StatusTone, string> = {
   neutral: 'border-border bg-muted text-muted-foreground',
   danger: 'border-transparent bg-destructive/15 text-destructive'
 };
-
-interface StatusBadgeProps {
-  status: string;
-  label?: string;
-  className?: string;
-  tone?: StatusTone;
-}
 
 export function StatusBadge({ status, label, className, tone }: StatusBadgeProps) {
   const resolved = tone ?? statusTone(status);

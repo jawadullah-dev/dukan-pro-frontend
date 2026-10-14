@@ -8,14 +8,10 @@ import { Toaster } from '@/components/ui/sonner';
 import { DEFAULT_THEME, THEMES } from '@/components/themes/theme.config';
 import { LocaleDocumentAttributes } from '@/components/locale-document-attributes';
 import { I18nProvider } from '@/components/i18n/i18n-provider';
+import type { LocaleLayoutProps } from '@/types';
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
-}
-
-export interface LocaleLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
 }
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {

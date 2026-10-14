@@ -59,7 +59,7 @@ function walkTree(rootDir, onFile, opts = {}) {
         if (/\.(test|spec)\.(tsx?|jsx?)$/.test(entry.name)) continue;
       }
 
-      const relative = full.replace(projectRoot + path.sep, "");
+      const relative = path.relative(projectRoot, full).split(path.sep).join("/");
       onFile(full, relative);
     }
   }

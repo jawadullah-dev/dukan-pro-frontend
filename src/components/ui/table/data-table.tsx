@@ -6,9 +6,9 @@ import { ResponsiveDataTable } from '@/components/data-table/responsive-data-tab
 import type {
   DetailConfig,
   MobileItemConfig,
-  QuickFilterChip
+  QuickFilterChip,
+  LedgerListConfig
 } from '@/components/data-table/types';
-import type { LedgerListConfig } from '@/components/data-table/responsive-data-table';
 
 interface DataTableProps<TData> {
   table: TanstackTable<TData>;

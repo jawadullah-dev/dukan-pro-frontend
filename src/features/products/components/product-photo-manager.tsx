@@ -21,12 +21,7 @@ import {
   useReorderProductImages,
   useUploadProductImage
 } from '../api/mutations';
-
-interface ProductPhotoManagerProps {
-  productId: string;
-  images: ProductImageDTO[];
-  onChange: (images: ProductImageDTO[]) => void;
-}
+import type { ProductPhotoManagerProps } from '@/types/products';
 
 export function ProductPhotoManager({ productId, images, onChange }: ProductPhotoManagerProps) {
   const t = useTranslations('dukaan.product');

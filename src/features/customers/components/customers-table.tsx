@@ -39,10 +39,7 @@ import { customerKeys, customersQueryOptions } from '../api/queries';
 import { deactivateCustomer, reactivateCustomer } from '../api/service';
 import type { CustomerListFilters } from '../api/service';
 import { CustomerDialog } from './customer-dialog';
-
-interface CustomerCellActionProps {
-  data: CustomerDTO;
-}
+import type { CustomerCellActionProps, CustomersTableProps } from '@/types';
 
 function CustomerCellAction({ data }: CustomerCellActionProps) {
   const t = useT();
@@ -344,10 +341,6 @@ const customerDetail: DetailConfig<CustomerDTO> = {
     }
   ]
 };
-
-interface CustomersTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function CustomersTable({ toolbarAction }: CustomersTableProps) {
   const t = useT();

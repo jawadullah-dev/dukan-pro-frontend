@@ -5,16 +5,7 @@ import type { Row, Table } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { RecordDetail } from './record-detail';
-import type { DetailConfig, MobileItemConfig } from './types';
-
-interface GroupedLedgerListProps<TData> {
-  table: Table<TData>;
-
-  getDateKey: (row: TData) => string;
-  mobileItem: MobileItemConfig<TData>;
-  detail: DetailConfig<TData>;
-  onNavigate?: (href: string) => void;
-}
+import type { DetailConfig, MobileItemConfig, GroupedLedgerListProps } from './types';
 
 function dateHeading(key: string): string {
   if (/^\d{4}-\d{2}-\d{2}/.test(key)) return key.slice(0, 10);

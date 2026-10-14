@@ -1,35 +1,4 @@
-export type ColumnSemanticType =
-  | 'text'
-  | 'id'
-  | 'phone'
-  | 'money'
-  | 'number'
-  | 'date'
-  | 'status'
-  | 'boolean'
-  | 'image'
-  | 'longtext';
-
-export interface ColumnLayoutMeta {
-  id: string;
-  type?: ColumnSemanticType;
-  priority?: 1 | 2 | 3 | 4;
-  primary?: boolean;
-  highlight?: boolean;
-  mobile?: 'title' | 'subtitle' | 'badge' | 'value' | 'meta' | 'hidden';
-  label?: string;
-}
-
-export interface ResolvedMobileSlots {
-  titleColumnId: string | null;
-  subtitleColumnId: string | null;
-  badgeColumnId: string | null;
-  valueColumnId: string | null;
-  metaColumnIds: string[];
-  leading: 'avatar' | 'icon' | 'thumbnail' | null;
-  imageColumnId: string | null;
-  detailOnlyColumnIds: string[];
-}
+import type { ColumnSemanticType, ColumnLayoutMeta, ResolvedMobileSlots } from './types';
 
 const SKIP_IDS = new Set(['actions', 'select', 'udhar_state']);
 

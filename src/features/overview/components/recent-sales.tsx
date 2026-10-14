@@ -55,7 +55,7 @@ export function RecentSales() {
           {salesData.map((sale, index) => (
             <div key={index} className='flex items-center'>
               <Avatar className='h-9 w-9'>
-                <AvatarImage src={sale.avatar} alt='Avatar' />
+                <AvatarImage src={sale.avatar} alt={sale.name} />
                 <AvatarFallback>{sale.fallback}</AvatarFallback>
               </Avatar>
               <div className='ms-4 space-y-1'>

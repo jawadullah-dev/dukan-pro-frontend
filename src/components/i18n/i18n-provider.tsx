@@ -2,11 +2,10 @@
 
 import { NextIntlClientProvider } from 'next-intl';
 import { t as staticT, setLocale } from '@/i18n';
-import type { ComponentProps } from 'react';
+import type { I18nProviderProps } from '@/types';
+export type { I18nProviderProps };
 
-type Props = ComponentProps<typeof NextIntlClientProvider>;
-
-export function I18nProvider({ children, ...props }: Props) {
+export function I18nProvider({ children, ...props }: I18nProviderProps) {
   if (props.locale) {
     setLocale(props.locale as string);
   }

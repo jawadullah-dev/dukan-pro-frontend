@@ -94,3 +94,73 @@ export interface ExpenseCategoryStatusResult {
   status: boolean;
   message: string;
 }
+
+export interface AddCategoryDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCategoryCreated?: (category: ExpenseCategoryDTO) => void;
+}
+
+export interface CancelExpenseDialogProps {
+  expense: ExpenseDTO;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+}
+
+export interface CategorySelectComboboxProps {
+  value: string;
+  onSelectCategory: (category: ExpenseCategoryDTO | null) => void;
+  selectedCategory?: ExpenseCategoryDTO | null;
+  placeholder?: string;
+  disabled?: boolean;
+  onAddNewCategoryClick?: () => void;
+}
+
+export interface ExpenseCategoryCellActionProps {
+  category: ExpenseCategoryDTO;
+  onEdit: (category: ExpenseCategoryDTO) => void;
+  onDeactivate: (category: ExpenseCategoryDTO) => void;
+  onActivate: (category: ExpenseCategoryDTO) => void;
+  isActivating: boolean;
+}
+
+export interface ExpenseCategoriesTableProps {
+  toolbarAction?: React.ReactNode;
+}
+
+export interface ExpenseCategoryDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  category?: ExpenseCategoryDTO | null;
+  onCategoryCreated?: (category: ExpenseCategoryDTO) => void;
+}
+
+export interface ExpenseCategoryDialogBodyProps {
+  category?: ExpenseCategoryDTO | null;
+  onOpenChange: (open: boolean) => void;
+  onCategoryCreated?: (category: ExpenseCategoryDTO) => void;
+}
+
+export interface ExpenseDetailSheetProps {
+  expense: ExpenseDTO | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCancelClick?: (expense: ExpenseDTO) => void;
+}
+
+export interface ExpenseRowActionsProps {
+  expense: ExpenseDTO;
+  onCancel: (expense: ExpenseDTO) => void;
+}
+
+export interface ExpensesTableProps {
+  toolbarAction?: React.ReactNode;
+}
+
+export interface RecordExpenseDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultCategoryId?: string;
+  onSuccess?: () => void;
+}

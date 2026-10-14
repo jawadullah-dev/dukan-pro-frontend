@@ -22,10 +22,7 @@ import { Icons } from '@/components/icons';
 import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { clearPwaCaches } from '@/lib/pwa';
 import { useT } from '@/i18n/use-t';
-
-interface ProfileAvatarProps {
-  className?: string;
-}
+import type { ProfileAvatarProps, AccountMenuItemsProps } from '@/types';
 
 function ProfileAvatar({ className }: ProfileAvatarProps) {
   return (
@@ -35,11 +32,6 @@ function ProfileAvatar({ className }: ProfileAvatarProps) {
       </AvatarFallback>
     </Avatar>
   );
-}
-
-interface AccountMenuItemsProps {
-  userName: string;
-  shopName: string;
 }
 
 function AccountMenuItems({ userName, shopName }: AccountMenuItemsProps) {

@@ -79,3 +79,22 @@ export interface CashStatusResult {
   status: boolean;
   message: string;
 }
+
+export interface CashTableProps {
+  toolbarAction?: React.ReactNode;
+}
+
+export interface OpeningCashDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export interface OwnerInvestmentDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export interface OwnerWithdrawalDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}

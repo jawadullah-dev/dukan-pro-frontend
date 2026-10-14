@@ -15,17 +15,11 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
+import { useT } from '@/i18n/use-t';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import type { ExpenseDTO } from '@/types/expense';
+import type { CancelExpenseDialogProps } from '@/types/expense';
 import { cancelExpenseMutation } from '../api/mutations';
 import { expenseKeys } from '../api/queries';
-
-interface CancelExpenseDialogProps {
-  expense: ExpenseDTO;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-}
 
 const PRESET_REASONS = [
   'Duplicate entry',
@@ -40,26 +34,27 @@ export function CancelExpenseDialog({
   onOpenChange,
   onSuccess
 }: CancelExpenseDialogProps) {
+  const t = useT();
   const qc = useQueryClient();
   const [reason, setReason] = useState('');
 
   const cancel = useMutation({
     ...cancelExpenseMutation,
     onSuccess: () => {
-      toast.success('Expense cancelled successfully');
+      toast.success(t('expenses.cancelSuccess'));
       void qc.invalidateQueries({ queryKey: expenseKeys.all });
       onOpenChange(false);
       onSuccess?.();
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to cancel expense');
+      toast.error(err.message || t('expenses.cancelFailed'));
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
-      toast.error('Cancellation reason is required');
+      toast.error(t('expenses.cancelReasonRequired'));
       return;
     }
 
@@ -75,39 +70,39 @@ export function CancelExpenseDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>Cancel Expense</DialogTitle>
+          <DialogTitle>{t('expenses.cancelTitle')}</DialogTitle>
           <DialogDescription>
-            Cancelling this expense will restore {formatPkr(expense.amount)} back to your cash
-            drawer.
+            {t('expenses.cancelDescPart1')} {formatPkr(expense.amount)}{' '}
+            {t('expenses.cancelDescPart2')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
           <div className='rounded-xl border border-border/70 bg-muted/30 p-3 text-xs space-y-1.5'>
             <div className='flex items-center justify-between text-muted-foreground'>
-              <span>Category:</span>
+              <span>{t('expenses.categoryLabel')}</span>
               <span className='font-medium text-foreground'>{expense.categoryName}</span>
             </div>
             <div className='flex items-center justify-between text-muted-foreground'>
-              <span>Amount:</span>
+              <span>{t('expenses.amountLabel')}</span>
               <span className='font-semibold text-foreground'>{formatPkr(expense.amount)}</span>
             </div>
             <div className='flex items-center justify-between text-muted-foreground'>
-              <span>Date:</span>
+              <span>{t('expenses.dateLabel')}</span>
               <span className='font-medium text-foreground'>
                 {expense.expenseDate ? expense.expenseDate.split('T')[0] : '—'}
               </span>
             </div>
             {expense.description && (
               <div className='flex items-center justify-between text-muted-foreground'>
-                <span>Description:</span>
+                <span>{t('expenses.descriptionLabel')}</span>
                 <span className='font-medium text-foreground truncate max-w-[200px]'>
                   {expense.description}
                 </span>
               </div>
             )}
             <div className='flex items-center justify-between border-t border-border/50 pt-1.5 text-muted-foreground'>
-              <span>Cash Restored:</span>
+              <span>{t('expenses.cashRestoredLabel')}</span>
               <span className='font-medium text-emerald-600 dark:text-emerald-400'>
                 +{formatPkr(expense.amount)}
               </span>
@@ -116,7 +111,7 @@ export function CancelExpenseDialog({
 
           <div className='space-y-2'>
             <Label htmlFor='expense-cancel-reason' className='text-sm font-normal text-foreground'>
-              Cancellation Reason <span className='text-destructive'>*</span>
+              {t('expenses.cancelReason')} <span className='text-destructive'>*</span>
             </Label>
 
             <div className='flex flex-wrap gap-1.5'>
@@ -135,7 +130,7 @@ export function CancelExpenseDialog({
             <Textarea
               id='expense-cancel-reason'
               rows={3}
-              placeholder='Explain why this expense is being cancelled...'
+              placeholder={t('expenses.cancelReasonPlaceholder')}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               disabled={cancel.isPending}
@@ -153,7 +148,7 @@ export function CancelExpenseDialog({
               className='gap-1.5'
             >
               <Icons.close className='size-4' />
-              Keep
+              {t('expenses.keep')}
             </Button>
             <Button
               type='submit'
@@ -166,7 +161,7 @@ export function CancelExpenseDialog({
               ) : (
                 <Icons.check className='size-4' />
               )}
-              Confirm
+              {t('expenses.confirm')}
             </Button>
           </DialogFooter>
         </form>

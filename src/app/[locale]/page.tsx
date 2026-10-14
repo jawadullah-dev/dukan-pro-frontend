@@ -2,10 +2,7 @@ import { auth } from '@/auth';
 import { homePathForRole, shortcutPathForRole, localize } from '@/lib/auth/routes';
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
-
-interface RootPageProps {
-  searchParams: Promise<{ to?: string }>;
-}
+import type { RootPageProps } from '@/types';
 
 export default async function Page({ searchParams }: RootPageProps) {
   const session = await auth();

@@ -6,11 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useTransition } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { useT } from '@/i18n/use-t';
-
-interface PieStatsErrorProps {
-  error: Error;
-  reset: () => void;
-}
+import type { PieStatsErrorProps } from '@/types';
+export type { PieStatsErrorProps };
 
 export default function PieStatsError({ error, reset }: PieStatsErrorProps) {
   const router = useRouter();

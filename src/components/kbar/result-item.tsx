@@ -2,12 +2,7 @@ import type { ActionId, ActionImpl } from 'kbar';
 import * as React from 'react';
 import { Kbd } from '@/components/ui/kbd';
 import { cn } from '@/lib/utils';
-
-interface ResultItemProps {
-  action: ActionImpl;
-  active: boolean;
-  currentRootActionId: ActionId;
-}
+import type { ResultItemProps } from '@/types';
 
 const ResultItem = React.forwardRef(
   ({ action, active, currentRootActionId }: ResultItemProps, ref: React.Ref<HTMLDivElement>) => {

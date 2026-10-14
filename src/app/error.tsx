@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
+import type { AppErrorProps } from '@/types';
+export type { AppErrorProps };
 
 function isChunkLoadError(error: Error): boolean {
   return (
@@ -11,11 +13,6 @@ function isChunkLoadError(error: Error): boolean {
     /Loading chunk [\d]+ failed/i.test(error.message) ||
     /Failed to fetch dynamically imported module/i.test(error.message)
   );
-}
-
-interface AppErrorProps {
-  error: Error & { digest?: string };
-  reset: () => void;
 }
 
 export default function AppError({ error, reset }: AppErrorProps) {

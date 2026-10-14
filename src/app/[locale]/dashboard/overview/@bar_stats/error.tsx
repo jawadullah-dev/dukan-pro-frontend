@@ -6,11 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useTransition } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { useT } from '@/i18n/use-t';
-
-interface BarStatsErrorProps {
-  error: Error;
-  reset: () => void;
-}
+import type { BarStatsErrorProps } from '@/types';
+export type { BarStatsErrorProps };
 
 export default function BarStatsError({ error, reset }: BarStatsErrorProps) {
   const router = useRouter();

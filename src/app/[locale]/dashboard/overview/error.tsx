@@ -6,11 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useTransition } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { useT } from '@/i18n/use-t';
-
-interface OverviewErrorProps {
-  error: Error;
-  reset: () => void;
-}
+import type { OverviewErrorProps } from '@/types';
+export type { OverviewErrorProps };
 
 export default function OverviewError({ error, reset }: OverviewErrorProps) {
   const router = useRouter();

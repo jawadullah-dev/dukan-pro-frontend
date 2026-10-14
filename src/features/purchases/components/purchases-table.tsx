@@ -1,7 +1,6 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { parseAsString, useQueryState } from 'nuqs';
@@ -28,15 +27,13 @@ import { useT } from '@/i18n/use-t';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type { PurchaseDTO } from '@/lib/api/types';
+import type { PurchaseRowActionsProps, PurchasesTableProps } from '@/types/purchases';
 import { purchasesQueryOptions } from '../api/queries';
 import type { PurchasesListFilters } from '../api/service';
 import { CancelPurchaseDialog } from './cancel-purchase-dialog';
 
-interface PurchaseRowActionsProps {
-  purchase: PurchaseDTO;
-}
-
 function PurchaseRowActions({ purchase }: PurchaseRowActionsProps) {
+  const t = useT();
   const [cancelOpen, setCancelOpen] = useState(false);
   const isCancelled = purchase.status === 'CANCELLED';
 
@@ -57,7 +54,7 @@ function PurchaseRowActions({ purchase }: PurchaseRowActionsProps) {
 
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-          <span className='sr-only'>Open menu</span>
+          <span className='sr-only'>{t('common.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-36'>
@@ -70,7 +67,7 @@ function PurchaseRowActions({ purchase }: PurchaseRowActionsProps) {
               }}
             >
               <Icons.close className='me-2 h-4 w-4' />
-              Cancel
+              {t('common.cancel')}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -82,128 +79,6 @@ function PurchaseRowActions({ purchase }: PurchaseRowActionsProps) {
 const STATUS_OPTIONS = [
   { label: 'Active', value: 'ACTIVE' },
   { label: 'Cancelled', value: 'CANCELLED' }
-];
-
-const purchaseColumns: ColumnDef<PurchaseDTO>[] = [
-  {
-    id: 'purchaseNo',
-    accessorKey: 'purchaseNo',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Purchase #' />,
-    cell: ({ row }) => (
-      <div className='flex items-center gap-1.5 font-normal text-foreground'>
-        <span>{row.original.purchaseNo}</span>
-        {row.original.isOpeningStock && (
-          <Badge
-            variant='outline'
-            className='border-blue-500/40 text-[10px] text-blue-600 dark:text-blue-400'
-          >
-            Opening
-          </Badge>
-        )}
-      </div>
-    ),
-    meta: {
-      label: 'table.col.no',
-      placeholderKey: 'search.purchases',
-      variant: 'text',
-      icon: Icons.search,
-      type: 'text',
-      primary: true,
-      priority: 1,
-      mobile: 'title'
-    },
-    enableColumnFilter: true,
-    enableSorting: true
-  },
-  {
-    id: 'purchaseDate',
-    accessorKey: 'purchaseDate',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
-    cell: ({ row }) => {
-      const dateVal = row.original.purchaseDate;
-      const formatted = dateVal ? dateVal.split('T')[0] : '—';
-      return <span className='font-normal text-foreground'>{formatted}</span>;
-    },
-    meta: {
-      label: 'table.col.date',
-      variant: 'date',
-      priority: 2,
-      mobile: 'meta'
-    },
-    enableColumnFilter: false,
-    enableSorting: true
-  },
-  {
-    id: 'supplierName',
-    accessorKey: 'supplierName',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Supplier' />,
-    cell: ({ row }) => (
-      <span className='font-normal text-foreground'>{row.original.supplierName || '—'}</span>
-    ),
-    meta: {
-      label: 'table.col.supplier',
-      variant: 'text',
-      priority: 2,
-      mobile: 'subtitle'
-    },
-    enableColumnFilter: false,
-    enableSorting: false
-  },
-  {
-    id: 'supplierInvoiceRef',
-    accessorKey: 'supplierInvoiceRef',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Supplier Invoice' />,
-    cell: ({ row }) => (
-      <span className='font-normal text-foreground'>{row.original.supplierInvoiceRef || '—'}</span>
-    ),
-    meta: {
-      label: 'table.col.supplierInvoice',
-      variant: 'text',
-      priority: 3,
-      mobile: 'hidden'
-    },
-    enableColumnFilter: false,
-    enableSorting: false
-  },
-  {
-    id: 'totalAmount',
-    accessorKey: 'totalAmount',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Total' />,
-    cell: ({ row }) => (
-      <span className='font-normal text-foreground'>{formatPkr(row.original.totalAmount)}</span>
-    ),
-    meta: {
-      label: 'table.col.total',
-      variant: 'number',
-      priority: 1,
-      mobile: 'value'
-    },
-    enableColumnFilter: false,
-    enableSorting: true
-  },
-  {
-    id: 'status',
-    accessorKey: 'status',
-    header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
-    cell: ({ row }) => <StatusBadge status={row.original.status} />,
-    meta: {
-      label: 'table.col.status',
-      variant: 'select',
-      options: STATUS_OPTIONS,
-      priority: 1,
-      mobile: 'badge'
-    },
-    enableColumnFilter: true,
-    enableSorting: true
-  },
-  {
-    id: 'actions',
-    size: 48,
-    enableSorting: false,
-    enableHiding: false,
-    meta: { mobile: 'hidden' },
-    cell: ({ row }) => <PurchaseRowActions purchase={row.original} />
-  }
 ];
 
 const purchaseMobileItem: MobileItemConfig<PurchaseDTO> = {
@@ -244,10 +119,6 @@ const purchaseDetail: DetailConfig<PurchaseDTO> = {
     }
   ]
 };
-
-interface PurchasesTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function PurchasesTable({ toolbarAction }: PurchasesTableProps) {
   const t = useT();
@@ -313,9 +184,143 @@ export function PurchasesTable({ toolbarAction }: PurchasesTableProps) {
   const total = data?.total ?? 0;
   const pageCount = Math.max(1, Math.ceil(total / params.perPage));
 
+  const columns: ColumnDef<PurchaseDTO>[] = [
+    {
+      id: 'purchaseNo',
+      accessorKey: 'purchaseNo',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('purchases.purchaseNoCol')} />
+      ),
+      cell: ({ row }) => (
+        <div className='flex items-center gap-1.5 font-normal text-foreground'>
+          <span>{row.original.purchaseNo}</span>
+          {row.original.isOpeningStock && (
+            <Badge
+              variant='outline'
+              className='border-blue-500/40 text-[10px] text-blue-600 dark:text-blue-400'
+            >
+              {t('purchases.openingBadge')}
+            </Badge>
+          )}
+        </div>
+      ),
+      meta: {
+        label: 'table.col.no',
+        placeholderKey: 'search.purchases',
+        variant: 'text',
+        icon: Icons.search,
+        type: 'text',
+        primary: true,
+        priority: 1,
+        mobile: 'title'
+      },
+      enableColumnFilter: true,
+      enableSorting: true
+    },
+    {
+      id: 'purchaseDate',
+      accessorKey: 'purchaseDate',
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
+      cell: ({ row }) => {
+        const dateVal = row.original.purchaseDate;
+        const formatted = dateVal ? dateVal.split('T')[0] : '—';
+        return <span className='font-normal text-foreground'>{formatted}</span>;
+      },
+      meta: {
+        label: 'table.col.date',
+        variant: 'date',
+        priority: 2,
+        mobile: 'meta'
+      },
+      enableColumnFilter: false,
+      enableSorting: true
+    },
+    {
+      id: 'supplierName',
+      accessorKey: 'supplierName',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.supplier')} />
+      ),
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>{row.original.supplierName || '—'}</span>
+      ),
+      meta: {
+        label: 'table.col.supplier',
+        variant: 'text',
+        priority: 2,
+        mobile: 'subtitle'
+      },
+      enableColumnFilter: false,
+      enableSorting: false
+    },
+    {
+      id: 'supplierInvoiceRef',
+      accessorKey: 'supplierInvoiceRef',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.supplierInvoice')} />
+      ),
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>
+          {row.original.supplierInvoiceRef || '—'}
+        </span>
+      ),
+      meta: {
+        label: 'table.col.supplierInvoice',
+        variant: 'text',
+        priority: 3,
+        mobile: 'hidden'
+      },
+      enableColumnFilter: false,
+      enableSorting: false
+    },
+    {
+      id: 'totalAmount',
+      accessorKey: 'totalAmount',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.total')} />
+      ),
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>{formatPkr(row.original.totalAmount)}</span>
+      ),
+      meta: {
+        label: 'table.col.total',
+        variant: 'number',
+        priority: 1,
+        mobile: 'value'
+      },
+      enableColumnFilter: false,
+      enableSorting: true
+    },
+    {
+      id: 'status',
+      accessorKey: 'status',
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.status')} />
+      ),
+      cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      meta: {
+        label: 'table.col.status',
+        variant: 'select',
+        options: STATUS_OPTIONS,
+        priority: 1,
+        mobile: 'badge'
+      },
+      enableColumnFilter: true,
+      enableSorting: true
+    },
+    {
+      id: 'actions',
+      size: 48,
+      enableSorting: false,
+      enableHiding: false,
+      meta: { mobile: 'hidden' },
+      cell: ({ row }) => <PurchaseRowActions purchase={row.original} />
+    }
+  ];
+
   const { table } = useDataTable({
     data: items,
-    columns: purchaseColumns,
+    columns,
     pageCount,
     rowCount: total,
     shallow: true,
@@ -326,16 +331,16 @@ export function PurchasesTable({ toolbarAction }: PurchasesTableProps) {
   });
 
   const purchaseQuickFilters: QuickFilterChip[] = [
-    { id: 'all', label: t('table.all') || 'All' },
+    { id: 'all', label: t('table.all') },
     {
       id: 'active',
-      label: t('status.active') || 'Active',
+      label: t('status.active'),
       columnId: 'status',
       value: ['ACTIVE']
     },
     {
       id: 'cancelled',
-      label: t('status.cancelled') || 'Cancelled',
+      label: t('status.cancelled'),
       columnId: 'status',
       value: ['CANCELLED']
     }

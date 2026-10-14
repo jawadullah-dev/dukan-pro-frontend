@@ -3,6 +3,8 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import { AppError } from '@/lib/errors';
 import { DEFAULT_THEME } from './theme.config';
+import type { ThemeContextType, ActiveThemeProviderProps } from '@/types';
+export type { ActiveThemeProviderProps };
 
 const COOKIE_NAME = 'active_theme';
 
@@ -12,17 +14,7 @@ function setThemeCookie(theme: string) {
   document.cookie = `${COOKIE_NAME}=${theme}; path=/; max-age=31536000; SameSite=Lax; ${window.location.protocol === 'https:' ? 'Secure;' : ''}`;
 }
 
-type ThemeContextType = {
-  activeTheme: string;
-  setActiveTheme: (theme: string) => void;
-};
-
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export interface ActiveThemeProviderProps {
-  children: ReactNode;
-  initialTheme?: string;
-}
 
 export function ActiveThemeProvider({ children, initialTheme }: ActiveThemeProviderProps) {
   const themeToUse = initialTheme || DEFAULT_THEME;

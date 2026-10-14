@@ -8,10 +8,8 @@ import useThemeSwitching from './use-theme-switching';
 import { useFilteredNavGroups } from '@/hooks/use-nav';
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
-
-interface KBarProps {
-  children: React.ReactNode;
-}
+import type { KBarProps, KBarComponentProps } from '@/types';
+export type { KBarProps };
 
 export default function KBar({ children }: KBarProps) {
   const router = useRouter();
@@ -60,9 +58,6 @@ export default function KBar({ children }: KBarProps) {
     </KBarProvider>
   );
 }
-interface KBarComponentProps {
-  children: React.ReactNode;
-}
 
 const KBarComponent = ({ children }: KBarComponentProps) => {
   useThemeSwitching();
@@ -91,7 +86,7 @@ const KBarComponent = ({ children }: KBarComponentProps) => {
                 <Kbd>↵</Kbd> {t('open')}
               </span>
               <span className='flex items-center gap-1'>
-                <Kbd>esc</Kbd> {t('close')}
+                <Kbd>ESC</Kbd> {t('close')}
               </span>
             </div>
           </KBarAnimator>

@@ -14,16 +14,11 @@ import {
 import { FieldGroup } from '@/components/ui/field';
 import { useAppForm } from '@/lib/form';
 import type { BrandDTO } from '@/lib/api/types';
+import type { BrandDialogProps, BrandDialogBodyProps } from '@/types';
 import { brandKeys } from '../api/queries';
 import { createBrand, updateBrand } from '../api/service';
 import { createBrandFormSchema } from '../schemas/brand-schema';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
-
-interface BrandDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  brand?: BrandDTO | null;
-}
 
 export function BrandDialog({ open, onOpenChange, brand }: BrandDialogProps) {
   return (
@@ -33,11 +28,6 @@ export function BrandDialog({ open, onOpenChange, brand }: BrandDialogProps) {
       ) : null}
     </Dialog>
   );
-}
-
-interface BrandDialogBodyProps {
-  brand?: BrandDTO | null;
-  onOpenChange: (open: boolean) => void;
 }
 
 function BrandDialogBody({ brand, onOpenChange }: BrandDialogBodyProps) {

@@ -23,10 +23,7 @@ import { customerQueryOptions, dukaanKeys } from '@/features/dukaan/api/queries'
 import { createReceivePaymentSchema } from '../schemas/customer-schema';
 import { CustomerDialog } from './customer-dialog';
 import { CustomersTable } from './customers-table';
-
-interface CustomersHeaderActionProps {
-  onAdd?: () => void;
-}
+import type { CustomersHeaderActionProps, CustomerLedgerClientProps } from '@/types';
 
 export function CustomersHeaderAction({ onAdd }: CustomersHeaderActionProps) {
   const t = useT();
@@ -56,10 +53,6 @@ export function CustomersListClient() {
       <CustomerDialog open={open} onOpenChange={setOpen} />
     </TablePageBody>
   );
-}
-
-interface CustomerLedgerClientProps {
-  id: string;
 }
 
 export function CustomerLedgerClient({ id }: CustomerLedgerClientProps) {

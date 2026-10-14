@@ -4,14 +4,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { StatusBadge } from './status-badge';
-import type { MobileItemConfig } from './types';
-
-interface MobileListItemProps<TData> {
-  row: TData;
-  config: MobileItemConfig<TData>;
-  onOpen: () => void;
-  actionsSlot?: React.ReactNode;
-}
+import type { MobileItemConfig, MobileListItemProps } from './types';
 
 function initials(text: string): string {
   const parts = text.trim().split(/\s+/).filter(Boolean);

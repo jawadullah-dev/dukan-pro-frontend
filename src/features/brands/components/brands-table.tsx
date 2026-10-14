@@ -31,12 +31,9 @@ import {
 import { brandsQueryOptions, brandKeys } from '../api/queries';
 import { deleteBrand, updateBrand, createBrand } from '../api/service';
 import type { BrandDTO } from '@/lib/api/types';
+import type { BrandCellActionProps, BrandsTableProps } from '@/types';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { BrandDialog } from './brand-dialog';
-
-interface BrandCellActionProps {
-  data: BrandDTO;
-}
 
 function BrandCellAction({ data }: BrandCellActionProps) {
   const t = useT();
@@ -169,10 +166,6 @@ const brandDetail: DetailConfig<BrandDTO> = {
     }
   ]
 };
-
-interface BrandsTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function BrandsTable({ toolbarAction }: BrandsTableProps) {
   const columnIds = ['name', 'isActive'];

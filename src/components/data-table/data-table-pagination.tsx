@@ -13,13 +13,7 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
-
-interface DataTablePaginationProps<TData> extends React.ComponentProps<'div'> {
-  table: Table<TData>;
-  pageSizeOptions?: number[];
-
-  variant?: 'compact' | 'full';
-}
+import type { DataTablePaginationProps } from './types';
 
 export function DataTablePagination<TData>({
   table,

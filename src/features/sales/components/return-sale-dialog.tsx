@@ -24,26 +24,16 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Icons } from '@/components/icons';
-import { formatPkr, toPaisa, fromPaisa } from '@/lib/dukaan/numbers';
-import type { SaleDTO, ReturnPreviewDTO, ReturnItemInput } from '@/lib/api/types';
+import { useT } from '@/i18n/use-t';
+import { formatPkr, toPaisa } from '@/lib/dukaan/numbers';
+import type { ReturnPreviewDTO, ReturnItemInput } from '@/lib/api/types';
+import type { ReturnSaleDialogProps, ItemReturnState } from '@/types/sales';
 import { saleKeys } from '../api/queries';
 import { createReturnMutation, previewReturnMutation } from '../api/mutations';
 
-interface ReturnSaleDialogProps {
-  sale: SaleDTO;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
-}
-
-interface ItemReturnState {
-  selected: boolean;
-  quantity: number;
-  condition: 'GOOD' | 'DAMAGED';
-}
-
 export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: ReturnSaleDialogProps) {
   const qc = useQueryClient();
+  const t = useT();
   const today = new Date().toISOString().split('T')[0];
 
   const [returnDate, setReturnDate] = useState(today);
@@ -71,7 +61,7 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
       setPreviewData(data);
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to preview return settlement');
+      toast.error(err.message || t('sales.returnDialog.previewFailed'));
     }
   });
 
@@ -79,18 +69,18 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
     ...createReturnMutation,
     onSuccess: (res) => {
       if (res && 'confirmOverdraft' in res && res.confirmOverdraft) {
-        toast.warning(res.message || 'Overdraft confirmation required');
+        toast.warning(res.message || t('sales.returnDialog.overdraftRequired'));
         setConfirmOverdraft(true);
         return;
       }
 
-      toast.success('Return recorded successfully');
+      toast.success(t('sales.returnDialog.success'));
       void qc.invalidateQueries({ queryKey: saleKeys.all });
       onOpenChange(false);
       onSuccess?.();
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to record return');
+      toast.error(err.message || t('sales.returnDialog.failed'));
     }
   });
 
@@ -104,7 +94,7 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
       }));
 
     if (selectedItems.length === 0) {
-      toast.error('Please select at least one item to return');
+      toast.error(t('sales.returnDialog.selectAtLeastOne'));
       return;
     }
 
@@ -120,7 +110,7 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reason.trim()) {
-      toast.error('Return reason is required');
+      toast.error(t('sales.returnDialog.reasonRequired'));
       return;
     }
 
@@ -133,7 +123,7 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
       }));
 
     if (selectedItems.length === 0) {
-      toast.error('Please select at least one item to return');
+      toast.error(t('sales.returnDialog.selectAtLeastOne'));
       return;
     }
 
@@ -154,16 +144,14 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-xl'>
         <DialogHeader>
-          <DialogTitle>Return Items - Sale {sale.saleNo}</DialogTitle>
-          <DialogDescription>
-            Select items to return, inspect settlement preview, and refund cash if required.
-          </DialogDescription>
+          <DialogTitle>{t('sales.returnDialog.title', { saleNo: sale.saleNo })}</DialogTitle>
+          <DialogDescription>{t('sales.returnDialog.description')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 py-2'>
           <div className='space-y-2'>
             <Label className='text-xs font-semibold uppercase tracking-wider text-muted-foreground'>
-              Select Items to Return
+              {t('sales.returnDialog.selectItems')}
             </Label>
             <div className='space-y-2 rounded-lg border p-3'>
               {sale.items.map((item) => {
@@ -194,8 +182,9 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
                           {item.productName}
                         </Label>
                         <p className='text-xs text-muted-foreground'>
-                          Sold: {item.quantity} · Price: {formatPkr(item.unitPrice)}
-                          {item.imei && ` · IMEI: ${item.imei}`}
+                          {t('sales.returnDialog.sold')} {item.quantity}{' '}
+                          {t('sales.returnDialog.price')} {formatPkr(item.unitPrice)}
+                          {item.imei && ` · ${t('inventory.imeiLabel')} ${item.imei}`}
                         </p>
                       </div>
                     </div>
@@ -236,8 +225,12 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value='GOOD'>Good</SelectItem>
-                            <SelectItem value='DAMAGED'>Damaged</SelectItem>
+                            <SelectItem value='GOOD'>
+                              {t('sales.returnDialog.conditionGood')}
+                            </SelectItem>
+                            <SelectItem value='DAMAGED'>
+                              {t('sales.returnDialog.conditionDamaged')}
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -251,7 +244,7 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
           <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
             <div className='space-y-1.5'>
               <Label htmlFor='returnDate'>
-                Return Date <span className='text-destructive'>*</span>
+                {t('sales.returnDialog.returnDate')} <span className='text-destructive'>*</span>
               </Label>
               <Input
                 id='returnDate'
@@ -263,7 +256,7 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
             </div>
 
             <div className='space-y-1.5'>
-              <Label htmlFor='refundAmount'>Cash Refund (PKR)</Label>
+              <Label htmlFor='refundAmount'>{t('sales.returnDialog.cashRefund')}</Label>
               <Input
                 id='refundAmount'
                 type='number'
@@ -284,36 +277,48 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
               isLoading={preview.isPending}
             >
               <Icons.eye className='me-1.5 h-3.5 w-3.5' />
-              Preview Settlement
+              {t('sales.returnDialog.previewSettlement')}
             </Button>
           </div>
 
           {previewData && (
             <div className='space-y-2 rounded-lg border bg-muted/40 p-3 text-xs'>
-              <p className='font-semibold text-foreground'>Settlement Preview:</p>
+              <p className='font-semibold text-foreground'>
+                {t('sales.returnDialog.settlementPreview')}
+              </p>
               <div className='grid grid-cols-2 gap-2'>
                 <div>
-                  <span className='text-muted-foreground'>Return Value: </span>
+                  <span className='text-muted-foreground'>
+                    {t('sales.returnDialog.returnValue')}{' '}
+                  </span>
                   <span className='font-medium'>{formatPkr(previewData.returnAmount)}</span>
                 </div>
                 <div>
-                  <span className='text-muted-foreground'>Max Refundable Cash: </span>
+                  <span className='text-muted-foreground'>
+                    {t('sales.returnDialog.maxRefundableCash')}{' '}
+                  </span>
                   <span className='font-medium text-emerald-600 dark:text-emerald-400'>
                     {formatPkr(previewData.refundable)}
                   </span>
                 </div>
                 <div>
-                  <span className='text-muted-foreground'>Udhar Relief: </span>
+                  <span className='text-muted-foreground'>
+                    {t('sales.returnDialog.udharRelief')}{' '}
+                  </span>
                   <span className='font-medium'>
                     {formatPkr(previewData.outstandingBefore - previewData.outstandingAfter)}
                   </span>
                 </div>
                 <div>
-                  <span className='text-muted-foreground'>Outstanding After: </span>
+                  <span className='text-muted-foreground'>
+                    {t('sales.returnDialog.outstandingAfter')}{' '}
+                  </span>
                   <span className='font-medium'>{formatPkr(previewData.outstandingAfter)}</span>
                 </div>
                 <div>
-                  <span className='text-muted-foreground'>Drawer Cash After: </span>
+                  <span className='text-muted-foreground'>
+                    {t('sales.returnDialog.drawerCashAfter')}{' '}
+                  </span>
                   <span className='font-medium'>{formatPkr(previewData.cashAfter)}</span>
                 </div>
               </div>
@@ -327,7 +332,7 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
                       onCheckedChange={(checked) => setConfirmOverdraft(Boolean(checked))}
                     />
                     <Label htmlFor='return-overdraft' className='cursor-pointer text-xs'>
-                      Refund exceeds drawer cash. Confirm overdraft.
+                      {t('sales.returnDialog.overdraftNotice')}
                     </Label>
                   </div>
                 </div>
@@ -337,25 +342,25 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
 
           <div className='space-y-1.5'>
             <Label htmlFor='returnReason'>
-              Reason <span className='text-destructive'>*</span>
+              {t('sales.returnDialog.reason')} <span className='text-destructive'>*</span>
             </Label>
             <Textarea
               id='returnReason'
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder='Reason for returning the item(s)...'
+              placeholder={t('sales.returnDialog.reasonPlaceholder')}
               rows={2}
               required
             />
           </div>
 
           <div className='space-y-1.5'>
-            <Label htmlFor='returnNotes'>Notes (Optional)</Label>
+            <Label htmlFor='returnNotes'>{t('sales.returnDialog.notes')}</Label>
             <Input
               id='returnNotes'
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder='e.g., Original packaging included'
+              placeholder={t('sales.returnDialog.notesPlaceholder')}
             />
           </div>
 
@@ -366,14 +371,14 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
               disabled={recordReturn.isPending}
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               type='submit'
               disabled={recordReturn.isPending}
               isLoading={recordReturn.isPending}
             >
-              Submit Return
+              {t('sales.returnDialog.submit')}
             </Button>
           </DialogFooter>
         </form>

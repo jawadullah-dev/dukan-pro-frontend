@@ -14,16 +14,11 @@ import {
 import { FieldGroup } from '@/components/ui/field';
 import { useAppForm } from '@/lib/form';
 import type { CategoryDTO } from '@/lib/api/types';
+import type { CategoryDialogProps, CategoryDialogBodyProps } from '@/types';
 import { categoryKeys } from '../api/queries';
 import { createCategory, updateCategory } from '../api/service';
 import { createCategoryFormSchema } from '../schemas/category-schema';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
-
-interface CategoryDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  category?: CategoryDTO | null;
-}
 
 export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogProps) {
   return (
@@ -37,11 +32,6 @@ export function CategoryDialog({ open, onOpenChange, category }: CategoryDialogP
       ) : null}
     </Dialog>
   );
-}
-
-interface CategoryDialogBodyProps {
-  category?: CategoryDTO | null;
-  onOpenChange: (open: boolean) => void;
 }
 
 function CategoryDialogBody({ category, onOpenChange }: CategoryDialogBodyProps) {

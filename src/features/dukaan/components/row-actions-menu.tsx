@@ -13,18 +13,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { useT } from '@/i18n/use-t';
-
-export interface RowAction {
-  label: string;
-  href?: string;
-  onClick?: () => void;
-  icon?: ComponentType<{ className?: string }>;
-  variant?: 'default' | 'destructive';
-}
-
-export interface RowActionsMenuProps {
-  actions: RowAction[];
-}
+import type { RowAction, RowActionsMenuProps } from '@/types';
 
 export function RowActionsMenu({ actions }: RowActionsMenuProps) {
   const t = useT();

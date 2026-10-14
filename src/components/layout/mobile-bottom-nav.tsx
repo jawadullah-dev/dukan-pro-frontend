@@ -8,7 +8,7 @@ import { getNavGroupsForRole } from '@/config/nav-config';
 import { useFilteredNavGroups } from '@/hooks/use-nav';
 import { useIsPhone } from '@/hooks/use-mobile';
 import type { SessionRole } from '@/lib/dukaan/session';
-import type { NavItem } from '@/types';
+import type { NavItem, MobileBottomNavProps } from '@/types';
 import { useT, translateMaybe } from '@/i18n/use-t';
 import { cn } from '@/lib/utils';
 
@@ -39,10 +39,6 @@ function isActivePath(pathname: string, url: string): boolean {
   if (pathname === url) return true;
   if (url !== '/dashboard' && pathname.startsWith(`${url}/`)) return true;
   return false;
-}
-
-interface MobileBottomNavProps {
-  role: SessionRole;
 }
 
 export function MobileBottomNav({ role }: MobileBottomNavProps) {

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useTranslations } from 'next-intl';
 import { env } from '@/config/env';
+import type { PwaUpdateInlineProps } from '@/types';
 
 export function PwaUpdateBanner() {
   const t = useTranslations();
@@ -72,10 +73,6 @@ export function PwaUpdateBanner() {
   }, [updateLabel, reloadLabel]);
 
   return null;
-}
-
-interface PwaUpdateInlineProps {
-  onReload: () => void;
 }
 
 function PwaUpdateInline({ onReload }: PwaUpdateInlineProps) {

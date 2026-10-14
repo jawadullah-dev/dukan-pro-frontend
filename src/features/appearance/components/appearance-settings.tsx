@@ -64,7 +64,7 @@ function LivePreview() {
             <span className='text-end'>{t('appearance.previewColAmount')}</span>
           </div>
           <div className='grid grid-cols-3 gap-2 px-3 py-2 text-sm'>
-            <span>iPhone 15</span>
+            <span>{t('appearance.previewSampleItem')}</span>
             <span>1</span>
             <span className='text-end tabular-nums'>
               {digits === 'eastern' ? '٨٥٬٠٠٠' : '85,000'}

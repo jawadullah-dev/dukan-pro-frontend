@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Icons } from '@/components/icons';
 import React from 'react';
 import { useT } from '@/i18n/use-t';
+import type { DottedBackgroundPatternProps } from '@/types';
 
 const chartData = [
   { month: 'January', desktop: 342, mobile: 245 },
@@ -92,10 +93,6 @@ export function AreaGraph() {
       </CardContent>
     </Card>
   );
-}
-
-interface DottedBackgroundPatternProps {
-  config: ChartConfig;
 }
 
 const DottedBackgroundPattern = ({ config }: DottedBackgroundPatternProps) => {

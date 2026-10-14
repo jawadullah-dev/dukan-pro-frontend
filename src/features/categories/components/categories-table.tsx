@@ -31,12 +31,9 @@ import {
 import { categoriesQueryOptions, categoryKeys } from '../api/queries';
 import { deleteCategory } from '../api/service';
 import type { CategoryDTO } from '@/lib/api/types';
+import type { CategoryCellActionProps, CategoriesTableProps } from '@/types';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { CategoryDialog } from './category-dialog';
-
-interface CategoryCellActionProps {
-  data: CategoryDTO;
-}
 
 function CategoryCellAction({ data }: CategoryCellActionProps) {
   const t = useT();
@@ -172,10 +169,6 @@ const categoryDetail: DetailConfig<CategoryDTO> = {
     }
   ]
 };
-
-interface CategoriesTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function CategoriesTable({ toolbarAction }: CategoriesTableProps) {
   const columnIds = ['name', 'isActive'];

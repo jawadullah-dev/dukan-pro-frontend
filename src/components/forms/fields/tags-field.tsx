@@ -46,7 +46,7 @@ export function TagsField({
             }
           }}
           placeholder={placeholder || t('common.add')}
-          aria-label={`Add a ${label.toLowerCase().replace(/ \*$/, '')}`}
+          aria-label={`${t('common.add')} ${label.toLowerCase().replace(/ \*$/, '')}`}
           aria-invalid={isInvalid}
           aria-describedby={isInvalid ? `${field.name}-error` : undefined}
         />
@@ -62,7 +62,7 @@ export function TagsField({
               <button
                 type='button'
                 onClick={() => field.removeValue(idx)}
-                aria-label={`Remove ${tag}`}
+                aria-label={`${t('common.remove')} ${tag}`}
                 className='hover:text-destructive ms-0.5'
               >
                 <Icons.close className='h-3 w-3' />

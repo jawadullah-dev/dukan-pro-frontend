@@ -11,14 +11,8 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { StatusBadge } from '@/components/data-table';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import type { ExpenseDTO } from '@/types/expense';
-
-interface ExpenseDetailSheetProps {
-  expense: ExpenseDTO | null;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onCancelClick?: (expense: ExpenseDTO) => void;
-}
+import { useT } from '@/i18n/use-t';
+import type { ExpenseDTO, ExpenseDetailSheetProps } from '@/types/expense';
 
 export function ExpenseDetailSheet({
   expense,
@@ -26,6 +20,7 @@ export function ExpenseDetailSheet({
   onOpenChange,
   onCancelClick
 }: ExpenseDetailSheetProps) {
+  const t = useT();
   if (!expense) return null;
 
   const isCancelled = expense.status === 'CANCELLED';
@@ -38,11 +33,13 @@ export function ExpenseDetailSheet({
             <SheetTitle className='text-lg font-semibold'>{expense.categoryName}</SheetTitle>
             <StatusBadge status={expense.status} />
           </div>
-          <SheetDescription className='text-xs'>Operating expense details</SheetDescription>
+          <SheetDescription className='text-xs'>{t('expenses.detailTitle')}</SheetDescription>
         </SheetHeader>
 
         <div className='rounded-xl border border-border/70 bg-muted/40 p-4 text-center'>
-          <span className='text-xs font-normal text-muted-foreground'>Expense Amount</span>
+          <span className='text-xs font-normal text-muted-foreground'>
+            {t('expenses.expenseAmount')}
+          </span>
           <p className='mt-1 text-2xl font-bold tracking-tight text-foreground'>
             {formatPkr(expense.amount)}
           </p>
@@ -53,19 +50,19 @@ export function ExpenseDetailSheet({
 
         <div className='space-y-3 divide-y divide-border/60 text-sm'>
           <div className='flex justify-between py-2'>
-            <span className='text-muted-foreground'>Category</span>
+            <span className='text-muted-foreground'>{t('expenses.category')}</span>
             <span className='font-medium text-foreground'>{expense.categoryName}</span>
           </div>
 
           <div className='flex justify-between py-2'>
-            <span className='text-muted-foreground'>Expense Date</span>
+            <span className='text-muted-foreground'>{t('expenses.expenseDate')}</span>
             <span className='font-medium text-foreground'>
               {expense.expenseDate ? expense.expenseDate.split('T')[0] : '—'}
             </span>
           </div>
 
           <div className='flex justify-between py-2'>
-            <span className='text-muted-foreground'>Status</span>
+            <span className='text-muted-foreground'>{t('expenses.status')}</span>
             <span>
               <StatusBadge status={expense.status} />
             </span>
@@ -73,7 +70,9 @@ export function ExpenseDetailSheet({
 
           {expense.description && (
             <div className='py-2'>
-              <span className='text-muted-foreground block text-xs mb-1'>Description</span>
+              <span className='text-muted-foreground block text-xs mb-1'>
+                {t('expenses.description')}
+              </span>
               <p className='rounded-md bg-muted/50 p-2 text-xs font-medium text-foreground whitespace-pre-wrap'>
                 {expense.description}
               </p>
@@ -84,17 +83,17 @@ export function ExpenseDetailSheet({
             <div className='space-y-2 rounded-lg border border-destructive/20 bg-destructive/5 p-3 text-xs'>
               <div className='flex items-center gap-1.5 font-semibold text-destructive'>
                 <Icons.warning className='size-3.5' />
-                <span>Expense Cancelled</span>
+                <span>{t('expenses.cancelledTitle')}</span>
               </div>
               {expense.cancelReason && (
                 <p className='text-muted-foreground'>
-                  <span className='font-medium text-foreground'>Reason: </span>
+                  <span className='font-medium text-foreground'>{t('expenses.reasonLabel')} </span>
                   {expense.cancelReason}
                 </p>
               )}
               {expense.cancelledAt && (
                 <p className='text-muted-foreground text-[11px]'>
-                  Cancelled at: {new Date(expense.cancelledAt).toLocaleString()}
+                  {t('expenses.cancelledAtLabel')} {new Date(expense.cancelledAt).toLocaleString()}
                 </p>
               )}
             </div>
@@ -113,7 +112,7 @@ export function ExpenseDetailSheet({
               }}
             >
               <Icons.close className='me-2 size-4' />
-              Cancel
+              {t('expenses.cancelAction')}
             </Button>
           </div>
         )}

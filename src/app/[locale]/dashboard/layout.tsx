@@ -8,6 +8,8 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { auth } from '@/auth';
 import type { SessionRole } from '@/lib/dukaan/session';
 import type { Metadata } from 'next';
+import type { DashboardLayoutProps } from '@/types';
+export type { DashboardLayoutProps };
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -24,10 +26,6 @@ export async function generateMetadata(): Promise<Metadata> {
       follow: false
     }
   };
-}
-
-interface DashboardLayoutProps {
-  children: React.ReactNode;
 }
 
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {

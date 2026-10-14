@@ -20,7 +20,8 @@ import {
 import { getNavGroupsForRole } from '@/config/nav-config';
 import { useFilteredNavGroups } from '@/hooks/use-nav';
 import type { SessionRole } from '@/lib/dukaan/session';
-import type { NavGroup, NavItem } from '@/types';
+import type { NavGroup, NavItem, AppSidebarProps } from '@/types';
+export type { AppSidebarProps };
 import { Link, usePathname } from '@/i18n/navigation';
 import * as React from 'react';
 import { Icons } from '@/components/icons';
@@ -57,10 +58,6 @@ function filterNavGroups(
 function translateMaybe(key: string, t: ReturnType<typeof useTranslations>): string {
   const translated = t(key);
   return translated.startsWith('MISSING_MESSAGE') ? key : translated;
-}
-
-export interface AppSidebarProps {
-  role: SessionRole;
 }
 
 export default function AppSidebar({ role }: AppSidebarProps) {
@@ -190,7 +187,7 @@ export default function AppSidebar({ role }: AppSidebarProps) {
         ))}
       </SidebarContent>
       <SidebarFooter className='group-data-[collapsible=icon]:hidden'>
-        <p className='text-muted-foreground px-2 py-1 text-xs'>Dukaan Pro</p>
+        <p className='text-muted-foreground px-2 py-1 text-xs'>{t('common.appName')}</p>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

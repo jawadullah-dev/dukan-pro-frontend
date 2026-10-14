@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from 'next';
+import type { RootLayoutProps } from '@/types';
+export type { RootLayoutProps };
 import { getTranslations, setRequestLocale, getLocale } from 'next-intl/server';
 import { isLocale } from '@/i18n/request';
 import { cookies } from 'next/headers';
@@ -116,10 +118,6 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover'
 };
-
-export interface RootLayoutProps {
-  children: React.ReactNode;
-}
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const requestedLocale = await getLocale();

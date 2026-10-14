@@ -1,7 +1,6 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { parseAsString, useQueryState } from 'nuqs';
@@ -21,6 +20,7 @@ import { useT } from '@/i18n/use-t';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { formatLabel } from '@/lib/dukaan/numbers';
 import type { InventoryAdjustmentDTO } from '@/lib/api/types';
+import type { AdjustmentsTableProps } from '@/types/inventory';
 import { inventoryAdjustmentsQueryOptions } from '../api/queries';
 import { StockAdjustDialog } from './stock-adjust-dialog';
 
@@ -29,10 +29,6 @@ const TYPE_OPTIONS = [
   { label: 'Damaged', value: 'DAMAGED' },
   { label: 'Lost', value: 'LOST' }
 ];
-
-interface AdjustmentsTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
   const t = useT();
@@ -88,7 +84,7 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
     {
       id: 'createdAt',
       accessorKey: 'createdAt',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
       cell: ({ row }) => {
         const val = row.original.createdAt;
         const formatted = val ? val.split('T')[0] : '—';
@@ -106,13 +102,15 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
     {
       id: 'productName',
       accessorKey: 'productName',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Product' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.product')} />
+      ),
       cell: ({ row }) => (
         <div className='flex flex-col gap-0.5'>
           <span className='font-normal text-foreground'>{row.original.productName}</span>
           {row.original.imei && (
             <span className='font-mono text-xs text-muted-foreground'>
-              IMEI: {row.original.imei}
+              {t('inventory.imeiLabel')} {row.original.imei}
             </span>
           )}
         </div>
@@ -133,7 +131,7 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
     {
       id: 'type',
       accessorKey: 'type',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.type')} />,
       cell: ({ row }) => {
         const type = row.original.type;
         const colorClass =
@@ -161,7 +159,9 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
     {
       id: 'quantityChange',
       accessorKey: 'quantityChange',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Qty Change' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.qtyDelta')} />
+      ),
       cell: ({ row }) => {
         const change = row.original.quantityChange;
         const isPositive = change > 0;
@@ -189,7 +189,9 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
     {
       id: 'reason',
       accessorKey: 'reason',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Reason' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.reason')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground truncate max-w-xs block'>
           {row.original.reason || '—'}
@@ -248,7 +250,7 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
   };
 
   const quickFilters: QuickFilterChip[] = [
-    { id: 'all', label: t('table.all') || 'All' },
+    { id: 'all', label: t('table.all') },
     {
       id: 'adjustment',
       label: 'Adjustment',

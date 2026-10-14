@@ -14,13 +14,8 @@ import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import { useTranslations } from 'next-intl';
 import { useFieldContext, useFieldInvalid, type BaseFieldProps } from '@/lib/form-context';
-
-type IconComponent = React.ComponentType<{ className?: string }>;
-
-type TextFieldProps = BaseFieldProps &
-  Omit<React.ComponentProps<typeof Input>, 'value' | 'onChange' | 'onBlur'> & {
-    startIcon?: IconComponent;
-  };
+import type { IconComponent, TextFieldProps } from '@/types';
+export type { TextFieldProps };
 
 export function TextField({
   label,

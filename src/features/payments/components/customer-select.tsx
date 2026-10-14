@@ -7,16 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/use-t';
 import { listCustomers } from '@/features/customers/api/service';
 import type { CustomerDTO } from '@/lib/api/types';
-
-interface CustomerSelectComboboxProps {
-  value: string;
-  onSelectCustomer: (customer: CustomerDTO | null) => void;
-  selectedCustomer?: CustomerDTO | null;
-  placeholder?: string;
-  disabled?: boolean;
-}
+import type { CustomerSelectComboboxProps } from '@/types/payment';
 
 const PAGE_SIZE = 20;
 
@@ -24,9 +18,11 @@ export function CustomerSelectCombobox({
   value,
   onSelectCustomer,
   selectedCustomer,
-  placeholder = 'Select a customer...',
+  placeholder,
   disabled
 }: CustomerSelectComboboxProps) {
+  const t = useT();
+  const effectivePlaceholder = placeholder || t('common.select');
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [debouncedSearch, setDebouncedSearch] = React.useState('');
@@ -124,7 +120,9 @@ export function CustomerSelectCombobox({
             )}
           </div>
         ) : (
-          <span className='truncate font-normal text-foreground text-sm'>{placeholder}</span>
+          <span className='truncate font-normal text-foreground text-sm'>
+            {effectivePlaceholder}
+          </span>
         )}
 
         <div className='flex items-center gap-1 ms-2 shrink-0'>
@@ -151,7 +149,7 @@ export function CustomerSelectCombobox({
         <div className='flex items-center border-b px-2.5 py-1.5 gap-2'>
           <Icons.search className='size-4 shrink-0 text-muted-foreground' />
           <Input
-            placeholder='Search name or mobile...'
+            placeholder={t('payments.searchCustomerPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className='h-7 border-0 bg-transparent p-0 text-xs shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground'
@@ -175,11 +173,11 @@ export function CustomerSelectCombobox({
           {isLoading ? (
             <div className='flex items-center justify-center py-6 text-muted-foreground gap-2'>
               <Icons.spinner className='size-4 animate-spin' />
-              <span>Loading customers...</span>
+              <span>{t('payments.loadingCustomers')}</span>
             </div>
           ) : allCustomers.length === 0 ? (
             <div className='py-6 text-center text-muted-foreground'>
-              {debouncedSearch ? 'No customers found.' : 'No active customers.'}
+              {debouncedSearch ? t('payments.noCustomersFound') : t('payments.noActiveCustomers')}
             </div>
           ) : (
             <>
@@ -212,7 +210,7 @@ export function CustomerSelectCombobox({
               {isFetchingNextPage && (
                 <div className='flex items-center justify-center py-2 text-[11px] text-muted-foreground gap-1.5'>
                   <Icons.spinner className='size-3.5 animate-spin' />
-                  <span>Loading more...</span>
+                  <span>{t('table.loadMore')}</span>
                 </div>
               )}
             </>

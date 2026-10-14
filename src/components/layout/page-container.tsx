@@ -1,18 +1,8 @@
 'use client';
 
-export interface PageContainerProps {
-  children: React.ReactNode;
-  isLoading?: boolean;
-  access?: boolean;
-  accessFallback?: React.ReactNode;
-  pageTitle?: string;
-  pageDescription?: string;
-  infoContent?: InfobarContent;
-  pageHeaderAction?: React.ReactNode;
-  fill?: boolean;
-}
-
 import React from 'react';
+import type { PageContainerProps } from '@/types';
+export type { PageContainerProps };
 import { Heading } from '../ui/heading';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import type { InfobarContent } from '@/components/ui/infobar';

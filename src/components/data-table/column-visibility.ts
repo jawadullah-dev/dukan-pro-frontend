@@ -1,5 +1,5 @@
 import type { Column, Table } from '@tanstack/react-table';
-import type { ContainerMode } from './use-container-mode';
+import type { ContainerMode } from './types';
 
 export function isColumnVisibleInMode<TData>(
   column: Column<TData, unknown>,

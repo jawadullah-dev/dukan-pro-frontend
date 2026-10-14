@@ -1,7 +1,6 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import type { ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { parseAsString, useQueryState } from 'nuqs';
@@ -29,15 +28,12 @@ import { useT } from '@/i18n/use-t';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type { InventoryItemDTO } from '@/lib/api/types';
+import type { InventoryRowActionsProps, InventoryTableProps } from '@/types/inventory';
 import { inventoryStockQueryOptions } from '../api/queries';
 import { StockAdjustDialog } from './stock-adjust-dialog';
 
-interface InventoryRowActionsProps {
-  item: InventoryItemDTO;
-  onAdjust: (item: InventoryItemDTO) => void;
-}
-
 function InventoryRowActions({ item, onAdjust }: InventoryRowActionsProps) {
+  const t = useT();
   return (
     <div
       onClick={(e) => e.stopPropagation()}
@@ -47,7 +43,7 @@ function InventoryRowActions({ item, onAdjust }: InventoryRowActionsProps) {
     >
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-          <span className='sr-only'>Open menu</span>
+          <span className='sr-only'>{t('common.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-40'>
@@ -59,7 +55,7 @@ function InventoryRowActions({ item, onAdjust }: InventoryRowActionsProps) {
               }}
             >
               <Icons.adjustments className='me-2 h-4 w-4' />
-              Adjust Stock
+              {t('common.adjustStock')}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -77,10 +73,6 @@ const LOW_STOCK_OPTIONS = [
   { label: 'Low Stock', value: 'true' },
   { label: 'OK', value: 'false' }
 ];
-
-interface InventoryTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function InventoryTable({ toolbarAction }: InventoryTableProps) {
   const t = useT();
@@ -164,7 +156,9 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
     {
       id: 'name',
       accessorKey: 'name',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Product' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.product')} />
+      ),
       cell: ({ row }) => (
         <div className='flex flex-col gap-0.5'>
           <span className='font-normal text-foreground'>{row.original.name}</span>
@@ -196,7 +190,9 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
     {
       id: 'trackingType',
       accessorKey: 'trackingType',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Tracking' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.tracking')} />
+      ),
       cell: ({ row }) => (
         <Badge
           variant='outline'
@@ -222,7 +218,7 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
     {
       id: 'inStock',
       accessorKey: 'inStock',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Qty' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.qty')} />,
       cell: ({ row }) => (
         <span className='font-normal tabular-nums text-foreground'>{row.original.inStock}</span>
       ),
@@ -238,7 +234,7 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
     {
       id: 'stockValue',
       accessorKey: 'stockValue',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Cost' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.cost')} />,
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>{formatPkr(row.original.stockValue)}</span>
       ),
@@ -254,10 +250,12 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
     {
       id: 'lowStock',
       accessorKey: 'lowStock',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Low stock' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('inventory.lowStock')} />
+      ),
       cell: ({ row }) =>
         row.original.lowStock ? (
-          <StatusBadge status='OVERDUE' label='Low stock' tone='danger' />
+          <StatusBadge status='OVERDUE' label={t('inventory.lowStock')} tone='danger' />
         ) : (
           <StatusBadge status='ACTIVE' label='OK' tone='success' />
         ),
@@ -322,7 +320,7 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
           {
             label: 'Status',
             value: row.lowStock ? (
-              <StatusBadge status='OVERDUE' label='Low stock' tone='danger' />
+              <StatusBadge status='OVERDUE' label={t('inventory.lowStock')} tone='danger' />
             ) : (
               <StatusBadge status='ACTIVE' label='OK' tone='success' />
             )
@@ -337,7 +335,7 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
                 label: `Unit #${idx + 1}`,
                 value: (
                   <Badge variant='outline' className='font-mono'>
-                    IMEI: {imei}
+                    {t('inventory.imeiLabel')} {imei}
                   </Badge>
                 )
               }))
@@ -348,10 +346,10 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
   };
 
   const inventoryQuickFilters: QuickFilterChip[] = [
-    { id: 'all', label: t('table.all') || 'All' },
+    { id: 'all', label: t('table.all') },
     {
       id: 'low',
-      label: t('status.lowStock') || 'Low stock',
+      label: t('status.lowStock'),
       columnId: 'lowStock',
       value: ['true']
     },

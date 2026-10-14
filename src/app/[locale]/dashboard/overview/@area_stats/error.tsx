@@ -6,11 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useTransition } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import { useT } from '@/i18n/use-t';
-
-interface AreaStatsErrorProps {
-  error: Error;
-  reset: () => void;
-}
+import type { AreaStatsErrorProps } from '@/types';
+export type { AreaStatsErrorProps };
 
 export default function AreaStatsError({ error, reset }: AreaStatsErrorProps) {
   const router = useRouter();

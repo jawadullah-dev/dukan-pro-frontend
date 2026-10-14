@@ -7,17 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Icons } from '@/components/icons';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n/use-t';
 import { listExpenseCategories } from '../api/service';
-import type { ExpenseCategoryDTO } from '@/types/expense';
-
-interface CategorySelectComboboxProps {
-  value: string;
-  onSelectCategory: (category: ExpenseCategoryDTO | null) => void;
-  selectedCategory?: ExpenseCategoryDTO | null;
-  placeholder?: string;
-  disabled?: boolean;
-  onAddNewCategoryClick?: () => void;
-}
+import type { ExpenseCategoryDTO, CategorySelectComboboxProps } from '@/types/expense';
 
 const PAGE_SIZE = 20;
 
@@ -25,10 +17,11 @@ export function CategorySelectCombobox({
   value,
   onSelectCategory,
   selectedCategory,
-  placeholder = 'Select category...',
+  placeholder,
   disabled,
   onAddNewCategoryClick
 }: CategorySelectComboboxProps) {
+  const t = useT();
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState('');
   const [debouncedSearch, setDebouncedSearch] = React.useState('');
@@ -144,7 +137,7 @@ export function CategorySelectCombobox({
                 }
               }}
               className='cursor-pointer rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground'
-              title='Clear selection'
+              title={t('expenses.clearSelection')}
             >
               <Icons.close className='size-3.5' />
             </span>
@@ -163,7 +156,7 @@ export function CategorySelectCombobox({
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder='Search category...'
+              placeholder={t('expenses.searchCategory')}
               className='h-9 ps-8 pe-8 text-sm font-normal text-foreground w-full'
               autoFocus
             />
@@ -186,11 +179,11 @@ export function CategorySelectCombobox({
           {isLoading && allCategories.length === 0 ? (
             <div className='flex items-center justify-center gap-2 py-6 text-sm font-normal text-muted-foreground'>
               <Icons.spinner className='size-4 animate-spin text-primary' />
-              <span>Loading categories...</span>
+              <span>{t('expenses.loadingCategories')}</span>
             </div>
           ) : allCategories.length === 0 ? (
             <div className='py-6 text-center text-sm font-normal text-muted-foreground'>
-              No expense categories found
+              {t('expenses.noCategoriesFound')}
             </div>
           ) : (
             allCategories.map((cat) => {
@@ -216,7 +209,7 @@ export function CategorySelectCombobox({
           {isFetchingNextPage && (
             <div className='flex items-center justify-center gap-2 py-2 text-xs text-muted-foreground'>
               <Icons.spinner className='size-3 animate-spin text-primary' />
-              <span>Loading more...</span>
+              <span>{t('expenses.loadingMore')}</span>
             </div>
           )}
         </div>
@@ -234,7 +227,7 @@ export function CategorySelectCombobox({
               className='w-full justify-start text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 gap-1.5'
             >
               <Icons.add className='size-3.5' />
-              <span>Add new category</span>
+              <span>{t('expenses.addNewCategory')}</span>
             </Button>
           </div>
         )}

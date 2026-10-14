@@ -4,11 +4,7 @@ import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { useT } from '@/i18n/use-t';
 import { ACTION_LABELS } from '@/features/dukaan/constants/ui';
-
-interface DialogCancelButtonProps {
-  onClick: () => void;
-  disabled?: boolean;
-}
+import type { DialogCancelButtonProps, DialogPrimaryButtonProps } from '@/types';
 
 export function DialogCancelButton({ onClick, disabled }: DialogCancelButtonProps) {
   const t = useT();
@@ -18,18 +14,6 @@ export function DialogCancelButton({ onClick, disabled }: DialogCancelButtonProp
       {t('common.cancel')}
     </Button>
   );
-}
-
-type DialogPrimaryMode = 'add' | 'edit' | 'save';
-
-interface DialogPrimaryButtonProps {
-  mode: DialogPrimaryMode;
-  disabled?: boolean;
-
-  loading?: boolean;
-  type?: 'submit' | 'button';
-  onClick?: () => void;
-  variant?: 'default' | 'destructive';
 }
 
 const PRIMARY_ICON = {

@@ -45,7 +45,8 @@ export function ThemeSelector() {
           </span>
           <span className='text-muted-foreground block sm:hidden'>{t('appearance.theme')}</span>
           <SelectValue placeholder={t('appearance.selectTheme')} />
-          <Kbd>T T</Kbd>
+          <Kbd>T</Kbd>
+          <Kbd>T</Kbd>
         </SelectTrigger>
         <SelectContent align='end'>
           {THEMES.length > 0 && (

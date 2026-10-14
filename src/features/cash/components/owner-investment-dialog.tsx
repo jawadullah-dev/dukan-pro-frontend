@@ -16,15 +16,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { toPaisa } from '@/lib/dukaan/numbers';
+import type { OwnerInvestmentDialogProps } from '@/types/cash';
 import { createOwnerInvestmentMutation } from '../api/mutations';
 import { cashKeys } from '../api/queries';
 
 import { useT } from '@/i18n/use-t';
-
-export interface OwnerInvestmentDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
 
 export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDialogProps) {
   const t = useT();
@@ -36,7 +32,7 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
   const createMutation = useMutation({
     ...createOwnerInvestmentMutation,
     onSuccess: async () => {
-      toast.success(t('dukaan.cash.investmentSuccess') || 'Owner investment recorded successfully');
+      toast.success(t('dukaan.cash.investmentSuccess'));
       await qc.invalidateQueries({ queryKey: cashKeys.all });
       await qc.invalidateQueries({ queryKey: ['dashboard'] });
       setAmountStr('');
@@ -44,7 +40,7 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
       onOpenChange(false);
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to record owner investment');
+      toast.error(err.message || t('dukaan.cash.investmentFailed'));
     }
   });
 
@@ -52,7 +48,7 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
     e.preventDefault();
     const parsedAmount = parseFloat(amountStr);
     if (isNaN(parsedAmount) || parsedAmount <= 0) {
-      toast.error('Please enter a valid amount greater than 0');
+      toast.error(t('common.invalidAmount'));
       return;
     }
 
@@ -76,24 +72,18 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
     >
       <DialogContent className='w-full sm:max-w-md'>
         <DialogHeader>
-          <DialogTitle>
-            {t('dukaan.cash.recordInvestmentTitle') || 'Record Owner Investment'}
-          </DialogTitle>
-          <DialogDescription>
-            {t('dukaan.cash.recordInvestmentDesc') ||
-              'Record cash the owner puts into the shop drawer. This is not counted as shop revenue.'}
-          </DialogDescription>
+          <DialogTitle>{t('dukaan.cash.recordInvestmentTitle')}</DialogTitle>
+          <DialogDescription>{t('dukaan.cash.recordInvestmentDesc')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className='space-y-4 pt-2'>
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-amount' className='text-sm font-normal text-foreground'>
-              {t('dukaan.cash.investmentAmount') || 'Investment Amount (PKR)'}{' '}
-              <span className='text-destructive'>*</span>
+              {t('dukaan.cash.investmentAmount')} <span className='text-destructive'>*</span>
             </Label>
             <div className='relative w-full'>
               <span className='absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground'>
-                Rs
+                {t('common.currency')}
               </span>
               <Input
                 id='investment-amount'
@@ -113,7 +103,7 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
 
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-date' className='text-sm font-normal text-foreground'>
-              {t('dukaan.cash.date') || 'Date'} <span className='text-destructive'>*</span>
+              {t('dukaan.cash.date')} <span className='text-destructive'>*</span>
             </Label>
             <Input
               id='investment-date'
@@ -128,15 +118,13 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
 
           <div className='space-y-1.5 w-full'>
             <Label htmlFor='investment-notes' className='text-sm font-normal text-foreground'>
-              {t('dukaan.cash.notes') || 'Notes'}{' '}
-              <span className='text-xs text-muted-foreground'>
-                ({t('common.optional') || 'Optional'})
-              </span>
+              {t('dukaan.cash.notes')}{' '}
+              <span className='text-xs text-muted-foreground'>({t('common.optional')})</span>
             </Label>
             <Textarea
               id='investment-notes'
               rows={2}
-              placeholder='e.g. Added personal cash for restock...'
+              placeholder={t('dukaan.cash.investmentPlaceholder')}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               disabled={createMutation.isPending}

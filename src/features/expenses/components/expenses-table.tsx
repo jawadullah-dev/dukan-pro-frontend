@@ -23,19 +23,20 @@ import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-h
 import { useDataTable } from '@/hooks/use-data-table';
 import { useDukaanListParams } from '@/components/data-table/list-params';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import type { ExpenseDTO, ExpenseQueryFilter } from '@/types/expense';
+import type {
+  ExpenseDTO,
+  ExpenseQueryFilter,
+  ExpenseRowActionsProps,
+  ExpensesTableProps
+} from '@/types/expense';
 import { useState, type ReactNode } from 'react';
 import { expensesQueryOptions } from '../api/queries';
 import { CancelExpenseDialog } from './cancel-expense-dialog';
 import { RecordExpenseDialog } from './record-expense-dialog';
 import { ExpenseDetailSheet } from './expense-detail-sheet';
 
-interface ExpenseRowActionsProps {
-  expense: ExpenseDTO;
-  onCancel: (expense: ExpenseDTO) => void;
-}
-
 function ExpenseRowActions({ expense, onCancel }: ExpenseRowActionsProps) {
+  const t = useT();
   const isCancelled = expense.status === 'CANCELLED';
 
   if (isCancelled) return null;
@@ -44,7 +45,7 @@ function ExpenseRowActions({ expense, onCancel }: ExpenseRowActionsProps) {
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger render={<Button variant='ghost' className='h-8 w-8 p-0' />}>
-          <span className='sr-only'>Open menu</span>
+          <span className='sr-only'>{t('table.openMenu')}</span>
           <Icons.ellipsis className='h-4 w-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-32'>
@@ -57,7 +58,7 @@ function ExpenseRowActions({ expense, onCancel }: ExpenseRowActionsProps) {
               }}
             >
               <Icons.close className='me-2 h-4 w-4' />
-              Cancel
+              {t('expenses.cancelAction')}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
@@ -98,10 +99,6 @@ const expenseDetail: DetailConfig<ExpenseDTO> = {
     }
   ]
 };
-
-interface ExpensesTableProps {
-  toolbarAction?: ReactNode;
-}
 
 export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
   const t = useT();
@@ -161,7 +158,7 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
     {
       id: 'expenseDate',
       accessorKey: 'expenseDate',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Date' />,
+      header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
       cell: ({ row }) => {
         const val = row.original.expenseDate;
         const formatted = val ? val.split('T')[0] : '—';
@@ -179,7 +176,9 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
     {
       id: 'categoryName',
       accessorKey: 'categoryName',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Category' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.category')} />
+      ),
       cell: ({ row }) => (
         <span className='font-medium text-foreground'>{row.original.categoryName}</span>
       ),
@@ -199,7 +198,9 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
     {
       id: 'amount',
       accessorKey: 'amount',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Amount' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.amount')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-foreground'>{formatPkr(row.original.amount)}</span>
       ),
@@ -215,7 +216,9 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
     {
       id: 'description',
       accessorKey: 'description',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Description' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.description')} />
+      ),
       cell: ({ row }) => (
         <span className='font-normal text-muted-foreground truncate max-w-[260px] inline-block'>
           {row.original.description || '—'}
@@ -233,7 +236,9 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
     {
       id: 'status',
       accessorKey: 'status',
-      header: ({ column }) => <DataTableColumnHeader column={column} title='Status' />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title={t('table.col.status')} />
+      ),
       cell: ({ row }) => {
         const isCancelled = row.original.status === 'CANCELLED';
         return (
@@ -285,7 +290,7 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
       {toolbarAction}
       <Button size='sm' className='h-8 gap-1.5' onClick={() => setRecordOpen(true)}>
         <Icons.add className='h-3.5 w-3.5' />
-        <span>Add expense</span>
+        <span>{t('expenses.addExpense')}</span>
       </Button>
     </div>
   );

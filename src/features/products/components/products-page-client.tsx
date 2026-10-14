@@ -8,10 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useT } from '@/i18n/use-t';
 import { ProductDialog } from './product-dialog';
 import { ProductsTable } from './products-table';
-
-interface ProductsHeaderActionProps {
-  onAdd?: () => void;
-}
+import type { ProductsHeaderActionProps } from '@/types/products';
 
 export function ProductsHeaderAction({ onAdd }: ProductsHeaderActionProps) {
   const t = useT();

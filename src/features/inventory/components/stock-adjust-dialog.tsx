@@ -24,19 +24,16 @@ import {
 } from '@/components/ui/select';
 import { DialogCancelButton } from '@/components/common/dialog-actions';
 import { Icons } from '@/components/icons';
+import { useT } from '@/i18n/use-t';
+import type { StockAdjustDialogProps } from '@/types/inventory';
 import { createInventoryAdjustment } from '../api/service';
 import { inventoryKeys, inventoryStockQueryOptions } from '../api/queries';
-import type { CreateInventoryAdjustmentInput, InventoryItemDTO } from '@/lib/api/types';
+import type { CreateInventoryAdjustmentInput } from '@/lib/api/types';
 import { ValidationError } from '@/lib/errors';
-
-interface StockAdjustDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  initialProduct?: InventoryItemDTO | null;
-}
 
 export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockAdjustDialogProps) {
   const qc = useQueryClient();
+  const t = useT();
   const { data: stockData } = useQuery(inventoryStockQueryOptions({ limit: 100 }));
   const products = stockData?.items ?? [];
 
@@ -107,13 +104,13 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
       return createInventoryAdjustment(payload);
     },
     onSuccess: (res) => {
-      toast.success(res.message || 'Stock change recorded successfully');
+      toast.success(res.message || t('inventory.adjustSuccess'));
       void qc.invalidateQueries({ queryKey: inventoryKeys.all });
       onOpenChange(false);
       setReason('');
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to record stock change');
+      toast.error(err.message || t('inventory.adjustFailed'));
     }
   });
 
@@ -127,27 +124,25 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
       <DialogContent className='sm:max-w-md'>
         <form onSubmit={handleSubmit} className='space-y-4'>
           <DialogHeader>
-            <DialogTitle>Record Stock Adjustment</DialogTitle>
-            <DialogDescription>
-              Record a physical count adjustment or write off damaged / lost stock.
-            </DialogDescription>
+            <DialogTitle>{t('inventory.adjustTitle')}</DialogTitle>
+            <DialogDescription>{t('inventory.adjustDesc')}</DialogDescription>
           </DialogHeader>
 
           <div className='grid gap-4 py-2'>
             <div className='space-y-1.5'>
-              <Label htmlFor='adj-product'>Product</Label>
+              <Label htmlFor='adj-product'>{t('table.col.product')}</Label>
               <Select value={productId} onValueChange={(val) => setProductId(val ?? '')}>
                 <SelectTrigger id='adj-product' className='w-full'>
-                  <SelectValue placeholder='Select a product'>
+                  <SelectValue placeholder={t('inventory.selectProduct')}>
                     {selectedProduct
-                      ? `${selectedProduct.name} (${selectedProduct.inStock} in stock · ${selectedProduct.trackingType})`
+                      ? `${selectedProduct.name} (${selectedProduct.inStock} ${t('inventory.inStockDot')} ${selectedProduct.trackingType})`
                       : undefined}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {products.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.name} ({p.inStock} in stock · {p.trackingType})
+                      {p.name} ({p.inStock} {t('inventory.inStockDot')} {p.trackingType})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -155,7 +150,7 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
             </div>
 
             <div className='space-y-1.5'>
-              <Label htmlFor='adj-type'>Change Type</Label>
+              <Label htmlFor='adj-type'>{t('inventory.changeType')}</Label>
               <Select
                 value={type}
                 onValueChange={(val) => {
@@ -167,12 +162,10 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
                 </SelectTrigger>
                 <SelectContent>
                   {!isSerialized && (
-                    <SelectItem value='ADJUSTMENT'>
-                      Shelf Count Adjustment (Correct shelf count)
-                    </SelectItem>
+                    <SelectItem value='ADJUSTMENT'>{t('inventory.typeShelfCount')}</SelectItem>
                   )}
-                  <SelectItem value='DAMAGED'>Damaged Stock (Write off)</SelectItem>
-                  <SelectItem value='LOST'>Lost Stock (Write off)</SelectItem>
+                  <SelectItem value='DAMAGED'>{t('inventory.typeDamaged')}</SelectItem>
+                  <SelectItem value='LOST'>{t('inventory.typeLost')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -180,10 +173,10 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
             {type === 'ADJUSTMENT' ? (
               <div className='space-y-1.5'>
                 <div className='flex items-center justify-between'>
-                  <Label htmlFor='adj-count'>Physical Count on Shelf</Label>
+                  <Label htmlFor='adj-count'>{t('inventory.physicalCount')}</Label>
                   {selectedProduct && (
                     <span className='text-xs text-muted-foreground'>
-                      Current system stock: {selectedProduct.inStock}
+                      {t('inventory.currentSystemStock')} {selectedProduct.inStock}
                     </span>
                   )}
                 </div>
@@ -197,7 +190,7 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
                 />
                 {selectedProduct && (
                   <p className='text-[11px] text-muted-foreground'>
-                    Change:{' '}
+                    {t('inventory.changeLabel')}{' '}
                     <span
                       className={
                         countedQuantity - selectedProduct.inStock > 0
@@ -210,24 +203,24 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
                       {countedQuantity - selectedProduct.inStock > 0 ? '+' : ''}
                       {countedQuantity - selectedProduct.inStock}
                     </span>{' '}
-                    units
+                    {t('inventory.units')}
                   </p>
                 )}
               </div>
             ) : isSerialized ? (
               <div className='space-y-1.5'>
-                <Label htmlFor='adj-imei'>Unit IMEI to Write Off</Label>
+                <Label htmlFor='adj-imei'>{t('inventory.unitImeiToWriteOff')}</Label>
                 {selectedProduct?.imeis && selectedProduct.imeis.length > 0 ? (
                   <Select value={selectedImei} onValueChange={(val) => setSelectedImei(val ?? '')}>
                     <SelectTrigger id='adj-imei'>
-                      <SelectValue placeholder='Select IMEI'>
-                        {selectedImei ? `IMEI: ${selectedImei}` : undefined}
+                      <SelectValue placeholder={t('inventory.selectImei')}>
+                        {selectedImei ? `${t('inventory.imeiLabel')} ${selectedImei}` : undefined}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       {selectedProduct.imeis.map((imei) => (
                         <SelectItem key={imei} value={imei}>
-                          IMEI: {imei}
+                          {t('inventory.imeiLabel')} {imei}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -235,7 +228,7 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
                 ) : (
                   <Input
                     id='adj-imei'
-                    placeholder='Enter unit IMEI or ID'
+                    placeholder={t('inventory.enterImeiOrId')}
                     value={selectedImei}
                     onChange={(e) => setSelectedImei(e.target.value)}
                     required
@@ -245,10 +238,10 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
             ) : (
               <div className='space-y-1.5'>
                 <div className='flex items-center justify-between'>
-                  <Label htmlFor='adj-qty'>Quantity to Write Off</Label>
+                  <Label htmlFor='adj-qty'>{t('inventory.quantityToWriteOff')}</Label>
                   {selectedProduct && (
                     <span className='text-xs text-muted-foreground'>
-                      Available: {selectedProduct.inStock}
+                      {t('inventory.availableLabel')} {selectedProduct.inStock}
                     </span>
                   )}
                 </div>
@@ -265,10 +258,10 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
             )}
 
             <div className='space-y-1.5'>
-              <Label htmlFor='adj-reason'>Reason (Mandatory)</Label>
+              <Label htmlFor='adj-reason'>{t('inventory.reasonMandatory')}</Label>
               <Textarea
                 id='adj-reason'
-                placeholder='e.g., Physical stock count difference, item cracked in box'
+                placeholder={t('inventory.reasonPlaceholder')}
                 rows={3}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -281,7 +274,7 @@ export function StockAdjustDialog({ open, onOpenChange, initialProduct }: StockA
             <DialogCancelButton onClick={() => onOpenChange(false)} disabled={mutation.isPending} />
             <Button type='submit' disabled={mutation.isPending || !reason.trim()}>
               {mutation.isPending && <Icons.spinner className='me-2 h-4 w-4 animate-spin' />}
-              Record Change
+              {t('inventory.recordChange')}
             </Button>
           </DialogFooter>
         </form>

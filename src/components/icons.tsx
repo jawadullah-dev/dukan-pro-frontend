@@ -100,8 +100,7 @@ import {
   IconWallet,
   IconX
 } from '@tabler/icons-react';
-
-export type Icon = React.ComponentType<IconProps>;
+export type { Icon } from '@/types';
 
 export const Icons = {
   alertCircle: IconAlertCircle,

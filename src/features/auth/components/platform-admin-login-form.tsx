@@ -13,21 +13,21 @@ import { useTranslations, useLocale } from 'next-intl';
 import { homePathForRole } from '@/lib/auth/routes';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
 import { getSession } from 'next-auth/react';
-
-const platformAdminLoginSchema = z.object({
-  phone: z
-    .string()
-    .min(1, 'Phone number is required')
-    .refine(isValidPkMobile, 'Enter a valid Pakistani mobile number'),
-  password: z.string().min(8, 'Password must be at least 8 characters')
-});
-
-type PlatformAdminLoginValues = z.infer<typeof platformAdminLoginSchema>;
+import type { PlatformAdminLoginValues } from '@/types/auth';
 
 export function PlatformAdminLoginForm() {
+  const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+
+  const platformAdminLoginSchema = z.object({
+    phone: z
+      .string()
+      .min(1, t('auth.phoneRequired'))
+      .refine(isValidPkMobile, t('auth.phoneInvalid')),
+    password: z.string().min(8, t('auth.passwordRequired'))
+  });
 
   const form = useAppForm({
     defaultValues: {
@@ -48,7 +48,7 @@ export function PlatformAdminLoginForm() {
       });
 
       if (result?.error) {
-        setError('Phone number or password is incorrect. Please try again.');
+        setError(t('auth.platformAdminError'));
         return;
       }
 
@@ -63,9 +63,9 @@ export function PlatformAdminLoginForm() {
     <Card className='w-full max-w-md border-border/60 shadow-sm'>
       <CardHeader className='space-y-1'>
         <CardTitle className='text-2xl font-semibold tracking-tight'>
-          Platform Admin Sign In
+          {t('auth.platformAdminSignInTitle')}
         </CardTitle>
-        <CardDescription>Sign in to manage shops and subscriptions</CardDescription>
+        <CardDescription>{t('auth.platformAdminSignInDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -87,7 +87,7 @@ export function PlatformAdminLoginForm() {
               name='phone'
               children={(field) => (
                 <field.TextField
-                  label='Phone'
+                  label={t('auth.phone')}
                   type='tel'
                   inputMode='numeric'
                   autoComplete='tel'
@@ -101,7 +101,7 @@ export function PlatformAdminLoginForm() {
               name='password'
               children={(field) => (
                 <field.TextField
-                  label='Password'
+                  label={t('auth.password')}
                   type='password'
                   autoComplete='current-password'
                   placeholder='••••••••'
@@ -115,12 +115,12 @@ export function PlatformAdminLoginForm() {
           <form.AppForm>
             <form.SubmitButton className='w-full'>
               <Icons.login className='size-4' />
-              Sign In
+              {t('auth.signIn')}
             </form.SubmitButton>
           </form.AppForm>
 
           <p className='text-muted-foreground text-center text-xs'>
-            This portal is for Dukaan Pro platform administrators only.
+            {t('auth.platformAdminNotice')}
           </p>
         </form>
       </CardContent>

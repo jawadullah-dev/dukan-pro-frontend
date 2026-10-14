@@ -12,6 +12,7 @@ import { Icons } from '@/components/icons';
 import { homePathForRole, canAccessPath, platformAdminLoginPath } from '@/lib/auth/routes';
 import { isValidPkMobile, normalizePhone } from '@/lib/auth/phone';
 import { useTranslations, useLocale } from 'next-intl';
+import type { LoginValues } from '@/types/auth';
 
 export function LoginForm() {
   const t = useTranslations();
@@ -28,8 +29,6 @@ export function LoginForm() {
       .refine(isValidPkMobile, t('auth.phoneInvalid')),
     password: z.string().min(1, t('auth.passwordRequired'))
   });
-
-  type LoginValues = z.infer<typeof loginSchema>;
 
   const form = useAppForm({
     defaultValues: {
@@ -124,12 +123,12 @@ export function LoginForm() {
           </form.AppForm>
 
           <p className='text-muted-foreground text-center text-xs leading-relaxed'>
-            Platform admin?{' '}
+            {t('auth.platformAdminPrompt')}{' '}
             <a
               href={platformAdminLoginPath(locale)}
               className='text-foreground underline-offset-4 hover:underline'
             >
-              Sign in here
+              {t('auth.platformAdminSignInLink')}
             </a>
           </p>
         </form>

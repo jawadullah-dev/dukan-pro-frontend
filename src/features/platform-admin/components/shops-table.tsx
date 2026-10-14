@@ -13,7 +13,8 @@ import {
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
 import { Icons } from '@/components/icons';
-import { t } from '@/i18n';
+import { useT } from '@/i18n/use-t';
+import { t as staticT } from '@/i18n/static-t';
 import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import type { PlatformShop } from '../api/types';
 import { platformShopsQueryOptions } from '../api/queries';
@@ -146,7 +147,7 @@ const shopMobileItem: MobileItemConfig<PlatformShop> = {
   subtitle: (row) => `${row.owner_name} · ${row.city}`,
   badge: (row) => ({ label: row.status, status: row.status }),
   value: (row) => row.next_due_at ?? '—',
-  valueLabel: () => t('table.due'),
+  valueLabel: () => staticT('table.due'),
   meta: [(row) => row.owner_phone],
   ariaLabel: (row) => `${row.name}, ${row.owner_name}, ${row.city}, ${row.status}`
 };
@@ -198,6 +199,7 @@ const shopDetail: DetailConfig<PlatformShop> = {
 
 export function PlatformShopsTable() {
   const router = useRouter();
+  const t = useT();
   const [page] = useQueryState('page', parseAsInteger.withDefault(1));
   const [perPage] = useQueryState('perPage', parseAsInteger.withDefault(10));
   const [name] = useQueryState('name', parseAsString);

@@ -17,6 +17,7 @@ import { platformSubscriptionsQueryOptions } from '../api/queries';
 import { PLATFORM_PLAN_OPTIONS, PLATFORM_STATUS_OPTIONS } from '../constants/filters';
 import { ShopStatusBadge } from './shop-status-badge';
 import { useT } from '@/i18n/use-t';
+import { Icons } from '@/components/icons';
 
 const columns: ColumnDef<PlatformSubscription>[] = [
   {

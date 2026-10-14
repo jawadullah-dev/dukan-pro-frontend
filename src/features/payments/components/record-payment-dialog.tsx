@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { toPaisa } from '@/lib/money';
 import { useT } from '@/i18n/use-t';
+import { Icons } from '@/components/icons';
 import type { CustomerDTO } from '@/lib/api/types';
 import type { PaymentMethodOption, RecordPaymentDialogProps } from '@/types/payment';
 import {

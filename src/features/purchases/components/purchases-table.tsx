@@ -5,14 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { parseAsString, useQueryState } from 'nuqs';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -52,28 +45,16 @@ function PurchaseRowActions({ purchase }: PurchaseRowActionsProps) {
         <CancelPurchaseDialog purchase={purchase} open={cancelOpen} onOpenChange={setCancelOpen} />
       )}
 
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('common.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-36'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              className='text-destructive focus:text-destructive'
-              onClick={(e) => {
-                e.stopPropagation();
-                requestAnimationFrame(() => setCancelOpen(true));
-              }}
-            >
-              <Icons.close className='me-2 h-4 w-4' />
-              {t('common.cancel')}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu
+        actions={[
+          {
+            label: t('common.cancel'),
+            icon: Icons.close,
+            variant: 'destructive',
+            onClick: () => setCancelOpen(true)
+          }
+        ]}
+      />
     </div>
   );
 }

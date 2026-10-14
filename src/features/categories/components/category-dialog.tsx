@@ -60,6 +60,11 @@ function CategoryDialogBody({ category, onOpenChange }: CategoryDialogBodyProps)
     }
   });
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void form.handleSubmit();
+  };
+
   return (
     <DialogContent className='sm:max-w-lg'>
       <DialogHeader className='pe-12'>
@@ -70,13 +75,7 @@ function CategoryDialogBody({ category, onOpenChange }: CategoryDialogBodyProps)
           {isEdit ? t('dukaan.category.editDescription') : t('dukaan.category.addDescription')}
         </DialogDescription>
       </DialogHeader>
-      <form
-        className='grid gap-4'
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
+      <form className='grid gap-4' onSubmit={handleSubmit}>
         <FieldGroup>
           <form.AppField
             name='name'

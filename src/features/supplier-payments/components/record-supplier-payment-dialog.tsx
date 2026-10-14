@@ -164,14 +164,23 @@ export function RecordSupplierPaymentDialog({
     });
   };
 
+  const handleOpenChange = (next: boolean) => {
+    if (!next) resetForm();
+    onOpenChange(next);
+  };
+
+  const handleTargetTypeChange = (val: string) => {
+    setTargetType(val as 'opening' | 'purchase');
+    setAmountStr('');
+  };
+
+  const handleSelectPurchase = (purchaseId: string) => {
+    setSelectedPurchaseId(purchaseId);
+    setAmountStr('');
+  };
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) resetForm();
-        onOpenChange(next);
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='max-h-[92vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>{t('supplierPayments.addPaymentTitle')}</DialogTitle>
@@ -235,10 +244,7 @@ export function RecordSupplierPaymentDialog({
               </Label>
               <RadioGroup
                 value={targetType}
-                onValueChange={(val) => {
-                  setTargetType(val as 'opening' | 'purchase');
-                  setAmountStr('');
-                }}
+                onValueChange={handleTargetTypeChange}
                 className='grid grid-cols-2 gap-2'
               >
                 <div
@@ -307,10 +313,7 @@ export function RecordSupplierPaymentDialog({
                         return (
                           <div
                             key={purchase.id}
-                            onClick={() => {
-                              setSelectedPurchaseId(purchase.id);
-                              setAmountStr('');
-                            }}
+                            onClick={() => handleSelectPurchase(purchase.id)}
                             className={`flex cursor-pointer items-center justify-between rounded-md p-2 text-xs transition-colors ${
                               isChosen
                                 ? 'bg-primary/10 font-semibold text-primary'

@@ -3,19 +3,10 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useRouter } from '@/i18n/navigation';
 import { useQueryState, parseAsString } from 'nuqs';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -41,7 +32,6 @@ import type { CustomerCellActionProps, CustomersTableProps } from '@/types';
 
 function CustomerCellAction({ data }: CustomerCellActionProps) {
   const t = useT();
-  const router = useRouter();
   const qc = useQueryClient();
   const [editOpen, setEditOpen] = useState(false);
   const [archiveOpen, setArchiveOpen] = useState(false);
@@ -82,59 +72,38 @@ function CustomerCellAction({ data }: CustomerCellActionProps) {
         confirmLabel={t('common.archive')}
       />
       <CustomerDialog open={editOpen} onOpenChange={setEditOpen} customer={data} />
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('common.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-40'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push(`/dashboard/customers/${data.id}`);
-              }}
-            >
-              <Icons.page className='me-2 h-4 w-4' /> {t('table.openLedger')}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                requestAnimationFrame(() => setEditOpen(true));
-              }}
-            >
-              <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            {data.isActive ? (
-              <DropdownMenuItem
-                className='text-amber-600 focus:text-amber-700 dark:text-amber-400'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestAnimationFrame(() => setArchiveOpen(true));
-                }}
-              >
-                <Icons.archive className='me-2 h-4 w-4' /> {t('common.archive')}
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                className='text-emerald-600 focus:text-emerald-700 dark:text-emerald-400'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  activate.mutate();
-                }}
-                disabled={activate.isPending}
-              >
-                <Icons.check className='me-2 h-4 w-4' /> {t('common.activate')}
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu
+        actions={[
+          {
+            label: t('table.openLedger'),
+            icon: Icons.page,
+            href: `/dashboard/customers/${data.id}`
+          },
+          {
+            label: t('common.edit'),
+            icon: Icons.edit,
+            onClick: () => setEditOpen(true)
+          },
+          ...(data.isActive
+            ? [
+                {
+                  label: t('common.archive'),
+                  icon: Icons.archive,
+                  className: 'text-amber-600 focus:text-amber-700 dark:text-amber-400',
+                  onClick: () => setArchiveOpen(true)
+                }
+              ]
+            : [
+                {
+                  label: t('common.activate'),
+                  icon: Icons.check,
+                  className: 'text-emerald-600 focus:text-emerald-700 dark:text-emerald-400',
+                  disabled: activate.isPending,
+                  onClick: () => activate.mutate()
+                }
+              ])
+        ]}
+      />
     </div>
   );
 }

@@ -25,6 +25,11 @@ export function ExpenseDetailSheet({
 
   const isCancelled = expense.status === 'CANCELLED';
 
+  const handleCancel = () => {
+    onOpenChange(false);
+    onCancelClick?.(expense);
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className='flex flex-col gap-6 sm:max-w-md overflow-y-auto'>
@@ -106,10 +111,7 @@ export function ExpenseDetailSheet({
               type='button'
               variant='outline'
               className='w-full text-destructive hover:bg-destructive/10 hover:text-destructive'
-              onClick={() => {
-                onOpenChange(false);
-                onCancelClick(expense);
-              }}
+              onClick={handleCancel}
             >
               <Icons.close className='me-2 size-4' />
               {t('expenses.cancelAction')}

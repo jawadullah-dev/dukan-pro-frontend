@@ -2,19 +2,11 @@
 
 import type { ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
-import { useRouter } from '@/i18n/navigation';
 import { useState } from 'react';
 import { parseAsString, useQueryState } from 'nuqs';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
+import type { RowAction } from '@/types/dukaan';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -36,13 +28,40 @@ import { CancelSaleDialog } from './cancel-sale-dialog';
 import { ReturnSaleDialog } from './return-sale-dialog';
 
 function SaleRowActions({ sale }: SaleRowActionsProps) {
-  const router = useRouter();
   const t = useT();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [returnOpen, setReturnOpen] = useState(false);
 
   const hasReturns = (sale.returns?.length ?? 0) > 0;
   const isCancelled = sale.status === 'CANCELLED';
+
+  const actions: RowAction[] = [
+    {
+      label: t('common.view'),
+      icon: Icons.page,
+      href: `/dashboard/sales/${sale.id}`
+    },
+    ...(!isCancelled
+      ? [
+          {
+            label: t('sales.returnBadge'),
+            icon: Icons.history,
+            className: 'text-blue-500',
+            onClick: () => setReturnOpen(true)
+          }
+        ]
+      : []),
+    ...(!isCancelled && !hasReturns
+      ? [
+          {
+            label: t('common.cancel'),
+            icon: Icons.trash,
+            variant: 'destructive' as const,
+            onClick: () => setCancelOpen(true)
+          }
+        ]
+      : [])
+  ];
 
   return (
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
@@ -53,57 +72,7 @@ function SaleRowActions({ sale }: SaleRowActionsProps) {
         <ReturnSaleDialog sale={sale} open={returnOpen} onOpenChange={setReturnOpen} />
       )}
 
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('common.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-36'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push(`/dashboard/sales/${sale.id}`);
-              }}
-            >
-              <Icons.page className='me-2 h-4 w-4' />
-              {t('common.view')}
-            </DropdownMenuItem>
-
-            {!isCancelled && (
-              <DropdownMenuItem
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestAnimationFrame(() => setReturnOpen(true));
-                }}
-              >
-                <Icons.history className='me-2 h-4 w-4 text-blue-500' />
-                {t('sales.returnBadge')}
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuGroup>
-
-          {!isCancelled && !hasReturns && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  className='text-destructive focus:text-destructive'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    requestAnimationFrame(() => setCancelOpen(true));
-                  }}
-                >
-                  <Icons.trash className='me-2 h-4 w-4' />
-                  {t('common.cancel')}
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu actions={actions} />
     </div>
   );
 }

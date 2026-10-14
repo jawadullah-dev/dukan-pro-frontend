@@ -25,6 +25,11 @@ export function SupplierPaymentDetailSheet({
 
   const isCancelled = payment.status === 'CANCELLED';
 
+  const handleCancelPayment = () => {
+    onOpenChange(false);
+    onCancelClick?.(payment);
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className='flex flex-col gap-6 sm:max-w-md overflow-y-auto'>
@@ -122,10 +127,7 @@ export function SupplierPaymentDetailSheet({
               type='button'
               variant='outline'
               className='w-full text-destructive hover:bg-destructive/10 hover:text-destructive'
-              onClick={() => {
-                onOpenChange(false);
-                onCancelClick(payment);
-              }}
+              onClick={handleCancelPayment}
             >
               <Icons.close className='me-2 size-4' />
               {t('supplierPayments.cancelPayment')}

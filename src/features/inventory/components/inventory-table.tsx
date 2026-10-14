@@ -6,13 +6,7 @@ import { useState } from 'react';
 import { parseAsString, useQueryState } from 'nuqs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -41,27 +35,15 @@ function InventoryRowActions({ item, onAdjust }: InventoryRowActionsProps) {
       role='presentation'
       data-slot='action-cell'
     >
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('common.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-40'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onAdjust(item);
-              }}
-            >
-              <Icons.adjustments className='me-2 h-4 w-4' />
-              {t('common.adjustStock')}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu
+        actions={[
+          {
+            label: t('common.adjustStock'),
+            icon: Icons.adjustments,
+            onClick: () => onAdjust(item)
+          }
+        ]}
+      />
     </div>
   );
 }
@@ -381,20 +363,18 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
     }
   });
 
+  const handleOpenAdjustStock = () => {
+    setSelectedProduct(null);
+    setAdjustOpen(true);
+  };
+
   return (
     <>
       <ResponsiveDataTable
         table={table}
         toolbarAction={
           toolbarAction ?? (
-            <Button
-              type='button'
-              size='sm'
-              onClick={() => {
-                setSelectedProduct(null);
-                setAdjustOpen(true);
-              }}
-            >
+            <Button type='button' size='sm' onClick={handleOpenAdjustStock}>
               <IconPlus className='me-1.5 h-4 w-4' />
               {t('common.adjustStock')}
             </Button>

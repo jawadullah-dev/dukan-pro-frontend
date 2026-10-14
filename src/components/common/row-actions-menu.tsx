@@ -11,16 +11,31 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { useT } from '@/i18n/use-t';
-import type { RowActionsMenuProps } from '@/types';
+import type { RowAction, RowActionsMenuProps } from '@/types';
 
 export function RowActionsMenu({ actions }: RowActionsMenuProps) {
   const t = useT();
   const router = useRouter();
+
   if (actions.length === 0) return null;
+
+  const handleActionClick = (e: React.MouseEvent, action: RowAction) => {
+    e.stopPropagation();
+    requestAnimationFrame(() => {
+      if (action.onClick) {
+        action.onClick();
+        return;
+      }
+      if (action.href) {
+        router.push(action.href);
+      }
+    });
+  };
 
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger
+        onClick={(e) => e.stopPropagation()}
         render={
           <Button
             type='button'
@@ -40,12 +55,9 @@ export function RowActionsMenu({ actions }: RowActionsMenuProps) {
               <DropdownMenuItem
                 key={action.label}
                 variant={action.variant}
-                onClick={() => {
-                  requestAnimationFrame(() => {
-                    if (action.onClick) action.onClick();
-                    else if (action.href) router.push(action.href);
-                  });
-                }}
+                className={action.className}
+                disabled={action.disabled}
+                onClick={(e) => handleActionClick(e, action)}
               >
                 <Icon className='me-2 h-4 w-4' />
                 {action.label}

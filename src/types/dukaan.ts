@@ -22,6 +22,8 @@ export interface RowAction {
   onClick?: () => void;
   icon?: ComponentType<{ className?: string }>;
   variant?: 'default' | 'destructive';
+  className?: string;
+  disabled?: boolean;
 }
 
 export interface RowActionsMenuProps {

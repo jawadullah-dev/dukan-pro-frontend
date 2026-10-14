@@ -99,6 +99,11 @@ export function RecordPaymentDialog({
     });
   };
 
+  const handleSelectCustomer = (cust: CustomerDTO | null) => {
+    setCustomerId(cust ? cust.id : '');
+    setSelectedCustomer(cust);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-md'>
@@ -115,10 +120,7 @@ export function RecordPaymentDialog({
             <CustomerSelectCombobox
               value={customerId}
               selectedCustomer={selectedCustomer}
-              onSelectCustomer={(cust) => {
-                setCustomerId(cust ? cust.id : '');
-                setSelectedCustomer(cust);
-              }}
+              onSelectCustomer={handleSelectCustomer}
             />
           </div>
 

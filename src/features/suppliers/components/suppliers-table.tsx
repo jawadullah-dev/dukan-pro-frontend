@@ -6,14 +6,7 @@ import { useState } from 'react';
 import { useQueryState, parseAsString } from 'nuqs';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -79,49 +72,36 @@ function SupplierCellAction({ data }: SupplierCellActionProps) {
         confirmLabel={t('common.deactivate')}
       />
       <SupplierDialog open={editOpen} onOpenChange={setEditOpen} supplier={data} />
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('common.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-40'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                requestAnimationFrame(() => setEditOpen(true));
-              }}
-            >
-              <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
-            </DropdownMenuItem>
-            {!data.isSystem && data.isActive && (
-              <DropdownMenuItem
-                className='text-amber-600 focus:text-amber-700 dark:text-amber-400'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestAnimationFrame(() => setDeactivateOpen(true));
-                }}
-              >
-                <Icons.trash className='me-2 h-4 w-4' /> {t('common.deactivate')}
-              </DropdownMenuItem>
-            )}
-            {!data.isSystem && !data.isActive && (
-              <DropdownMenuItem
-                className='text-emerald-600 focus:text-emerald-700 dark:text-emerald-400'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  activate.mutate();
-                }}
-                disabled={activate.isPending}
-              >
-                <Icons.check className='me-2 h-4 w-4' /> {t('common.activate')}
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu
+        actions={[
+          {
+            label: t('common.edit'),
+            icon: Icons.edit,
+            onClick: () => setEditOpen(true)
+          },
+          ...(!data.isSystem && data.isActive
+            ? [
+                {
+                  label: t('common.deactivate'),
+                  icon: Icons.trash,
+                  className: 'text-amber-600 focus:text-amber-700 dark:text-amber-400',
+                  onClick: () => setDeactivateOpen(true)
+                }
+              ]
+            : []),
+          ...(!data.isSystem && !data.isActive
+            ? [
+                {
+                  label: t('common.activate'),
+                  icon: Icons.check,
+                  className: 'text-emerald-600 focus:text-emerald-700 dark:text-emerald-400',
+                  disabled: activate.isPending,
+                  onClick: () => activate.mutate()
+                }
+              ]
+            : [])
+        ]}
+      />
     </div>
   );
 }

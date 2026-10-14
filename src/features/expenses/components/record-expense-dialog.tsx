@@ -110,15 +110,19 @@ export function RecordExpenseDialog({
     });
   };
 
+  const handleOpenChange = (next: boolean) => {
+    if (!next) resetForm();
+    onOpenChange(next);
+  };
+
+  const handleCategorySelect = (cat: ExpenseCategoryDTO | null) => {
+    setSelectedCategory(cat);
+    setCategoryId(cat?.id ?? '');
+  };
+
   return (
     <>
-      <Dialog
-        open={open}
-        onOpenChange={(next) => {
-          if (!next) resetForm();
-          onOpenChange(next);
-        }}
-      >
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className='max-h-[92vh] overflow-y-auto w-full sm:max-w-lg'>
           <DialogHeader>
             <DialogTitle>{t('expenses.recordExpenseTitle')}</DialogTitle>
@@ -144,10 +148,7 @@ export function RecordExpenseDialog({
               <CategorySelectCombobox
                 value={categoryId}
                 selectedCategory={selectedCategory}
-                onSelectCategory={(cat) => {
-                  setSelectedCategory(cat);
-                  setCategoryId(cat?.id ?? '');
-                }}
+                onSelectCategory={handleCategorySelect}
                 placeholder={t('expenses.searchAndSelectCategory')}
                 disabled={recordMutation.isPending}
                 onAddNewCategoryClick={() => setAddCategoryOpen(true)}

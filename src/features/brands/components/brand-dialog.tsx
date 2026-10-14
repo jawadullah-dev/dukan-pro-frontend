@@ -56,6 +56,11 @@ function BrandDialogBody({ brand, onOpenChange }: BrandDialogBodyProps) {
     }
   });
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void form.handleSubmit();
+  };
+
   return (
     <DialogContent className='sm:max-w-lg'>
       <DialogHeader className='pe-12'>
@@ -66,13 +71,7 @@ function BrandDialogBody({ brand, onOpenChange }: BrandDialogBodyProps) {
           {isEdit ? t('dukaan.brand.editDescription') : t('dukaan.brand.addDescription')}
         </DialogDescription>
       </DialogHeader>
-      <form
-        className='grid gap-4'
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
+      <form className='grid gap-4' onSubmit={handleSubmit}>
         <FieldGroup>
           <form.AppField
             name='name'

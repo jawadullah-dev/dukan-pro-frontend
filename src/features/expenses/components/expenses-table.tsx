@@ -6,13 +6,7 @@ import { parseAsString, useQueryState } from 'nuqs';
 import { useT } from '@/i18n/use-t';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -43,28 +37,16 @@ function ExpenseRowActions({ expense, onCancel }: ExpenseRowActionsProps) {
 
   return (
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('table.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-32'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              className='text-destructive focus:text-destructive cursor-pointer'
-              onClick={(e) => {
-                e.stopPropagation();
-                requestAnimationFrame(() => onCancel(expense));
-              }}
-            >
-              <Icons.close className='me-2 h-4 w-4' />
-              {t('expenses.cancelAction')}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu
+        actions={[
+          {
+            label: t('expenses.cancelAction'),
+            icon: Icons.close,
+            variant: 'destructive',
+            onClick: () => onCancel(expense)
+          }
+        ]}
+      />
     </div>
   );
 }

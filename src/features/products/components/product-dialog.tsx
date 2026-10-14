@@ -197,19 +197,18 @@ function ProductDialogBody({ product, onOpenChange }: ProductDialogBodyProps) {
     }
   });
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void form.handleSubmit();
+  };
+
   return (
     <DialogContent className='flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl'>
       <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
         <DialogTitle>{isEdit ? t('editTitle') : t('addTitle')}</DialogTitle>
         <DialogDescription>{isEdit ? t('editDescription') : t('addDescription')}</DialogDescription>
       </DialogHeader>
-      <form
-        className='flex min-h-0 flex-1 flex-col'
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
+      <form className='flex min-h-0 flex-1 flex-col' onSubmit={handleSubmit}>
         <div className='no-scrollbar min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-4'>
           <FieldGroup className='gap-4'>
             <form.AppField

@@ -36,14 +36,17 @@ export function AlertModal({
       onClose();
     }
   };
+  const handleConfirm = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onConfirm();
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !loading) onClose();
+  };
 
   return (
-    <AlertDialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open && !loading) onClose();
-      }}
-    >
+    <AlertDialog open={isOpen} onOpenChange={handleOpenChange}>
       <AlertDialogContent size='default' onOverlayClick={handleOutsideClick}>
         <AlertDialogHeader>
           <AlertDialogTitle>{resolvedTitle}</AlertDialogTitle>
@@ -51,14 +54,7 @@ export function AlertModal({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={loading}>{resolvedCancel}</AlertDialogCancel>
-          <AlertDialogAction
-            variant='destructive'
-            isLoading={loading}
-            onClick={(e) => {
-              e.preventDefault();
-              onConfirm();
-            }}
-          >
+          <AlertDialogAction variant='destructive' isLoading={loading} onClick={handleConfirm}>
             {resolvedConfirm}
           </AlertDialogAction>
         </AlertDialogFooter>

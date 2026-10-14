@@ -38,6 +38,7 @@ import {
   toPaisa
 } from '@/lib/dukaan/numbers';
 import type { Product } from '@/lib/dukaan/types';
+import type { SubFieldApi } from '@/types/forms';
 import { listCustomers } from '@/features/customers/api/service';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { SalesTable } from './sales-table';
@@ -61,14 +62,13 @@ export function SaleCreateDialog({ open, onOpenChange, clearDefaultQuery }: Sale
   const router = useRouter();
   const t = useT();
 
+  const handleOpenChange = (next: boolean) => {
+    onOpenChange(next);
+    if (!next && clearDefaultQuery) router.replace('/dashboard/sales');
+  };
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        onOpenChange(next);
-        if (!next && clearDefaultQuery) router.replace('/dashboard/sales');
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='flex max-h-[90vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl'>
         <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
           <DialogTitle>{t('dukaan.sale.newTitle')}</DialogTitle>
@@ -172,14 +172,29 @@ export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
     }
   });
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void form.handleSubmit();
+  };
+
+  const handleProductSelect = (
+    idx: number,
+    subField: SubFieldApi,
+    id: string,
+    product: Product | null
+  ) => {
+    subField.handleChange(id);
+    form.setFieldValue(
+      `lines[${idx}].unit_price`,
+      product ? fromPaisa(product.default_selling_price) : 0
+    );
+    form.setFieldValue(`lines[${idx}].tracking_type`, product?.tracking_type);
+    form.setFieldValue(`lines[${idx}].inventory_unit_id`, '');
+    form.setFieldValue(`lines[${idx}].quantity`, 1);
+  };
+
   return (
-    <form
-      className='space-y-4'
-      onSubmit={(e) => {
-        e.preventDefault();
-        void form.handleSubmit();
-      }}
-    >
+    <form className='space-y-4' onSubmit={handleSubmit}>
       <FieldGroup className='max-w-md gap-3'>
         <form.Subscribe
           selector={(s) => s.values.lines}
@@ -268,19 +283,9 @@ export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
                             required
                             value={subField.state.value}
                             onBlur={subField.handleBlur}
-                            onValueChange={(id, product) => {
-                              subField.handleChange(id);
-                              form.setFieldValue(
-                                `lines[${idx}].unit_price`,
-                                product ? fromPaisa(product.default_selling_price) : 0
-                              );
-                              form.setFieldValue(
-                                `lines[${idx}].tracking_type`,
-                                product?.tracking_type
-                              );
-                              form.setFieldValue(`lines[${idx}].inventory_unit_id`, '');
-                              form.setFieldValue(`lines[${idx}].quantity`, 1);
-                            }}
+                            onValueChange={(id, product) =>
+                              handleProductSelect(idx, subField, id, product)
+                            }
                             isInvalid={isInvalid}
                             errors={subField.state.meta.errors}
                             queryKey={['products', 'picker']}

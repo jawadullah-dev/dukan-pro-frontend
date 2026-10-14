@@ -18,14 +18,7 @@ import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { t } from '@/i18n';
 import { AlertModal } from '@/components/modal/alert-modal';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import { brandsQueryOptions, brandKeys } from '../api/queries';
 import { deleteBrand } from '../api/service';
 import type { BrandDTO } from '@/lib/api/types';
@@ -61,24 +54,21 @@ function BrandCellAction({ data }: BrandCellActionProps) {
         confirmLabel={t('common.delete')}
       />
       <BrandDialog open={editOpen} onOpenChange={setEditOpen} brand={data} />
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('common.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => requestAnimationFrame(() => setEditOpen(true))}>
-              <Icons.edit className='me-2 h-4 w-4' /> {t('common.edit')}
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => requestAnimationFrame(() => setDeleteOpen(true))}>
-              <Icons.trash className='me-2 h-4 w-4' /> {t('common.delete')}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu
+        actions={[
+          {
+            label: t('common.edit'),
+            icon: Icons.edit,
+            onClick: () => setEditOpen(true)
+          },
+          {
+            label: t('common.delete'),
+            icon: Icons.trash,
+            variant: 'destructive',
+            onClick: () => setDeleteOpen(true)
+          }
+        ]}
+      />
     </>
   );
 }

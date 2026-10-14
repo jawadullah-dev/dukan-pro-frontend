@@ -37,6 +37,7 @@ import { createPurchaseMutation } from '../api/mutations';
 import { createPurchaseFormSchema } from '../schemas/purchase-schema';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { FormEntitySelect } from '@/components/forms/form-entity-select';
+import type { SubFieldApi } from '@/types/forms';
 
 function parseImeiList(text: string): string[] {
   return text
@@ -131,14 +132,27 @@ export function PurchaseCreateForm({ onDone }: PurchaseCreateFormProps) {
     }
   });
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void form.handleSubmit();
+  };
+
+  const handleProductSelect = (
+    idx: number,
+    subField: SubFieldApi,
+    id: string,
+    product: Product | null
+  ) => {
+    subField.handleChange(id);
+    form.setFieldValue(
+      `lines[${idx}].unit_cost`,
+      product ? fromPaisa(product.default_purchase_price) : 0
+    );
+    form.setFieldValue(`lines[${idx}].tracking_type`, product?.tracking_type);
+  };
+
   return (
-    <form
-      className='space-y-4'
-      onSubmit={(e) => {
-        e.preventDefault();
-        void form.handleSubmit();
-      }}
-    >
+    <form className='space-y-4' onSubmit={handleSubmit}>
       <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
         <form.Field
           name='supplier_id'
@@ -215,17 +229,9 @@ export function PurchaseCreateForm({ onDone }: PurchaseCreateFormProps) {
                           required
                           value={subField.state.value}
                           onBlur={subField.handleBlur}
-                          onValueChange={(id, product) => {
-                            subField.handleChange(id);
-                            form.setFieldValue(
-                              `lines[${idx}].unit_cost`,
-                              product ? fromPaisa(product.default_purchase_price) : 0
-                            );
-                            form.setFieldValue(
-                              `lines[${idx}].tracking_type`,
-                              product?.tracking_type
-                            );
-                          }}
+                          onValueChange={(id, product) =>
+                            handleProductSelect(idx, subField, id, product)
+                          }
                           isInvalid={isInvalid}
                           errors={subField.state.meta.errors}
                           queryKey={['products', 'picker']}
@@ -385,14 +391,13 @@ export function PurchaseCreateDialog({
   const router = useRouter();
   const t = useT();
 
+  const handleOpenChange = (next: boolean) => {
+    onOpenChange(next);
+    if (!next && clearDefaultQuery) router.replace('/dashboard/purchases');
+  };
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        onOpenChange(next);
-        if (!next && clearDefaultQuery) router.replace('/dashboard/purchases');
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='flex max-h-[90dvh] w-full flex-col gap-0 overflow-hidden p-0 data-[size]:max-w-none sm:max-w-3xl max-sm:inset-x-0 max-sm:bottom-0 max-sm:top-auto max-sm:max-h-[90dvh] max-sm:translate-y-0 max-sm:rounded-t-[var(--radius)] max-sm:rounded-b-none'>
         <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
           <DialogTitle>{t('dukaan.purchase.newTitle')}</DialogTitle>

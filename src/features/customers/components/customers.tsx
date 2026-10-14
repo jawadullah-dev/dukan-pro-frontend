@@ -90,6 +90,11 @@ export function CustomerLedgerClient({ id }: CustomerLedgerClientProps) {
     }
   });
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void form.handleSubmit();
+  };
+
   return (
     <div className='space-y-4'>
       <div>
@@ -103,10 +108,7 @@ export function CustomerLedgerClient({ id }: CustomerLedgerClientProps) {
 
       <form
         className='flex max-w-md flex-wrap items-end gap-2 rounded-lg border p-3'
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
-        }}
+        onSubmit={handleSubmit}
       >
         <div className='grid flex-1 gap-2'>
           <form.AppField

@@ -126,3 +126,7 @@ export interface FormEntitySelectProps<T extends NamedEntity> extends InfiniteEn
   errors: Array<{ message?: string } | undefined>;
   onBlur?: () => void;
 }
+
+export interface SubFieldApi<T = string> {
+  handleChange: (val: T) => void;
+}

@@ -152,14 +152,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
       data-appearance-density={densityToApply}
       data-appearance-digits={digitsToApply}
     >
-      <head>
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `:root { --primary: ${ACCENT_OKLCH[accentToApply]}; --radius: ${RADIUS_REM[radiusToApply]}; }`
-          }}
-        />
+      <head suppressHydrationWarning>
         <script
           id='theme-and-extension-attribute-bootstrap'
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `
               try {
@@ -169,6 +165,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 var parsedApp = rawApp ? JSON.parse(rawApp) : null;
                 var appState = (parsedApp && parsedApp.state) ? parsedApp.state : null;
                 var docEl = document.documentElement;
+                docEl.style.setProperty('--primary', '${ACCENT_OKLCH[accentToApply]}');
+                docEl.style.setProperty('--radius', '${RADIUS_REM[radiusToApply]}');
                 if (appState) {
                   var accent = appState.accent;
                   var radius = appState.radius;

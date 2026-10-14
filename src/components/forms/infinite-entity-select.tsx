@@ -98,14 +98,24 @@ export function InfiniteEntitySelect<T extends NamedEntity>({
     }
   };
 
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (!next) setSearch('');
+  };
+
+  const handleSelectItem = (item: T) => {
+    const next = value === item.id ? '' : item.id;
+    onValueChange(next, next ? item : null);
+    if (next) {
+      setLabelCache((prev) =>
+        prev[item.id] === item.name ? prev : { ...prev, [item.id]: item.name }
+      );
+    }
+    setOpen(false);
+  };
+
   return (
-    <Popover
-      open={open}
-      onOpenChange={(next) => {
-        setOpen(next);
-        if (!next) setSearch('');
-      }}
-    >
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         render={
           <Button
@@ -142,16 +152,7 @@ export function InfiniteEntitySelect<T extends NamedEntity>({
                   value={item.id}
                   keywords={[item.name]}
                   data-checked={value === item.id || undefined}
-                  onSelect={() => {
-                    const next = value === item.id ? '' : item.id;
-                    onValueChange(next, next ? item : null);
-                    if (next) {
-                      setLabelCache((prev) =>
-                        prev[item.id] === item.name ? prev : { ...prev, [item.id]: item.name }
-                      );
-                    }
-                    setOpen(false);
-                  }}
+                  onSelect={() => handleSelectItem(item)}
                 >
                   <Icons.check
                     className={cn('me-2 size-4', value === item.id ? 'opacity-100' : 'opacity-0')}

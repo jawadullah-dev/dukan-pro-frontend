@@ -78,6 +78,11 @@ function CustomerDialogBody({ customer, onOpenChange }: CustomerDialogBodyProps)
     }
   });
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void form.handleSubmit();
+  };
+
   return (
     <DialogContent className='flex max-h-[85vh] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-lg'>
       <DialogHeader className='shrink-0 px-4 pt-4 pe-12'>
@@ -90,13 +95,7 @@ function CustomerDialogBody({ customer, onOpenChange }: CustomerDialogBodyProps)
             : t('dukaan.party.customerAddDescription')}
         </DialogDescription>
       </DialogHeader>
-      <form
-        className='flex min-h-0 flex-1 flex-col'
-        onSubmit={(e) => {
-          e.preventDefault();
-          void form.handleSubmit();
-        }}
-      >
+      <form className='flex min-h-0 flex-1 flex-col' onSubmit={handleSubmit}>
         <div className='no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-4'>
           <FieldGroup className='gap-4'>
             <form.AppField

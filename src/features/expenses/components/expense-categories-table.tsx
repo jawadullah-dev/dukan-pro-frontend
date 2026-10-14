@@ -9,14 +9,8 @@ import { useT } from '@/i18n/use-t';
 import { t } from '@/i18n';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
+import type { RowAction } from '@/types/dukaan';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -47,57 +41,35 @@ function ExpenseCategoryCellAction({
 }: ExpenseCategoryCellActionProps) {
   const t = useT();
 
+  const actions: RowAction[] = [
+    {
+      label: t('common.edit'),
+      icon: Icons.edit,
+      onClick: () => onEdit(category)
+    },
+    ...(category.isActive
+      ? [
+          {
+            label: t('common.deactivate'),
+            icon: Icons.close,
+            variant: 'destructive' as const,
+            onClick: () => onDeactivate(category)
+          }
+        ]
+      : [
+          {
+            label: t('common.activate'),
+            icon: Icons.check,
+            className: 'text-emerald-600 focus:text-emerald-700 dark:text-emerald-400',
+            disabled: isActivating,
+            onClick: () => onActivate(category)
+          }
+        ])
+  ];
+
   return (
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('common.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-36'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              className='cursor-pointer'
-              onClick={(e) => {
-                e.stopPropagation();
-                requestAnimationFrame(() => onEdit(category));
-              }}
-            >
-              <Icons.edit className='me-2 h-4 w-4' />
-              {t('common.edit')}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            {category.isActive ? (
-              <DropdownMenuItem
-                className='text-destructive focus:text-destructive cursor-pointer'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  requestAnimationFrame(() => onDeactivate(category));
-                }}
-              >
-                <Icons.close className='me-2 h-4 w-4' />
-                {t('common.deactivate')}
-              </DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem
-                className='text-emerald-600 focus:text-emerald-700 dark:text-emerald-400 cursor-pointer'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onActivate(category);
-                }}
-                disabled={isActivating}
-              >
-                <Icons.check className='me-2 h-4 w-4' />
-                {t('common.activate')}
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu actions={actions} />
     </div>
   );
 }

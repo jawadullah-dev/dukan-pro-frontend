@@ -56,6 +56,11 @@ export function PlatformAdminLoginForm() {
     }
   });
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    form.handleSubmit();
+  };
+
   return (
     <Card className='w-full max-w-md border-border/60 shadow-sm'>
       <CardHeader className='space-y-1'>
@@ -65,13 +70,7 @@ export function PlatformAdminLoginForm() {
         <CardDescription>{t('auth.platformAdminSignInDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form
-          className='space-y-6'
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
+        <form className='space-y-6' onSubmit={handleSubmit}>
           {error ? (
             <Alert variant='destructive'>
               <Icons.warning className='h-4 w-4' />

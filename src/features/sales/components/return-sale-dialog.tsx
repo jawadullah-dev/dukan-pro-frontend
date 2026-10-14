@@ -82,6 +82,29 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
     }
   });
 
+  const handleItemSelectChange = (itemId: string, selected: boolean) => {
+    setItemStates((prev) => ({
+      ...prev,
+      [itemId]: { ...prev[itemId], selected }
+    }));
+  };
+
+  const handleItemQuantityChange = (itemId: string, maxQty: number, valStr: string) => {
+    const val = Math.max(1, Math.min(maxQty, Number(valStr) || 1));
+    setItemStates((prev) => ({
+      ...prev,
+      [itemId]: { ...prev[itemId], quantity: val }
+    }));
+  };
+
+  const handleItemConditionChange = (itemId: string, condition: 'GOOD' | 'DAMAGED' | null) => {
+    if (!condition) return;
+    setItemStates((prev) => ({
+      ...prev,
+      [itemId]: { ...prev[itemId], condition }
+    }));
+  };
+
   const handleRunPreview = () => {
     const selectedItems: ReturnItemInput[] = sale.items
       .filter((item) => itemStates[item.id]?.selected)
@@ -168,12 +191,9 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
                       <Checkbox
                         id={`check-${item.id}`}
                         checked={state.selected}
-                        onCheckedChange={(checked) => {
-                          setItemStates((prev) => ({
-                            ...prev,
-                            [item.id]: { ...state, selected: Boolean(checked) }
-                          }));
-                        }}
+                        onCheckedChange={(checked) =>
+                          handleItemSelectChange(item.id, Boolean(checked))
+                        }
                       />
                       <div>
                         <Label htmlFor={`check-${item.id}`} className='font-medium cursor-pointer'>
@@ -195,29 +215,17 @@ export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: Return
                             min={1}
                             max={item.quantity}
                             value={state.quantity}
-                            onChange={(e) => {
-                              const val = Math.max(
-                                1,
-                                Math.min(item.quantity, Number(e.target.value) || 1)
-                              );
-                              setItemStates((prev) => ({
-                                ...prev,
-                                [item.id]: { ...state, quantity: val }
-                              }));
-                            }}
+                            onChange={(e) =>
+                              handleItemQuantityChange(item.id, item.quantity, e.target.value)
+                            }
                             className='h-8'
                           />
                         </div>
                         <Select
                           value={state.condition}
-                          onValueChange={(val: 'GOOD' | 'DAMAGED' | null) => {
-                            if (val) {
-                              setItemStates((prev) => ({
-                                ...prev,
-                                [item.id]: { ...state, condition: val }
-                              }));
-                            }
-                          }}
+                          onValueChange={(val: 'GOOD' | 'DAMAGED' | null) =>
+                            handleItemConditionChange(item.id, val)
+                          }
                         >
                           <SelectTrigger className='h-8 w-28'>
                             <SelectValue />

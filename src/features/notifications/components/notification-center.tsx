@@ -29,6 +29,14 @@ export function NotificationCenter() {
   const count = unreadCount();
   const visibleNotifications = notifications.slice(0, MAX_VISIBLE);
 
+  const handleAction = (notifId: string, actionId: string) => {
+    const route = actionRoutes[actionId];
+    if (route) {
+      markAsRead(notifId);
+      router.push(route);
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger
@@ -99,13 +107,7 @@ export function NotificationCenter() {
                   createdAt={notification.createdAt}
                   actions={notification.actions}
                   onMarkAsRead={markAsRead}
-                  onAction={(notifId, actionId) => {
-                    const route = actionRoutes[actionId];
-                    if (route) {
-                      markAsRead(notifId);
-                      router.push(route);
-                    }
-                  }}
+                  onAction={handleAction}
                 />
               ))}
             </div>

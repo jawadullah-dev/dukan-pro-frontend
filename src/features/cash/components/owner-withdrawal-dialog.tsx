@@ -60,6 +60,12 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
     }
   });
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmountStr(e.target.value);
+    setOverdraftPrompt(null);
+    setConfirmOverdraft(false);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const parsedAmount = parseFloat(amountStr);
@@ -76,19 +82,18 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
     });
   };
 
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      setAmountStr('');
+      setNotes('');
+      setOverdraftPrompt(null);
+      setConfirmOverdraft(false);
+    }
+    onOpenChange(next);
+  };
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) {
-          setAmountStr('');
-          setNotes('');
-          setOverdraftPrompt(null);
-          setConfirmOverdraft(false);
-        }
-        onOpenChange(next);
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='w-full sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>{t('dukaan.cash.recordWithdrawalTitle')}</DialogTitle>
@@ -111,11 +116,7 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
                 step='any'
                 placeholder='0.00'
                 value={amountStr}
-                onChange={(e) => {
-                  setAmountStr(e.target.value);
-                  setOverdraftPrompt(null);
-                  setConfirmOverdraft(false);
-                }}
+                onChange={handleAmountChange}
                 disabled={withdrawalMutation.isPending}
                 className='h-10 ps-9 text-sm font-normal text-foreground w-full'
                 autoFocus

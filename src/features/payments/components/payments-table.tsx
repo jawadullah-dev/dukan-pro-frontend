@@ -6,13 +6,7 @@ import { parseAsString, useQueryState } from 'nuqs';
 import { useT } from '@/i18n/use-t';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -29,6 +23,7 @@ import { paymentsQueryOptions } from '../api/queries';
 import type { PaymentsListFilters } from '@/types';
 import { CancelPaymentDialog } from './cancel-payment-dialog';
 import { RecordPaymentDialog } from './record-payment-dialog';
+import type { RowAction } from '@/types/dukaan';
 import type { PaymentRowActionsProps, PaymentsTableProps } from '@/types/payment';
 
 function PaymentRowActions({ payment, onCancel }: PaymentRowActionsProps) {
@@ -37,30 +32,18 @@ function PaymentRowActions({ payment, onCancel }: PaymentRowActionsProps) {
 
   if (isCancelled) return null;
 
+  const actions: RowAction[] = [
+    {
+      label: t('common.cancel'),
+      icon: Icons.trash,
+      variant: 'destructive' as const,
+      onClick: () => onCancel(payment)
+    }
+  ];
+
   return (
     <div onClick={(e) => e.stopPropagation()} data-slot='action-cell'>
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          render={<Button type='button' variant='ghost' className='h-8 w-8 p-0' />}
-        >
-          <span className='sr-only'>{t('table.openMenu')}</span>
-          <Icons.ellipsis className='h-4 w-4' />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align='end' className='w-32'>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              className='text-destructive focus:text-destructive'
-              onClick={(e) => {
-                e.stopPropagation();
-                requestAnimationFrame(() => onCancel(payment));
-              }}
-            >
-              <Icons.trash className='me-2 h-4 w-4' />
-              {t('common.cancel')}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <RowActionsMenu actions={actions} />
     </div>
   );
 }
@@ -337,10 +320,15 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
     }
   });
 
+  const handleOpenRecord = () => setRecordOpen(true);
+  const handleCancelOpenChange = (open: boolean) => {
+    if (!open) setCancelPaymentTarget(null);
+  };
+
   const recordActionButton = (
     <div className='flex items-center gap-2'>
       {toolbarAction}
-      <Button type='button' size='sm' className='h-8 gap-1.5' onClick={() => setRecordOpen(true)}>
+      <Button type='button' size='sm' className='h-8 gap-1.5' onClick={handleOpenRecord}>
         <Icons.add className='h-3.5 w-3.5' />
         <span>{t('payments.recordPayment')}</span>
       </Button>
@@ -355,9 +343,7 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
         <CancelPaymentDialog
           payment={cancelPaymentTarget}
           open={!!cancelPaymentTarget}
-          onOpenChange={(open) => {
-            if (!open) setCancelPaymentTarget(null);
-          }}
+          onOpenChange={handleCancelOpenChange}
         />
       )}
 

@@ -51,6 +51,16 @@ export function DataTableFiltersSheet<TData>({
     table.resetSorting();
   };
 
+  const handleSortChange = (value: string | null) => {
+    if (!value || value === '__none__') {
+      table.setSorting([]);
+      return;
+    }
+    const [id, dir] = value.split(':');
+    if (!id) return;
+    table.setSorting([{ id, desc: dir === 'desc' }]);
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -80,15 +90,7 @@ export function DataTableFiltersSheet<TData>({
                   })
                 ]}
                 value={sortValue || '__none__'}
-                onValueChange={(value) => {
-                  if (!value || value === '__none__') {
-                    table.setSorting([]);
-                    return;
-                  }
-                  const [id, dir] = value.split(':');
-                  if (!id) return;
-                  table.setSorting([{ id, desc: dir === 'desc' }]);
-                }}
+                onValueChange={handleSortChange}
               >
                 <SelectTrigger id='table-sort' className='h-11 w-full'>
                   <SelectValue placeholder={t('table.sortBy')} />

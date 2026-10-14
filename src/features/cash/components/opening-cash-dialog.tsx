@@ -59,17 +59,16 @@ export function OpeningCashDialog({ open, onOpenChange }: OpeningCashDialogProps
     });
   };
 
+  const handleOpenChange = (next: boolean) => {
+    if (!next) {
+      setAmountStr('');
+      setNotes('');
+    }
+    onOpenChange(next);
+  };
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (!next) {
-          setAmountStr('');
-          setNotes('');
-        }
-        onOpenChange(next);
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className='w-full sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>{t('dukaan.cash.recordOpeningTitle')}</DialogTitle>

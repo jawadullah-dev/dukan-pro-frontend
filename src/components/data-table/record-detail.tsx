@@ -37,6 +37,11 @@ export function RecordDetail<TData>({
   const actions = detail.actions?.(data) ?? [];
   const side = presentation === 'side' ? 'right' : 'bottom';
 
+  const handleActionClick = (action: (typeof actions)[number]) => {
+    action.onClick();
+    onOpenChange(false);
+  };
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -101,10 +106,7 @@ export function RecordDetail<TData>({
                 type='button'
                 variant={action.variant ?? 'default'}
                 className='h-11 w-full'
-                onClick={() => {
-                  action.onClick();
-                  onOpenChange(false);
-                }}
+                onClick={() => handleActionClick(action)}
               >
                 {action.label}
               </Button>

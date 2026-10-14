@@ -26,6 +26,14 @@ export default function NotificationsPage() {
   const unreadNotifications = notifications.filter((n) => n.status === 'unread');
   const readNotifications = notifications.filter((n) => n.status === 'read');
 
+  const handleAction = (notifId: string, actionId: string) => {
+    const route = actionRoutes[actionId];
+    if (route) {
+      markAsRead(notifId);
+      router.push(route);
+    }
+  };
+
   const renderList = (items: typeof notifications) => {
     if (items.length === 0) {
       return (
@@ -48,13 +56,7 @@ export default function NotificationsPage() {
             createdAt={notification.createdAt}
             actions={notification.actions}
             onMarkAsRead={markAsRead}
-            onAction={(notifId, actionId) => {
-              const route = actionRoutes[actionId];
-              if (route) {
-                markAsRead(notifId);
-                router.push(route);
-              }
-            }}
+            onAction={handleAction}
           />
         ))}
       </div>

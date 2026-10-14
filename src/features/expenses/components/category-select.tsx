@@ -89,14 +89,18 @@ export function CategorySelectCombobox({
     onSelectCategory(null);
   };
 
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (!nextOpen) setSearch('');
+  };
+
+  const handleAddNewCategory = () => {
+    setOpen(false);
+    onAddNewCategoryClick?.();
+  };
+
   return (
-    <Popover
-      open={open}
-      onOpenChange={(nextOpen) => {
-        setOpen(nextOpen);
-        if (!nextOpen) setSearch('');
-      }}
-    >
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         render={
           <Button
@@ -220,10 +224,7 @@ export function CategorySelectCombobox({
               type='button'
               variant='ghost'
               size='sm'
-              onClick={() => {
-                setOpen(false);
-                onAddNewCategoryClick();
-              }}
+              onClick={handleAddNewCategory}
               className='w-full justify-start text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 gap-1.5'
             >
               <Icons.add className='size-3.5' />

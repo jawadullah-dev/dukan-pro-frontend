@@ -37,19 +37,23 @@ export function ComboboxField({
   const selected = options.find((o) => o.value === field.state.value);
   const listboxId = `${field.name}-listbox`;
 
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (!next) field.handleBlur();
+  };
+
+  const handleSelect = (next: string) => {
+    field.handleChange(next);
+    setOpen(false);
+  };
+
   return (
     <Field data-invalid={isInvalid}>
       <FieldLabel htmlFor={field.name}>
         {label}
         {required && ' *'}
       </FieldLabel>
-      <Popover
-        open={open}
-        onOpenChange={(next) => {
-          setOpen(next);
-          if (!next) field.handleBlur();
-        }}
-      >
+      <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger
           render={
             <Button
@@ -83,10 +87,7 @@ export function ComboboxField({
                     value={opt.value}
                     disabled={opt.disabled}
                     keywords={[opt.label]}
-                    onSelect={(next) => {
-                      field.handleChange(next);
-                      setOpen(false);
-                    }}
+                    onSelect={handleSelect}
                   >
                     <Icons.check
                       className={cn(

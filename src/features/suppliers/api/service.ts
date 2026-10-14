@@ -8,21 +8,16 @@ import type {
 import type { SupplierListFilters } from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
 
+import { buildQueryString } from '@/lib/api/query-params';
+
 export async function listSuppliers(
   filters: SupplierListFilters = {},
   token?: string
 ): Promise<PaginatedResponse<SupplierDTO>> {
-  const params = new URLSearchParams();
-  const effectivePageSize = filters.pageSize ?? filters.limit;
-
-  if (filters.page) params.set('page', String(filters.page));
-  if (effectivePageSize) params.set('pageSize', String(effectivePageSize));
-  if (filters.search) params.set('search', filters.search);
-  if (typeof filters.isActive === 'boolean') params.set('isActive', String(filters.isActive));
-  if (filters.sortBy) params.set('sortBy', filters.sortBy);
-  if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
-
-  const qs = params.toString() ? `?${params.toString()}` : '';
+  const qs = buildQueryString({
+    ...filters,
+    pageSize: filters.pageSize ?? filters.limit
+  } as Record<string, unknown>);
 
   if (token) {
     return apiRequest<PaginatedResponse<SupplierDTO>>(`/suppliers${qs}`, undefined, token);

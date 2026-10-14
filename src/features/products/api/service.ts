@@ -10,20 +10,13 @@ import type {
 import type { ProductImageListResponse, ProductImageReorderItem } from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
 
+import { buildQueryString } from '@/lib/api/query-params';
+
 export async function listProducts(
   filters: ProductListFilters = {},
   token?: string
 ): Promise<PaginatedResponse<ProductDTO>> {
-  const params = new URLSearchParams();
-  if (filters.page) params.set('page', String(filters.page));
-  if (filters.pageSize) params.set('pageSize', String(filters.pageSize));
-  if (filters.search) params.set('search', filters.search);
-  if (filters.categoryId) params.set('categoryId', String(filters.categoryId));
-  if (filters.brandId) params.set('brandId', String(filters.brandId));
-  if (filters.trackingType) params.set('trackingType', String(filters.trackingType));
-  if (filters.isActive) params.set('isActive', String(filters.isActive));
-
-  const qs = params.toString() ? `?${params.toString()}` : '';
+  const qs = buildQueryString(filters as Record<string, unknown>);
 
   if (token) {
     return apiRequest<PaginatedResponse<ProductDTO>>(`/products${qs}`, undefined, token);

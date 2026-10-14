@@ -16,23 +16,16 @@ import type {
 
 import { appFetch } from '@/lib/api/app-fetch';
 
+import { buildQueryString } from '@/lib/api/query-params';
+
 export async function listExpenses(
   filters: ExpenseQueryFilter = {},
   token?: string
 ): Promise<PaginatedResponse<ExpenseDTO>> {
-  const params = new URLSearchParams();
-  if (filters.page) params.set('page', String(filters.page));
-  const effectivePageSize = filters.pageSize ?? filters.limit;
-  if (effectivePageSize) params.set('pageSize', String(effectivePageSize));
-  if (filters.search) params.set('search', filters.search);
-  if (filters.categoryId) params.set('categoryId', filters.categoryId);
-  if (filters.status) params.set('status', filters.status);
-  if (filters.from) params.set('from', filters.from);
-  if (filters.to) params.set('to', filters.to);
-  if (filters.sortBy) params.set('sortBy', filters.sortBy);
-  if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
-
-  const qs = params.toString() ? `?${params.toString()}` : '';
+  const qs = buildQueryString({
+    ...filters,
+    pageSize: filters.pageSize ?? filters.limit
+  } as Record<string, unknown>);
 
   if (token) {
     return apiRequest<PaginatedResponse<ExpenseDTO>>(`/expenses${qs}`, undefined, token);
@@ -71,16 +64,10 @@ export async function listExpenseCategories(
   filters: ExpenseCategoryQueryFilter = {},
   token?: string
 ): Promise<PaginatedResponse<ExpenseCategoryDTO>> {
-  const params = new URLSearchParams();
-  if (filters.page) params.set('page', String(filters.page));
-  const effectivePageSize = filters.pageSize ?? filters.limit;
-  if (effectivePageSize) params.set('pageSize', String(effectivePageSize));
-  if (filters.search) params.set('search', filters.search);
-  if (filters.isActive !== undefined) params.set('isActive', String(filters.isActive));
-  if (filters.sortBy) params.set('sortBy', filters.sortBy);
-  if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
-
-  const qs = params.toString() ? `?${params.toString()}` : '';
+  const qs = buildQueryString({
+    ...filters,
+    pageSize: filters.pageSize ?? filters.limit
+  } as Record<string, unknown>);
 
   if (token) {
     return apiRequest<PaginatedResponse<ExpenseCategoryDTO>>(

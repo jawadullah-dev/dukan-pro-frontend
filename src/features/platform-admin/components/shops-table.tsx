@@ -14,8 +14,7 @@ import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-h
 import { useDataTable } from '@/hooks/use-data-table';
 import { Icons } from '@/components/icons';
 import { t } from '@/i18n';
-import { useT } from '@/i18n/use-t';
-import { RowActionsMenu } from '@/features/dukaan/components/row-actions-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import type { PlatformShop } from '../api/types';
 import { platformShopsQueryOptions } from '../api/queries';
 import { PLATFORM_CITY_OPTIONS, PLATFORM_STATUS_OPTIONS } from '../constants/filters';

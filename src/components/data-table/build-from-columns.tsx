@@ -72,12 +72,6 @@ export function buildMobileItemFromTable<TData>(
   const layouts = table.getAllColumns().map(metaOf);
   const slots = resolveMobileSlots(layouts);
 
-  if (env.NODE_ENV !== 'production' && !slots.titleColumnId) {
-    console.warn(
-      '[ResponsiveDataTable] No resolvable title column. Mark a column with meta.primary or type text/id.'
-    );
-  }
-
   return {
     leading: slots.leading ?? 'icon',
     title: (row) => {

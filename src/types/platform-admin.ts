@@ -1,6 +1,8 @@
-import type { PlatformShopStatus } from '@/features/platform-admin/api/types';
 import type { Icons } from '@/components/icons';
-import type { SubscriptionPlan } from '@/features/platform-admin/api/types';
+
+export type PlatformShopStatus = 'ACTIVE' | 'TRIAL' | 'EXPIRED';
+
+export type SubscriptionPlan = 'TRIAL' | 'MONTHLY' | 'YEARLY';
 
 export interface ShopStatusConfig {
   labelKey: string;

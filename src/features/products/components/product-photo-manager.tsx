@@ -62,9 +62,7 @@ export function ProductPhotoManager({ productId, images, onChange }: ProductPhot
   };
 
   const handleDelete = (imageId: string) => {
-    if (confirm(t('removeImageConfirm'))) {
-      deleteMutation.mutate(imageId);
-    }
+    deleteMutation.mutate(imageId);
   };
 
   const handleMove = (fromIndex: number, toIndex: number) => {

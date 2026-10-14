@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import type { ComponentType } from 'react';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,11 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { useT } from '@/i18n/use-t';
-import type { RowAction, RowActionsMenuProps } from '@/types';
+import type { RowActionsMenuProps } from '@/types';
 
 export function RowActionsMenu({ actions }: RowActionsMenuProps) {
   const t = useT();

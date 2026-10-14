@@ -17,19 +17,8 @@ export interface SupplierPaymentDTO {
   updatedAt: string;
 }
 
-export interface SupplierDTO {
-  id: string;
-  shopId: string;
-  name: string;
-  phone?: string | null;
-  address?: string | null;
-  notes?: string | null;
-  openingBalance: number;
-  isSystem: boolean;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
+import type { SupplierDTO } from '@/lib/api/types';
+export type { SupplierDTO };
 
 export interface UnpaidPurchaseDTO {
   id: string;

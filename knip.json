@@ -14,7 +14,6 @@
     "src/auth.ts",
     "src/auth.config.ts",
     "src/proxy.ts",
-    "src/middleware.ts",
     "scripts/run-checks.mjs",
     "scripts/generate-icons.mjs",
     "scripts/check-list-tables.mjs",
@@ -47,15 +46,15 @@
 
   "ignoreExportsUsedInFile": true,
 
-  "next": {
-    "entry": [
-      "next.config.{js,ts,mjs}",
-      "src/app/**/{layout,page,error,not-found,global-error,loading}.tsx",
-      "src/app/**/route.ts",
-      "src/app/manifest.ts",
-      "src/middleware.ts",
-      "src/instrumentation.ts",
-      "src/instrumentation-client.ts"
-    ]
+  "rules": {
+    "files": "error",
+    "dependencies": "error",
+    "unlisted": "error",
+    "unresolved": "error",
+    "exports": "error",
+    "types": "error",
+    "enumMembers": "error",
+    "duplicates": "error",
+    "cycles": "error"
   }
 }

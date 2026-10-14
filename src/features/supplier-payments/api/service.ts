@@ -12,24 +12,16 @@ import type {
 
 import { appFetch } from '@/lib/api/app-fetch';
 
+import { buildQueryString } from '@/lib/api/query-params';
+
 export async function listSupplierPayments(
   filters: SupplierPaymentQueryFilter = {},
   token?: string
 ): Promise<PaginatedResponse<SupplierPaymentDTO>> {
-  const params = new URLSearchParams();
-  if (filters.page) params.set('page', String(filters.page));
-  const effectivePageSize = filters.pageSize ?? filters.limit;
-  if (effectivePageSize) params.set('pageSize', String(effectivePageSize));
-  if (filters.search) params.set('search', filters.search);
-  if (filters.supplierId) params.set('supplierId', filters.supplierId);
-  if (filters.purchaseId) params.set('purchaseId', filters.purchaseId);
-  if (filters.status) params.set('status', filters.status);
-  if (filters.from) params.set('from', filters.from);
-  if (filters.to) params.set('to', filters.to);
-  if (filters.sortBy) params.set('sortBy', filters.sortBy);
-  if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
-
-  const qs = params.toString() ? `?${params.toString()}` : '';
+  const qs = buildQueryString({
+    ...filters,
+    pageSize: filters.pageSize ?? filters.limit
+  } as Record<string, unknown>);
 
   if (token) {
     return apiRequest<PaginatedResponse<SupplierPaymentDTO>>(

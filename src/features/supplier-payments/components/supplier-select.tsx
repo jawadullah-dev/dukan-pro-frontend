@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { useT } from '@/i18n/use-t';
 import type { SupplierDTO, SupplierSelectComboboxProps } from '@/types/supplier-payment';
 import type { PaginatedResponse } from '@/lib/api/types';
-import { AppError } from '@/lib/errors';
+import { listSuppliers } from '@/features/suppliers/api/service';
 
 export function SupplierSelectCombobox({
   value,
@@ -44,17 +44,12 @@ export function SupplierSelectCombobox({
   const { data, isLoading } = useQuery<PaginatedResponse<SupplierDTO>>({
     queryKey: ['suppliers', 'combobox-list', debouncedSearch],
     queryFn: async () => {
-      const params = new URLSearchParams();
-      params.set('page', '1');
-      params.set('pageSize', '50');
-      params.set('isActive', 'true');
-      if (debouncedSearch) params.set('search', debouncedSearch);
-
-      const res = await fetch(`/api/suppliers?${params.toString()}`);
-      if (!res.ok) {
-        throw new AppError('Failed to fetch suppliers');
-      }
-      return res.json();
+      return listSuppliers({
+        page: 1,
+        pageSize: 50,
+        isActive: true,
+        search: debouncedSearch || undefined
+      });
     },
     enabled: open
   });

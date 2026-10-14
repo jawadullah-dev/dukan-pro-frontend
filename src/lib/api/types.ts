@@ -447,30 +447,7 @@ export interface ProductDTO {
   updatedAt: string;
 }
 
-export interface CreateProductInput {
-  name: string;
-  categoryId: string;
-  brandId: string;
-  trackingType: TrackingType;
-  model?: string;
-  color?: string;
-  ram?: string;
-  storage?: string;
-  sku?: string;
-  barcode?: string;
-  description?: string;
-  imageUrl?: string;
-  defaultPurchasePrice?: number;
-  defaultSellingPrice?: number;
-  lowStockThreshold?: number;
-  isActive?: boolean;
-}
-
-export interface UpdateProductInput {
-  name?: string;
-  categoryId?: string;
-  brandId?: string;
-  trackingType?: TrackingType;
+export interface ProductAttributes {
   model?: string | null;
   color?: string | null;
   ram?: string | null;
@@ -483,6 +460,20 @@ export interface UpdateProductInput {
   defaultSellingPrice?: number;
   lowStockThreshold?: number;
   isActive?: boolean;
+}
+
+export interface CreateProductInput extends ProductAttributes {
+  name: string;
+  categoryId: string;
+  brandId: string;
+  trackingType: TrackingType;
+}
+
+export interface UpdateProductInput extends Partial<ProductAttributes> {
+  name?: string;
+  categoryId?: string;
+  brandId?: string;
+  trackingType?: TrackingType;
   isPublished?: boolean;
   publicDescription?: string | null;
   contactForPrice?: boolean;

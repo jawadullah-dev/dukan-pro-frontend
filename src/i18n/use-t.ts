@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { t as staticT } from './index';
+import { t as staticT } from './static-t';
 
 export function useT() {
   return useTranslations();

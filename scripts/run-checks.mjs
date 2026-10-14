@@ -28,18 +28,25 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const root = join(__dir, '..');
 
 const CHECKS = [
-  { id: 'secrets',        cmd: ['node', 'scripts/code/check-secrets.cjs'] },
-  { id: 'hardcoded-text', cmd: ['node', 'scripts/code/check-hardcoded-text.cjs'] },
-  { id: 'arch-rules',     cmd: ['node', 'scripts/code/check-arch-rules.cjs'] },
-  { id: 'structure',      cmd: ['node', 'scripts/code/check-structure.cjs'] },
-  { id: 'metadata',       cmd: ['node', 'scripts/code/check-metadata.cjs'] },
-  { id: 'types',          cmd: ['node', 'scripts/code/check-types.cjs'] },
-  { id: 'nest-type',      cmd: ['node', 'scripts/code/check-nest-type.cjs'] },
-  { id: 'api-urls',       cmd: ['node', 'scripts/code/check-api-urls.cjs'] },
-  { id: 'comments',       cmd: ['node', 'scripts/code/check-comments.cjs'] },
-  { id: 'list-tables',    cmd: ['node', 'scripts/check-list-tables.mjs'] },
-  { id: 'duplicates',     cmd: ['npx', '--yes', 'jscpd', '--config', '.jscpd.json'] },
-  { id: 'knip',           cmd: ['npx', '--yes', 'knip', '--reporter', 'compact'] },
+  { id: 'secrets',            cmd: ['node', 'scripts/code/check-secrets.cjs'] },
+  { id: 'hardcoded-text',     cmd: ['node', 'scripts/code/check-hardcoded-text.cjs'] },
+  { id: 'arch-rules',         cmd: ['node', 'scripts/code/check-arch-rules.cjs'] },
+  { id: 'structure',          cmd: ['node', 'scripts/code/check-structure.cjs'] },
+  { id: 'metadata',           cmd: ['node', 'scripts/code/check-metadata.cjs'] },
+  { id: 'types',              cmd: ['node', 'scripts/code/check-types.cjs'] },
+  { id: 'nest-type',          cmd: ['node', 'scripts/code/check-nest-type.cjs'] },
+  { id: 'api-urls',           cmd: ['node', 'scripts/code/check-api-urls.cjs'] },
+  { id: 'comments',           cmd: ['node', 'scripts/code/check-comments.cjs'] },
+  { id: 'console',            cmd: ['node', 'scripts/code/check-console.cjs'] },
+  { id: 'feature-boundaries', cmd: ['node', 'scripts/code/check-feature-boundaries.cjs'] },
+  { id: 'banned-deps',        cmd: ['node', 'scripts/code/check-banned-deps.cjs'] },
+  { id: 'tenancy',            cmd: ['node', 'scripts/code/check-tenancy.cjs'] },
+  { id: 'financial-safety',   cmd: ['node', 'scripts/code/check-financial-safety.cjs'] },
+  { id: 'error-boundaries',   cmd: ['node', 'scripts/code/check-error-boundaries.cjs'] },
+  { id: 'mutation-hooks',     cmd: ['node', 'scripts/code/check-mutation-hooks.cjs'] },
+  { id: 'list-tables',        cmd: ['node', 'scripts/check-list-tables.mjs'] },
+  { id: 'duplicates',         cmd: ['npx', '--yes', 'jscpd', '--config', '.jscpd.json'] },
+  { id: 'knip',               cmd: ['npx', '--yes', 'knip', '--include', 'files,dependencies,unlisted,unresolved,exports,nsExports,types,nsTypes,enumMembers,duplicates,cycles', '--reporter', 'compact'] },
 ];
 
 const onlyArg = process.argv.find((a) => a.startsWith('--only=') || a === '--only');

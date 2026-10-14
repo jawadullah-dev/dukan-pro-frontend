@@ -11,8 +11,7 @@ import {
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
 import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
-import { Icons } from '@/components/icons';
-import { RowActionsMenu } from '@/features/dukaan/components/row-actions-menu';
+import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import type { PlatformSubscription } from '../api/types';
 import { platformSubscriptionsQueryOptions } from '../api/queries';
 import { PLATFORM_PLAN_OPTIONS, PLATFORM_STATUS_OPTIONS } from '../constants/filters';

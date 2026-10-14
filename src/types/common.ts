@@ -120,3 +120,5 @@ export interface RelatedApp {
 export interface NavigatorWithRelatedApps extends Navigator {
   getInstalledRelatedApps?: () => Promise<RelatedApp[]>;
 }
+
+export type IdKeyed = { id: string };

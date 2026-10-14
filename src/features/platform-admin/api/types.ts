@@ -1,6 +1,5 @@
-export type PlatformShopStatus = 'ACTIVE' | 'TRIAL' | 'EXPIRED';
-
-export type SubscriptionPlan = 'TRIAL' | 'MONTHLY' | 'YEARLY';
+import type { PlatformShopStatus, SubscriptionPlan } from '@/types';
+export type { PlatformShopStatus, SubscriptionPlan };
 
 export interface PlatformShop {
   id: string;

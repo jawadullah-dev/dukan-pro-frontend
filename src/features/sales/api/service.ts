@@ -15,23 +15,16 @@ import type { SalesListFilters, CancelSaleResult, CreateReturnResult } from '@/t
 
 import { appFetch } from '@/lib/api/app-fetch';
 
+import { buildQueryString } from '@/lib/api/query-params';
+
 export async function listSales(
   filters: SalesListFilters = {},
   token?: string
 ): Promise<PaginatedResponse<SaleDTO>> {
-  const params = new URLSearchParams();
-  if (filters.page) params.set('page', String(filters.page));
-  const effectivePageSize = filters.pageSize ?? filters.limit;
-  if (effectivePageSize) params.set('pageSize', String(effectivePageSize));
-  if (filters.search) params.set('search', filters.search);
-  if (filters.customerId) params.set('customerId', filters.customerId);
-  if (filters.status) params.set('status', filters.status);
-  if (filters.from) params.set('from', filters.from);
-  if (filters.to) params.set('to', filters.to);
-  if (filters.sortBy) params.set('sortBy', filters.sortBy);
-  if (filters.sortOrder) params.set('sortOrder', filters.sortOrder);
-
-  const qs = params.toString() ? `?${params.toString()}` : '';
+  const qs = buildQueryString({
+    ...filters,
+    pageSize: filters.pageSize ?? filters.limit
+  } as Record<string, unknown>);
 
   if (token) {
     return apiRequest<PaginatedResponse<SaleDTO>>(`/sales${qs}`, undefined, token);

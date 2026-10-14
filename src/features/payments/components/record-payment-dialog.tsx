@@ -14,8 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Icons } from '@/components/icons';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { toPaisa } from '@/lib/money';
 import { useT } from '@/i18n/use-t';
 import type { CustomerDTO } from '@/lib/api/types';
 import type { PaymentMethodOption, RecordPaymentDialogProps } from '@/types/payment';
@@ -86,7 +86,7 @@ export function RecordPaymentDialog({
       return;
     }
 
-    const paisaAmount = Math.round(num * 100);
+    const paisaAmount = toPaisa(num);
 
     recordMutation.mutate({
       clientRequestId: crypto.randomUUID(),

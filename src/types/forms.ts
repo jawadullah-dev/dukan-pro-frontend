@@ -103,27 +103,6 @@ export interface NamedEntity {
   is_active?: boolean;
 }
 
-export interface FormEntitySelectProps<T extends NamedEntity> {
-  label: string;
-  required?: boolean;
-  value: string;
-  onValueChange: (value: string, item: T | null) => void;
-  onBlur?: () => void;
-  isInvalid: boolean;
-  errors: Array<{ message?: string } | undefined>;
-  name: string;
-  queryKey: readonly unknown[];
-  fetchPage: (filters: ListFilters) => Promise<Paginated<T>>;
-  placeholder?: string;
-  searchPlaceholder?: string;
-  emptyMessage?: string;
-  selectedLabel?: string;
-  activeOnly?: boolean;
-  disabled?: boolean;
-  className?: string;
-  extraItems?: NamedEntity[];
-}
-
 export interface InfiniteEntitySelectProps<T extends NamedEntity> {
   value: string;
   onValueChange: (value: string, item: T | null) => void;
@@ -137,4 +116,13 @@ export interface InfiniteEntitySelectProps<T extends NamedEntity> {
   disabled?: boolean;
   className?: string;
   extraItems?: NamedEntity[];
+}
+
+export interface FormEntitySelectProps<T extends NamedEntity> extends InfiniteEntitySelectProps<T> {
+  label: string;
+  required?: boolean;
+  name: string;
+  isInvalid: boolean;
+  errors: Array<{ message?: string } | undefined>;
+  onBlur?: () => void;
 }

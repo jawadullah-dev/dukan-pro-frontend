@@ -3,15 +3,13 @@ import type { PaginatedResponse, BrandDTO } from '@/lib/api/types';
 import type { BrandListFilters } from '@/types';
 import { appFetch } from '@/lib/api/app-fetch';
 
+import { buildQueryString } from '@/lib/api/query-params';
+
 export async function listBrands(
   filters: BrandListFilters = {},
   token?: string
 ): Promise<PaginatedResponse<BrandDTO>> {
-  const params = new URLSearchParams();
-  if (filters.page) params.set('page', String(filters.page));
-  if (filters.pageSize) params.set('pageSize', String(filters.pageSize));
-  if (filters.search) params.set('search', filters.search);
-  const qs = params.toString() ? `?${params.toString()}` : '';
+  const qs = buildQueryString(filters as Record<string, unknown>);
 
   if (token) {
     return apiRequest<PaginatedResponse<BrandDTO>>(`/brands${qs}`, undefined, token);

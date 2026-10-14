@@ -19,7 +19,7 @@ import {
 } from '@/components/data-table';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
-import { useDukaanListParams } from '@/components/data-table/list-params';
+import { parseBooleanFacet, useDukaanListParams } from '@/components/data-table/list-params';
 import { AlertModal } from '@/components/modal/alert-modal';
 import { formatDate } from '@/lib/format';
 import type {
@@ -115,31 +115,20 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
   const [deactivateTarget, setDeactivateTarget] = useState<ExpenseCategoryDTO | null>(null);
 
   const sortableColumnIds = ['name', 'createdAt', 'updatedAt'];
-  const { params } = useDukaanListParams(sortableColumnIds, 'name', ['isActive']);
+  const { params, sortBy, sortOrder, getPageCount } = useDukaanListParams<ExpenseCategorySortField>(
+    sortableColumnIds,
+    'name',
+    ['isActive'],
+    'name',
+    'asc'
+  );
 
   const [nameParam] = useQueryState('name', parseAsString);
   const [searchParam] = useQueryState('search', parseAsString);
   const [isActiveParam] = useQueryState('isActive', parseAsString);
 
   const search = searchParam || nameParam || undefined;
-
-  let isActiveFilter: boolean | undefined;
-  if (isActiveParam) {
-    if (isActiveParam === 'true' || isActiveParam.includes('true')) {
-      isActiveFilter = true;
-    } else if (isActiveParam === 'false' || isActiveParam.includes('false')) {
-      isActiveFilter = false;
-    }
-  }
-
-  const sortItem = params.sort[0];
-  let sortBy: ExpenseCategorySortField = 'name';
-  let sortOrder: 'asc' | 'desc' = 'asc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as ExpenseCategorySortField;
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
+  const isActiveFilter = parseBooleanFacet(isActiveParam);
 
   const { data, isLoading, isFetching } = useQuery(
     expenseCategoriesQueryOptions({
@@ -177,7 +166,7 @@ export function ExpenseCategoriesTable({ toolbarAction }: ExpenseCategoriesTable
 
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
 
   const columns: ColumnDef<ExpenseCategoryDTO>[] = [
     {

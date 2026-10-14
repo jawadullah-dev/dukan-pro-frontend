@@ -17,6 +17,7 @@ import {
 import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
+import { todayIsoDate } from '@/lib/dates';
 import { createClientRequestId, formatPkr, fromPaisa, toPaisa } from '@/lib/dukaan/numbers';
 import type { Product } from '@/lib/dukaan/types';
 import type {
@@ -84,7 +85,7 @@ export function PurchaseCreateForm({ onDone }: PurchaseCreateFormProps) {
   });
 
   const submitPurchase = (values: PurchaseFormValues, confirmOverdraft = false) => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayIsoDate();
     const items: CreatePurchaseItemInput[] = values.lines
       .filter((l) => l.product_id)
       .map((l) => {

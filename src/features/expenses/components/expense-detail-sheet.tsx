@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { StatusBadge } from '@/components/data-table';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { formatIsoDate } from '@/lib/dates';
 import { useT } from '@/i18n/use-t';
 import type { ExpenseDTO, ExpenseDetailSheetProps } from '@/types/expense';
 
@@ -49,7 +50,7 @@ export function ExpenseDetailSheet({
             {formatPkr(expense.amount)}
           </p>
           <span className='mt-1 inline-block text-xs text-muted-foreground'>
-            {expense.expenseDate ? expense.expenseDate.split('T')[0] : '—'}
+            {formatIsoDate(expense.expenseDate)}
           </span>
         </div>
 
@@ -62,7 +63,7 @@ export function ExpenseDetailSheet({
           <div className='flex justify-between py-2'>
             <span className='text-muted-foreground'>{t('expenses.expenseDate')}</span>
             <span className='font-medium text-foreground'>
-              {expense.expenseDate ? expense.expenseDate.split('T')[0] : '—'}
+              {formatIsoDate(expense.expenseDate)}
             </span>
           </div>
 

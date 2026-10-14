@@ -15,7 +15,11 @@ import {
 } from '@/components/data-table';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
-import { useDukaanListParams } from '@/components/data-table/list-params';
+import {
+  parseActiveCancelledStatus,
+  useDukaanListParams
+} from '@/components/data-table/list-params';
+import { formatIsoDate } from '@/lib/dates';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import type {
   SupplierPaymentDTO,
@@ -60,7 +64,7 @@ const supplierPaymentMobileItem: MobileItemConfig<SupplierPaymentDTO> = {
     label: row.status === 'ACTIVE' ? 'Active' : 'Cancelled',
     status: row.status
   }),
-  meta: [(row: SupplierPaymentDTO) => (row.paymentDate ? row.paymentDate.split('T')[0] : '—')]
+  meta: [(row: SupplierPaymentDTO) => formatIsoDate(row.paymentDate)]
 };
 
 const supplierPaymentDetail: DetailConfig<SupplierPaymentDTO> = {
@@ -75,7 +79,7 @@ const supplierPaymentDetail: DetailConfig<SupplierPaymentDTO> = {
     {
       title: 'Payment Details',
       fields: [
-        { label: 'Date', value: row.paymentDate ? row.paymentDate.split('T')[0] : '—' },
+        { label: 'Date', value: formatIsoDate(row.paymentDate) },
         { label: 'Supplier', value: row.supplierName || '—' },
         {
           label: 'Applied To',
@@ -104,29 +108,14 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
     'createdAt',
     'updatedAt'
   ];
-  const { params } = useDukaanListParams(sortableColumnIds, 'paymentDate', ['status']);
+  const { params, sortBy, sortOrder, getPageCount } = useDukaanListParams<
+    SupplierPaymentQueryFilter['sortBy']
+  >(sortableColumnIds, 'paymentDate', ['status'], 'paymentDate');
 
   const [searchParam] = useQueryState('search', parseAsString);
   const [statusParam] = useQueryState('status', parseAsString);
 
-  let statusFilter: 'ACTIVE' | 'CANCELLED' | undefined;
-  if (statusParam) {
-    const statuses = statusParam.split(',');
-    if (statuses.includes('ACTIVE') && !statuses.includes('CANCELLED')) {
-      statusFilter = 'ACTIVE';
-    } else if (statuses.includes('CANCELLED') && !statuses.includes('ACTIVE')) {
-      statusFilter = 'CANCELLED';
-    }
-  }
-
-  const sortItem = params.sort[0];
-  let sortBy: SupplierPaymentQueryFilter['sortBy'] = 'paymentDate';
-  let sortOrder: 'asc' | 'desc' = 'desc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as SupplierPaymentQueryFilter['sortBy'];
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
+  const statusFilter = parseActiveCancelledStatus(statusParam);
 
   const { data, isLoading, isFetching } = useQuery(
     supplierPaymentsQueryOptions({
@@ -141,7 +130,7 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
 
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
 
   const columns: ColumnDef<SupplierPaymentDTO>[] = [
     {
@@ -172,11 +161,11 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
       id: 'paymentDate',
       accessorKey: 'paymentDate',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
-      cell: ({ row }) => {
-        const val = row.original.paymentDate;
-        const formatted = val ? val.split('T')[0] : '—';
-        return <span className='font-normal text-foreground'>{formatted}</span>;
-      },
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>
+          {formatIsoDate(row.original.paymentDate)}
+        </span>
+      ),
       meta: {
         label: 'table.col.date',
         variant: 'date',

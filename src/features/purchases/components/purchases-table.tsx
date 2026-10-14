@@ -17,7 +17,12 @@ import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-h
 import { useDataTable } from '@/hooks/use-data-table';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
-import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
+import {
+  DUKAAN_DEFAULT_PAGE_SIZE,
+  parseActiveCancelledStatus,
+  useDukaanListParams
+} from '@/components/data-table/list-params';
+import { formatIsoDate } from '@/lib/dates';
 import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type { PurchaseDTO } from '@/lib/api/types';
 import type { PurchaseRowActionsProps, PurchasesTableProps } from '@/types/purchases';
@@ -71,7 +76,7 @@ const purchaseMobileItem: MobileItemConfig<PurchaseDTO> = {
   subtitle: (row) => row.supplierInvoiceRef || row.supplierName || '—',
   badge: (row) => ({ label: formatLabel(row.status), status: row.status }),
   value: (row) => formatPkr(row.totalAmount),
-  meta: [(row) => (row.purchaseDate ? row.purchaseDate.split('T')[0] : '—')],
+  meta: [(row) => formatIsoDate(row.purchaseDate)],
   ariaLabel: (row) => `${row.purchaseNo}, ${row.supplierName ?? ''}, ${formatPkr(row.totalAmount)}`
 };
 
@@ -85,7 +90,7 @@ const purchaseDetail: DetailConfig<PurchaseDTO> = {
       title: 'Purchase Information',
       fields: [
         { label: 'Purchase #', value: row.purchaseNo },
-        { label: 'Date', value: row.purchaseDate ? row.purchaseDate.split('T')[0] : '—' },
+        { label: 'Date', value: formatIsoDate(row.purchaseDate) },
         { label: 'Supplier', value: row.supplierName ?? '—' },
         { label: 'Supplier Invoice', value: row.supplierInvoiceRef ?? '—' },
         { label: 'Total Amount', value: formatPkr(row.totalAmount) },
@@ -113,37 +118,18 @@ export function PurchasesTable({ toolbarAction }: PurchasesTableProps) {
     'createdAt',
     'updatedAt'
   ];
-  const { params, filters } = useDukaanListParams(sortableColumnIds, 'purchaseDate', ['status']);
+  const { params, filters, sortBy, sortOrder, getPageCount } = useDukaanListParams<
+    PurchasesListFilters['sortBy']
+  >(sortableColumnIds, 'purchaseDate', ['status'], 'purchaseDate');
 
   const [purchaseNoParam] = useQueryState('purchaseNo', parseAsString);
   const [searchParam] = useQueryState('search', parseAsString);
   const [statusParam] = useQueryState('status', parseAsString);
 
   const search = searchParam || purchaseNoParam || undefined;
-
-  let statusFilter: 'ACTIVE' | 'CANCELLED' | undefined;
-  const rawStatus = (filters as Record<string, unknown>).status ?? statusParam;
-  if (rawStatus) {
-    const statuses: string[] = Array.isArray(rawStatus)
-      ? (rawStatus as string[])
-      : typeof rawStatus === 'string'
-        ? rawStatus.split(',')
-        : [];
-    if (statuses.includes('ACTIVE') && !statuses.includes('CANCELLED')) {
-      statusFilter = 'ACTIVE';
-    } else if (statuses.includes('CANCELLED') && !statuses.includes('ACTIVE')) {
-      statusFilter = 'CANCELLED';
-    }
-  }
-
-  const sortItem = params.sort[0];
-  let sortBy: PurchasesListFilters['sortBy'] = 'purchaseDate';
-  let sortOrder: 'asc' | 'desc' = 'desc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as PurchasesListFilters['sortBy'];
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
+  const statusFilter = parseActiveCancelledStatus(
+    (filters as Record<string, unknown>).status ?? statusParam
+  );
 
   const { data } = useQuery(
     purchasesQueryOptions({
@@ -165,7 +151,7 @@ export function PurchasesTable({ toolbarAction }: PurchasesTableProps) {
     });
   }
   const total = data?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
 
   const columns: ColumnDef<PurchaseDTO>[] = [
     {
@@ -204,11 +190,11 @@ export function PurchasesTable({ toolbarAction }: PurchasesTableProps) {
       id: 'purchaseDate',
       accessorKey: 'purchaseDate',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
-      cell: ({ row }) => {
-        const dateVal = row.original.purchaseDate;
-        const formatted = dateVal ? dateVal.split('T')[0] : '—';
-        return <span className='font-normal text-foreground'>{formatted}</span>;
-      },
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>
+          {formatIsoDate(row.original.purchaseDate)}
+        </span>
+      ),
       meta: {
         label: 'table.col.date',
         variant: 'date',

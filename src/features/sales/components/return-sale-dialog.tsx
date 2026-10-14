@@ -27,6 +27,7 @@ import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { formatPkr, toPaisa } from '@/lib/dukaan/numbers';
 import type { ReturnPreviewDTO, ReturnItemInput } from '@/lib/api/types';
+import { todayIsoDate } from '@/lib/dates';
 import type { ReturnSaleDialogProps, ItemReturnState } from '@/types/sales';
 import { saleKeys } from '../api/queries';
 import { createReturnMutation, previewReturnMutation } from '../api/mutations';
@@ -34,7 +35,7 @@ import { createReturnMutation, previewReturnMutation } from '../api/mutations';
 export function ReturnSaleDialog({ sale, open, onOpenChange, onSuccess }: ReturnSaleDialogProps) {
   const qc = useQueryClient();
   const t = useT();
-  const [returnDate, setReturnDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [returnDate, setReturnDate] = useState(todayIsoDate);
   const [reason, setReason] = useState('');
   const [notes, setNotes] = useState('');
   const [refundPkr, setRefundPkr] = useState<number>(0);

@@ -16,6 +16,7 @@ import { StatusBadge } from '@/components/data-table';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { formatIsoDate } from '@/lib/dates';
 import type { PurchaseDetailClientProps } from '@/types/purchases';
 import { purchaseKeys, purchaseQueryOptions } from '../api/queries';
 import { CancelPurchaseDialog } from './cancel-purchase-dialog';
@@ -27,7 +28,7 @@ export function PurchaseDetailClient({ id }: PurchaseDetailClientProps) {
   const [cancelOpen, setCancelOpen] = useState(false);
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-6'>
       {cancelOpen && (
         <CancelPurchaseDialog
           purchase={data}
@@ -41,8 +42,8 @@ export function PurchaseDetailClient({ id }: PurchaseDetailClientProps) {
         <div className='grid gap-1'>
           <h3 className='text-xl font-semibold'>{data.purchaseNo}</h3>
           <p className='text-muted-foreground text-sm'>
-            {data.supplierName ?? '—'} · {data.purchaseDate ? data.purchaseDate.split('T')[0] : '—'}{' '}
-            · {formatPkr(data.totalAmount)}
+            {data.supplierName ?? '—'} · {formatIsoDate(data.purchaseDate)} ·{' '}
+            {formatPkr(data.totalAmount)}
           </p>
           <div className='flex flex-wrap gap-2 pt-1'>
             <StatusBadge status={data.status} />

@@ -6,6 +6,11 @@ export function nowIso(): string {
   return new Date().toISOString();
 }
 
+export function formatIsoDate(iso?: string | null, fallback = '—'): string {
+  if (!iso) return fallback;
+  return iso.slice(0, 10) || fallback;
+}
+
 export function formatDateTime(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;

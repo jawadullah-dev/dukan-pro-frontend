@@ -30,6 +30,7 @@ import {
 import { useT } from '@/i18n/use-t';
 import { useAppForm } from '@/lib/form';
 import { dukaan } from '@/lib/dukaan';
+import { formatIsoDate, todayIsoDate } from '@/lib/dates';
 import {
   createClientRequestId,
   formatLabel,
@@ -160,7 +161,7 @@ export function SaleCreateForm({ onDone }: SaleCreateFormProps) {
 
       const payload: CreateSaleInput = {
         clientRequestId,
-        saleDate: new Date().toISOString().split('T')[0],
+        saleDate: todayIsoDate(),
         customerId: value.customer_id === '__walkin__' ? undefined : value.customer_id,
         items,
         discount: toPaisa(Number(value.discount) || 0),
@@ -428,8 +429,7 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
             )}
           </div>
           <p className='mt-1 text-muted-foreground text-sm'>
-            {data.customerName ?? t('dukaan.sale.walkIn')} ·{' '}
-            {data.saleDate ? data.saleDate.split('T')[0] : '—'}
+            {data.customerName ?? t('dukaan.sale.walkIn')} · {formatIsoDate(data.saleDate)}
             {outstanding > 0 && !isCancelled && (
               <span className='font-medium text-amber-600 dark:text-amber-400'>
                 {' '}
@@ -486,7 +486,7 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
           )}
           {data.cancelledAt && (
             <p className='text-xs text-muted-foreground mt-0.5'>
-              {t('dukaan.sale.cancelledOn')} {data.cancelledAt.split('T')[0]}
+              {t('dukaan.sale.cancelledOn')} {formatIsoDate(data.cancelledAt)}
             </p>
           )}
         </div>
@@ -539,7 +539,7 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
                     )}
                   </div>
                   <span className='text-muted-foreground font-mono text-[11px]'>
-                    {p.createdAt ? p.createdAt.split('T')[0] : ''}
+                    {formatIsoDate(p.createdAt, '')}
                   </span>
                 </div>
               ))}
@@ -587,7 +587,7 @@ export function SaleDetailClient({ id }: SaleDetailClientProps) {
                   </span>
                 </div>
                 <p className='text-muted-foreground'>
-                  {t('dukaan.sale.date')} {ret.returnDate ? ret.returnDate.split('T')[0] : '—'}
+                  {t('dukaan.sale.date')} {formatIsoDate(ret.returnDate)}
                   {ret.notes ? ` · Notes: ${ret.notes}` : ''}
                 </p>
                 {ret.items && ret.items.length > 0 && (
@@ -628,7 +628,7 @@ export function SaleReceiptClient({ id }: SaleReceiptClientProps) {
         <p className='mt-2 font-medium'>
           {t('dukaan.sale.receipt')} {data.saleNo}
         </p>
-        <p className='text-sm'>{data.saleDate ? data.saleDate.split('T')[0] : '—'}</p>
+        <p className='text-sm'>{formatIsoDate(data.saleDate)}</p>
       </div>
       <div className='text-sm'>
         {t('table.col.customer')}: {data.customerName ?? t('dukaan.sale.walkIn')}

@@ -18,6 +18,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Icons } from '@/components/icons';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { formatPkr, toPaisa } from '@/lib/dukaan/numbers';
+import { todayIsoDate } from '@/lib/dates';
 import { createOwnerWithdrawalMutation } from '../api/mutations';
 import { cashKeys } from '../api/queries';
 import type {
@@ -32,7 +33,7 @@ export function OwnerWithdrawalDialog({ open, onOpenChange }: OwnerWithdrawalDia
   const t = useT();
   const qc = useQueryClient();
   const [amountStr, setAmountStr] = useState('');
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(todayIsoDate);
   const [notes, setNotes] = useState('');
   const [overdraftPrompt, setOverdraftPrompt] = useState<CashOverdraftPrompt | null>(null);
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);

@@ -20,7 +20,11 @@ import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { t } from '@/i18n';
 import { AlertModal } from '@/components/modal/alert-modal';
-import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
+import {
+  DUKAAN_DEFAULT_PAGE_SIZE,
+  parseBooleanFacet,
+  useDukaanListParams
+} from '@/components/data-table/list-params';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { formatDate } from '@/lib/format';
 import type { CustomerDTO } from '@/lib/api/types';
@@ -299,31 +303,16 @@ export function CustomersTable({ toolbarAction }: CustomersTableProps) {
   const t = useT();
 
   const sortableColumnIds = ['name', 'phone', 'openingBalance', 'createdAt', 'isActive'];
-  const { params } = useDukaanListParams(sortableColumnIds, 'name', ['isActive']);
+  const { params, sortBy, sortOrder, getPageCount } = useDukaanListParams<
+    CustomerListFilters['sortBy']
+  >(sortableColumnIds, 'name', ['isActive'], 'createdAt');
 
   const [nameParam] = useQueryState('name', parseAsString);
   const [searchParam] = useQueryState('search', parseAsString);
   const [isActiveParam] = useQueryState('isActive', parseAsString);
 
   const search = searchParam || nameParam || undefined;
-
-  let isActiveFilter: boolean | undefined;
-  if (isActiveParam) {
-    if (isActiveParam === 'true' || isActiveParam.includes('true')) {
-      isActiveFilter = true;
-    } else if (isActiveParam === 'false' || isActiveParam.includes('false')) {
-      isActiveFilter = false;
-    }
-  }
-
-  const sortItem = params.sort[0];
-  let sortBy: CustomerListFilters['sortBy'] = 'createdAt';
-  let sortOrder: 'asc' | 'desc' = 'desc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as CustomerListFilters['sortBy'];
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
+  const isActiveFilter = parseBooleanFacet(isActiveParam);
 
   const { data, isLoading, isFetching } = useQuery(
     customersQueryOptions({
@@ -338,7 +327,7 @@ export function CustomersTable({ toolbarAction }: CustomersTableProps) {
 
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
   const { table } = useDataTable({
     data: items,
     columns: customerColumns,

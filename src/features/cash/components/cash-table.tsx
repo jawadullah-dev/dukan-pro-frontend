@@ -15,7 +15,7 @@ import {
 } from '@/components/data-table';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
-import { useDukaanListParams } from '@/components/data-table/list-params';
+import { parseBinaryFacet, useDukaanListParams } from '@/components/data-table/list-params';
 import { cn } from '@/lib/utils';
 import { formatDateTime, formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type {
@@ -90,7 +90,14 @@ export function CashTable({ toolbarAction }: CashTableProps) {
   const [withdrawalOpen, setWithdrawalOpen] = useState(false);
 
   const sortableColumnIds = ['movementDate', 'amount', 'createdAt'];
-  const { params, filters } = useDukaanListParams(sortableColumnIds, 'note', ['type', 'direction']);
+  const { params, filters, sortBy, sortOrder, getPageCount } =
+    useDukaanListParams<CashMovementSortField>(
+      sortableColumnIds,
+      'note',
+      ['type', 'direction'],
+      'movementDate',
+      'desc'
+    );
 
   const [searchParam] = useQueryState('search', parseAsString);
   const [noteParam] = useQueryState('note', parseAsString);
@@ -113,28 +120,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
   }
 
   const rawDir = (filters as Record<string, unknown>).direction ?? directionParam;
-  let directionFilter: CashDirection | undefined;
-  if (rawDir) {
-    const dirs = Array.isArray(rawDir)
-      ? (rawDir as string[])
-      : typeof rawDir === 'string'
-        ? rawDir.split(',')
-        : [];
-    if (dirs.includes('IN') && !dirs.includes('OUT')) {
-      directionFilter = 'IN';
-    } else if (dirs.includes('OUT') && !dirs.includes('IN')) {
-      directionFilter = 'OUT';
-    }
-  }
-
-  const sortItem = params.sort[0];
-  let sortBy: CashMovementSortField = 'movementDate';
-  let sortOrder: 'asc' | 'desc' = 'desc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as CashMovementSortField;
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
+  const directionFilter = parseBinaryFacet<CashDirection>(rawDir, 'IN', 'OUT');
 
   const queryFilter: CashMovementQueryFilter = {
     page: params.page,
@@ -150,7 +136,7 @@ export function CashTable({ toolbarAction }: CashTableProps) {
 
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
 
   const columns: ColumnDef<CashMovementDTO>[] = [
     {

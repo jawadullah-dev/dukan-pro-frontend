@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Icons } from '@/components/icons';
 import { formatPkr, toPaisa, fromPaisa } from '@/lib/dukaan/numbers';
+import { todayIsoDate } from '@/lib/dates';
 import { useT } from '@/i18n/use-t';
 import type {
   SupplierDTO,
@@ -43,7 +44,7 @@ export function RecordSupplierPaymentDialog({
   const [targetType, setTargetType] = useState<'opening' | 'purchase'>('opening');
   const [selectedPurchaseId, setSelectedPurchaseId] = useState<string>('');
   const [amountStr, setAmountStr] = useState('');
-  const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [paymentDate, setPaymentDate] = useState(todayIsoDate);
   const [notes, setNotes] = useState('');
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);
   const [overdraftPrompt, setOverdraftPrompt] = useState<OverdraftPrompt | null>(null);

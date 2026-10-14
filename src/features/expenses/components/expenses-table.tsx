@@ -15,7 +15,11 @@ import {
 } from '@/components/data-table';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
-import { useDukaanListParams } from '@/components/data-table/list-params';
+import {
+  parseActiveCancelledStatus,
+  useDukaanListParams
+} from '@/components/data-table/list-params';
+import { formatIsoDate } from '@/lib/dates';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import type {
   ExpenseDTO,
@@ -59,7 +63,7 @@ const expenseMobileItem: MobileItemConfig<ExpenseDTO> = {
     label: row.status === 'ACTIVE' ? 'Active' : 'Cancelled',
     status: row.status
   }),
-  meta: [(row: ExpenseDTO) => (row.expenseDate ? row.expenseDate.split('T')[0] : '—')]
+  meta: [(row: ExpenseDTO) => formatIsoDate(row.expenseDate)]
 };
 
 const expenseDetail: DetailConfig<ExpenseDTO> = {
@@ -74,7 +78,7 @@ const expenseDetail: DetailConfig<ExpenseDTO> = {
     {
       title: 'Expense Details',
       fields: [
-        { label: 'Date', value: row.expenseDate ? row.expenseDate.split('T')[0] : '—' },
+        { label: 'Date', value: formatIsoDate(row.expenseDate) },
         { label: 'Category', value: row.categoryName },
         { label: 'Amount', value: formatPkr(row.amount) },
         { label: 'Status', value: row.status === 'ACTIVE' ? 'Active' : 'Cancelled' },
@@ -99,29 +103,14 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
     'status',
     'createdAt'
   ];
-  const { params } = useDukaanListParams(sortableColumnIds, 'expenseDate', ['status']);
+  const { params, sortBy, sortOrder, getPageCount } = useDukaanListParams<
+    ExpenseQueryFilter['sortBy']
+  >(sortableColumnIds, 'expenseDate', ['status'], 'expenseDate');
 
   const [searchParam] = useQueryState('search', parseAsString);
   const [statusParam] = useQueryState('status', parseAsString);
 
-  let statusFilter: 'ACTIVE' | 'CANCELLED' | undefined;
-  if (statusParam) {
-    const statuses = statusParam.split(',');
-    if (statuses.includes('ACTIVE') && !statuses.includes('CANCELLED')) {
-      statusFilter = 'ACTIVE';
-    } else if (statuses.includes('CANCELLED') && !statuses.includes('ACTIVE')) {
-      statusFilter = 'CANCELLED';
-    }
-  }
-
-  const sortItem = params.sort[0];
-  let sortBy: ExpenseQueryFilter['sortBy'] = 'expenseDate';
-  let sortOrder: 'asc' | 'desc' = 'desc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as ExpenseQueryFilter['sortBy'];
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
+  const statusFilter = parseActiveCancelledStatus(statusParam);
 
   const { data, isLoading, isFetching } = useQuery(
     expensesQueryOptions({
@@ -136,18 +125,18 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
 
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
 
   const columns: ColumnDef<ExpenseDTO>[] = [
     {
       id: 'expenseDate',
       accessorKey: 'expenseDate',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
-      cell: ({ row }) => {
-        const val = row.original.expenseDate;
-        const formatted = val ? val.split('T')[0] : '—';
-        return <span className='font-normal text-foreground'>{formatted}</span>;
-      },
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>
+          {formatIsoDate(row.original.expenseDate)}
+        </span>
+      ),
       meta: {
         label: 'table.col.date',
         variant: 'date',

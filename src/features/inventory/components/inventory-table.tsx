@@ -19,7 +19,12 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { Icons } from '@/components/icons';
 import { IconPlus } from '@tabler/icons-react';
 import { useT } from '@/i18n/use-t';
-import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
+import {
+  DUKAAN_DEFAULT_PAGE_SIZE,
+  parseBinaryFacet,
+  parseBooleanFacet,
+  useDukaanListParams
+} from '@/components/data-table/list-params';
 import { formatLabel, formatPkr } from '@/lib/dukaan/numbers';
 import type { InventoryItemDTO } from '@/lib/api/types';
 import type { InventoryRowActionsProps, InventoryTableProps } from '@/types/inventory';
@@ -64,10 +69,9 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
   const [selectedProduct, setSelectedProduct] = useState<InventoryItemDTO | null>(null);
 
   const sortableColumnIds = ['name', 'trackingType', 'inStock', 'stockValue', 'lowStock'];
-  const { params, filters } = useDukaanListParams(sortableColumnIds, 'name', [
-    'trackingType',
-    'lowStock'
-  ]);
+  const { params, filters, sortBy, sortOrder, getPageCount } = useDukaanListParams<
+    'name' | 'inStock' | 'stockValue' | 'trackingType' | 'lowStock'
+  >(sortableColumnIds, 'name', ['trackingType', 'lowStock'], 'name', 'asc');
 
   const [nameParam] = useQueryState('name', parseAsString);
   const [searchParam] = useQueryState('search', parseAsString);
@@ -77,43 +81,14 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
   const search = searchParam || nameParam || undefined;
 
   const rawTracking = (filters as Record<string, unknown>).trackingType ?? trackingTypeParam;
-  let trackingFilter: 'QUANTITY' | 'SERIALIZED' | undefined;
-  if (rawTracking) {
-    const arr = Array.isArray(rawTracking)
-      ? (rawTracking as string[])
-      : typeof rawTracking === 'string'
-        ? rawTracking.split(',')
-        : [];
-    if (arr.includes('QUANTITY') && !arr.includes('SERIALIZED')) {
-      trackingFilter = 'QUANTITY';
-    } else if (arr.includes('SERIALIZED') && !arr.includes('QUANTITY')) {
-      trackingFilter = 'SERIALIZED';
-    }
-  }
+  const trackingFilter = parseBinaryFacet<'QUANTITY' | 'SERIALIZED'>(
+    rawTracking,
+    'QUANTITY',
+    'SERIALIZED'
+  );
 
   const rawLowStock = (filters as Record<string, unknown>).lowStock ?? lowStockParam;
-  let lowStockFilter: boolean | undefined;
-  if (rawLowStock) {
-    const arr = Array.isArray(rawLowStock)
-      ? (rawLowStock as string[])
-      : typeof rawLowStock === 'string'
-        ? rawLowStock.split(',')
-        : [];
-    if (arr.includes('true') && !arr.includes('false')) {
-      lowStockFilter = true;
-    } else if (arr.includes('false') && !arr.includes('true')) {
-      lowStockFilter = false;
-    }
-  }
-
-  const sortItem = params.sort[0];
-  let sortBy: 'name' | 'inStock' | 'stockValue' | 'trackingType' | 'lowStock' = 'name';
-  let sortOrder: 'asc' | 'desc' = 'asc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as typeof sortBy;
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
+  const lowStockFilter = parseBooleanFacet(rawLowStock);
 
   const { data, isLoading } = useQuery(
     inventoryStockQueryOptions({
@@ -129,7 +104,7 @@ export function InventoryTable({ toolbarAction }: InventoryTableProps) {
 
   let items = data?.items ?? [];
   const total = data?.total ?? items.length;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
 
   const handleAdjust = (item: InventoryItemDTO) => {
     setSelectedProduct(item);

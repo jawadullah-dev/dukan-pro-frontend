@@ -13,10 +13,48 @@ function pickFilterValue(values: string[] | null | undefined): string | undefine
   return values.join(',');
 }
 
-export function useDukaanListParams(
+export function parseBinaryFacet<T extends string>(
+  param: unknown,
+  optA: T,
+  optB: T
+): T | undefined {
+  if (!param) return undefined;
+  const items = Array.isArray(param)
+    ? (param as string[])
+    : typeof param === 'string'
+      ? param.split(',')
+      : [];
+  if (items.includes(optA) && !items.includes(optB)) return optA;
+  if (items.includes(optB) && !items.includes(optA)) return optB;
+  return undefined;
+}
+
+export function parseActiveCancelledStatus(
+  statusParam: unknown
+): 'ACTIVE' | 'CANCELLED' | undefined {
+  return parseBinaryFacet(statusParam, 'ACTIVE', 'CANCELLED');
+}
+
+export function parseBooleanFacet(param: unknown): boolean | undefined {
+  if (!param) return undefined;
+  const items = Array.isArray(param)
+    ? (param as string[])
+    : typeof param === 'string'
+      ? param.split(',')
+      : [];
+  const hasTrue = items.includes('true');
+  const hasFalse = items.includes('false');
+  if (hasTrue && !hasFalse) return true;
+  if (hasFalse && !hasTrue) return false;
+  return undefined;
+}
+
+export function useDukaanListParams<TSort extends string | undefined = string>(
   sortableColumnIds: string[],
   searchKey = 'name',
-  filterKeys: string[] = []
+  filterKeys: string[] = [],
+  defaultSort?: TSort,
+  defaultOrder: 'asc' | 'desc' = 'desc'
 ) {
   const [params] = useQueryStates({
     page: parseAsInteger.withDefault(1),
@@ -53,5 +91,16 @@ export function useDukaanListParams(
     }
   }
 
-  return { params, filters, search };
+  const sortItem = params.sort[0];
+  let sortBy: TSort | undefined = defaultSort;
+  let sortOrder: 'asc' | 'desc' = defaultOrder;
+
+  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
+    sortBy = sortItem.id as TSort;
+    sortOrder = sortItem.desc ? 'desc' : 'asc';
+  }
+
+  const getPageCount = (total: number) => Math.max(1, Math.ceil(total / params.perPage));
+
+  return { params, filters, search, sortBy, sortOrder, getPageCount };
 }

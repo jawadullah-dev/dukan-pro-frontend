@@ -18,6 +18,7 @@ import { Icons } from '@/components/icons';
 import { IconPlus } from '@tabler/icons-react';
 import { useT } from '@/i18n/use-t';
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
+import { formatIsoDate } from '@/lib/dates';
 import { formatLabel } from '@/lib/dukaan/numbers';
 import type { InventoryAdjustmentDTO } from '@/lib/api/types';
 import type { AdjustmentsTableProps } from '@/types/inventory';
@@ -35,7 +36,9 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
   const [adjustOpen, setAdjustOpen] = useState(false);
 
   const sortableColumnIds = ['createdAt', 'quantityChange'];
-  const { params, filters } = useDukaanListParams(sortableColumnIds, 'createdAt', ['type']);
+  const { params, filters, sortBy, sortOrder, getPageCount } = useDukaanListParams<
+    'createdAt' | 'quantityChange'
+  >(sortableColumnIds, 'createdAt', ['type'], 'createdAt', 'desc');
 
   const [searchParam] = useQueryState('search', parseAsString);
   const [typeParam] = useQueryState('type', parseAsString);
@@ -56,15 +59,6 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
     }
   }
 
-  const sortItem = params.sort[0];
-  let sortBy: 'createdAt' | 'quantityChange' = 'createdAt';
-  let sortOrder: 'asc' | 'desc' = 'desc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as typeof sortBy;
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
-
   const { data, isLoading } = useQuery(
     inventoryAdjustmentsQueryOptions({
       page: params.page,
@@ -78,18 +72,16 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
 
   const items = data?.items ?? [];
   const total = data?.total ?? items.length;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
 
   const columns: ColumnDef<InventoryAdjustmentDTO>[] = [
     {
       id: 'createdAt',
       accessorKey: 'createdAt',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
-      cell: ({ row }) => {
-        const val = row.original.createdAt;
-        const formatted = val ? val.split('T')[0] : '—';
-        return <span className='font-normal text-foreground'>{formatted}</span>;
-      },
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>{formatIsoDate(row.original.createdAt)}</span>
+      ),
       meta: {
         label: 'table.col.date',
         variant: 'date',
@@ -218,7 +210,7 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
       status: row.type === 'ADJUSTMENT' ? 'ACTIVE' : 'OVERDUE'
     }),
     value: (row) => (row.quantityChange > 0 ? `+${row.quantityChange}` : `${row.quantityChange}`),
-    meta: [(row) => (row.createdAt ? row.createdAt.split('T')[0] : '—')],
+    meta: [(row) => formatIsoDate(row.createdAt)],
     ariaLabel: (row) => `${row.productName}, ${row.type}, ${row.quantityChange}`
   };
 
@@ -236,7 +228,7 @@ export function AdjustmentsTable({ toolbarAction }: AdjustmentsTableProps) {
         title: 'Adjustment Details',
         fields: [
           { label: 'Product', value: row.productName },
-          { label: 'Date', value: row.createdAt ? row.createdAt.split('T')[0] : '—' },
+          { label: 'Date', value: formatIsoDate(row.createdAt) },
           { label: 'Type', value: formatLabel(row.type) },
           {
             label: 'Quantity Change',

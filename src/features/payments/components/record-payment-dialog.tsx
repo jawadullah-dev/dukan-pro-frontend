@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { toPaisa } from '@/lib/money';
+import { todayIsoDate } from '@/lib/dates';
 import { useT } from '@/i18n/use-t';
 import { Icons } from '@/components/icons';
 import type { CustomerDTO } from '@/lib/api/types';
@@ -51,7 +52,7 @@ export function RecordPaymentDialog({
   const [customerId, setCustomerId] = useState(defaultCustomerId ?? '');
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerDTO | null>(null);
   const [amountStr, setAmountStr] = useState('');
-  const [paymentDate, setPaymentDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [paymentDate, setPaymentDate] = useState(todayIsoDate);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodOption>('CASH');
   const [notes, setNotes] = useState('');
 

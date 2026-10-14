@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Icons } from '@/components/icons';
 import { formatPkr, toPaisa } from '@/lib/dukaan/numbers';
+import { todayIsoDate } from '@/lib/dates';
 import { useT } from '@/i18n/use-t';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { createExpenseMutation } from '../api/mutations';
@@ -37,7 +38,7 @@ export function RecordExpenseDialog({
   const [categoryId, setCategoryId] = useState(defaultCategoryId ?? '');
   const [selectedCategory, setSelectedCategory] = useState<ExpenseCategoryDTO | null>(null);
   const [amountStr, setAmountStr] = useState('');
-  const [expenseDate, setExpenseDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [expenseDate, setExpenseDate] = useState(todayIsoDate);
   const [description, setDescription] = useState('');
   const [confirmOverdraft, setConfirmOverdraft] = useState(false);
   const [overdraftPrompt, setOverdraftPrompt] = useState<OverdraftPrompt | null>(null);

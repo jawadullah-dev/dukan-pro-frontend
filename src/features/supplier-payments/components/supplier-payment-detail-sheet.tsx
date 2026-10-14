@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { StatusBadge } from '@/components/data-table';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { formatIsoDate } from '@/lib/dates';
 import { useT } from '@/i18n/use-t';
 import type { SupplierPaymentDetailSheetProps } from '@/types/supplier-payment';
 
@@ -53,7 +54,7 @@ export function SupplierPaymentDetailSheet({
             {formatPkr(payment.amount)}
           </p>
           <span className='mt-1 inline-block text-xs text-muted-foreground'>
-            {payment.paymentDate ? payment.paymentDate.split('T')[0] : '—'}
+            {formatIsoDate(payment.paymentDate)}
           </span>
         </div>
 
@@ -75,7 +76,7 @@ export function SupplierPaymentDetailSheet({
           <div className='flex justify-between py-2'>
             <span className='text-muted-foreground'>{t('supplierPayments.paymentDateLabel')}</span>
             <span className='font-medium text-foreground'>
-              {payment.paymentDate ? payment.paymentDate.split('T')[0] : '—'}
+              {formatIsoDate(payment.paymentDate)}
             </span>
           </div>
 

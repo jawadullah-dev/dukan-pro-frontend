@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { formatIsoDate } from '@/lib/dates';
 import type { CancelExpenseDialogProps } from '@/types/expense';
 import { cancelExpenseMutation } from '../api/mutations';
 import { expenseKeys } from '../api/queries';
@@ -90,7 +91,7 @@ export function CancelExpenseDialog({
             <div className='flex items-center justify-between text-muted-foreground'>
               <span>{t('expenses.dateLabel')}</span>
               <span className='font-medium text-foreground'>
-                {expense.expenseDate ? expense.expenseDate.split('T')[0] : '—'}
+                {formatIsoDate(expense.expenseDate)}
               </span>
             </div>
             {expense.description && (

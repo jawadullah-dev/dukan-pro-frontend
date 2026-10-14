@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { DialogCancelButton, DialogPrimaryButton } from '@/components/common/dialog-actions';
 import { toPaisa } from '@/lib/dukaan/numbers';
+import { todayIsoDate } from '@/lib/dates';
 import type { OwnerInvestmentDialogProps } from '@/types/cash';
 import { createOwnerInvestmentMutation } from '../api/mutations';
 import { cashKeys } from '../api/queries';
@@ -26,7 +27,7 @@ export function OwnerInvestmentDialog({ open, onOpenChange }: OwnerInvestmentDia
   const t = useT();
   const qc = useQueryClient();
   const [amountStr, setAmountStr] = useState('');
-  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(todayIsoDate);
   const [notes, setNotes] = useState('');
 
   const createMutation = useMutation({

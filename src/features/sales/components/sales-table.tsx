@@ -18,7 +18,12 @@ import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-h
 import { useDataTable } from '@/hooks/use-data-table';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
-import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
+import {
+  DUKAAN_DEFAULT_PAGE_SIZE,
+  parseActiveCancelledStatus,
+  useDukaanListParams
+} from '@/components/data-table/list-params';
+import { formatIsoDate } from '@/lib/dates';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import type { SaleDTO } from '@/lib/api/types';
 import type { SaleRowActionsProps, SalesTableProps } from '@/types/sales';
@@ -87,7 +92,7 @@ const saleMobileItem: MobileItemConfig<SaleDTO> = {
     status: row.status
   }),
   value: (row) => formatPkr(row.totalAmount),
-  meta: [(row: SaleDTO) => (row.saleDate ? row.saleDate.split('T')[0] : '—')],
+  meta: [(row: SaleDTO) => formatIsoDate(row.saleDate)],
   ariaLabel: (row: SaleDTO) =>
     `${row.saleNo}, ${row.customerName ?? 'Walk-in'}, ${formatPkr(row.totalAmount)}`
 };
@@ -105,7 +110,7 @@ const saleDetail: DetailConfig<SaleDTO> = {
       title: 'Sale Information',
       fields: [
         { label: 'Sale #', value: row.saleNo },
-        { label: 'Sale Date', value: row.saleDate ? row.saleDate.split('T')[0] : '—' },
+        { label: 'Sale Date', value: formatIsoDate(row.saleDate) },
         { label: 'Customer', value: row.customerName ?? 'Walk-in' },
         { label: 'Total Amount', value: formatPkr(row.totalAmount) },
         {
@@ -135,7 +140,7 @@ const saleDetail: DetailConfig<SaleDTO> = {
               { label: 'Reason', value: row.cancelReason || '—' },
               {
                 label: 'Cancelled At',
-                value: row.cancelledAt ? row.cancelledAt.split('T')[0] : '—'
+                value: formatIsoDate(row.cancelledAt)
               }
             ]
           }
@@ -156,36 +161,16 @@ export function SalesTable({ toolbarAction }: SalesTableProps) {
     'createdAt',
     'updatedAt'
   ];
-  const { params } = useDukaanListParams(sortableColumnIds, 'saleDate', ['status']);
+  const { params, sortBy, sortOrder, getPageCount } = useDukaanListParams<
+    SalesListFilters['sortBy']
+  >(sortableColumnIds, 'saleDate', ['status'], 'createdAt');
 
   const [saleNoParam] = useQueryState('saleNo', parseAsString);
   const [searchParam] = useQueryState('search', parseAsString);
   const [statusParam] = useQueryState('status', parseAsString);
 
   const search = searchParam || saleNoParam || undefined;
-
-  let statusFilter: 'ACTIVE' | 'CANCELLED' | undefined;
-  if (statusParam) {
-    const statuses = Array.isArray(statusParam)
-      ? (statusParam as string[])
-      : typeof statusParam === 'string'
-        ? statusParam.split(',')
-        : [];
-    if (statuses.includes('ACTIVE') && !statuses.includes('CANCELLED')) {
-      statusFilter = 'ACTIVE';
-    } else if (statuses.includes('CANCELLED') && !statuses.includes('ACTIVE')) {
-      statusFilter = 'CANCELLED';
-    }
-  }
-
-  const sortItem = params.sort[0];
-  let sortBy: SalesListFilters['sortBy'] = 'createdAt';
-  let sortOrder: 'asc' | 'desc' = 'desc';
-
-  if (sortItem && sortableColumnIds.includes(sortItem.id)) {
-    sortBy = sortItem.id as SalesListFilters['sortBy'];
-    sortOrder = sortItem.desc ? 'desc' : 'asc';
-  }
+  const statusFilter = parseActiveCancelledStatus(statusParam);
 
   const { data, isLoading, isFetching } = useQuery(
     salesQueryOptions({
@@ -200,7 +185,7 @@ export function SalesTable({ toolbarAction }: SalesTableProps) {
 
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
-  const pageCount = Math.max(1, Math.ceil(total / params.perPage));
+  const pageCount = getPageCount(total);
 
   const columns: ColumnDef<SaleDTO>[] = [
     {
@@ -264,11 +249,9 @@ export function SalesTable({ toolbarAction }: SalesTableProps) {
       id: 'saleDate',
       accessorKey: 'saleDate',
       header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
-      cell: ({ row }) => {
-        const dateVal = row.original.saleDate;
-        const formatted = dateVal ? dateVal.split('T')[0] : '—';
-        return <span className='font-normal text-foreground'>{formatted}</span>;
-      },
+      cell: ({ row }) => (
+        <span className='font-normal text-foreground'>{formatIsoDate(row.original.saleDate)}</span>
+      ),
       meta: {
         label: 'table.col.date',
         variant: 'date',

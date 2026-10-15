@@ -14,10 +14,12 @@
  *  10. list-tables      — data tables use responsive mobile engine
  *  11. unused           — dead exports & unused imports across src/
  *  12. orphans          — dead/unreferenced components & hooks
- *  13. duplicates       — copy-paste detection & clone clusters (.jscpd.json)
- *  14. knip             — dead code and unused dependency detection (knip.json)
+ *  13. duplicates       — copy-paste detection via jscpd (.jscpd.json)
+ *  14. duplicate-audit  — full clone cluster breakdown (check-duplicates.cjs)
+ *  15. knip             — dead code and unused dependency detection (knip.json)
  *
  * Usage:
+
 
  *   npm run check
  *   npm run check -- --only types,arch-rules
@@ -58,9 +60,11 @@ const CHECKS = [
   { id: 'list-tables',        cmd: ['node', 'scripts/check-list-tables.mjs'] },
   { id: 'unused',             cmd: ['node', 'scripts/code/check-unused.cjs'] },
   { id: 'orphans',            cmd: ['node', 'scripts/code/check-orphans.cjs'] },
-  { id: 'duplicates',         cmd: ['node', 'scripts/code/check-duplicates.cjs'] },
+  { id: 'duplicates',         cmd: ['npx', '--yes', 'jscpd', '--config', '.jscpd.json'] },
+  { id: 'duplicate-audit',    cmd: ['node', 'scripts/code/check-duplicates.cjs'] },
   { id: 'knip',               cmd: ['npx', '--yes', 'knip', '--include', 'files,dependencies,unlisted,unresolved,exports,nsExports,types,nsTypes,enumMembers,duplicates,cycles', '--reporter', 'compact'] },
 ];
+
 
 
 

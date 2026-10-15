@@ -1,12 +1,9 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useQueryState, parseAsString } from 'nuqs';
-import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
-import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
   type DetailConfig,
@@ -17,7 +14,6 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { t } from '@/i18n';
-import { AlertModal } from '@/components/modal/alert-modal';
 import {
   DUKAAN_DEFAULT_PAGE_SIZE,
   parseBooleanFacet,
@@ -39,80 +35,28 @@ import {
   buildPartyDetail,
   getActiveStatusQuickFilters
 } from '@/components/common/party-table-helpers';
+import { PartyCellAction } from '@/components/common/party-cell-action';
 
 function SupplierCellAction({ data }: SupplierCellActionProps) {
   const t = useT();
-  const qc = useQueryClient();
-  const [editOpen, setEditOpen] = useState(false);
-  const [deactivateOpen, setDeactivateOpen] = useState(false);
-
-  const deactivate = useMutation({
-    mutationFn: () => deactivateSupplier(data.id),
-    onSuccess: () => {
-      toast.success(t('dukaan.party.supplierDeactivated'));
-      setDeactivateOpen(false);
-      void qc.invalidateQueries({ queryKey: supplierKeys.all });
-    },
-    onError: (error: Error) => toast.error(error.message)
-  });
-
-  const activate = useMutation({
-    mutationFn: () => reactivateSupplier(data.id),
-    onSuccess: () => {
-      toast.success(t('dukaan.party.supplierActivated'));
-      void qc.invalidateQueries({ queryKey: supplierKeys.all });
-    },
-    onError: (error: Error) => toast.error(error.message)
-  });
 
   return (
-    <div
-      onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => e.stopPropagation()}
-      role='presentation'
-      data-slot='action-cell'
-    >
-      <AlertModal
-        isOpen={deactivateOpen}
-        onClose={() => setDeactivateOpen(false)}
-        onConfirm={() => deactivate.mutate()}
-        loading={deactivate.isPending}
-        title={t('dukaan.party.supplierDeactivateTitle')}
-        description={t('dukaan.party.supplierDeactivateDescription')}
-        confirmLabel={t('common.deactivate')}
-      />
-      <SupplierDialog open={editOpen} onOpenChange={setEditOpen} supplier={data} />
-      <RowActionsMenu
-        actions={[
-          {
-            label: t('common.edit'),
-            icon: Icons.edit,
-            onClick: () => setEditOpen(true)
-          },
-          ...(!data.isSystem && data.isActive
-            ? [
-                {
-                  label: t('common.deactivate'),
-                  icon: Icons.trash,
-                  className: 'text-amber-600 focus:text-amber-700 dark:text-amber-400',
-                  onClick: () => setDeactivateOpen(true)
-                }
-              ]
-            : []),
-          ...(!data.isSystem && !data.isActive
-            ? [
-                {
-                  label: t('common.activate'),
-                  icon: Icons.check,
-                  className: 'text-emerald-600 focus:text-emerald-700 dark:text-emerald-400',
-                  disabled: activate.isPending,
-                  onClick: () => activate.mutate()
-                }
-              ]
-            : [])
-        ]}
-      />
-    </div>
+    <PartyCellAction
+      id={data.id}
+      isActive={data.isActive}
+      isSystem={data.isSystem}
+      deactivateTitle={t('dukaan.party.supplierDeactivateTitle')}
+      deactivateDescription={t('dukaan.party.supplierDeactivateDescription')}
+      deactivateConfirmLabel={t('common.deactivate')}
+      deactivateSuccess={t('dukaan.party.supplierDeactivated')}
+      activateSuccess={t('dukaan.party.supplierActivated')}
+      onDeactivate={deactivateSupplier}
+      onActivate={reactivateSupplier}
+      invalidateQueryKey={supplierKeys.all}
+      renderEditDialog={(open, onOpenChange) => (
+        <SupplierDialog open={open} onOpenChange={onOpenChange} supplier={data} />
+      )}
+    />
   );
 }
 

@@ -13,7 +13,13 @@ import { formatPkr } from '@/lib/dukaan/numbers';
 import { formatDate } from '@/lib/format';
 import { t } from '@/i18n';
 import type { BasePartyRecord, PartyDetailLabels } from '@/types/party';
-import type { HasStatusRecord, HasAmountRecord, HasIsActiveRecord } from '@/types/common';
+import type {
+  HasStatusRecord,
+  HasAmountRecord,
+  HasIsActiveRecord,
+  Icon,
+  NamedActiveItem
+} from '@/types/common';
 
 export function createPartyPhoneColumn<T extends BasePartyRecord>(): ColumnDef<T> {
   return {
@@ -243,5 +249,47 @@ export function createAmountColumn<T extends HasAmountRecord>(amountTitle: strin
     },
     enableColumnFilter: false,
     enableSorting: true
+  };
+}
+
+export function buildSimpleEntityMobileItem<T extends NamedActiveItem>(
+  leadingIcon: Icon
+): MobileItemConfig<T> {
+  return {
+    leading: 'icon',
+    leadingIcon,
+    title: (row) => row.name,
+    subtitle: (row) => (row.isActive ? t('status.active') : t('status.inactive')),
+    ariaLabel: (row) => `${row.name}, ${row.isActive ? t('status.active') : t('status.inactive')}`
+  };
+}
+
+export function buildSimpleEntityDetail<T extends NamedActiveItem>(
+  sectionTitle: string
+): DetailConfig<T> {
+  return {
+    mode: 'sheet',
+    title: (row) => row.name,
+    badge: (row) => ({
+      label: row.isActive ? t('status.active') : t('status.inactive'),
+      status: row.isActive ? 'ACTIVE' : 'INACTIVE'
+    }),
+    sections: (row) => [
+      {
+        title: sectionTitle,
+        fields: [
+          { label: t('table.col.name'), value: row.name },
+          {
+            label: t('table.col.status'),
+            value: (
+              <StatusBadge
+                status={row.isActive ? 'ACTIVE' : 'INACTIVE'}
+                label={row.isActive ? t('status.active') : t('status.inactive')}
+              />
+            )
+          }
+        ]
+      }
+    ]
   };
 }

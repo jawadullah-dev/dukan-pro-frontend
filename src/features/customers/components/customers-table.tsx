@@ -1,11 +1,8 @@
 'use client';
 
 import type { ColumnDef } from '@tanstack/react-table';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useQueryState, parseAsString } from 'nuqs';
-import { toast } from 'sonner';
-import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
   type DetailConfig,
@@ -16,7 +13,6 @@ import { useDataTable } from '@/hooks/use-data-table';
 import { Icons } from '@/components/icons';
 import { useT } from '@/i18n/use-t';
 import { t } from '@/i18n';
-import { AlertModal } from '@/components/modal/alert-modal';
 import {
   DUKAAN_DEFAULT_PAGE_SIZE,
   parseBooleanFacet,
@@ -39,81 +35,28 @@ import {
   getActiveStatusQuickFilters
 } from '@/components/common/party-table-helpers';
 
+import { PartyCellAction } from '@/components/common/party-cell-action';
+
 function CustomerCellAction({ data }: CustomerCellActionProps) {
   const t = useT();
-  const qc = useQueryClient();
-  const [editOpen, setEditOpen] = useState(false);
-  const [archiveOpen, setArchiveOpen] = useState(false);
-
-  const archive = useMutation({
-    mutationFn: () => deactivateCustomer(data.id),
-    onSuccess: () => {
-      toast.success(t('dukaan.party.customerArchived'));
-      setArchiveOpen(false);
-      void qc.invalidateQueries({ queryKey: customerKeys.all });
-    },
-    onError: (e: Error) => toast.error(e.message)
-  });
-
-  const activate = useMutation({
-    mutationFn: () => reactivateCustomer(data.id),
-    onSuccess: () => {
-      toast.success(t('dukaan.party.customerActivated'));
-      void qc.invalidateQueries({ queryKey: customerKeys.all });
-    },
-    onError: (e: Error) => toast.error(e.message)
-  });
 
   return (
-    <div
-      onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => e.stopPropagation()}
-      role='presentation'
-      data-slot='action-cell'
-    >
-      <AlertModal
-        isOpen={archiveOpen}
-        onClose={() => setArchiveOpen(false)}
-        onConfirm={() => archive.mutate()}
-        loading={archive.isPending}
-        title={t('dukaan.party.customerArchiveTitle')}
-        description={t('dukaan.party.customerArchiveDescription')}
-        confirmLabel={t('common.archive')}
-      />
-      <CustomerDialog open={editOpen} onOpenChange={setEditOpen} customer={data} />
-      <RowActionsMenu
-        actions={[
-          {
-            label: t('table.openLedger'),
-            icon: Icons.page,
-            href: `/dashboard/customers/${data.id}`
-          },
-          {
-            label: t('common.edit'),
-            icon: Icons.edit,
-            onClick: () => setEditOpen(true)
-          },
-          ...(data.isActive
-            ? [
-                {
-                  label: t('common.archive'),
-                  icon: Icons.archive,
-                  className: 'text-amber-600 focus:text-amber-700 dark:text-amber-400',
-                  onClick: () => setArchiveOpen(true)
-                }
-              ]
-            : [
-                {
-                  label: t('common.activate'),
-                  icon: Icons.check,
-                  className: 'text-emerald-600 focus:text-emerald-700 dark:text-emerald-400',
-                  disabled: activate.isPending,
-                  onClick: () => activate.mutate()
-                }
-              ])
-        ]}
-      />
-    </div>
+    <PartyCellAction
+      id={data.id}
+      isActive={data.isActive}
+      ledgerHref={`/dashboard/customers/${data.id}`}
+      deactivateTitle={t('dukaan.party.customerArchiveTitle')}
+      deactivateDescription={t('dukaan.party.customerArchiveDescription')}
+      deactivateConfirmLabel={t('common.archive')}
+      deactivateSuccess={t('dukaan.party.customerArchived')}
+      activateSuccess={t('dukaan.party.customerActivated')}
+      onDeactivate={deactivateCustomer}
+      onActivate={reactivateCustomer}
+      invalidateQueryKey={customerKeys.all}
+      renderEditDialog={(open, onOpenChange) => (
+        <CustomerDialog open={open} onOpenChange={onOpenChange} customer={data} />
+      )}
+    />
   );
 }
 

@@ -40,19 +40,6 @@ export interface CustomerDialogProps {
   customer?: CustomerDTO | null;
 }
 
-export interface CustomerDialogBodyProps {
-  customer?: CustomerDTO | null;
-  onOpenChange: (open: boolean) => void;
-}
-
-export interface CustomerFormState {
-  name: string;
-  phone: string;
-  address: string;
-  notes: string;
-  opening_balance: number;
-}
-
 export interface CustomerCellActionProps {
   data: CustomerDTO;
 }

@@ -17,19 +17,6 @@ export interface SupplierDialogProps {
   supplier?: SupplierDTO | null;
 }
 
-export interface SupplierDialogBodyProps {
-  supplier?: SupplierDTO | null;
-  onOpenChange: (open: boolean) => void;
-}
-
-export interface SupplierFormState {
-  name: string;
-  phone?: string;
-  address?: string;
-  notes?: string;
-  opening_balance: number;
-}
-
 export interface SuppliersHeaderActionProps {
   onAdd?: () => void;
 }

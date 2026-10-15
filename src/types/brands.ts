@@ -13,11 +13,6 @@ export interface BrandDialogProps {
   brand?: BrandDTO | null;
 }
 
-export interface BrandDialogBodyProps {
-  brand?: BrandDTO | null;
-  onOpenChange: (open: boolean) => void;
-}
-
 export interface BrandsHeaderActionProps {
   onAdd?: () => void;
 }

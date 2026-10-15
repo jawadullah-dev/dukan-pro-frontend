@@ -13,11 +13,6 @@ export interface CategoryDialogProps {
   category?: CategoryDTO | null;
 }
 
-export interface CategoryDialogBodyProps {
-  category?: CategoryDTO | null;
-  onOpenChange: (open: boolean) => void;
-}
-
 export interface CategoriesHeaderActionProps {
   onAdd?: () => void;
 }

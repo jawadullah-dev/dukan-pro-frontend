@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { AuthAccountRole } from '@/lib/auth/accounts';
 
 export interface LoginValues {
@@ -5,9 +6,12 @@ export interface LoginValues {
   password: string;
 }
 
-export interface PlatformAdminLoginValues {
-  phone: string;
-  password: string;
+export interface BaseLoginFormProps {
+  title: string;
+  description: string;
+  minPasswordLength?: number;
+  onSubmit: (values: LoginValues) => Promise<string | null>;
+  footer?: ReactNode;
 }
 
 export interface LoginResult {

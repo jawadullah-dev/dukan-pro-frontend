@@ -211,3 +211,59 @@ export interface HasAmountRecord {
 export interface HasIsActiveRecord {
   isActive: boolean;
 }
+
+export interface NamedActiveItem {
+  name: string;
+  isActive: boolean;
+}
+
+export interface NamedEntityItem {
+  id: string;
+  name: string;
+}
+
+export interface SimpleEntityDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  entity?: NamedEntityItem | null;
+  titleAdd: string;
+  titleEdit: string;
+  descriptionAdd: string;
+  descriptionEdit: string;
+  nameLabel: string;
+  namePlaceholder: string;
+  successCreated: string;
+  successUpdated: string;
+  onSave: (id: string | undefined, name: string) => Promise<unknown>;
+  invalidateQueryKey: readonly unknown[];
+  schema?: unknown;
+}
+
+export interface SimpleEntityDialogBodyProps extends SimpleEntityDialogProps {}
+
+export interface SimpleEntityCellActionProps {
+  id: string;
+  deleteTitle: string;
+  deleteDescription: string;
+  deleteSuccess: string;
+  onDelete: (id: string) => Promise<unknown>;
+  invalidateQueryKey: readonly unknown[];
+  renderDialog: (open: boolean, onOpenChange: (open: boolean) => void) => ReactNode;
+}
+
+export interface NotFoundViewProps {
+  onBack: () => void;
+  onHome: () => void;
+}
+
+export interface DateFieldShellProps {
+  name: string;
+  label: string;
+  description?: string;
+  required?: boolean;
+  isInvalid: boolean;
+  errors?: unknown[];
+  hasValue: boolean;
+  displayText: ReactNode;
+  children: ReactNode;
+}

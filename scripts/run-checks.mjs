@@ -53,6 +53,7 @@ const CHECKS = [
   { id: 'mutation-hooks',     cmd: ['node', 'scripts/code/check-mutation-hooks.cjs'] },
   { id: 'clean-handlers',     cmd: ['node', 'scripts/code/check-clean-handlers.cjs'] },
   { id: 'list-tables',        cmd: ['node', 'scripts/check-list-tables.mjs'] },
+  { id: 'unused',             cmd: ['node', 'scripts/code/check-unused.cjs'] },
   { id: 'duplicates',         cmd: ['npx', '--yes', 'jscpd', '--config', '.jscpd.json'] },
   { id: 'knip',               cmd: ['npx', '--yes', 'knip', '--include', 'files,dependencies,unlisted,unresolved,exports,nsExports,types,nsTypes,enumMembers,duplicates,cycles', '--reporter', 'compact'] },
 ];

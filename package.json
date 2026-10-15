@@ -10,6 +10,8 @@
     "test": "node --experimental-strip-types --test src/components/data-table/resolve-mobile-item.test.ts",
     "check": "node scripts/run-checks.mjs",
     "knip": "knip --reporter compact",
+    "check:unused": "node scripts/code/check-unused.cjs",
+    "fix:unused": "node scripts/code/check-unused.cjs --fix",
     "duplicates": "jscpd --config .jscpd.json",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix && npm run format",

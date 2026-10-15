@@ -8,6 +8,7 @@ import useThemeSwitching from './use-theme-switching';
 import { useFilteredNavGroups } from '@/hooks/use-nav';
 import { useRouter } from '@/i18n/navigation';
 import { useTranslations } from 'next-intl';
+import { useT, translateMaybe } from '@/i18n/use-t';
 import type { KBarProps, KBarComponentProps } from '@/types';
 export type { KBarProps };
 
@@ -15,6 +16,7 @@ export default function KBar({ children }: KBarProps) {
   const router = useRouter();
   const filteredGroups = useFilteredNavGroups(navGroups);
   const t = useTranslations('kbar');
+  const rootT = useT();
 
   const actions = useMemo(() => {
     const navigateTo = (url: string) => {
@@ -24,33 +26,37 @@ export default function KBar({ children }: KBarProps) {
     const allItems = filteredGroups.flatMap((group) => group.items);
 
     return allItems.flatMap((navItem) => {
+      const translatedTitle = translateMaybe(navItem.title, rootT) || navItem.title;
       const baseAction =
         navItem.url !== '#'
           ? {
               id: `${navItem.url}Action`,
-              name: navItem.title,
+              name: translatedTitle,
               shortcut: navItem.shortcut,
-              keywords: navItem.title.toLowerCase(),
+              keywords: `${translatedTitle} ${navItem.title}`.toLowerCase(),
               section: t('section'),
-              subtitle: t('goToItem', { item: navItem.title }),
+              subtitle: t('goToItem', { item: translatedTitle }),
               perform: () => navigateTo(navItem.url)
             }
           : null;
 
       const childActions =
-        navItem.items?.map((childItem) => ({
-          id: `${childItem.url}Action`,
-          name: childItem.title,
-          shortcut: childItem.shortcut,
-          keywords: childItem.title.toLowerCase(),
-          section: navItem.title,
-          subtitle: t('goToItem', { item: childItem.title }),
-          perform: () => navigateTo(childItem.url)
-        })) ?? [];
+        navItem.items?.map((childItem) => {
+          const translatedChildTitle = translateMaybe(childItem.title, rootT) || childItem.title;
+          return {
+            id: `${childItem.url}Action`,
+            name: translatedChildTitle,
+            shortcut: childItem.shortcut,
+            keywords: `${translatedChildTitle} ${childItem.title}`.toLowerCase(),
+            section: translatedTitle,
+            subtitle: t('goToItem', { item: translatedChildTitle }),
+            perform: () => navigateTo(childItem.url)
+          };
+        }) ?? [];
 
       return baseAction ? [baseAction, ...childActions] : childActions;
     });
-  }, [router, filteredGroups, t]);
+  }, [router, filteredGroups, t, rootT]);
 
   return (
     <KBarProvider actions={actions}>

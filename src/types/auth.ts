@@ -14,6 +14,25 @@ export interface BaseLoginFormProps {
   footer?: ReactNode;
 }
 
+export interface RegisterValues {
+  fullName: string;
+  phone: string;
+  password: string;
+  shopName: string;
+  city: string;
+  address?: string;
+}
+
+export interface RegisterFormValues extends RegisterValues {
+  confirmPassword: string;
+}
+
+export interface RegisterFormProps {
+  title: string;
+  description: string;
+  footer?: ReactNode;
+}
+
 export interface LoginResult {
   id: string;
   name: string;

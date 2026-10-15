@@ -32,7 +32,8 @@ function handleAuthRedirects(req: NextRequest, session: AuthRedirectSession | nu
 
   const isOwnerLoginPage = pathname.endsWith('/login') && !pathname.includes('/platform-admin');
   const isPlatformAdminLoginPage = /\/platform-admin\/login(\/|$)/.test(pathname);
-  const isAnyLoginPage = isOwnerLoginPage || isPlatformAdminLoginPage;
+  const isRegisterPage = pathname.endsWith('/register');
+  const isAnyLoginPage = isOwnerLoginPage || isPlatformAdminLoginPage || isRegisterPage;
 
   const startsWithDashboard = /^\/(en|ur|ps)\/dashboard(\/|$)/.test(pathname);
   const isAuthApi = pathname.startsWith('/api/auth');

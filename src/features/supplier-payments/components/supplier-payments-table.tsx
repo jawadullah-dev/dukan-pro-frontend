@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
-  StatusBadge,
   type DetailConfig,
   type MobileItemConfig
 } from '@/components/data-table';
+
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
 import {
@@ -21,6 +21,10 @@ import {
 } from '@/components/data-table/list-params';
 import { formatIsoDate } from '@/lib/dates';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import {
+  createActiveCancelledStatusColumn,
+  createAmountColumn
+} from '@/components/common/party-table-helpers';
 import type {
   SupplierPaymentDTO,
   SupplierPaymentQueryFilter,
@@ -175,24 +179,7 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
       enableColumnFilter: false,
       enableSorting: true
     },
-    {
-      id: 'amount',
-      accessorKey: 'amount',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('table.col.amount')} />
-      ),
-      cell: ({ row }) => (
-        <span className='font-normal text-foreground'>{formatPkr(row.original.amount)}</span>
-      ),
-      meta: {
-        label: 'table.col.amount',
-        variant: 'number',
-        priority: 1,
-        mobile: 'value'
-      },
-      enableColumnFilter: false,
-      enableSorting: true
-    },
+    createAmountColumn<SupplierPaymentDTO>(t('table.col.amount')),
     {
       id: 'target',
       header: ({ column }) => (
@@ -234,31 +221,7 @@ export function SupplierPaymentsTable({ toolbarAction }: SupplierPaymentsTablePr
       enableColumnFilter: false,
       enableSorting: false
     },
-    {
-      id: 'status',
-      accessorKey: 'status',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('table.col.status')} />
-      ),
-      cell: ({ row }) => {
-        const isCancelled = row.original.status === 'CANCELLED';
-        return (
-          <StatusBadge status={row.original.status} label={isCancelled ? 'Cancelled' : 'Active'} />
-        );
-      },
-      meta: {
-        label: 'table.col.status',
-        variant: 'select',
-        options: [
-          { label: 'Active', value: 'ACTIVE' },
-          { label: 'Cancelled', value: 'CANCELLED' }
-        ],
-        priority: 3,
-        mobile: 'badge'
-      },
-      enableColumnFilter: true,
-      enableSorting: true
-    },
+    createActiveCancelledStatusColumn<SupplierPaymentDTO>(t('table.col.status')),
     {
       id: 'actions',
       size: 72,

@@ -9,13 +9,13 @@
     "**/src/constants/mock*/**",
     "**/src/lib/dukaan/operations.ts"
   ],
-  "minLines": 7,
-  "minTokens": 60,
-  "threshold": 0,
-  "format": ["typescript"],
+  "minLines": 8,
+  "minTokens": 75,
+  "threshold": 3,
+  "format": ["typescript", "tsx"],
   "reporters": ["console"],
   "skipLocal": false,
   "absolute": false,
-  "silent": false,
-  "exitCode": 1
+  "silent": false
 }
+

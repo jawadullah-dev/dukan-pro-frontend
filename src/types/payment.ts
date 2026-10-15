@@ -1,5 +1,10 @@
 import type { ReactNode } from 'react';
 import type { PaymentDTO, CustomerDTO, CancelPaymentInput } from '@/lib/api/types';
+import type { EntityComboboxItem } from './common';
+
+export interface CustomerComboboxItem extends EntityComboboxItem {
+  raw: CustomerDTO;
+}
 
 export type PaymentMethodOption =
   | 'CASH'

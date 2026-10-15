@@ -99,6 +99,28 @@ export interface OwnerInvestmentDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+export interface BaseCashInflowInput {
+  amount: number;
+  date?: string;
+  notes?: string;
+}
+
+export type CashInflowMutateFn = (input: BaseCashInflowInput) => Promise<CashStatusResult>;
+
+export interface BaseCashInflowDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  amountLabel: string;
+  dateLabel: string;
+  notesPlaceholder: string;
+  successMessage: string;
+  failedMessage: string;
+  idPrefix: string;
+  mutateFn: CashInflowMutateFn;
+}
+
 export interface OwnerWithdrawalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

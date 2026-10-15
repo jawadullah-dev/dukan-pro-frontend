@@ -1,43 +1,17 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { StatsErrorAlert } from '@/features/overview/components/stats-error';
-import { useRouter } from '@/i18n/navigation';
-import { useEffect, useTransition } from 'react';
-import * as Sentry from '@sentry/nextjs';
+import { StatsErrorFallback } from '@/features/overview/components/stats-error';
 import { useT } from '@/i18n/use-t';
 import type { BarStatsErrorProps } from '@/types';
 export type { BarStatsErrorProps };
 
 export default function BarStatsError({ error, reset }: BarStatsErrorProps) {
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
   const t = useT();
-
-  useEffect(() => {
-    Sentry.captureException(error);
-  }, [error]);
-
-  const retry = () => {
-    startTransition(() => {
-      router.refresh();
-      reset();
-    });
-  };
-
   return (
-    <StatsErrorAlert
+    <StatsErrorFallback
+      error={error}
+      reset={reset}
       message={t('overview.failedToLoadBar', { message: error.message })}
-      action={
-        <>
-          <Button type='button' variant='outline' size='sm' onClick={retry} isLoading={isPending}>
-            {t('overview.tryAgain')}
-          </Button>
-          <span role='status' aria-live='polite' className='sr-only'>
-            {isPending ? t('overview.retrying') : ''}
-          </span>
-        </>
-      }
     />
   );
 }

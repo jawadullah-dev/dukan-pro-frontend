@@ -12,6 +12,8 @@
     "knip": "knip --reporter compact",
     "check:unused": "node scripts/code/check-unused.cjs",
     "fix:unused": "node scripts/code/check-unused.cjs --fix",
+    "check:orphans": "node scripts/code/check-orphans.cjs",
+    "check:duplicates": "node scripts/code/check-duplicates.cjs",
     "duplicates": "jscpd --config .jscpd.json",
     "lint": "oxlint",
     "lint:fix": "oxlint --fix && npm run format",

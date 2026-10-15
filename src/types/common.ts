@@ -137,3 +137,77 @@ export interface PresetReasonPillsProps {
   onSelect: (reason: string) => void;
   className?: string;
 }
+
+export interface CancelImpactItem {
+  label: string;
+  value: ReactNode;
+  divider?: boolean;
+  highlight?: boolean;
+  success?: boolean;
+  destructive?: boolean;
+}
+
+export interface BaseCancelDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  isBlocked?: boolean;
+  blockedTitle?: string;
+  blockedReason?: string;
+  closeLabel?: string;
+  isLoadingImpact?: boolean;
+  loadingImpactText?: string;
+  impactItems?: CancelImpactItem[];
+  overdraftAlert?: ReactNode;
+  presetReasons?: readonly string[] | string[];
+  reason: string;
+  onReasonChange: (reason: string) => void;
+  reasonLabel?: string;
+  reasonPlaceholder?: string;
+  reasonId?: string;
+  reasonCharactersCountText?: string;
+  quickSelectReasonText?: string;
+  onSubmit: (e: React.FormEvent) => void;
+  isSubmitting: boolean;
+  cancelButtonText?: string;
+  submitButtonText?: string;
+}
+
+export interface EntityComboboxItem {
+  id: string;
+  label: string;
+  subLabel?: string;
+}
+
+export interface EntityComboboxProps<T extends EntityComboboxItem = EntityComboboxItem> {
+  value?: string;
+  items: T[];
+  selectedItem?: T | null;
+  onSelect: (item: T | null) => void;
+  placeholder?: string;
+  searchPlaceholder?: string;
+  search: string;
+  onSearchChange: (search: string) => void;
+  isLoading?: boolean;
+  loadingText?: string;
+  emptyText?: string;
+  clearSelectionTitle?: string;
+  disabled?: boolean;
+  className?: string;
+  renderTriggerLeading?: ReactNode;
+  onAddNewClick?: () => void;
+  addNewLabel?: string;
+}
+
+export interface HasStatusRecord {
+  status: string;
+}
+
+export interface HasAmountRecord {
+  amount: number;
+}
+
+export interface HasIsActiveRecord {
+  isActive: boolean;
+}

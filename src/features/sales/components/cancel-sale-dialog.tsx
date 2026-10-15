@@ -3,23 +3,12 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Icons } from '@/components/icons';
-import { useT } from '@/i18n/use-t';
-import { formatPkr } from '@/lib/dukaan/numbers';
+import { BaseCancelDialog } from '@/components/common/base-cancel-dialog';
 import { OverdraftAlert } from '@/components/common/overdraft-alert';
+import { formatPkr } from '@/lib/dukaan/numbers';
+import { useT } from '@/i18n/use-t';
+import type { CancelImpactItem, OverdraftPrompt } from '@/types';
 import type { CancelSaleDialogProps } from '@/types/sales';
-import type { OverdraftPrompt } from '@/types';
 import { cancelImpactQueryOptions, saleKeys } from '../api/queries';
 import { cancelSaleMutation } from '../api/mutations';
 
@@ -74,145 +63,78 @@ export function CancelSaleDialog({ sale, open, onOpenChange, onSuccess }: Cancel
     });
   };
 
+  const impactItems: CancelImpactItem[] = [];
+  if (impact) {
+    impactItems.push(
+      {
+        label: t('sales.cancelDialog.cashReversal'),
+        value: `-${formatPkr(impact.cashReversedAmount ?? 0)}`,
+        destructive: true
+      },
+      {
+        label: t('sales.cancelDialog.cashAfter'),
+        value: formatPkr(impact.cashAfter ?? 0)
+      }
+    );
+
+    if (impact.customerUdharAfter !== null && impact.customerUdharAfter !== undefined) {
+      impactItems.push({
+        label: t('sales.cancelDialog.customerUdharAfter'),
+        value: formatPkr(impact.customerUdharAfter)
+      });
+    }
+  }
+
+  const overdraftSection = (
+    <>
+      {impact?.willCauseOverdraft && (
+        <OverdraftAlert
+          checked={confirmOverdraft}
+          onCheckedChange={setConfirmOverdraft}
+          title={t('sales.cancelDialog.overdraftWarning')}
+          description={t('sales.cancelDialog.overdraftDescription', {
+            amount: formatPkr(impact.cashAfter ?? 0)
+          })}
+          confirmLabel={t('sales.cancelDialog.confirmOverdraft')}
+          id='sale-confirm-overdraft'
+        />
+      )}
+      {overdraftPrompt && !impact?.willCauseOverdraft && (
+        <OverdraftAlert
+          checked={confirmOverdraft}
+          onCheckedChange={setConfirmOverdraft}
+          title={t('sales.cancelDialog.overdraftWarning')}
+          description={overdraftPrompt.message}
+          confirmLabel={t('sales.cancelDialog.confirmOverdraft')}
+          id='sale-confirm-overdraft-prompt'
+        />
+      )}
+    </>
+  );
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
-        <DialogHeader>
-          <DialogTitle>
-            {t('sales.cancelDialog.title')} {sale.saleNo}
-          </DialogTitle>
-          <DialogDescription>{t('sales.cancelDialog.description')}</DialogDescription>
-        </DialogHeader>
-
-        {impactLoading ? (
-          <div className='flex items-center justify-center py-8 text-muted-foreground'>
-            <Icons.spinner className='me-2 h-5 w-5 animate-spin' />
-            {t('sales.cancelDialog.calculatingImpact')}
-          </div>
-        ) : impact?.blocked ? (
-          <div className='space-y-4 py-2'>
-            <div className='rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive'>
-              <p className='font-semibold'>{t('sales.cancelDialog.cannotCancel')}</p>
-              <p className='mt-1'>
-                {impact.blockedReason || t('purchases.cancelDialog.defaultBlockedReason')}
-              </p>
-            </div>
-            <DialogFooter>
-              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
-                {t('sales.cancelDialog.close')}
-              </Button>
-            </DialogFooter>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className='space-y-4 py-2'>
-            <div className='space-y-2 rounded-lg border bg-muted/40 p-3 text-sm'>
-              <p className='font-semibold text-foreground'>
-                {t('sales.cancelDialog.previewImpact')}
-              </p>
-
-              <div className='grid grid-cols-2 gap-2 text-xs'>
-                <div>
-                  <span className='text-muted-foreground'>
-                    {t('sales.cancelDialog.cashReversal')}{' '}
-                  </span>
-                  <span className='font-medium text-destructive'>
-                    -{formatPkr(impact?.cashReversedAmount ?? 0)}
-                  </span>
-                </div>
-                <div>
-                  <span className='text-muted-foreground'>
-                    {t('sales.cancelDialog.cashAfter')}{' '}
-                  </span>
-                  <span className='font-medium text-foreground'>
-                    {formatPkr(impact?.cashAfter ?? 0)}
-                  </span>
-                </div>
-                {impact?.customerUdharAfter !== null &&
-                  impact?.customerUdharAfter !== undefined && (
-                    <div className='col-span-2'>
-                      <span className='text-muted-foreground'>
-                        {t('sales.cancelDialog.customerUdharAfter')}{' '}
-                      </span>
-                      <span className='font-medium text-foreground'>
-                        {formatPkr(impact.customerUdharAfter)}
-                      </span>
-                    </div>
-                  )}
-              </div>
-
-              {impact?.stockItems && impact.stockItems.length > 0 && (
-                <div className='pt-2'>
-                  <p className='text-xs font-medium text-muted-foreground'>
-                    {t('sales.cancelDialog.stockRestorations')}
-                  </p>
-                  <ul className='mt-1 space-y-1 text-xs'>
-                    {impact.stockItems.map((item, idx) => (
-                      <li key={idx} className='flex items-center gap-1.5 text-foreground'>
-                        <span className='text-emerald-600 dark:text-emerald-400'>
-                          +{item.quantityChange}
-                        </span>
-                        <span>{item.productName}</span>
-                        {item.imei && (
-                          <span className='font-mono text-muted-foreground'>
-                            {t('sales.cancelDialog.imei', { imei: item.imei })}
-                          </span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-
-            {(impact?.willCauseOverdraft || overdraftPrompt) && (
-              <OverdraftAlert
-                variant='banner'
-                checked={confirmOverdraft}
-                onCheckedChange={setConfirmOverdraft}
-                title={t('sales.cancelDialog.overdraftWarning')}
-                description={overdraftPrompt?.message || t('dukaan.actions.cashBelowZeroWarning')}
-                confirmLabel={t('sales.cancelDialog.confirmOverdraft')}
-              />
-            )}
-
-            <div className='space-y-1.5'>
-              <Label htmlFor='cancelReason'>
-                {t('sales.cancelDialog.reasonLabel')} <span className='text-destructive'>*</span>
-              </Label>
-              <Textarea
-                id='cancelReason'
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder={t('sales.cancelDialog.reasonPlaceholder')}
-                rows={3}
-                required
-              />
-            </div>
-
-            <DialogFooter className='gap-2 sm:gap-0'>
-              <Button
-                type='button'
-                variant='outline'
-                disabled={cancel.isPending}
-                onClick={() => onOpenChange(false)}
-              >
-                {t('common.cancel')}
-              </Button>
-              <Button
-                type='submit'
-                variant='destructive'
-                disabled={
-                  cancel.isPending ||
-                  ((impact?.willCauseOverdraft || !!overdraftPrompt) && !confirmOverdraft)
-                }
-                isLoading={cancel.isPending}
-              >
-                {t('sales.cancelDialog.confirm')}
-              </Button>
-            </DialogFooter>
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
+    <BaseCancelDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={`${t('sales.cancelDialog.title')} ${sale.saleNo}`}
+      description={t('sales.cancelDialog.description')}
+      isBlocked={impact?.blocked}
+      blockedTitle={t('sales.cancelDialog.cannotCancel')}
+      blockedReason={impact?.blockedReason || t('purchases.cancelDialog.defaultBlockedReason')}
+      closeLabel={t('sales.cancelDialog.close')}
+      isLoadingImpact={impactLoading}
+      loadingImpactText={t('sales.cancelDialog.calculatingImpact')}
+      impactItems={impactItems}
+      overdraftAlert={overdraftSection}
+      reason={reason}
+      onReasonChange={setReason}
+      reasonLabel={t('sales.cancelDialog.reasonLabel')}
+      reasonPlaceholder={t('sales.cancelDialog.reasonPlaceholder')}
+      reasonId='saleCancelReason'
+      onSubmit={handleSubmit}
+      isSubmitting={cancel.isPending}
+      cancelButtonText={t('sales.cancelDialog.cancel')}
+      submitButtonText={t('sales.cancelDialog.confirm')}
+    />
   );
 }

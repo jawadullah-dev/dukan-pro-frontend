@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
-  StatusBadge,
   type DetailConfig,
   type MobileItemConfig
 } from '@/components/data-table';
+
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
 import {
@@ -21,6 +21,7 @@ import {
 } from '@/components/data-table/list-params';
 import { formatIsoDate } from '@/lib/dates';
 import { formatPkr } from '@/lib/dukaan/numbers';
+import { createActiveCancelledStatusColumn } from '@/components/common/party-table-helpers';
 import type {
   ExpenseDTO,
   ExpenseQueryFilter,
@@ -206,31 +207,7 @@ export function ExpensesTable({ toolbarAction }: ExpensesTableProps) {
       enableColumnFilter: false,
       enableSorting: true
     },
-    {
-      id: 'status',
-      accessorKey: 'status',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('table.col.status')} />
-      ),
-      cell: ({ row }) => {
-        const isCancelled = row.original.status === 'CANCELLED';
-        return (
-          <StatusBadge status={row.original.status} label={isCancelled ? 'Cancelled' : 'Active'} />
-        );
-      },
-      meta: {
-        label: 'table.col.status',
-        variant: 'select',
-        options: [
-          { label: 'Active', value: 'ACTIVE' },
-          { label: 'Cancelled', value: 'CANCELLED' }
-        ],
-        priority: 2,
-        mobile: 'badge'
-      },
-      enableColumnFilter: true,
-      enableSorting: true
-    },
+    createActiveCancelledStatusColumn<ExpenseDTO>(t('table.col.status')),
     {
       id: 'actions',
       size: 72,

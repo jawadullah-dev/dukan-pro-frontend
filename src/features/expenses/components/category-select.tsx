@@ -1,15 +1,18 @@
 'use client';
 
-import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { EntityCombobox } from '@/components/common/entity-combobox';
 import { Icons } from '@/components/icons';
-import { cn } from '@/lib/utils';
+import { useDebouncedSearch } from '@/hooks/use-debounced-search';
+import { getNextPageParam } from '@/lib/pagination';
 import { useT } from '@/i18n/use-t';
 import { listExpenseCategories } from '../api/service';
-import type { ExpenseCategoryDTO, CategorySelectComboboxProps } from '@/types/expense';
+import type {
+  ExpenseCategoryDTO,
+  CategorySelectComboboxProps,
+  CategoryComboboxItem
+} from '@/types/expense';
 
 const PAGE_SIZE = 20;
 
@@ -22,27 +25,18 @@ export function CategorySelectCombobox({
   onAddNewCategoryClick
 }: CategorySelectComboboxProps) {
   const t = useT();
-  const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('');
-  const [debouncedSearch, setDebouncedSearch] = React.useState('');
-  const [localCategory, setLocalCategory] = React.useState<ExpenseCategoryDTO | null>(
+  const [search, debouncedSearch, setSearch] = useDebouncedSearch();
+  const [localCategory, setLocalCategory] = useState<ExpenseCategoryDTO | null>(
     selectedCategory ?? null
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedCategory) {
       setLocalCategory(selectedCategory);
     }
   }, [selectedCategory]);
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search.trim());
-    }, 250);
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInfiniteQuery({
+  const { data, isLoading } = useInfiniteQuery({
     queryKey: ['expense-categories', 'infinite-select', debouncedSearch],
     queryFn: async ({ pageParam = 1 }) => {
       return listExpenseCategories({
@@ -55,184 +49,53 @@ export function CategorySelectCombobox({
       });
     },
     initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      const loaded = lastPage.page * lastPage.pageSize;
-      return loaded < lastPage.total ? lastPage.page + 1 : undefined;
-    },
-    enabled: open
+    getNextPageParam
   });
 
-  const allCategories = React.useMemo(() => {
+  const allCategories = useMemo(() => {
     return data?.pages.flatMap((p) => p.items) ?? [];
   }, [data]);
 
   const currentCategory = localCategory || allCategories.find((c) => c.id === value) || null;
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget;
-    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
-    if (nearBottom && hasNextPage && !isFetchingNextPage) {
-      void fetchNextPage();
-    }
-  };
+  const items: CategoryComboboxItem[] = allCategories.map((c) => ({
+    id: c.id,
+    label: c.name,
+    raw: c
+  }));
 
-  const handleSelect = (cat: ExpenseCategoryDTO) => {
+  const selectedItem: CategoryComboboxItem | null = currentCategory
+    ? {
+        id: currentCategory.id,
+        label: currentCategory.name,
+        raw: currentCategory
+      }
+    : null;
+
+  const handleSelect = (item: CategoryComboboxItem | null) => {
+    const cat = item?.raw ?? null;
     setLocalCategory(cat);
     onSelectCategory(cat);
-    setOpen(false);
-    setSearch('');
-  };
-
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setLocalCategory(null);
-    onSelectCategory(null);
-  };
-
-  const handleOpenChange = (nextOpen: boolean) => {
-    setOpen(nextOpen);
-    if (!nextOpen) setSearch('');
-  };
-
-  const handleAddNewCategory = () => {
-    setOpen(false);
-    onAddNewCategoryClick?.();
   };
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger
-        render={
-          <Button
-            type='button'
-            variant='outline'
-            role='combobox'
-            aria-expanded={open}
-            disabled={disabled}
-            className={cn(
-              'h-10 w-full justify-between rounded-lg border-input bg-background px-3 py-2 text-start font-normal shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground',
-              'text-sm font-normal text-foreground'
-            )}
-          />
-        }
-      >
-        <span className='flex min-w-0 flex-1 items-center gap-2'>
-          <Icons.dashboard className='size-4 shrink-0 text-muted-foreground' />
-          {currentCategory ? (
-            <span className='truncate font-medium text-foreground'>{currentCategory.name}</span>
-          ) : (
-            <span className='truncate text-sm font-normal text-muted-foreground'>
-              {placeholder}
-            </span>
-          )}
-        </span>
-        <span className='flex shrink-0 items-center gap-1.5'>
-          {currentCategory && !disabled && (
-            <span
-              role='button'
-              tabIndex={0}
-              onClick={handleClear}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setLocalCategory(null);
-                  onSelectCategory(null);
-                }
-              }}
-              className='cursor-pointer rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground'
-              title={t('expenses.clearSelection')}
-            >
-              <Icons.close className='size-3.5' />
-            </span>
-          )}
-          <Icons.chevronDown className='size-4 shrink-0 text-muted-foreground opacity-70' />
-        </span>
-      </PopoverTrigger>
-
-      <PopoverContent
-        align='start'
-        className='z-50 w-[var(--radix-popover-trigger-width)] min-w-[320px] p-0 shadow-lg'
-      >
-        <div className='p-2 pb-1.5'>
-          <div className='relative flex items-center'>
-            <Icons.search className='pointer-events-none absolute start-2.5 size-4 text-muted-foreground' />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('expenses.searchCategory')}
-              className='h-9 ps-8 pe-8 text-sm font-normal text-foreground w-full'
-              autoFocus
-            />
-            {search && (
-              <button
-                type='button'
-                onClick={() => setSearch('')}
-                className='absolute end-2.5 text-muted-foreground hover:text-foreground'
-              >
-                <Icons.close className='size-3.5' />
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div
-          onScroll={handleScroll}
-          className='max-h-56 overflow-y-auto p-1 text-sm divide-y divide-border/20'
-        >
-          {isLoading && allCategories.length === 0 ? (
-            <div className='flex items-center justify-center gap-2 py-6 text-sm font-normal text-muted-foreground'>
-              <Icons.spinner className='size-4 animate-spin text-primary' />
-              <span>{t('expenses.loadingCategories')}</span>
-            </div>
-          ) : allCategories.length === 0 ? (
-            <div className='py-6 text-center text-sm font-normal text-muted-foreground'>
-              {t('expenses.noCategoriesFound')}
-            </div>
-          ) : (
-            allCategories.map((cat) => {
-              const isSelected = (currentCategory?.id ?? value) === cat.id;
-              return (
-                <div
-                  key={cat.id}
-                  onClick={() => handleSelect(cat)}
-                  className={cn(
-                    'flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm transition-colors',
-                    isSelected
-                      ? 'bg-primary/10 font-semibold text-primary'
-                      : 'text-foreground hover:bg-accent hover:text-accent-foreground'
-                  )}
-                >
-                  <span className='truncate text-sm font-medium'>{cat.name}</span>
-                  {isSelected && <Icons.check className='size-4 shrink-0 text-primary' />}
-                </div>
-              );
-            })
-          )}
-
-          {isFetchingNextPage && (
-            <div className='flex items-center justify-center gap-2 py-2 text-xs text-muted-foreground'>
-              <Icons.spinner className='size-3 animate-spin text-primary' />
-              <span>{t('expenses.loadingMore')}</span>
-            </div>
-          )}
-        </div>
-
-        {onAddNewCategoryClick && (
-          <div className='border-t border-border/60 p-1.5 bg-muted/20'>
-            <Button
-              type='button'
-              variant='ghost'
-              size='sm'
-              onClick={handleAddNewCategory}
-              className='w-full justify-start text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 gap-1.5'
-            >
-              <Icons.add className='size-3.5' />
-              <span>{t('expenses.addNewCategory')}</span>
-            </Button>
-          </div>
-        )}
-      </PopoverContent>
-    </Popover>
+    <EntityCombobox<CategoryComboboxItem>
+      value={value}
+      items={items}
+      selectedItem={selectedItem}
+      onSelect={handleSelect}
+      placeholder={placeholder || t('common.select')}
+      searchPlaceholder={t('expenses.searchCategoryPlaceholder')}
+      search={search}
+      onSearchChange={setSearch}
+      isLoading={isLoading}
+      loadingText={t('expenses.loadingCategories')}
+      emptyText={t('expenses.noCategoriesFound')}
+      clearSelectionTitle={t('expenses.clearCategorySelection')}
+      disabled={disabled}
+      renderTriggerLeading={<Icons.dashboard className='size-4 shrink-0 text-muted-foreground' />}
+      onAddNewClick={onAddNewCategoryClick}
+      addNewLabel={t('expenses.addNewCategory')}
+    />
   );
 }

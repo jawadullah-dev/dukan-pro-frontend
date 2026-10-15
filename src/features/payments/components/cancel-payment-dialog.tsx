@@ -3,32 +3,20 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Icons } from '@/components/icons';
+import { BaseCancelDialog } from '@/components/common/base-cancel-dialog';
 import { formatPkr } from '@/lib/dukaan/numbers';
 import { OverdraftAlert } from '@/components/common/overdraft-alert';
-import { PresetReasonPills } from '@/components/common/preset-reason-pills';
 import { useT } from '@/i18n/use-t';
+import type { CancelImpactItem, OverdraftPrompt } from '@/types';
 import type { CancelPaymentDialogProps } from '@/types/payment';
-import type { OverdraftPrompt } from '@/types';
 import { paymentCancelImpactQueryOptions, paymentKeys } from '../api/queries';
 import { cancelPaymentMutation } from '../api/mutations';
 
 const PRESET_REASONS = [
-  { key: 'payments.presetDuplicate' },
-  { key: 'payments.presetWrongAmount' },
-  { key: 'payments.presetCustomerRequested' }
-] as const;
+  'Duplicate payment entry',
+  'Incorrect amount entered',
+  'Customer requested cancellation'
+];
 
 export function CancelPaymentDialog({
   payment,
@@ -91,140 +79,89 @@ export function CancelPaymentDialog({
     });
   };
 
+  const impactItems: CancelImpactItem[] = [];
+  if (impact) {
+    impactItems.push(
+      {
+        label: t('payments.currentDrawerCash'),
+        value: formatPkr(impact.currentCash)
+      },
+      {
+        label: t('payments.cashReturnedOut'),
+        value: `-${formatPkr(impact.cashReversedAmount)}`,
+        destructive: true
+      },
+      {
+        label: t('payments.drawerCashAfter'),
+        value: formatPkr(impact.cashAfter),
+        highlight: true,
+        destructive: impact.cashAfter < 0
+      }
+    );
+
+    if (impact.customerUdharAfter != null) {
+      impactItems.push({
+        label: t('payments.customerUdharAfter'),
+        value: formatPkr(impact.customerUdharAfter),
+        highlight: true
+      });
+    }
+  }
+
+  const overdraftSection = (
+    <>
+      {impact?.willCauseOverdraft && (
+        <OverdraftAlert
+          checked={confirmOverdraft}
+          onCheckedChange={setConfirmOverdraft}
+          title={t('payments.drawerOverdraftWarning')}
+          description={t('payments.drawerOverdraftDesc', { amount: formatPkr(impact.cashAfter) })}
+          confirmLabel={t('payments.confirmNegativeCash')}
+          id='confirm-overdraft'
+        />
+      )}
+      {overdraftPrompt && !impact?.willCauseOverdraft && (
+        <OverdraftAlert
+          checked={confirmOverdraft}
+          onCheckedChange={setConfirmOverdraft}
+          title={t('payments.drawerOverdraftWarning')}
+          description={overdraftPrompt.message}
+          confirmLabel={t('payments.confirmNegativeCash')}
+          id='confirm-overdraft-prompt'
+        />
+      )}
+    </>
+  );
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
-        <DialogHeader>
-          <DialogTitle>{t('payments.cancelTitle')}</DialogTitle>
-          <DialogDescription>
-            {t('payments.cancelDesc', {
-              amount: formatPkr(payment.amount),
-              customer: payment.customerName || t('payments.defaultCustomer')
-            })}
-          </DialogDescription>
-        </DialogHeader>
-
-        {impactLoading ? (
-          <div className='flex items-center justify-center py-8 text-muted-foreground'>
-            <Icons.spinner className='me-2 h-5 w-5 animate-spin' />
-            {t('payments.calculatingImpact')}
-          </div>
-        ) : payment.status === 'CANCELLED' || impact?.blocked ? (
-          <div className='space-y-4 py-2'>
-            <div className='rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive space-y-2'>
-              <div className='flex items-center font-semibold gap-2'>
-                <Icons.warning className='h-4 w-4' />
-                {t('payments.cancellationBlocked')}
-              </div>
-              <p>{impact?.blockedReason || t('payments.defaultBlockedReason')}</p>
-            </div>
-            <DialogFooter>
-              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
-                {t('common.close')}
-              </Button>
-            </DialogFooter>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className='space-y-4'>
-            {impact && (
-              <div className='rounded-lg border bg-muted/40 p-3 text-xs space-y-2'>
-                <p className='font-semibold text-foreground text-sm'>
-                  {t('payments.drawerImpactPreview')}
-                </p>
-                <div className='grid grid-cols-2 gap-2 pt-1 border-t'>
-                  <span className='text-muted-foreground'>{t('payments.currentDrawerCash')}</span>
-                  <span className='text-end font-medium'>{formatPkr(impact.currentCash)}</span>
-
-                  <span className='text-muted-foreground'>{t('payments.cashReturnedOut')}</span>
-                  <span className='text-end font-medium text-destructive'>
-                    -{formatPkr(impact.cashReversedAmount)}
-                  </span>
-
-                  <span className='text-muted-foreground'>{t('payments.drawerCashAfter')}</span>
-                  <span
-                    className={`text-end font-semibold ${
-                      impact.cashAfter < 0 ? 'text-destructive' : 'text-foreground'
-                    }`}
-                  >
-                    {formatPkr(impact.cashAfter)}
-                  </span>
-
-                  {impact.customerUdharAfter != null && (
-                    <>
-                      <span className='text-muted-foreground'>
-                        {t('payments.customerUdharAfter')}
-                      </span>
-                      <span className='text-end font-medium text-amber-600 dark:text-amber-400'>
-                        {formatPkr(impact.customerUdharAfter)}
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                {impact.willCauseOverdraft && (
-                  <div className='mt-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-2.5 text-xs text-amber-700 dark:text-amber-300 flex items-start gap-2'>
-                    <Icons.warning className='h-4 w-4 shrink-0 mt-0.5' />
-                    <div>
-                      <p className='font-semibold'>{t('payments.drawerOverdraftWarning')}</p>
-                      <p className='text-muted-foreground mt-0.5'>
-                        {t('payments.drawerOverdraftDesc', { amount: formatPkr(impact.cashAfter) })}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className='space-y-1.5'>
-              <Label htmlFor='cancel-reason' className='text-xs font-medium text-foreground'>
-                {t('payments.reasonForCancellation')} <span className='text-destructive'>*</span>
-              </Label>
-              <Textarea
-                id='cancel-reason'
-                placeholder={t('payments.cancelReasonPlaceholder')}
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                rows={3}
-                className='text-sm font-normal text-foreground'
-                required
-              />
-              <PresetReasonPills
-                reasons={PRESET_REASONS.map((preset) => t(preset.key))}
-                onSelect={setReason}
-                className='pt-1'
-              />
-            </div>
-
-            {(impact?.willCauseOverdraft || overdraftPrompt) && (
-              <OverdraftAlert
-                variant='compact'
-                checked={confirmOverdraft}
-                onCheckedChange={setConfirmOverdraft}
-                description={t('payments.confirmNegativeDrawer')}
-              />
-            )}
-
-            <DialogFooter className='gap-2 sm:gap-2.5 pt-2'>
-              <Button
-                type='button'
-                variant='outline'
-                onClick={() => onOpenChange(false)}
-                disabled={cancel.isPending}
-              >
-                {t('payments.keep')}
-              </Button>
-              <Button
-                type='submit'
-                variant='destructive'
-                disabled={cancel.isPending}
-                isLoading={cancel.isPending}
-              >
-                {t('payments.confirm')}
-              </Button>
-            </DialogFooter>
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
+    <BaseCancelDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={t('payments.cancelTitle')}
+      description={t('payments.cancelDesc', {
+        amount: formatPkr(payment.amount),
+        customer: payment.customerName || t('payments.defaultCustomer')
+      })}
+      isBlocked={payment.status === 'CANCELLED' || impact?.blocked}
+      blockedTitle={t('payments.cancellationBlocked')}
+      blockedReason={impact?.blockedReason || t('payments.defaultBlockedReason')}
+      closeLabel={t('common.close')}
+      isLoadingImpact={impactLoading}
+      loadingImpactText={t('payments.calculatingImpact')}
+      impactItems={impactItems}
+      overdraftAlert={overdraftSection}
+      presetReasons={PRESET_REASONS}
+      reason={reason}
+      onReasonChange={setReason}
+      reasonLabel={t('payments.reasonLabel')}
+      reasonPlaceholder={t('payments.reasonPlaceholder')}
+      reasonId='cancel-reason'
+      reasonCharactersCountText={t('payments.charactersCount', { count: reason.length })}
+      quickSelectReasonText={t('payments.quickSelectReason')}
+      onSubmit={handleSubmit}
+      isSubmitting={cancel.isPending}
+      cancelButtonText={t('common.close')}
+      submitButtonText={t('payments.confirmCancel')}
+    />
   );
 }

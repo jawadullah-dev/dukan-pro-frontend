@@ -3,8 +3,8 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+
 import {
   ResponsiveDataTable,
   StatusBadge,
@@ -23,6 +23,8 @@ import { categoriesQueryOptions, categoryKeys } from '../api/queries';
 import { deleteCategory } from '../api/service';
 import type { CategoryDTO } from '@/lib/api/types';
 import type { CategoryCellActionProps, CategoriesTableProps } from '@/types';
+import { createPartyIsActiveColumn } from '@/components/common/party-table-helpers';
+
 import { DUKAAN_DEFAULT_PAGE_SIZE, useDukaanListParams } from '@/components/data-table/list-params';
 import { CategoryDialog } from './category-dialog';
 
@@ -89,17 +91,7 @@ const categoryColumns: ColumnDef<CategoryDTO>[] = [
     },
     enableColumnFilter: true
   },
-  {
-    id: 'isActive',
-    accessorKey: 'isActive',
-    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.status')} />,
-    meta: { label: 'table.col.status', type: 'boolean', priority: 2 },
-    cell: ({ row }) => (
-      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-        {row.original.isActive ? t('status.active') : t('status.inactive')}
-      </Badge>
-    )
-  },
+  createPartyIsActiveColumn<CategoryDTO>(),
   {
     id: 'actions',
     size: 48,

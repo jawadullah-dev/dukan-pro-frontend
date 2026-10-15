@@ -108,6 +108,12 @@ export interface CancelExpenseDialogProps {
   onSuccess?: () => void;
 }
 
+import type { EntityComboboxItem } from './common';
+
+export interface CategoryComboboxItem extends EntityComboboxItem {
+  raw: ExpenseCategoryDTO;
+}
+
 export interface CategorySelectComboboxProps {
   value: string;
   onSelectCategory: (category: ExpenseCategoryDTO | null) => void;

@@ -18,7 +18,12 @@ export interface SupplierPaymentDTO {
 }
 
 import type { SupplierDTO } from '@/lib/api/types';
+import type { EntityComboboxItem } from './common';
 export type { SupplierDTO };
+
+export interface SupplierComboboxItem extends EntityComboboxItem {
+  raw: SupplierDTO;
+}
 
 export interface UnpaidPurchaseDTO {
   id: string;

@@ -5,14 +5,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useQueryState, parseAsString } from 'nuqs';
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
 import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
-  StatusBadge,
   type DetailConfig,
-  type MobileItemConfig,
-  type QuickFilterChip
+  type MobileItemConfig
 } from '@/components/data-table';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
@@ -26,13 +23,21 @@ import {
   useDukaanListParams
 } from '@/components/data-table/list-params';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import { formatDate } from '@/lib/format';
 import type { CustomerDTO } from '@/lib/api/types';
 import { customerKeys, customersQueryOptions } from '../api/queries';
 import { deactivateCustomer, reactivateCustomer } from '../api/service';
 import type { CustomerListFilters } from '@/types';
 import { CustomerDialog } from './customer-dialog';
 import type { CustomerCellActionProps, CustomersTableProps } from '@/types';
+import {
+  createPartyPhoneColumn,
+  createPartyCreatedAtColumn,
+  createPartyIsActiveColumn,
+  PartyActionsHeader,
+  buildPartyMobileItem,
+  buildPartyDetail,
+  getActiveStatusQuickFilters
+} from '@/components/common/party-table-helpers';
 
 function CustomerCellAction({ data }: CustomerCellActionProps) {
   const t = useT();
@@ -130,15 +135,7 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
     enableColumnFilter: true,
     enableSorting: true
   },
-  {
-    id: 'phone',
-    accessorKey: 'phone',
-    size: 160,
-    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.phone')} />,
-    meta: { label: 'table.col.phone', type: 'phone', priority: 2, mobile: 'subtitle' },
-    enableSorting: true,
-    cell: ({ row }) => row.original.phone || '—'
-  },
+  createPartyPhoneColumn<CustomerDTO>(),
   {
     id: 'openingBalance',
     accessorKey: 'openingBalance',
@@ -155,67 +152,12 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
     enableSorting: true,
     cell: ({ row }) => formatPkr(row.original.openingBalance)
   },
-  {
-    id: 'createdAt',
-    accessorKey: 'createdAt',
-    size: 140,
-    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
-    meta: {
-      label: 'table.col.date',
-      type: 'date',
-      priority: 3,
-      mobile: 'hidden'
-    },
-    enableSorting: true,
-    cell: ({ row }) =>
-      formatDate(row.original.createdAt, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      })
-  },
-  {
-    id: 'isActive',
-    accessorKey: 'isActive',
-    size: 110,
-    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.status')} />,
-    meta: {
-      label: 'table.col.status',
-      variant: 'select',
-      options: [
-        {
-          get label() {
-            return t('status.active');
-          },
-          value: 'true'
-        },
-        {
-          get label() {
-            return t('status.inactive');
-          },
-          value: 'false'
-        }
-      ],
-      type: 'boolean',
-      priority: 4,
-      mobile: 'badge'
-    },
-    enableColumnFilter: true,
-    enableSorting: true,
-    cell: ({ row }) => (
-      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-        {row.original.isActive ? t('status.active') : t('status.inactive')}
-      </Badge>
-    )
-  },
+  createPartyCreatedAtColumn<CustomerDTO>(),
+  createPartyIsActiveColumn<CustomerDTO>(),
   {
     id: 'actions',
     size: 72,
-    header: () => (
-      <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
-        {t('table.actions')}
-      </span>
-    ),
+    header: PartyActionsHeader,
     enableSorting: false,
     enableHiding: false,
     meta: { mobile: 'hidden' },
@@ -227,77 +169,15 @@ const customerColumns: ColumnDef<CustomerDTO>[] = [
   }
 ];
 
-const customerMobileItem: MobileItemConfig<CustomerDTO> = {
-  leading: 'avatar',
-  title: (row) => row.name,
-  subtitle: (row) => row.phone ?? undefined,
-  badge: (row) => ({
-    label: row.isActive ? t('status.active') : t('status.inactive'),
-    status: row.isActive ? 'ACTIVE' : 'INACTIVE'
-  }),
-  value: (row) => formatPkr(row.openingBalance),
-  valueLabel: () => t('dukaan.party.customerOpeningBalance'),
-  ariaLabel: (row) => `${row.name}, ${row.phone ?? ''}, ${row.isActive ? 'Active' : 'Inactive'}`
-};
+const customerMobileItem: MobileItemConfig<CustomerDTO> = buildPartyMobileItem<CustomerDTO>(() =>
+  t('dukaan.party.customerOpeningBalance')
+);
 
-const customerDetail: DetailConfig<CustomerDTO> = {
-  mode: 'sheet',
-  title: (row) => row.name,
-  badge: (row) => ({
-    label: row.isActive ? t('status.active') : t('status.inactive'),
-    status: row.isActive ? 'ACTIVE' : 'INACTIVE'
-  }),
-  value: (row) => formatPkr(row.openingBalance),
-  sections: (row) => [
-    {
-      title: t('dukaan.party.name'),
-      fields: [
-        { label: t('table.col.name'), value: row.name },
-        {
-          label: t('table.col.phone'),
-          value: row.phone ? (
-            <a
-              className='text-primary underline-offset-2 hover:underline'
-              href={`tel:${row.phone}`}
-            >
-              {row.phone}
-            </a>
-          ) : (
-            '—'
-          )
-        },
-        {
-          label: t('table.col.status'),
-          value: (
-            <StatusBadge
-              status={row.isActive ? 'ACTIVE' : 'INACTIVE'}
-              label={row.isActive ? t('status.active') : t('status.inactive')}
-            />
-          )
-        },
-        {
-          label: t('table.col.date'),
-          value: formatDate(row.createdAt, {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          })
-        },
-        { label: t('table.address'), value: row.address ?? '—' },
-        { label: t('table.col.note'), value: row.notes ?? '—' }
-      ]
-    },
-    {
-      title: t('table.balance'),
-      fields: [
-        {
-          label: t('dukaan.party.customerOpeningBalance'),
-          value: formatPkr(row.openingBalance)
-        }
-      ]
-    }
-  ]
-};
+const customerDetail: DetailConfig<CustomerDTO> = buildPartyDetail<CustomerDTO>({
+  partyName: t('dukaan.party.name'),
+  balance: t('table.balance'),
+  openingBalance: t('dukaan.party.customerOpeningBalance')
+});
 
 export function CustomersTable({ toolbarAction }: CustomersTableProps) {
   const t = useT();
@@ -340,21 +220,11 @@ export function CustomersTable({ toolbarAction }: CustomersTableProps) {
     }
   });
 
-  const customerQuickFilters: QuickFilterChip[] = [
-    { id: 'all', label: t('table.all') },
-    {
-      id: 'active',
-      label: t('status.active'),
-      columnId: 'isActive',
-      value: ['true']
-    },
-    {
-      id: 'inactive',
-      label: t('status.inactive'),
-      columnId: 'isActive',
-      value: ['false']
-    }
-  ];
+  const customerQuickFilters = getActiveStatusQuickFilters(
+    t('table.all'),
+    t('status.active'),
+    t('status.inactive')
+  );
 
   return (
     <ResponsiveDataTable

@@ -9,10 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
-  StatusBadge,
   type DetailConfig,
-  type MobileItemConfig,
-  type QuickFilterChip
+  type MobileItemConfig
 } from '@/components/data-table';
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
@@ -26,13 +24,21 @@ import {
   useDukaanListParams
 } from '@/components/data-table/list-params';
 import { formatPkr } from '@/lib/dukaan/numbers';
-import { formatDate } from '@/lib/format';
 import type { SupplierDTO } from '@/lib/api/types';
 import { supplierKeys, suppliersQueryOptions } from '../api/queries';
 import { deactivateSupplier, reactivateSupplier } from '../api/service';
 import type { SupplierListFilters } from '@/types';
 import { SupplierDialog } from './supplier-dialog';
 import type { SupplierCellActionProps, SuppliersTableProps } from '@/types/suppliers';
+import {
+  createPartyPhoneColumn,
+  createPartyCreatedAtColumn,
+  createPartyIsActiveColumn,
+  PartyActionsHeader,
+  buildPartyMobileItem,
+  buildPartyDetail,
+  getActiveStatusQuickFilters
+} from '@/components/common/party-table-helpers';
 
 function SupplierCellAction({ data }: SupplierCellActionProps) {
   const t = useT();
@@ -138,15 +144,7 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
       </div>
     )
   },
-  {
-    id: 'phone',
-    accessorKey: 'phone',
-    size: 160,
-    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.phone')} />,
-    meta: { label: 'table.col.phone', type: 'phone', priority: 2, mobile: 'subtitle' },
-    enableSorting: true,
-    cell: ({ row }) => row.original.phone || '—'
-  },
+  createPartyPhoneColumn<SupplierDTO>(),
   {
     id: 'openingBalance',
     accessorKey: 'openingBalance',
@@ -163,67 +161,12 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
     enableSorting: true,
     cell: ({ row }) => formatPkr(row.original.openingBalance)
   },
-  {
-    id: 'createdAt',
-    accessorKey: 'createdAt',
-    size: 140,
-    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.date')} />,
-    meta: {
-      label: 'table.col.date',
-      type: 'date',
-      priority: 3,
-      mobile: 'hidden'
-    },
-    enableSorting: true,
-    cell: ({ row }) =>
-      formatDate(row.original.createdAt, {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      })
-  },
-  {
-    id: 'isActive',
-    accessorKey: 'isActive',
-    size: 110,
-    header: ({ column }) => <DataTableColumnHeader column={column} title={t('table.col.status')} />,
-    meta: {
-      label: 'table.col.status',
-      variant: 'select',
-      options: [
-        {
-          get label() {
-            return t('status.active');
-          },
-          value: 'true'
-        },
-        {
-          get label() {
-            return t('status.inactive');
-          },
-          value: 'false'
-        }
-      ],
-      type: 'boolean',
-      priority: 4,
-      mobile: 'badge'
-    },
-    enableColumnFilter: true,
-    enableSorting: false,
-    cell: ({ row }) => (
-      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-        {row.original.isActive ? t('status.active') : t('status.inactive')}
-      </Badge>
-    )
-  },
+  createPartyCreatedAtColumn<SupplierDTO>(),
+  createPartyIsActiveColumn<SupplierDTO>(),
   {
     id: 'actions',
     size: 72,
-    header: () => (
-      <span className='h-8 inline-flex items-center text-xs font-medium text-foreground'>
-        {t('table.actions')}
-      </span>
-    ),
+    header: PartyActionsHeader,
     enableSorting: false,
     enableHiding: false,
     meta: { mobile: 'hidden' },
@@ -235,82 +178,20 @@ const supplierColumns: ColumnDef<SupplierDTO>[] = [
   }
 ];
 
-const supplierMobileItem: MobileItemConfig<SupplierDTO> = {
-  leading: 'avatar',
-  title: (row) => row.name,
-  subtitle: (row) => row.phone ?? undefined,
-  badge: (row) => ({
-    label: row.isActive ? t('status.active') : t('status.inactive'),
-    status: row.isActive ? 'ACTIVE' : 'INACTIVE'
-  }),
-  value: (row) => formatPkr(row.openingBalance),
-  valueLabel: () => t('dukaan.party.supplierOpeningBalance'),
-  ariaLabel: (row) => `${row.name}, ${row.phone ?? ''}, ${row.isActive ? 'Active' : 'Inactive'}`
-};
+const supplierMobileItem: MobileItemConfig<SupplierDTO> = buildPartyMobileItem<SupplierDTO>(() =>
+  t('dukaan.party.supplierOpeningBalance')
+);
 
-const supplierDetail: DetailConfig<SupplierDTO> = {
-  mode: 'sheet',
-  title: (row) => row.name,
-  badge: (row) => ({
-    label: row.isActive ? t('status.active') : t('status.inactive'),
-    status: row.isActive ? 'ACTIVE' : 'INACTIVE'
-  }),
-  value: (row) => formatPkr(row.openingBalance),
-  sections: (row) => [
-    {
-      title: t('table.col.supplier'),
-      fields: [
-        { label: t('table.col.name'), value: row.name },
-        {
-          label: t('table.col.phone'),
-          value: row.phone ? (
-            <a
-              className='text-primary underline-offset-2 hover:underline'
-              href={`tel:${row.phone}`}
-            >
-              {row.phone}
-            </a>
-          ) : (
-            '—'
-          )
-        },
-        {
-          label: t('table.col.status'),
-          value: (
-            <StatusBadge
-              status={row.isActive ? 'ACTIVE' : 'INACTIVE'}
-              label={row.isActive ? t('status.active') : t('status.inactive')}
-            />
-          )
-        },
-        {
-          label: t('table.col.date'),
-          value: formatDate(row.createdAt, {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          })
-        },
-        { label: t('table.address'), value: row.address ?? '—' },
-        { label: t('table.col.note'), value: row.notes ?? '—' }
-      ]
-    },
-    {
-      title: t('table.balance'),
-      fields: [
-        {
-          label: t('dukaan.party.supplierOpeningBalance'),
-          value: formatPkr(row.openingBalance)
-        }
-      ]
-    }
-  ]
-};
+const supplierDetail: DetailConfig<SupplierDTO> = buildPartyDetail<SupplierDTO>({
+  partyName: t('dukaan.party.name'),
+  balance: t('table.balance'),
+  openingBalance: t('dukaan.party.supplierOpeningBalance')
+});
 
 export function SuppliersTable({ toolbarAction }: SuppliersTableProps) {
   const t = useT();
 
-  const sortableColumnIds = ['name', 'phone', 'openingBalance', 'createdAt'];
+  const sortableColumnIds = ['name', 'phone', 'openingBalance', 'createdAt', 'isActive'];
   const { params, sortBy, sortOrder, getPageCount } = useDukaanListParams<
     SupplierListFilters['sortBy']
   >(sortableColumnIds, 'name', ['isActive'], 'createdAt');
@@ -336,7 +217,6 @@ export function SuppliersTable({ toolbarAction }: SuppliersTableProps) {
   const items = data?.items ?? [];
   const total = data?.total ?? 0;
   const pageCount = getPageCount(total);
-
   const { table } = useDataTable({
     data: items,
     columns: supplierColumns,
@@ -349,21 +229,11 @@ export function SuppliersTable({ toolbarAction }: SuppliersTableProps) {
     }
   });
 
-  const supplierQuickFilters: QuickFilterChip[] = [
-    { id: 'all', label: t('table.all') },
-    {
-      id: 'active',
-      label: t('status.active'),
-      columnId: 'isActive',
-      value: ['true']
-    },
-    {
-      id: 'inactive',
-      label: t('status.inactive'),
-      columnId: 'isActive',
-      value: ['false']
-    }
-  ];
+  const supplierQuickFilters = getActiveStatusQuickFilters(
+    t('table.all'),
+    t('status.active'),
+    t('status.inactive')
+  );
 
   return (
     <ResponsiveDataTable

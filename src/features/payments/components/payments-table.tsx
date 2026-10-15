@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 import { RowActionsMenu } from '@/components/common/row-actions-menu';
 import {
   ResponsiveDataTable,
-  StatusBadge,
   type DetailConfig,
   type MobileItemConfig
 } from '@/components/data-table';
+
 import { DataTableColumnHeader } from '@/components/ui/table/data-table-column-header';
 import { useDataTable } from '@/hooks/use-data-table';
 import {
@@ -28,6 +28,12 @@ import type { PaymentsListFilters } from '@/types';
 import { CancelPaymentDialog } from './cancel-payment-dialog';
 import { RecordPaymentDialog } from './record-payment-dialog';
 import type { RowAction } from '@/types/dukaan';
+import { formatPaymentMethod } from '@/lib/format-payment';
+import {
+  createActiveCancelledStatusColumn,
+  createAmountColumn
+} from '@/components/common/party-table-helpers';
+
 import type { PaymentRowActionsProps, PaymentsTableProps } from '@/types/payment';
 
 function PaymentRowActions({ payment, onCancel }: PaymentRowActionsProps) {
@@ -63,19 +69,7 @@ const paymentMobileItem: MobileItemConfig<PaymentDTO> = {
   meta: [(row: PaymentDTO) => formatIsoDate(row.paymentDate)]
 };
 
-export function formatPaymentMethod(method?: string | null, notes?: string | null): string {
-  const match = notes?.match(/\[Method:\s*([^\]]+)\]/i);
-  if (match && match[1]) {
-    return match[1];
-  }
-  if (!method) return 'Cash';
-  const upper = method.toUpperCase();
-  if (upper === 'CASH') return 'Cash';
-  if (upper === 'JAZZCASH') return 'JazzCash';
-  if (upper === 'EASYPAISA') return 'EasyPaisa';
-  if (upper === 'BANK' || upper === 'BANK_TRANSFER') return 'Bank Transfer';
-  return method.charAt(0).toUpperCase() + method.slice(1).toLowerCase();
-}
+export { formatPaymentMethod };
 
 const paymentDetail: DetailConfig<PaymentDTO> = {
   mode: 'sheet',
@@ -197,24 +191,7 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
       enableColumnFilter: false,
       enableSorting: true
     },
-    {
-      id: 'amount',
-      accessorKey: 'amount',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('table.col.amount')} />
-      ),
-      cell: ({ row }) => (
-        <span className='font-normal text-foreground'>{formatPkr(row.original.amount)}</span>
-      ),
-      meta: {
-        label: 'table.col.amount',
-        variant: 'number',
-        priority: 1,
-        mobile: 'value'
-      },
-      enableColumnFilter: false,
-      enableSorting: true
-    },
+    createAmountColumn<PaymentDTO>(t('table.col.amount')),
     {
       id: 'saleNo',
       accessorKey: 'saleNo',
@@ -257,31 +234,7 @@ export function PaymentsTable({ toolbarAction }: PaymentsTableProps) {
       enableColumnFilter: false,
       enableSorting: true
     },
-    {
-      id: 'status',
-      accessorKey: 'status',
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title={t('table.col.status')} />
-      ),
-      cell: ({ row }) => {
-        const isCancelled = row.original.status === 'CANCELLED';
-        return (
-          <StatusBadge status={row.original.status} label={isCancelled ? 'Cancelled' : 'Active'} />
-        );
-      },
-      meta: {
-        label: 'table.col.status',
-        variant: 'select',
-        options: [
-          { label: 'Active', value: 'ACTIVE' },
-          { label: 'Cancelled', value: 'CANCELLED' }
-        ],
-        priority: 3,
-        mobile: 'badge'
-      },
-      enableColumnFilter: true,
-      enableSorting: true
-    },
+    createActiveCancelledStatusColumn<PaymentDTO>(t('table.col.status')),
     {
       id: 'actions',
       size: 72,
